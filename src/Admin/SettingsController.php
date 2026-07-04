@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin;
 
 use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
 
@@ -57,7 +58,7 @@ class SettingsController {
 	 * @return void
 	 */
 	public function handle(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
 		}
 

@@ -13,6 +13,7 @@ use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\RunDuration;
 use WorkflowAutomate\Plugin\Admin\RunStatusBadge;
 use WorkflowAutomate\Plugin\Admin\RunTimestamp;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
@@ -87,7 +88,7 @@ class RunDetailPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function capability(): string {
-		return 'manage_options';
+		return Capabilities::MANAGE_RUNS;
 	}
 
 	/**

@@ -48,7 +48,7 @@ workflow-automate.php   Plugin bootstrap (header, version gate, autoload, activa
 uninstall.php           WordPress-invoked cleanup entry point
 src/
   autoload.php           Fallback PSR-4 autoloader (see "Local setup" above)
-  Core/                  Bootstrap: Plugin, Container, Requirements, Activator, Deactivator, Uninstaller, Options, Encryption
+  Core/                  Bootstrap: Plugin, Container, Requirements, Activator, Deactivator, Uninstaller, Options, Encryption, Capabilities
   Database/              Migration base class/runner, table-name helper, migrations (dbDelta-based schema)
   Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode, WorkflowRun, WorkflowRunLog, Connection, Webhook)
   Domain/Contracts/      Public extension interfaces (TriggerInterface, ActionInterface)

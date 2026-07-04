@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\RunsListTable;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -70,7 +71,7 @@ class RunsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function capability(): string {
-		return 'manage_options';
+		return Capabilities::MANAGE_RUNS;
 	}
 
 	/**

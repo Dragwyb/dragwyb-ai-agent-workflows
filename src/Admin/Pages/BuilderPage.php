@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -63,7 +64,7 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function capability(): string {
-		return 'manage_options';
+		return Capabilities::MANAGE_WORKFLOWS;
 	}
 
 	/**

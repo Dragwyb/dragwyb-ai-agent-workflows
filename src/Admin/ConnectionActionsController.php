@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Admin;
 use InvalidArgumentException;
 use RuntimeException;
 use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
@@ -61,7 +62,7 @@ class ConnectionActionsController {
 	 * @return void
 	 */
 	public function handle(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
 		}
 

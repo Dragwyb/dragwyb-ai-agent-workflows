@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Rest;
 
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Connection;
 use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
@@ -81,7 +82,9 @@ class ConnectionsController {
 	 * @return true|WP_Error
 	 */
 	public function permissionsCheck( $request ) {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Builder authors (workflows) need the picker; connection managers
+		// may also list connections over REST. Either cap is enough.
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
 				'wfa_rest_forbidden',
 				__( 'Sorry, you are not allowed to view connections.', 'workflow-automate' ),

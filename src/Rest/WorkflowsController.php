@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
@@ -187,14 +188,14 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	/**
-	 * All routes on this controller require the same capability. There are
-	 * no granular workflow capabilities yet (planned in a later roadmap
-	 * increment); until then, `manage_options` is the gate.
+	 * All routes on this controller require `wfa_manage_workflows`
+	 * (administrators and anyone with `manage_options` receive it via
+	 * `Core\Capabilities::filterUserHasCap()`).
 	 *
 	 * @return true|WP_Error
 	 */
 	private function checkPermission() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
 				'wfa_rest_forbidden',
 				__( 'Sorry, you are not allowed to manage workflows.', 'workflow-automate' ),

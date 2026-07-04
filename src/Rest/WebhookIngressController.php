@@ -32,7 +32,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * - a site-wide "require signing" setting (see SettingsService).
  *
  * This is the one intentional `__return_true`-style permission callback
- * in the plugin; every other REST route still requires `manage_options`.
+ * in the plugin; every other REST route still requires a `wfa_*` capability
+ * (with `manage_options` as a fallback — see `Core\Capabilities`).
  * Documented in `docs/rest-api.md` and `docs/integrations.md`.
  */
 class WebhookIngressController {

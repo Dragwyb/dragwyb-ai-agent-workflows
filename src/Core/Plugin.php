@@ -142,6 +142,15 @@ class Plugin {
 			return;
 		}
 
+		Capabilities::register();
+
+		// Defensive re-grant for already-active installs that predate
+		// roadmap item 14 (or whose administrator role lost the caps).
+		// Idempotent; cheap when caps are already present.
+		if ( is_admin() && current_user_can( 'manage_options' ) ) {
+			Capabilities::grantToAdministrator();
+		}
+
 		$this->registerServices();
 		$this->registerNodeTypes();
 		$this->registerExecutionEngine();
@@ -152,8 +161,10 @@ class Plugin {
 
 		// Capability-gated so schema upkeep never runs on ordinary front-end
 		// requests; this only protects against tables missing after a
-		// manual file update that skipped the activation hook.
-		if ( is_admin() && current_user_can( 'manage_options' ) ) {
+		// manual file update that skipped the activation hook. Any plugin
+		// capability (or manage_options, via the user_has_cap fallback)
+		// is enough — settings-only users still need a current schema.
+		if ( is_admin() && current_user_can( Capabilities::ACCESS ) ) {
 			( new MigrationRunner( SchemaMigrations::all() ) )->run();
 		}
 
@@ -404,7 +415,7 @@ class Plugin {
 			}
 		);
 
-		if ( is_admin() && current_user_can( 'manage_options' ) && ! wp_next_scheduled( BackgroundRunner::CRON_HOOK ) ) {
+		if ( is_admin() && current_user_can( Capabilities::ACCESS ) && ! wp_next_scheduled( BackgroundRunner::CRON_HOOK ) ) {
 			wp_schedule_event( time(), BackgroundRunner::CRON_SCHEDULE, BackgroundRunner::CRON_HOOK );
 		}
 	}
@@ -433,7 +444,7 @@ class Plugin {
 			}
 		);
 
-		if ( is_admin() && current_user_can( 'manage_options' ) && ! wp_next_scheduled( RunRetentionService::CRON_HOOK ) ) {
+		if ( is_admin() && current_user_can( Capabilities::ACCESS ) && ! wp_next_scheduled( RunRetentionService::CRON_HOOK ) ) {
 			wp_schedule_event( time(), 'daily', RunRetentionService::CRON_HOOK );
 		}
 	}

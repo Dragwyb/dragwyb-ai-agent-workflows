@@ -1,6 +1,12 @@
 # REST API Reference
 
-All endpoints are namespaced under `wfa/v1` and require an authenticated request from a user with the `manage_options` capability (custom, more granular capabilities are planned — see `docs/internal/roadmap.md` item 14). Requests must be authenticated the same way as any other WordPress REST API request (logged-in cookie + `X-WP-Nonce` header, or an application password).
+All endpoints are namespaced under `wfa/v1` and require an authenticated request from a user with the appropriate plugin capability (see below). Anyone with WordPress's `manage_options` capability receives every plugin capability automatically (see `Core\Capabilities`). Requests must be authenticated the same way as any other WordPress REST API request (logged-in cookie + `X-WP-Nonce` header, or an application password).
+
+| Route group | Capability |
+| --- | --- |
+| `/workflows`, `/node-types` | `wfa_manage_workflows` |
+| `/connections` (read-only picker) | `wfa_manage_workflows` **or** `wfa_manage_connections` |
+| `/webhooks/{public_id}` (ingress) | **None** — public; secured by UUID + optional HMAC/IP allow-list |
 
 This file is updated every time a roadmap increment ships a new REST resource.
 

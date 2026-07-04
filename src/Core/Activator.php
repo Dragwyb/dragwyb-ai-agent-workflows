@@ -23,8 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Runs once when the plugin is activated.
  *
  * Responsible for activation-time concerns: verifying the environment,
- * creating/updating the database schema, stamping installation metadata,
- * and scheduling the recurring background-queue cron event.
+ * creating/updating the database schema, granting plugin capabilities to
+ * the administrator role, stamping installation metadata, and scheduling
+ * the recurring background-queue cron event.
  */
 class Activator {
 
@@ -47,6 +48,8 @@ class Activator {
 		}
 
 		( new MigrationRunner( SchemaMigrations::all() ) )->run();
+
+		Capabilities::grantToAdministrator();
 
 		if ( false === Options::get( 'installed_at' ) ) {
 			Options::add( 'installed_at', time(), true );

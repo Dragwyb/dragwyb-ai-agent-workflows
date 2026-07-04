@@ -57,6 +57,10 @@ class Uninstaller {
 
 		self::dropTables();
 
+		// Remove plugin caps from every role so a later reinstall starts
+		// from a clean role state (activation will re-grant to administrator).
+		Capabilities::revokeFromAllRoles();
+
 		foreach ( self::OWNED_OPTIONS as $option ) {
 			Options::delete( $option );
 		}

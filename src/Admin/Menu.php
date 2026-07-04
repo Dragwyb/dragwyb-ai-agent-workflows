@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Admin;
 
+use WorkflowAutomate\Plugin\Core\Capabilities;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -68,10 +70,14 @@ class Menu {
 
 		$first = $this->pages[0];
 
+		// Top-level menu uses ACCESS (implied by any granular cap, and by
+		// manage_options) so a user granted only e.g. wfa_manage_runs still
+		// sees the plugin menu; individual submenu rows keep each page's
+		// own capability so unauthorized items stay hidden.
 		$hook = add_menu_page(
 			$first->pageTitle(),
 			__( 'Workflow Automate', 'workflow-automate' ),
-			$first->capability(),
+			Capabilities::ACCESS,
 			$first->slug(),
 			array( $this, 'renderCurrentPage' ),
 			'dashicons-randomize',
@@ -132,18 +138,39 @@ class Menu {
 	/**
 	 * Renders whichever page matches the current `$_GET['page']` slug.
 	 *
+	 * When the requested page exists but the user lacks its capability
+	 * (common when clicking the top-level menu, which always opens the
+	 * first page's slug, while the user only has e.g. Runs access),
+	 * redirects to the first menu-visible page they *can* access rather
+	 * than showing a dead-end "not allowed" screen.
+	 *
 	 * @return void
 	 */
 	public function renderCurrentPage(): void {
 		$requested_slug = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page routing, not a state change.
 
 		foreach ( $this->pages as $page ) {
-			if ( $page->slug() === $requested_slug ) {
+			if ( $page->slug() !== $requested_slug ) {
+				continue;
+			}
+
+			if ( current_user_can( $page->capability() ) ) {
 				$page->render();
 
 				return;
 			}
+
+			break;
 		}
+
+		foreach ( $this->pages as $page ) {
+			if ( $page->showInMenu() && current_user_can( $page->capability() ) ) {
+				wp_safe_redirect( admin_url( 'admin.php?page=' . $page->slug() ) );
+				exit;
+			}
+		}
+
+		wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ), 403 );
 	}
 
 	/**

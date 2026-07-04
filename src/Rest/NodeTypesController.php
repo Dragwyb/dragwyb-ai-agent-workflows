@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Rest;
 
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
@@ -64,7 +65,7 @@ class NodeTypesController {
 	 * @return true|WP_Error
 	 */
 	public function permissionsCheck( $request ) {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
 				'wfa_rest_forbidden',
 				__( 'Sorry, you are not allowed to view node types.', 'workflow-automate' ),

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Connection;
 use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
@@ -74,7 +75,7 @@ class ConnectionFormPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function capability(): string {
-		return 'manage_options';
+		return Capabilities::MANAGE_CONNECTIONS;
 	}
 
 	/**

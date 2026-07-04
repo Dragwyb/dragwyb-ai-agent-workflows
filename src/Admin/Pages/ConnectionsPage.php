@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\ConnectionsListTable;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
 
@@ -67,7 +68,7 @@ class ConnectionsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function capability(): string {
-		return 'manage_options';
+		return Capabilities::MANAGE_CONNECTIONS;
 	}
 
 	/**

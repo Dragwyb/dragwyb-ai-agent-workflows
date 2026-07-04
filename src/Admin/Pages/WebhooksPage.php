@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\WebhooksListTable;
+use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
@@ -66,7 +67,7 @@ class WebhooksPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function capability(): string {
-		return 'manage_options';
+		return Capabilities::MANAGE_WEBHOOKS;
 	}
 
 	/**
