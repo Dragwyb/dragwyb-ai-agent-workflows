@@ -322,3 +322,15 @@ This item is also where architecture §2.5's "Security/API Keys: connection mana
 **Self-review / security / performance / standards:** No new privileged surfaces; empty-state URLs use `admin_url` + known slugs; no extra queries beyond list tables already run. `npm run lint:js` and `npm run build` pass.
 
 **Deferred:** Full WCAG audit with a screen reader in a live admin; per-workflow "activate" CTA inside the builder (status changes still go through the Workflows list / REST).
+
+### 17. Extensibility documentation — done
+
+**Built:** Rewrote `docs/hooks-reference.md` as the authoritative extensibility reference (title and scope expanded beyond hooks alone). Audited every `do_action( 'wfa/…' )` in `src/` — six actions (`wfa/loaded`, `wfa/nodes/register`, `wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, `wfa/node/after_execute`), **zero** public filters. Corrected inaccurate timing for `before_run` / `after_run` (they run inside `executeNodes()` after the run row is already `running`; they do not fire on `queue()` alone or when a claimed run's workflow is gone). Documented fire/no-fire rules, full custom action and trigger examples, `configSchema()` field types the builder supports (`string`, `boolean`, `object`/`array`, `connection`), `NodeTypeRegistry` / `Container` / `Capabilities` surfaces, and an explicit "what is not an extension point" section. Updated architecture §2.6, `README.md`, and the PHPDoc on `WorkflowExecutionService::executeNodes()`'s `before_run` call to match.
+
+**Design decisions:** Did not invent `wfa/integrations/register` solely to document it — the deferred status is stated clearly so integrators are not sent looking for a filter that does not exist. Kept companion-plugin guidance (capabilities, contracts) in the same file as hooks so there is one public extensibility entry point.
+
+**Self-review:** Grep of `do_action(` / `apply_filters(` under `src/` for `wfa/` matches the document exactly. Examples use only public interfaces and methods.
+
+**Security / performance / standards:** Documentation-only increment (plus one clarifying PHPDoc). No runtime behavior change.
+
+**Deferred:** None for this item's scope. Future hooks/filters must be added to `docs/hooks-reference.md` in the same increment that ships them.

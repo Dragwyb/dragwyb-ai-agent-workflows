@@ -274,6 +274,8 @@ class WorkflowExecutionService {
 
 		/**
 		 * Fires immediately before a workflow run starts executing nodes.
+		 * The `wfa_workflow_runs` row already exists with status `running`.
+		 * See docs/hooks-reference.md.
 		 *
 		 * @since 0.1.0
 		 *

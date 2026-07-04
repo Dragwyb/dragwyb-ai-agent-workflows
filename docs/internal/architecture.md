@@ -294,17 +294,17 @@ All settings are sanitized on save (`sanitize_text_field`, `absint`, allow-lists
 
 ## 2.6 Extensibility Plan
 
-Documented in full in `/docs/hooks-reference.md` once implemented; planned extension points include:
+**Finalized in roadmap item 17.** The authoritative public list lives in `/docs/hooks-reference.md` (actions, PHP contracts, config-schema field types, capabilities). Shipped extension points:
 
-- `wfa/workflow/before_run`, `wfa/workflow/after_run`
-- `wfa/node/before_execute`, `wfa/node/after_execute`
-- `wfa/nodes/register` — filter for third parties to register trigger/action classes into the `NodeTypeRegistry`
-- `wfa/integrations/register` — filter for registering a new `IntegrationInterface` implementation
-- Public interfaces: `WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface`, `ActionInterface`
+- `wfa/loaded` — after requirements pass; receives `Core\Container`
+- `wfa/nodes/register` — **action** (not a filter) on `init`; register `TriggerInterface` / `ActionInterface` instances into `NodeTypeRegistry`
+- `wfa/workflow/before_run`, `wfa/workflow/after_run` — around node execution (run row already `running`)
+- `wfa/node/before_execute`, `wfa/node/after_execute` — per action node
+- Public interfaces: `TriggerInterface`, `ActionInterface` (both extend internal-only `NodeTypeInterface`)
 
-> **Implementation note (roadmap item 7 — execution engine):** `wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, and `wfa/node/after_execute` all shipped with the execution engine and are documented in `docs/hooks-reference.md`. `wfa/integrations/register` remains planned — there is no `IntegrationInterface` yet, since only two directly-`NodeTypeRegistry`-registered node types exist so far (`WpHookTrigger`, `HttpRequestAction`); that filter is deferred until a real third-party-integration increment needs a layer above individual node types.
+No public `wfa/…` filters are shipped. `wfa/integrations/register` / `IntegrationInterface` remain **deferred** (not planned for an imminent release): co-plugin integrations register individual node types on `wfa/nodes/register` only when the co-plugin is active. See item 15's implementation note under §2.2.
 
-> **Implementation note (roadmap item 12 — first real integrations):** Still deferred, now with one more node type (`SendEmailAction`) and one wired-up connection consumer (`HttpRequestAction`) as additional evidence for the call: three individually-registered node types with no shared abstraction between them is still comfortably simple via plain `NodeTypeRegistry` registration alone. See the item 12 implementation note under §2.2 for the full reasoning.
+> **Implementation note (roadmap item 17 — extensibility documentation):** `docs/hooks-reference.md` was audited against every `do_action( 'wfa/…' )` in `src/` (six actions, zero filters). Corrected an outdated claim that `before_run` fires before the run row exists — it fires inside `executeNodes()` after the row is `running`. Documented fire/no-fire rules for queued vs synchronous runs, full custom trigger/action examples, builder `configSchema()` field types, and `Core\Capabilities` strings for companion plugins.
 
 ---
 
@@ -324,4 +324,4 @@ Documented in full in `/docs/hooks-reference.md` once implemented; planned exten
 
 ## Next
 
-Proceed to `docs/internal/roadmap.md` for the ordered increments, then begin the Section 9 development loop starting with roadmap item 1.
+All roadmap items 1–17 have completed the Section 9 development loop (see `docs/internal/roadmap.md` completed-item log). Further work is demand-driven (additional co-plugin integrations under the item 15 pattern, or new public hooks documented in `docs/hooks-reference.md` in the same increment that ships them).
