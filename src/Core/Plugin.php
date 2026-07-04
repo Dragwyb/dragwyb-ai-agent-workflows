@@ -11,7 +11,10 @@ namespace WorkflowAutomate\Plugin\Core;
 
 use WorkflowAutomate\Plugin\Admin\Menu;
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
+use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
+use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
 use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
+use WorkflowAutomate\Plugin\Admin\RunActionsController;
 use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
@@ -336,17 +339,30 @@ class Plugin {
 	}
 
 	/**
-	 * Registers the admin menu/screens and the admin-post action handler
-	 * that backs their row actions.
+	 * Registers the admin menu/screens and the admin-post action handlers
+	 * that back their row/page actions.
+	 *
+	 * Page order matters here: Menu::registerMenu() treats the first entry
+	 * as the top-level menu item, so WorkflowsPage must stay first and
+	 * RunsPage — the only other roadmap-item-9 page shown in the menu
+	 * (see RunDetailPage::showInMenu()) — is added right after it. The two
+	 * hidden pages (BuilderPage, RunDetailPage) can go anywhere after that.
 	 *
 	 * @return void
 	 */
 	private function registerAdmin(): void {
 		$workflows = $this->container->get( WorkflowService::class );
-		$workflows_page = new WorkflowsPage( $workflows );
-		$builder_page = new BuilderPage();
+		$runs = $this->container->get( WorkflowRunRepository::class );
+		$workflow_repository = $this->container->get( WorkflowRepository::class );
+		$executor = $this->container->get( WorkflowExecutionService::class );
 
-		( new Menu( array( $workflows_page, $builder_page ) ) )->register();
+		$workflows_page = new WorkflowsPage( $workflows );
+		$runs_page = new RunsPage( $runs, $workflow_repository );
+		$builder_page = new BuilderPage();
+		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor );
+
+		( new Menu( array( $workflows_page, $runs_page, $builder_page, $run_detail_page ) ) )->register();
 		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
+		( new RunActionsController( $executor ) )->register();
 	}
 }

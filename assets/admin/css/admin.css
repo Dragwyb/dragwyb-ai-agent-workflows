@@ -40,3 +40,71 @@
 	color: #135e96;
 	text-decoration: underline;
 }
+
+/*
+ * Run/run-log status badges (roadmap item 9). Colors intentionally reuse
+ * WordPress admin's own semantic palette (success green, error red, etc.)
+ * rather than introducing a new one, per Section 7's "consistent with
+ * current WordPress admin design conventions".
+ */
+.wfa-status-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 12px;
+	line-height: 1.6;
+	white-space: nowrap;
+}
+
+.wfa-status-badge--success {
+	background: #edfaef;
+	color: #007017;
+}
+
+.wfa-status-badge--failed,
+.wfa-status-badge--error {
+	background: #fcf0f1;
+	color: #b32d2e;
+}
+
+.wfa-status-badge--partial {
+	background: #fcf9e8;
+	color: #997404;
+}
+
+.wfa-status-badge--running {
+	background: #e7f2fa;
+	color: #0a4b78;
+}
+
+.wfa-status-badge--queued,
+.wfa-status-badge--skipped {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.wfa-status-badge--unknown {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.wfa-run-meta th {
+	width: 160px;
+}
+
+.wfa-run-details-block {
+	margin: 4px 0;
+}
+
+.wfa-run-details-block pre {
+	max-width: 640px;
+	max-height: 320px;
+	overflow: auto;
+	background: #f6f7f7;
+	padding: 8px;
+	border: 1px solid #dcdcde;
+}
+
+.wfa-runs-filter-notice {
+	font-size: 14px;
+}

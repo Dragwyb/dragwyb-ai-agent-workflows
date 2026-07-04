@@ -260,6 +260,62 @@ class WorkflowRunRepository {
 	}
 
 	/**
+	 * Returns a paginated, optionally filtered list of runs across every
+	 * workflow, most recent first. Backs the top-level "Runs" history
+	 * screen (roadmap item 9); `paginateForWorkflow()` above remains for
+	 * any future single-workflow-scoped view.
+	 *
+	 * @param array<string, mixed> $args {
+	 *     @type int    $workflow_id Optional. Restrict to a single workflow.
+	 *     @type string $status      Optional. One of WorkflowRun::VALID_STATUSES.
+	 *     @type int    $page        1-indexed page number. Default 1.
+	 *     @type int    $per_page    Rows per page, clamped to [1, 100]. Default 20.
+	 * }
+	 *
+	 * @return array{items: WorkflowRun[], total: int, page: int, per_page: int}
+	 */
+	public function paginateAll( array $args = array() ): array {
+		global $wpdb;
+
+		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
+		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
+		$offset = ( $page - 1 ) * $per_page;
+
+		$where = array();
+		$params = array();
+
+		if ( ! empty( $args['workflow_id'] ) ) {
+			$where[] = 'workflow_id = %d';
+			$params[] = (int) $args['workflow_id'];
+		}
+
+		if ( ! empty( $args['status'] ) ) {
+			$where[] = 'status = %s';
+			$params[] = (string) $args['status'];
+		}
+
+		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
+		$table = $this->table();
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
+		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}";
+		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
+		$list_sql = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d";
+		$list_params = array_merge( $params, array( $per_page, $offset ) );
+		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+
+		return array(
+			'items' => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
+			'total' => $total,
+			'page' => $page,
+			'per_page' => $per_page,
+		);
+	}
+
+	/**
 	 * Returns every run id belonging to a workflow, so callers can cascade
 	 * into `wfa_workflow_run_logs` (which is keyed by run id, not workflow
 	 * id) before removing the runs themselves.

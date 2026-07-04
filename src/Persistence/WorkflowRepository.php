@@ -219,6 +219,47 @@ class WorkflowRepository {
 	}
 
 	/**
+	 * Batch-fetches multiple workflows by id, keyed by id. Used to resolve
+	 * workflow titles for a list of runs (roadmap item 9's history screen)
+	 * without an N+1 `find()` per row.
+	 *
+	 * Deliberately includes trashed workflows (unlike find()'s default): a
+	 * run's history shouldn't hide which workflow it belonged to just
+	 * because that workflow was later trashed. A hard-deleted workflow (no
+	 * row left at all) is simply absent from the returned map; callers
+	 * are expected to handle that case explicitly.
+	 *
+	 * @param int[] $ids Workflow ids.
+	 *
+	 * @return array<int, Workflow>
+	 */
+	public function findByIds( array $ids ): array {
+		global $wpdb;
+
+		$ids = array_values( array_unique( array_map( 'intval', $ids ) ) );
+
+		if ( array() === $ids ) {
+			return array();
+		}
+
+		$table = $this->table();
+		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
+		$sql = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $ids ) );
+
+		$map = array();
+
+		foreach ( $rows as $row ) {
+			$workflow = Workflow::fromRow( $row );
+			$map[ $workflow->id() ] = $workflow;
+		}
+
+		return $map;
+	}
+
+	/**
 	 * Atomically increments `run_count` by one. Uses `run_count = run_count
 	 * + 1` at the SQL level rather than a read-then-write round trip so
 	 * concurrent runs of the same workflow can never lose an increment.

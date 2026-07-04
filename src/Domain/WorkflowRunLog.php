@@ -32,6 +32,10 @@ class WorkflowRunLog {
 
 	private ?int $nodeId;
 
+	private ?string $nodeType;
+
+	private ?string $nodeLabel;
+
 	private string $status;
 
 	/**
@@ -58,6 +62,8 @@ class WorkflowRunLog {
 		int $id,
 		int $runId,
 		?int $nodeId,
+		?string $nodeType,
+		?string $nodeLabel,
 		string $status,
 		?array $input,
 		?array $output,
@@ -68,6 +74,8 @@ class WorkflowRunLog {
 		$this->id = $id;
 		$this->runId = $runId;
 		$this->nodeId = $nodeId;
+		$this->nodeType = $nodeType;
+		$this->nodeLabel = $nodeLabel;
 		$this->status = $status;
 		$this->input = $input;
 		$this->output = $output;
@@ -88,6 +96,8 @@ class WorkflowRunLog {
 			(int) $row->id,
 			(int) $row->run_id,
 			null !== $row->node_id ? (int) $row->node_id : null,
+			null !== $row->node_type ? (string) $row->node_type : null,
+			null !== $row->node_label ? (string) $row->node_label : null,
 			(string) $row->status,
 			self::decodeJsonObjectOrNull( $row->input_json ),
 			self::decodeJsonObjectOrNull( $row->output_json ),
@@ -122,6 +132,28 @@ class WorkflowRunLog {
 
 	public function nodeId(): ?int {
 		return $this->nodeId;
+	}
+
+	/**
+	 * The node type slug this entry ran as, snapshotted at execution time
+	 * (see `Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable`) so it
+	 * remains accurate even if `nodeId()` no longer resolves to a live
+	 * node. Null for entries logged before that migration ran.
+	 *
+	 * @return string|null
+	 */
+	public function nodeType(): ?string {
+		return $this->nodeType;
+	}
+
+	/**
+	 * The node's label at the time it ran, if it had one. Same
+	 * snapshot-at-execution-time reasoning as nodeType().
+	 *
+	 * @return string|null
+	 */
+	public function nodeLabel(): ?string {
+		return $this->nodeLabel;
 	}
 
 	public function status(): string {

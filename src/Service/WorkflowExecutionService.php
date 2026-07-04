@@ -22,7 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Runs a workflow's nodes start-to-finish. Two ways a run comes to exist:
+ * Runs a workflow's nodes start-to-finish. Several ways a run comes to
+ * exist:
  *
  * - `run()`: synchronous, within the current request. Used by the "run
  *   now"/test REST action, where a human is waiting for an immediate
@@ -39,8 +40,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   docs/internal/architecture.md §6 performance requirements). Failed or
  *   partial background runs are retried with backoff, up to a limit — see
  *   `maybeScheduleRetry()`.
+ * - `rerun()`: synchronous, like run(), but re-executes a specific past
+ *   run's trigger payload instead of a caller-supplied one — the "Re-run"
+ *   action in the history UI (roadmap item 9). Also never auto-retried,
+ *   for the same reason as run().
  *
- * Both paths share `executeNodes()` so they can never drift apart in how a
+ * All paths share `executeNodes()` so they can never drift apart in how a
  * run actually executes.
  *
  * Node ordering and failure handling are both intentionally simple for this
@@ -129,6 +134,49 @@ class WorkflowExecutionService {
 
 		if ( null === $run ) {
 			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'workflow-automate' ) );
+		}
+
+		return $this->executeNodes( $run );
+	}
+
+	/**
+	 * Re-executes a past run's trigger payload as a brand-new run, linked
+	 * back to the original via `parent_run_id`. Used by the "Re-run" action
+	 * in the history UI (roadmap item 9).
+	 *
+	 * Synchronous and never auto-retried, like run() — a human explicitly
+	 * asked for this one specific re-execution and is waiting to see its
+	 * result, not for it to be silently deferred or retried later.
+	 *
+	 * @param int $run_id The run to re-execute.
+	 *
+	 * @throws InvalidArgumentException When the run, or the workflow it belongs to, no longer exists.
+	 * @throws RuntimeException         When the new run could not be recorded.
+	 *
+	 * @return WorkflowRun The new (finished) run.
+	 */
+	public function rerun( int $run_id ): WorkflowRun {
+		$original = $this->runs->find( $run_id );
+
+		if ( null === $original ) {
+			throw new InvalidArgumentException( esc_html__( 'The specified run does not exist.', 'workflow-automate' ) );
+		}
+
+		if ( null === $this->workflows->find( $original->workflowId() ) ) {
+			throw new InvalidArgumentException( esc_html__( 'The workflow this run belongs to no longer exists.', 'workflow-automate' ) );
+		}
+
+		$run = $this->runs->insert(
+			array(
+				'workflow_id' => $original->workflowId(),
+				'parent_run_id' => $original->id(),
+				'status' => WorkflowRun::STATUS_RUNNING,
+				'trigger_payload' => $original->triggerPayload(),
+			)
+		);
+
+		if ( null === $run ) {
+			throw new RuntimeException( esc_html__( 'Failed to start the re-run.', 'workflow-automate' ) );
 		}
 
 		return $this->executeNodes( $run );
@@ -260,6 +308,8 @@ class WorkflowExecutionService {
 				array(
 					'run_id' => $run->id(),
 					'node_id' => $node->id(),
+					'node_type' => $node->nodeType(),
+					'node_label' => $node->label(),
 					'status' => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
 					'input' => $node->config(),
 					'output' => $result,

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Database;
 
+use WorkflowAutomate\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
 use WorkflowAutomate\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
 use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowNodesTable;
 use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
@@ -36,6 +37,7 @@ class SchemaMigrations {
 			CreateWorkflowRunsTable::class,
 			CreateWorkflowRunLogsTable::class,
 			AddQueueColumnsToWorkflowRunsTable::class,
+			AddNodeSnapshotColumnsToWorkflowRunLogsTable::class,
 		);
 	}
 }

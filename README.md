@@ -56,8 +56,8 @@ src/
   Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry, NodeExecutionService, WorkflowExecutionService, BackgroundRunner)
   Integration/           Built-in trigger/action node types (Triggers/, Actions/), registered via wfa/nodes/register; WorkflowTriggerBinder binds active workflows' triggers to WorkflowExecutionService::queue() on init
   Rest/                  WP_REST_Controller subclasses + rest_api_init bootstrap (wfa/v1 namespace)
-  Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers
-  Admin/Pages/           WorkflowsPage (list) and BuilderPage (visual editor shell)
+  Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers (WorkflowActionsController, RunActionsController), status badge/duration display helpers (RunStatusBadge, RunDuration)
+  Admin/Pages/           WorkflowsPage (list), BuilderPage (visual editor shell), RunsPage (execution history list), RunDetailPage (single run + node log)
 assets/
   admin/css/             Admin screen CSS, enqueued only on the plugin's own screens
   builder/src/           React builder app source (built with @wordpress/scripts; see "Local setup")

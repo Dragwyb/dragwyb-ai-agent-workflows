@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin;
 
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
+use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 use WP_List_Table;
@@ -136,6 +137,7 @@ class WorkflowsListTable extends WP_List_Table {
 			);
 			$actions = array(
 				'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
+				'runs' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'workflow-automate' ) ),
 				'trash' => $this->actionForm( 'trash', $item->id(), __( 'Trash', 'workflow-automate' ) ),
 			);
 		}
@@ -153,6 +155,24 @@ class WorkflowsListTable extends WP_List_Table {
 			array(
 				'page' => BuilderPage::SLUG,
 				'workflow' => $id,
+			),
+			admin_url( 'admin.php' )
+		);
+	}
+
+	/**
+	 * Links to the Runs history screen (roadmap item 9), pre-filtered to
+	 * this workflow.
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return string
+	 */
+	private function runsUrl( int $id ): string {
+		return add_query_arg(
+			array(
+				'page' => RunsPage::SLUG,
+				'workflow_id' => $id,
 			),
 			admin_url( 'admin.php' )
 		);

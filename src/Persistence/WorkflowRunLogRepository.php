@@ -42,6 +42,8 @@ class WorkflowRunLogRepository {
 	 * @param array<string, mixed> $attributes {
 	 *     @type int                       $run_id      Required.
 	 *     @type int|null                  $node_id     The node this entry is for, if any.
+	 *     @type string|null               $node_type   The node's type slug at the time it ran (see WorkflowRunLog::nodeType()).
+	 *     @type string|null               $node_label  The node's label at the time it ran, if any.
 	 *     @type string                    $status      One of WorkflowRunLog::STATUS_*.
 	 *     @type array<string, mixed>|null $input       The node's configuration at the time it ran.
 	 *     @type array<string, mixed>|null $output      The node's raw execution result.
@@ -57,6 +59,8 @@ class WorkflowRunLogRepository {
 		$data = array(
 			'run_id' => (int) $attributes['run_id'],
 			'node_id' => isset( $attributes['node_id'] ) ? (int) $attributes['node_id'] : null,
+			'node_type' => isset( $attributes['node_type'] ) ? (string) $attributes['node_type'] : null,
+			'node_label' => isset( $attributes['node_label'] ) ? (string) $attributes['node_label'] : null,
 			'status' => (string) $attributes['status'],
 			'input_json' => isset( $attributes['input'] ) ? wp_json_encode( $attributes['input'] ) : null,
 			'output_json' => isset( $attributes['output'] ) ? wp_json_encode( $attributes['output'] ) : null,
@@ -65,7 +69,7 @@ class WorkflowRunLogRepository {
 			'created_at' => current_time( 'mysql', true ),
 		);
 
-		$formats = array( '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s' );
+		$formats = array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s' );
 
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
