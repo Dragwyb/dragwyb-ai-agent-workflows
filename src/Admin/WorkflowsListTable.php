@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Admin;
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
 use WorkflowAutomate\Plugin\Domain\Workflow;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
@@ -43,7 +44,9 @@ class WorkflowsListTable extends WP_List_Table {
 
 	private WorkflowService $workflows;
 
-	public function __construct( WorkflowService $workflows ) {
+	private SettingsService $settings;
+
+	public function __construct( WorkflowService $workflows, SettingsService $settings ) {
 		parent::__construct(
 			array(
 				'singular' => 'workflow',
@@ -53,6 +56,7 @@ class WorkflowsListTable extends WP_List_Table {
 		);
 
 		$this->workflows = $workflows;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -193,11 +197,7 @@ class WorkflowsListTable extends WP_List_Table {
 				return esc_html( (string) $item->runCount() );
 
 			case 'updated_at':
-				// updatedAt() is stored in GMT (see Workflow); convert to the
-				// site's local time before formatting for display.
-				return esc_html(
-					get_date_from_gmt( $item->updatedAt(), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) )
-				);
+				return esc_html( RunTimestamp::format( $item->updatedAt(), $this->settings->displayTimestampsInUtc() ) );
 
 			default:
 				return '';

@@ -14,6 +14,7 @@ use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -52,6 +53,8 @@ class RunsListTable extends WP_List_Table {
 
 	private WorkflowRepository $workflows;
 
+	private SettingsService $settings;
+
 	/**
 	 * Workflow titles for the current page of rows, keyed by workflow id.
 	 * Populated once in prepare_items() via a single batch lookup, rather
@@ -61,7 +64,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	private array $workflowTitles = array();
 
-	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows ) {
+	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings ) {
 		parent::__construct(
 			array(
 				'singular' => 'run',
@@ -72,6 +75,7 @@ class RunsListTable extends WP_List_Table {
 
 		$this->runs = $runs;
 		$this->workflows = $workflows;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -216,7 +220,7 @@ class RunsListTable extends WP_List_Table {
 
 			case 'started_at':
 				return $item->startedAt()
-					? esc_html( get_date_from_gmt( $item->startedAt(), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) )
+					? esc_html( RunTimestamp::format( $item->startedAt(), $this->settings->displayTimestampsInUtc() ) )
 					: esc_html__( 'Not started yet', 'workflow-automate' );
 
 			case 'duration':

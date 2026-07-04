@@ -57,10 +57,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * - Every other node executes once, in the order it appears in the graph.
  *   This is a placeholder for real dependency-graph (DAG) execution, which
  *   needs the builder to support drawing connections first.
- * - Execution stops at the first failing node ("fail fast"). This is the
- *   sensible default until a per-workflow "continue on failure" setting
- *   (see docs/internal/architecture.md §2.4 Settings) exists to make it
- *   configurable.
+ * - Execution stops at the first failing node ("fail fast") by default;
+ *   the "General" tab of the Settings screen (roadmap item 10) exposes a
+ *   global "continue on failure" toggle instead — see
+ *   `SettingsService::shouldContinueOnFailure()`. There is no per-workflow
+ *   override yet, since the builder (roadmap item 6) has no settings panel
+ *   of its own to host one; that remains a possible future refinement, not
+ *   a gap in this increment's stated scope.
  */
 class WorkflowExecutionService {
 
@@ -90,18 +93,22 @@ class WorkflowExecutionService {
 
 	private WorkflowRunLogRepository $runLogs;
 
+	private SettingsService $settings;
+
 	public function __construct(
 		WorkflowService $workflows,
 		NodeTypeRegistry $registry,
 		NodeExecutionService $nodeExecutor,
 		WorkflowRunRepository $runs,
-		WorkflowRunLogRepository $runLogs
+		WorkflowRunLogRepository $runLogs,
+		SettingsService $settings
 	) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
 		$this->nodeExecutor = $nodeExecutor;
 		$this->runs = $runs;
 		$this->runLogs = $runLogs;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -318,7 +325,7 @@ class WorkflowExecutionService {
 				)
 			);
 
-			if ( ! $success ) {
+			if ( ! $success && ! $this->settings->shouldContinueOnFailure() ) {
 				break;
 			}
 		}

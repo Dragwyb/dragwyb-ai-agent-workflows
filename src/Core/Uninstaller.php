@@ -41,6 +41,7 @@ class Uninstaller {
 		'db_version',
 		'applied_migrations',
 		'remove_data_on_uninstall',
+		'global_settings',
 	);
 
 	/**

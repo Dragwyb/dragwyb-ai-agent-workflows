@@ -12,10 +12,12 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\RunDuration;
 use WorkflowAutomate\Plugin\Admin\RunStatusBadge;
+use WorkflowAutomate\Plugin\Admin\RunTimestamp;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 
 // BuilderPage and RunsPage live in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
@@ -51,10 +53,13 @@ class RunDetailPage implements AdminPage {
 
 	private WorkflowExecutionService $executor;
 
-	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, WorkflowExecutionService $executor ) {
+	private SettingsService $settings;
+
+	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, WorkflowExecutionService $executor, SettingsService $settings ) {
 		$this->runs = $runs;
 		$this->workflows = $workflows;
 		$this->executor = $executor;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -184,7 +189,6 @@ class RunDetailPage implements AdminPage {
 	 */
 	private function renderMeta( WorkflowRun $run ): void {
 		$workflow = $this->workflows->find( $run->workflowId(), true );
-		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 
 		echo '<table class="widefat fixed striped wfa-run-meta"><tbody>';
 
@@ -215,11 +219,11 @@ class RunDetailPage implements AdminPage {
 
 		$this->renderMetaRow(
 			__( 'Started', 'workflow-automate' ),
-			$run->startedAt() ? esc_html( get_date_from_gmt( $run->startedAt(), $date_format ) ) : esc_html__( 'Not started yet', 'workflow-automate' )
+			$run->startedAt() ? esc_html( RunTimestamp::format( $run->startedAt(), $this->settings->displayTimestampsInUtc() ) ) : esc_html__( 'Not started yet', 'workflow-automate' )
 		);
 		$this->renderMetaRow(
 			__( 'Finished', 'workflow-automate' ),
-			$run->finishedAt() ? esc_html( get_date_from_gmt( $run->finishedAt(), $date_format ) ) : esc_html__( 'Not finished yet', 'workflow-automate' )
+			$run->finishedAt() ? esc_html( RunTimestamp::format( $run->finishedAt(), $this->settings->displayTimestampsInUtc() ) ) : esc_html__( 'Not finished yet', 'workflow-automate' )
 		);
 		$this->renderMetaRow( __( 'Duration', 'workflow-automate' ), esc_html( RunDuration::forRun( $run ) ) );
 

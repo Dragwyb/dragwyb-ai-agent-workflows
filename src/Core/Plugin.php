@@ -13,8 +13,10 @@ use WorkflowAutomate\Plugin\Admin\Menu;
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
+use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
 use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
 use WorkflowAutomate\Plugin\Admin\RunActionsController;
+use WorkflowAutomate\Plugin\Admin\SettingsController;
 use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
@@ -28,6 +30,8 @@ use WorkflowAutomate\Plugin\Rest\RestApi;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use WorkflowAutomate\Plugin\Service\RunRetentionService;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
@@ -132,6 +136,7 @@ class Plugin {
 		$this->registerNodeTypes();
 		$this->registerExecutionEngine();
 		$this->registerBackgroundProcessing();
+		$this->registerRetentionPruning();
 		( new RestApi( $this->container ) )->register();
 		$this->registerAdmin();
 
@@ -216,6 +221,13 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			SettingsService::class,
+			static function (): SettingsService {
+				return new SettingsService();
+			}
+		);
+
+		$this->container->singleton(
 			WorkflowExecutionService::class,
 			static function ( Container $container ): WorkflowExecutionService {
 				return new WorkflowExecutionService(
@@ -223,7 +235,8 @@ class Plugin {
 					$container->get( NodeTypeRegistry::class ),
 					$container->get( NodeExecutionService::class ),
 					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class )
+					$container->get( WorkflowRunLogRepository::class ),
+					$container->get( SettingsService::class )
 				);
 			}
 		);
@@ -234,6 +247,17 @@ class Plugin {
 				return new BackgroundRunner(
 					$container->get( WorkflowRunRepository::class ),
 					$container->get( WorkflowExecutionService::class )
+				);
+			}
+		);
+
+		$this->container->singleton(
+			RunRetentionService::class,
+			static function ( Container $container ): RunRetentionService {
+				return new RunRetentionService(
+					$container->get( WorkflowRunRepository::class ),
+					$container->get( WorkflowRunLogRepository::class ),
+					$container->get( SettingsService::class )
 				);
 			}
 		);
@@ -297,7 +321,8 @@ class Plugin {
 				$binder = new WorkflowTriggerBinder(
 					$this->container->get( WorkflowService::class ),
 					$this->container->get( NodeTypeRegistry::class ),
-					$this->container->get( WorkflowExecutionService::class )
+					$this->container->get( WorkflowExecutionService::class ),
+					$this->container->get( SettingsService::class )
 				);
 
 				$binder->bindActiveWorkflows();
@@ -339,14 +364,44 @@ class Plugin {
 	}
 
 	/**
+	 * Wires the daily WP-Cron tick that implements the Settings screen's
+	 * "Logging & Retention" setting (roadmap item 10) — see
+	 * RunRetentionService. Uses WordPress's built-in `daily` schedule,
+	 * unlike BackgroundRunner's custom per-minute one: pruning is a
+	 * housekeeping task, not something that needs to happen more than
+	 * once a day.
+	 *
+	 * Scheduled on activation (see Activator) and cleared on deactivation
+	 * (see Deactivator), for the same reasons documented on
+	 * registerBackgroundProcessing() above; the defensive re-check here
+	 * mirrors that method's for the same "manual file update skipped
+	 * activation" scenario.
+	 *
+	 * @return void
+	 */
+	private function registerRetentionPruning(): void {
+		add_action(
+			RunRetentionService::CRON_HOOK,
+			function (): void {
+				$this->container->get( RunRetentionService::class )->pruneAccordingToSettings();
+			}
+		);
+
+		if ( is_admin() && current_user_can( 'manage_options' ) && ! wp_next_scheduled( RunRetentionService::CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'daily', RunRetentionService::CRON_HOOK );
+		}
+	}
+
+	/**
 	 * Registers the admin menu/screens and the admin-post action handlers
 	 * that back their row/page actions.
 	 *
 	 * Page order matters here: Menu::registerMenu() treats the first entry
-	 * as the top-level menu item, so WorkflowsPage must stay first and
-	 * RunsPage — the only other roadmap-item-9 page shown in the menu
-	 * (see RunDetailPage::showInMenu()) — is added right after it. The two
-	 * hidden pages (BuilderPage, RunDetailPage) can go anywhere after that.
+	 * as the top-level menu item, so WorkflowsPage must stay first. RunsPage
+	 * and SettingsPage — the other two menu-visible pages (see
+	 * RunDetailPage::showInMenu()) — are added right after it, in the order
+	 * they were introduced by the roadmap. The two hidden pages
+	 * (BuilderPage, RunDetailPage) can go anywhere after that.
 	 *
 	 * @return void
 	 */
@@ -355,14 +410,18 @@ class Plugin {
 		$runs = $this->container->get( WorkflowRunRepository::class );
 		$workflow_repository = $this->container->get( WorkflowRepository::class );
 		$executor = $this->container->get( WorkflowExecutionService::class );
+		$settings = $this->container->get( SettingsService::class );
+		$retention = $this->container->get( RunRetentionService::class );
 
-		$workflows_page = new WorkflowsPage( $workflows );
-		$runs_page = new RunsPage( $runs, $workflow_repository );
+		$workflows_page = new WorkflowsPage( $workflows, $settings );
+		$runs_page = new RunsPage( $runs, $workflow_repository, $settings );
 		$builder_page = new BuilderPage();
-		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor );
+		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
+		$settings_page = new SettingsPage( $settings );
 
-		( new Menu( array( $workflows_page, $runs_page, $builder_page, $run_detail_page ) ) )->register();
+		( new Menu( array( $workflows_page, $runs_page, $settings_page, $builder_page, $run_detail_page ) ) )->register();
 		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
 		( new RunActionsController( $executor ) )->register();
+		( new SettingsController( $settings, $retention ) )->register();
 	}
 }

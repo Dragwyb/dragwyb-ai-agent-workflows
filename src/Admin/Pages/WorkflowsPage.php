@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\WorkflowsListTable;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // BuilderPage lives in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
@@ -38,8 +39,11 @@ class WorkflowsPage implements AdminPage {
 
 	private WorkflowService $workflows;
 
-	public function __construct( WorkflowService $workflows ) {
+	private SettingsService $settings;
+
+	public function __construct( WorkflowService $workflows, SettingsService $settings ) {
 		$this->workflows = $workflows;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -97,7 +101,7 @@ class WorkflowsPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
 		}
 
-		$table = new WorkflowsListTable( $this->workflows );
+		$table = new WorkflowsListTable( $this->workflows, $this->settings );
 		$table->prepare_items();
 
 		echo '<div class="wrap wfa-admin-page">';

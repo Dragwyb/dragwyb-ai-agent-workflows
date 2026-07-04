@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Core;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
+use WorkflowAutomate\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,6 +55,7 @@ class Activator {
 		Options::update( 'db_version', WFA_VERSION );
 
 		self::scheduleBackgroundQueue();
+		self::scheduleRetentionPruning();
 	}
 
 	/**
@@ -75,6 +77,20 @@ class Activator {
 
 		if ( ! wp_next_scheduled( BackgroundRunner::CRON_HOOK ) ) {
 			wp_schedule_event( time(), BackgroundRunner::CRON_SCHEDULE, BackgroundRunner::CRON_HOOK );
+		}
+	}
+
+	/**
+	 * Schedules the daily cron event RunRetentionService runs on. Uses
+	 * WordPress's built-in `daily` schedule, so — unlike
+	 * scheduleBackgroundQueue() — there is no custom `cron_schedules`
+	 * filter to register first.
+	 *
+	 * @return void
+	 */
+	private static function scheduleRetentionPruning(): void {
+		if ( ! wp_next_scheduled( RunRetentionService::CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'daily', RunRetentionService::CRON_HOOK );
 		}
 	}
 }

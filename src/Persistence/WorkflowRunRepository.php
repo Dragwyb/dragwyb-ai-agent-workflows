@@ -27,6 +27,15 @@ class WorkflowRunRepository {
 	private const DEFAULT_PER_PAGE = 20;
 
 	/**
+	 * Defensive upper bound on how many runs a single retention-pruning
+	 * pass (cron tick or manual "Purge now" click) deletes. A site with a
+	 * larger backlog than this is caught up over several daily cron ticks
+	 * rather than one query attempting to delete an unbounded number of
+	 * rows in one request — same reasoning as BackgroundRunner::BATCH_SIZE.
+	 */
+	private const MAX_PRUNE_BATCH = 5000;
+
+	/**
 	 * @return string
 	 */
 	private function table(): string {
@@ -331,6 +340,55 @@ class WorkflowRunRepository {
 		$sql = "SELECT id FROM {$table} WHERE workflow_id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
 		return array_map( 'intval', $wpdb->get_col( $wpdb->prepare( $sql, $workflow_id ) ) );
+	}
+
+	/**
+	 * Returns up to MAX_PRUNE_BATCH ids of *finished* runs older than a
+	 * cutoff, for RunRetentionService. Deliberately scoped to
+	 * `finished_at` (not `created_at`): retention is about how long to
+	 * keep completed history, not about how old a row is — a `queued`/
+	 * `running` row is never eligible here regardless of age (a stuck one
+	 * is BackgroundRunner::claimBatch()'s stale-claim recovery's problem
+	 * to solve, not retention's).
+	 *
+	 * @param string $cutoff_gmt MySQL datetime (GMT). Runs finished strictly before this are eligible.
+	 *
+	 * @return int[]
+	 */
+	public function idsFinishedBefore( string $cutoff_gmt ): array {
+		global $wpdb;
+
+		$table = $this->table();
+		$sql = "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+
+		return array_map( 'intval', $wpdb->get_col( $wpdb->prepare( $sql, $cutoff_gmt, self::MAX_PRUNE_BATCH ) ) );
+	}
+
+	/**
+	 * Permanently removes the given runs. Callers must remove dependent
+	 * `wfa_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
+	 * same cascade-ordering requirement as `deleteByWorkflow()`.
+	 *
+	 * @param int[] $ids Run ids.
+	 *
+	 * @return int Number of rows deleted.
+	 */
+	public function deleteByIds( array $ids ): int {
+		global $wpdb;
+
+		if ( array() === $ids ) {
+			return 0;
+		}
+
+		$ids = array_map( 'intval', $ids );
+		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+		$table = $this->table();
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
+		$sql = "DELETE FROM {$table} WHERE id IN ({$placeholders})";
+		$deleted = $wpdb->query( $wpdb->prepare( $sql, $ids ) );
+
+		return false === $deleted ? 0 : (int) $deleted;
 	}
 
 	/**

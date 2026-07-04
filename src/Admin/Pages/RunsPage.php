@@ -13,6 +13,7 @@ use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\RunsListTable;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,9 +37,12 @@ class RunsPage implements AdminPage {
 
 	private WorkflowRepository $workflows;
 
-	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows ) {
+	private SettingsService $settings;
+
+	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings ) {
 		$this->runs = $runs;
 		$this->workflows = $workflows;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -96,7 +100,7 @@ class RunsPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
 		}
 
-		$table = new RunsListTable( $this->runs, $this->workflows );
+		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
 		$table->prepare_items();
 
 		echo '<div class="wrap wfa-admin-page">';

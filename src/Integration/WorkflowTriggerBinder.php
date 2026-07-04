@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Integration;
 
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
@@ -26,13 +27,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * workflow's trigger node(s), wiring each one to queue a run (via
  * WorkflowExecutionService::queue()) when its underlying event fires.
  *
- * Queues rather than runs synchronously: the WordPress hook a trigger binds
- * to could be firing in the middle of an arbitrary front-end/admin/REST
- * request that has nothing to do with this plugin, so blocking it on
- * potentially slow node execution (outbound HTTP calls, etc.) is not
- * acceptable — see docs/internal/architecture.md §6 performance
- * requirements. A WP-Cron-driven BackgroundRunner (roadmap item 8) executes
- * the queued run out-of-request shortly after.
+ * Queues rather than runs synchronously by default: the WordPress hook a
+ * trigger binds to could be firing in the middle of an arbitrary
+ * front-end/admin/REST request that has nothing to do with this plugin, so
+ * blocking it on potentially slow node execution (outbound HTTP calls,
+ * etc.) is not acceptable — see docs/internal/architecture.md §6
+ * performance requirements. A WP-Cron-driven BackgroundRunner (roadmap item
+ * 8) executes the queued run out-of-request shortly after. The Settings
+ * screen's "Advanced" tab (roadmap item 10) can disable background
+ * execution entirely — see SettingsService::backgroundExecutionEnabled()
+ * — in which case triggers fall back to running synchronously instead;
+ * this exists for hosts where WP-Cron is unreliable or disabled outright,
+ * not recommended otherwise.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
  * rather than the `wfa_workflow_nodes` table: binding must happen as early
@@ -68,10 +74,13 @@ class WorkflowTriggerBinder {
 
 	private WorkflowExecutionService $executor;
 
-	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor ) {
+	private SettingsService $settings;
+
+	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings ) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
 		$this->executor = $executor;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -123,7 +132,12 @@ class WorkflowTriggerBinder {
 				$config,
 				function ( array $payload, array $bound_config ) use ( $workflow_id ): void {
 					unset( $bound_config ); // Required by the TriggerInterface::bind() callback signature; unused here.
-					$this->executor->queue( $workflow_id, $payload );
+
+					if ( $this->settings->backgroundExecutionEnabled() ) {
+						$this->executor->queue( $workflow_id, $payload );
+					} else {
+						$this->executor->run( $workflow_id, $payload );
+					}
 				}
 			);
 		}
