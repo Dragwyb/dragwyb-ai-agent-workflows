@@ -2,12 +2,6 @@
 /vendor/
 /node_modules/
 
-# Build output
-/build/
-/dist/
-/assets/dist/
-/assets/builder/build/
-
 # Environment and secrets
 .env
 .env.*
