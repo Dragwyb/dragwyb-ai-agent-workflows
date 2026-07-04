@@ -1,6 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
+	SelectControl,
 	TextControl,
 	TextareaControl,
 	ToggleControl,
@@ -13,19 +14,25 @@ import { __ } from '@wordpress/i18n';
  * defined in Domain\Contracts\NodeTypeInterface on the PHP side) rather
  * than needing a bespoke React component per node type — this is what lets
  * third-party node types (registered via `wfa/nodes/register`) show up in
- * the builder with zero front-end changes.
+ * the builder with zero front-end changes. The one exception is the
+ * `connection` field type (item 12): it still needs no per-*node-type*
+ * component, but it does need the connections list itself, which is why
+ * that one extra prop is threaded through from App.js rather than fetched
+ * by this component directly.
  *
- * @param {Object}      props
- * @param {Object}      props.node
- * @param {Object|null} props.nodeType
- * @param {Function}    props.onChangeLabel
- * @param {Function}    props.onChangeConfig
- * @param {Function}    props.onDelete
- * @param {Function}    props.onClose
+ * @param {Object}        props
+ * @param {Object}        props.node
+ * @param {Object|null}   props.nodeType
+ * @param {Array<Object>} props.connections
+ * @param {Function}      props.onChangeLabel
+ * @param {Function}      props.onChangeConfig
+ * @param {Function}      props.onDelete
+ * @param {Function}      props.onClose
  */
 export default function ConfigPanel({
 	node,
 	nodeType,
+	connections,
 	onChangeLabel,
 	onChangeConfig,
 	onDelete,
@@ -84,6 +91,7 @@ export default function ConfigPanel({
 						fieldName={fieldName}
 						fieldSchema={nodeType.config_schema[fieldName]}
 						value={node.config ? node.config[fieldName] : undefined}
+						connections={connections}
 						onChange={(value) => onChangeConfig(fieldName, value)}
 					/>
 				))}
@@ -100,7 +108,7 @@ export default function ConfigPanel({
 	);
 }
 
-function ConfigField({ fieldName, fieldSchema, value, onChange }) {
+function ConfigField({ fieldName, fieldSchema, value, connections, onChange }) {
 	const label = fieldSchema.label || fieldName;
 	const resolved = value === undefined ? fieldSchema.default : value;
 
@@ -118,6 +126,17 @@ function ConfigField({ fieldName, fieldSchema, value, onChange }) {
 		return <JsonField label={label} value={resolved} onChange={onChange} />;
 	}
 
+	if (fieldSchema.type === 'connection') {
+		return (
+			<ConnectionField
+				label={label}
+				value={resolved}
+				connections={connections || []}
+				onChange={onChange}
+			/>
+		);
+	}
+
 	return (
 		<TextControl
 			label={label}
@@ -128,6 +147,40 @@ function ConfigField({ fieldName, fieldSchema, value, onChange }) {
 			}
 			required={Boolean(fieldSchema.required)}
 			onChange={onChange}
+		/>
+	);
+}
+
+/**
+ * Renders a "connection" field (item 12) as a `<select>` of every stored
+ * connection, identified by its stored id — never its credentials, which
+ * this component never receives in the first place (see
+ * `ConnectionsController`, which the `connections` prop ultimately comes
+ * from). `0`/"None" is always the first option since every consumer of
+ * this field type (e.g. `HttpRequestAction`) treats an unset connection as
+ * "send unauthenticated", not as an error.
+ *
+ * @param {Object}        props
+ * @param {string}        props.label
+ * @param {*}             props.value
+ * @param {Array<Object>} props.connections
+ * @param {Function}      props.onChange
+ */
+function ConnectionField({ label, value, connections, onChange }) {
+	const options = [
+		{ value: '0', label: __('None', 'workflow-automate') },
+		...connections.map((connection) => ({
+			value: String(connection.id),
+			label: `${connection.label} (${connection.auth_type_label})`,
+		})),
+	];
+
+	return (
+		<SelectControl
+			label={label}
+			value={String(value || 0)}
+			options={options}
+			onChange={(nextValue) => onChange(Number(nextValue))}
 		/>
 	);
 }

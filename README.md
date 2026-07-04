@@ -54,8 +54,8 @@ src/
   Domain/Contracts/      Public extension interfaces (TriggerInterface, ActionInterface)
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
   Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry, NodeExecutionService, WorkflowExecutionService, BackgroundRunner, SettingsService, RunRetentionService, ConnectionAuthTypes, ConnectionService)
-  Integration/           Built-in trigger/action node types (Triggers/, Actions/), registered via wfa/nodes/register; WorkflowTriggerBinder binds active workflows' triggers to WorkflowExecutionService::queue()/run() (per SettingsService::backgroundExecutionEnabled()) on init
-  Rest/                  WP_REST_Controller subclasses + rest_api_init bootstrap (wfa/v1 namespace)
+  Integration/           Built-in trigger/action node types (Triggers/, Actions/: WpHookTrigger, HttpRequestAction, SendEmailAction), registered via wfa/nodes/register (BuiltInNodeTypes); WorkflowTriggerBinder binds active workflows' triggers to WorkflowExecutionService::queue()/run() (per SettingsService::backgroundExecutionEnabled()) on init
+  Rest/                  WP_REST_Controller subclass (WorkflowsController) plus plain read-only route classes (NodeTypesController, ConnectionsController) + rest_api_init bootstrap (wfa/v1 namespace)
   Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers (WorkflowActionsController, RunActionsController, SettingsController, ConnectionActionsController), status badge/duration/timestamp display helpers (RunStatusBadge, RunDuration, RunTimestamp, ConnectionStatusBadge)
   Admin/Pages/           WorkflowsPage (list), BuilderPage (visual editor shell), RunsPage (execution history list), RunDetailPage (single run + node log), SettingsPage (General/Retention/Advanced tabs), ConnectionsPage (list), ConnectionFormPage (create/edit)
 assets/
@@ -66,6 +66,7 @@ webpack.config.js        Points @wordpress/scripts at assets/builder/src -> asse
 docs/
   hooks-reference.md     Public actions/filters reference
   rest-api.md            REST API endpoint reference (wfa/v1)
+  integrations.md        Every shipped integration: what it is, and how (or whether) it stores/uses credentials
   internal/              Development-only docs (analysis, architecture, roadmap) — excluded from release builds
 ```
 

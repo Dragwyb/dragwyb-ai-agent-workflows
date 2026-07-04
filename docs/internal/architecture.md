@@ -119,6 +119,16 @@ Deferred/out of scope for this item: an admin-visible queue/retry status (belong
 
 `ConnectionAuthTypes` (three built-in types — API Key, Username & Password, Bearer Token — each a fixed, hardcoded field schema) intentionally is *not* a `wfa/…/register`-style hook-based registry the way `NodeTypeRegistry` is. Nothing exists yet that would tell this project what real extensibility here should look like — no third-party integration is wired to a connection until roadmap item 12 — so a registry now would be speculative surface with nothing to exercise it, repeating the exact mistake already caught and avoided for `wfa/integrations/register` (§2.6). OAuth2 was deliberately left out of the three built-in types for the same reason as it's absent from this item's stated scope: it needs a redirect/callback endpoint and token-refresh handling this item does not build.
 
+### Implementation note (roadmap item 12 — first real integrations)
+
+`HttpRequestAction` gained an optional `connection_id` config field (a new `configSchema()` field type, `connection`) — this is the "real integration" this section's `ConnectionAuthTypes` note above was waiting on: `ConnectionService::credentials()` now has an actual caller. See `docs/integrations.md` for the exact per-auth-type header mapping and its documented v1 limitations. A new read-only `GET /wfa/v1/connections` route (`Rest\ConnectionsController`) exists solely to feed the builder's config panel a credential-free connections list to render that field as a picker; it is not a general connections CRUD API (that remains the admin-only, non-REST `admin-post.php` flow from item 11).
+
+`Integration\Actions\SendEmailAction` (`send_email_action`) was added alongside it, wrapping `wp_mail()`. It deliberately does **not** use `Connection`/`ConnectionService` at all — see `docs/integrations.md` for why (it delegates delivery entirely to whatever mailer the site already has configured, so it has no credentials of its own to store).
+
+`BuiltInNodeTypes` stopped being a purely static class as a direct consequence: `HttpRequestAction` now needs a constructor-injected `ConnectionService`, so `Plugin::registerNodeTypes()` builds one instance from the container and hooks that instance's `register()` method onto `wfa/nodes/register` instead of the class's static method. The action's own signature (`$registry` only) is unchanged, so this is invisible to third-party code already hooking it.
+
+`wfa/integrations/register` (§2.6) remains deferred. Both new/changed node types here are still registered as individual `TriggerInterface`/`ActionInterface` implementations via the existing `NodeTypeRegistry`, exactly like item 5's originals — nothing yet needs a layer of abstraction *above* individual node types (e.g. a bundle of several related triggers/actions sharing one connection type), so introducing `IntegrationInterface` now would still be speculative. This will be revisited if roadmap item 15 (additional integrations) surfaces a real need for it.
+
 ---
 
 ## 2.3 Database Schema Redesign
@@ -288,6 +298,8 @@ Documented in full in `/docs/hooks-reference.md` once implemented; planned exten
 
 > **Implementation note (roadmap item 7 — execution engine):** `wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, and `wfa/node/after_execute` all shipped with the execution engine and are documented in `docs/hooks-reference.md`. `wfa/integrations/register` remains planned — there is no `IntegrationInterface` yet, since only two directly-`NodeTypeRegistry`-registered node types exist so far (`WpHookTrigger`, `HttpRequestAction`); that filter is deferred until a real third-party-integration increment needs a layer above individual node types.
 
+> **Implementation note (roadmap item 12 — first real integrations):** Still deferred, now with one more node type (`SendEmailAction`) and one wired-up connection consumer (`HttpRequestAction`) as additional evidence for the call: three individually-registered node types with no shared abstraction between them is still comfortably simple via plain `NodeTypeRegistry` registration alone. See the item 12 implementation note under §2.2 for the full reasoning.
+
 ---
 
 ## Security & Performance Decisions Baked Into This Design
@@ -295,7 +307,7 @@ Documented in full in `/docs/hooks-reference.md` once implemented; planned exten
 (Cross-referenced against Sections 5–6 of `CURSOR_INSTRUCTIONS.md`; each will be re-verified per-feature in Section 9's loop.)
 
 - No open HTTP proxy endpoint (opportunity #1).
-- Secrets encrypted with a key derived from `wp_salt()` material plus a per-site stored key id, not a predictable `prefix + time()` value (opportunity #2) — implemented in roadmap item 11 as `Core\Encryption` (AES-256-CBC, random IV per value, key = `hash('sha256', wp_salt('auth') . '|' . encryption_key_id, true)`), used by `ConnectionService` for every `wfa_connections` credential field. Secrets are masked to their last 4 characters everywhere they're displayed (`ConnectionService::displayCredentials()`) and rotatable per-field without re-entering a connection's other fields.
+- Secrets encrypted with a key derived from `wp_salt()` material plus a per-site stored key id, not a predictable `prefix + time()` value (opportunity #2) — implemented in roadmap item 11 as `Core\Encryption` (AES-256-CBC, random IV per value, key = `hash('sha256', wp_salt('auth') . '|' . encryption_key_id, true)`), used by `ConnectionService` for every `wfa_connections` credential field. Secrets are masked to their last 4 characters everywhere they're displayed (`ConnectionService::displayCredentials()`) and rotatable per-field without re-entering a connection's other fields. Roadmap item 12 gave this its first real consumer (`HttpRequestAction`'s optional connection-based auth): a decrypted value only ever lives inside that single method call's local scope for the one outbound request that needs it, is never logged, and the credential-free `GET /wfa/v1/connections` route the builder's picker uses cannot leak it even inadvertently.
 - REST controllers with explicit schemas/permissions (opportunity #3).
 - Indexed run/log tables from the first migration (opportunity #6).
 - Custom capabilities planned for workflow management, layered on top of `manage_options` fallback (opportunity #7) — introduced once the roles/permissions roadmap item is reached.

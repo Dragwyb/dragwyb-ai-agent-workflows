@@ -99,9 +99,26 @@ Read-only. Lists every trigger and action node type currently registered against
     { "slug": "wp_hook_trigger", "label": "WordPress Hook", "description": "…", "config_schema": { "hook_name": { "type": "string", "label": "Hook name", "required": true } } }
   ],
   "actions": [
-    { "slug": "http_request_action", "label": "HTTP Request", "description": "…", "config_schema": { "url": { "type": "string", "label": "Request URL", "required": true }, "method": { "type": "string", "label": "HTTP method", "default": "GET" } } }
+    { "slug": "http_request_action", "label": "HTTP Request", "description": "…", "config_schema": { "url": { "type": "string", "label": "Request URL", "required": true }, "method": { "type": "string", "label": "HTTP method", "default": "GET" }, "connection_id": { "type": "connection", "label": "Authenticate with connection (optional)", "default": 0 } } },
+    { "slug": "send_email_action", "label": "Send Email", "description": "…", "config_schema": { "to": { "type": "string", "label": "To (comma-separated for multiple recipients)", "required": true }, "subject": { "type": "string", "label": "Subject", "required": true } } }
   ]
 }
 ```
 
-`config_schema` mirrors `Domain\Contracts\NodeTypeInterface::configSchema()` on the PHP side field-for-field; the builder renders its node configuration panel generically from this shape, so a third-party node type registered via `wfa/nodes/register` needs no front-end changes to show up there.
+`config_schema` mirrors `Domain\Contracts\NodeTypeInterface::configSchema()` on the PHP side field-for-field; the builder renders its node configuration panel generically from this shape, so a third-party node type registered via `wfa/nodes/register` needs no front-end changes to show up there. The one field `type` that needs an extra data source to render meaningfully is `connection` — see below.
+
+## Connections — `wfa/v1/connections`
+
+### `GET /wfa/v1/connections`
+
+Read-only. Lists every stored `Connection` (see `docs/internal/architecture.md` §2.3), stripped down to just enough to tell them apart in a picker — this is what powers the builder's "connection" config field type (e.g. `HttpRequestAction`'s `connection_id`, see `docs/integrations.md`). Never includes credential values, not even masked; the admin-only Connections screen (`admin.php?page=wfa-connections`) is the only place those are ever rendered (masked) or edited.
+
+**Response**
+
+```json
+[
+  { "id": 3, "label": "Acme CRM", "integration_slug": "acme_crm", "auth_type": "bearer_token", "auth_type_label": "Bearer Token" }
+]
+```
+
+Returns at most 100 connections (no pagination parameters yet) — see `src/Rest/ConnectionsController.php` for the rationale; this is a picker data source, not the admin list table (which does paginate, at 20 per page, via its own non-REST `WP_List_Table` screen).

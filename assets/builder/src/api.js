@@ -48,6 +48,16 @@ export function fetchNodeTypes() {
 }
 
 /**
+ * Credential-free connection summaries, used to populate a "connection"
+ * config field (see ConfigPanel) with a picker rather than a raw id input.
+ *
+ * @return {Promise<Array<Object>>} Every stored connection's id/label/auth type.
+ */
+export function fetchConnections() {
+	return apiFetch({ path: '/wfa/v1/connections' });
+}
+
+/**
  * Bootstrap data localized by BuilderPage::enqueueAssets().
  *
  * @return {{workflowId: number, listUrl: string}} Bootstrap settings.

@@ -304,7 +304,9 @@ class Plugin {
 			}
 		);
 
-		add_action( 'wfa/nodes/register', array( BuiltInNodeTypes::class, 'register' ) );
+		$built_in_node_types = new BuiltInNodeTypes( $this->container->get( ConnectionService::class ) );
+
+		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );
 
 		add_action(
 			'init',

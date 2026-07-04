@@ -1,0 +1,49 @@
+# Integrations Reference
+
+Every node type the plugin ships that talks to something outside the workflow engine itself, what (if anything) it stores credentials for, and exactly how those credentials are used. This file is updated every time a roadmap increment ships a new integration (see `docs/internal/roadmap.md`).
+
+For how connections themselves are stored and encrypted, see `docs/internal/architecture.md` §2.3 and §2.5. This file is about how each individual integration *uses* that storage — or, for the two below that don't need it, why not.
+
+## WordPress Hook — trigger (`wp_hook_trigger`)
+
+**What it is:** Starts a workflow whenever a specified WordPress action hook fires (`do_action()`). This is not a third-party service — it is WordPress core (or another already-installed plugin announcing its own events) — so there is no external account, API, or credential involved at all.
+
+**Credentials:** None. `bind()` just calls `add_action()` on the hook name the workflow author typed in.
+
+**Config fields:** `hook_name` (required), `priority`, `accepted_args`.
+
+## HTTP Request — action (`http_request_action`)
+
+**What it is:** Sends a single outbound HTTP request to a URL the workflow author configures — this is the plugin's general-purpose "talk to any API" building block, not an integration with one specific named service.
+
+**Credentials:** Optional. The `connection_id` config field (a "connection" picker in the builder) lets the author attach a stored `Connection` (see `docs/internal/architecture.md` §2.3) so the request is authenticated automatically instead of the author having to paste a secret into the plain-text Headers field. When set:
+
+| Connection auth type | Header added |
+| --- | --- |
+| API Key | `Authorization: Bearer <api_key>` |
+| Bearer Token | `Authorization: Bearer <token>` |
+| Username & Password | `Authorization: Basic <base64(username:password)>` |
+
+This mapping is a deliberate v1 simplification: `Authorization: Bearer <key>` is the single most common convention for a modern REST API key, but it is not universal — some APIs expect the key in a custom header or a query parameter instead. For those, the connection picker can be left unset and the header/query-string value added manually via the existing Headers/URL fields, or a future increment can add a way to pick where an API-key connection's value is injected instead of hardcoding `Authorization: Bearer`.
+
+The decrypted credential value only ever exists inside `HttpRequestAction::execute()`'s local scope for the single outbound `wp_safe_remote_request()` call that needs it — it is never logged, and `wfa_workflow_run_logs` only ever stores the node's *result* (status code, response body), never its request headers.
+
+If the configured connection no longer exists, or its stored value fails to decrypt, the action fails loudly (`success: false` with a clear error) rather than silently sending the request unauthenticated.
+
+**Config fields:** `url` (required), `method`, `headers`, `body`, `connection_id` (optional).
+
+## Send Email — action (`send_email_action`)
+
+**What it is:** Sends an email via WordPress core's own `wp_mail()`.
+
+**Credentials:** None — and deliberately so. `wp_mail()` already sends through whatever mail transport the site has configured: PHP's built-in `mail()` by default, or any SMTP/API-based transactional-email plugin (Mailgun, SendGrid, Postmark, an SMTP relay, etc.) already active on the site. This action does not talk to any provider's API directly and does not store, encrypt, or manage any mail-provider credentials of its own — it is a thin wrapper around a WordPress core function, and inherits whichever provider (if any) is already wired into `wp_mail()` at the site level.
+
+If a future increment adds a *direct* API-based email provider integration (bypassing `wp_mail()` to call, say, a provider's HTTP API for delivery analytics), it will need its own `Connection` (its own row in `ConnectionAuthTypes`) and will be documented here as a new, separate integration rather than folded into this one.
+
+**Config fields:** `to` (required, comma-separated), `subject` (required), `message` (required), `headers` (optional, e.g. `From`/`Reply-To`/`Content-Type`).
+
+---
+
+## Connections picker — `wfa/v1/connections`
+
+Any integration that supports the optional `connection_id` config field (see HTTP Request above) relies on the builder fetching `GET /wfa/v1/connections` (see `docs/rest-api.md`) to render that field as a dropdown of the site's stored connections, identified only by `id`/`label`/`integration_slug`/`auth_type` — never by any credential value. See `src/Rest/ConnectionsController.php`.

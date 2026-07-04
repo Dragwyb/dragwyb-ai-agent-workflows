@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Container;
+use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
@@ -58,5 +59,8 @@ class RestApi {
 
 		$node_types_controller = new NodeTypesController( $this->container->get( NodeTypeRegistry::class ) );
 		$node_types_controller->register_routes();
+
+		$connections_controller = new ConnectionsController( $this->container->get( ConnectionService::class ) );
+		$connections_controller->register_routes();
 	}
 }

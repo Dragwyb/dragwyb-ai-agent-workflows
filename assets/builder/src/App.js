@@ -10,6 +10,7 @@ import {
 	createWorkflow,
 	updateWorkflow,
 	fetchNodeTypes,
+	fetchConnections,
 	getBootstrap,
 } from './api';
 import { generateNodeId, emptyGraph, defaultNodePosition } from './utils';
@@ -42,6 +43,7 @@ export default function App() {
 	const [title, setTitle] = useState('');
 	const [graph, setGraph] = useState(emptyGraph());
 	const [nodeTypes, setNodeTypes] = useState({ triggers: [], actions: [] });
+	const [connections, setConnections] = useState([]);
 	const [selectedNodeId, setSelectedNodeId] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState('');
@@ -65,6 +67,11 @@ export default function App() {
 		async function load() {
 			try {
 				const typesPromise = fetchNodeTypes();
+				// A failure here shouldn't block loading the workflow
+				// itself — worst case the "connection" picker field just
+				// renders with no options besides "None" instead of the
+				// whole builder failing to load.
+				const connectionsPromise = fetchConnections().catch(() => []);
 				let workflow;
 
 				if (bootstrap.workflowId) {
@@ -87,6 +94,7 @@ export default function App() {
 				}
 
 				const types = await typesPromise;
+				const fetchedConnections = await connectionsPromise;
 
 				if (cancelled) {
 					return;
@@ -98,6 +106,9 @@ export default function App() {
 					triggers: types.triggers || [],
 					actions: types.actions || [],
 				});
+				setConnections(
+					Array.isArray(fetchedConnections) ? fetchedConnections : []
+				);
 
 				// The state we just set is data we loaded, not an edit — don't
 				// let the autosave effect below treat it as a change to save.
@@ -307,6 +318,7 @@ export default function App() {
 				<ConfigPanel
 					node={selectedNode}
 					nodeType={selectedNodeType}
+					connections={connections}
 					onChangeLabel={handleChangeLabel}
 					onChangeConfig={handleChangeConfig}
 					onDelete={handleDeleteNode}
