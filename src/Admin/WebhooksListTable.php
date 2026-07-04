@@ -102,6 +102,13 @@ class WebhooksListTable extends WP_List_Table {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function no_items() {
+		esc_html_e( 'No webhooks yet.', 'workflow-automate' );
+	}
+
+	/**
 	 * @param Webhook[] $webhooks Current page of webhooks.
 	 *
 	 * @return array<int, string>

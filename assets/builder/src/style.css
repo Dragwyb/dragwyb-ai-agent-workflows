@@ -134,7 +134,11 @@
 .wfa-builder-palette__item:hover,
 .wfa-builder-palette__item:focus {
 	border-color: #2271b1;
-	outline: none;
+}
+
+.wfa-builder-palette__item:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
 }
 
 .wfa-builder-palette__item-label {
@@ -157,13 +161,42 @@
 	background-color: #fdfdfd;
 }
 
-.wfa-builder-canvas__empty {
+.wfa-builder-canvas__guide {
 	position: absolute;
-	top: 40px;
-	left: 40px;
-	color: #8c8f94;
-	font-style: italic;
-	max-width: 280px;
+	top: 32px;
+	left: 32px;
+	max-width: 360px;
+	padding: 20px 22px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.wfa-builder-canvas__guide-title {
+	margin: 0 0 12px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.wfa-builder-canvas__guide-steps {
+	margin: 0 0 12px;
+	padding-left: 1.25em;
+	color: #2c3338;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.wfa-builder-canvas__guide-steps li + li {
+	margin-top: 8px;
+}
+
+.wfa-builder-canvas__guide-hint {
+	margin: 0;
+	font-size: 12px;
+	color: #50575e;
+	line-height: 1.45;
 }
 
 .wfa-builder-node {

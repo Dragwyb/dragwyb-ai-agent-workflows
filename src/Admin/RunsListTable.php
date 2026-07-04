@@ -130,6 +130,13 @@ class RunsListTable extends WP_List_Table {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function no_items() {
+		esc_html_e( 'No runs match this filter.', 'workflow-automate' );
+	}
+
+	/**
 	 * @param WorkflowRun[] $runs Current page of runs.
 	 *
 	 * @return array<int, string>

@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\ConnectionsListTable;
+use WorkflowAutomate\Plugin\Admin\EmptyState;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -113,6 +114,24 @@ class ConnectionsPage implements AdminPage {
 		$this->renderNotice();
 
 		echo '<p class="description">' . esc_html__( 'Credentials stored here are encrypted at rest and never displayed in full once saved.', 'workflow-automate' ) . '</p>';
+
+		if ( ! $table->has_items() ) {
+			EmptyState::render(
+				__( 'No connections yet', 'workflow-automate' ),
+				__( 'Store API keys and other credentials here, then pick them from an HTTP Request action in the workflow editor.', 'workflow-automate' ),
+				array(),
+				array(
+					array(
+						'url' => admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ),
+						'label' => __( 'Add connection', 'workflow-automate' ),
+						'primary' => true,
+					),
+				)
+			);
+			echo '</div>';
+
+			return;
+		}
 
 		echo '<form method="get">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );

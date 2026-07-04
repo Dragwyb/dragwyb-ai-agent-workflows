@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Admin\EmptyState;
 use WorkflowAutomate\Plugin\Admin\WebhooksListTable;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -115,6 +116,24 @@ class WebhooksPage implements AdminPage {
 
 		if ( $this->settings->requireWebhookSigning() ) {
 			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'workflow-automate' ) . '</p></div>';
+		}
+
+		if ( ! $table->has_items() ) {
+			EmptyState::render(
+				__( 'No webhooks yet', 'workflow-automate' ),
+				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'workflow-automate' ),
+				array(),
+				array(
+					array(
+						'url' => admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ),
+						'label' => __( 'Add webhook', 'workflow-automate' ),
+						'primary' => true,
+					),
+				)
+			);
+			echo '</div>';
+
+			return;
 		}
 
 		echo '<form method="get">';

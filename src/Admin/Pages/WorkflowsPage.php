@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Admin\EmptyState;
 use WorkflowAutomate\Plugin\Admin\WorkflowsListTable;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -116,6 +117,38 @@ class WorkflowsPage implements AdminPage {
 
 		$this->renderNotice();
 
+		// Guided first-workflow panel (roadmap item 16) when the site has
+		// no workflows at all — not when a status filter or Trash view is
+		// simply empty.
+		if ( $this->shouldShowFirstWorkflowGuide( $table ) ) {
+			EmptyState::render(
+				__( 'Create your first workflow', 'workflow-automate' ),
+				__( 'Workflows automate work for you: a trigger starts a run, then one or more actions do the work.', 'workflow-automate' ),
+				array(
+					__( 'Open the editor and add a trigger (for example a WordPress hook or an inbound webhook).', 'workflow-automate' ),
+					__( 'Add an action (send email, HTTP request, and more).', 'workflow-automate' ),
+					__( 'Save, then set the workflow to Active so it can run automatically.', 'workflow-automate' ),
+				),
+				array(
+					array(
+						'url' => admin_url( 'admin.php?page=' . BuilderPage::SLUG ),
+						'label' => __( 'Create workflow', 'workflow-automate' ),
+						'primary' => true,
+					),
+				)
+			);
+
+			// Keep the status views (especially Trash) reachable when the
+			// "all" list is empty but trashed workflows still exist.
+			echo '<form method="get">';
+			printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
+			$table->views();
+			echo '</form>';
+			echo '</div>';
+
+			return;
+		}
+
 		echo '<form method="get">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		$table->views();
@@ -123,6 +156,24 @@ class WorkflowsPage implements AdminPage {
 		echo '</form>';
 
 		echo '</div>';
+	}
+
+	/**
+	 * Whether to show the guided empty state instead of the list table.
+	 *
+	 * @param WorkflowsListTable $table Prepared list table.
+	 *
+	 * @return bool
+	 */
+	private function shouldShowFirstWorkflowGuide( WorkflowsListTable $table ): bool {
+		if ( $table->has_items() ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view selector.
+		$view = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
+
+		return 'all' === $view || '' === $view;
 	}
 
 	/**

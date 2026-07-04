@@ -312,3 +312,13 @@ This item is also where architecture §2.5's "Security/API Keys: connection mana
 **Refactor:** None required beyond the optional-registration helper on `BuiltInNodeTypes` (kept private and WooCommerce-specific rather than a generic "if plugin active" registry — a generic helper would be premature until a second co-plugin integration exists to share it).
 
 **Deferred / follow-up:** Same PHPCS/PHPUnit/PHPStan CLI gap; smoke-test with WooCommerce active (complete an order, confirm a run is queued with the structured payload) and inactive (confirm the trigger is absent from `GET /wfa/v1/node-types`). Further integrations (Contact Form 7, WPForms, more WooCommerce events/actions such as "order refunded" or "update order status") each get their own increment under this same optional-registration pattern. `IntegrationInterface` remains deferred.
+
+### 16. Onboarding & polish — done
+
+**Built:** Shared `Admin\EmptyState` panel; guided **Create your first workflow** empty state on Workflows (with status views still shown so Trash remains reachable); empty states with CTAs on Runs, Connections, and Webhooks; friendlier `no_items()` copy on all list tables. Builder: numbered **Build your workflow** canvas guide when the graph is empty (keyboard tip included); accessibility pass — `role="region"` canvas, `role="status"`/`alert` for load states, palette `aria-label`s via `sprintf`, node cards with descriptive `aria-label`/`aria-pressed`, focus moved to a newly added node, Escape clears selection, visible focus outlines, back-link `aria-label`. Docs: `README.md`, this report.
+
+**Design decisions:** Empty states replace the list only when there is truly nothing to show (not when a filter is empty — those keep the table + `no_items()`). Guided first workflow is copy + CTA, not a multi-step wizard modal (matches the plugin's low-JS admin style). Builder a11y builds on item 6's existing keyboard node cards rather than replacing the canvas interaction model.
+
+**Self-review / security / performance / standards:** No new privileged surfaces; empty-state URLs use `admin_url` + known slugs; no extra queries beyond list tables already run. `npm run lint:js` and `npm run build` pass.
+
+**Deferred:** Full WCAG audit with a screen reader in a live admin; per-workflow "activate" CTA inside the builder (status changes still go through the Workflows list / REST).

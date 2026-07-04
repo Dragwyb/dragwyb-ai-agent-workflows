@@ -94,6 +94,13 @@ class ConnectionsListTable extends WP_List_Table {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function no_items() {
+		esc_html_e( 'No connections yet.', 'workflow-automate' );
+	}
+
+	/**
 	 * @param Connection $item Row.
 	 *
 	 * @return string

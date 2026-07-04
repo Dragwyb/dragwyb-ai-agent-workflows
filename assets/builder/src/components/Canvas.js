@@ -15,6 +15,7 @@ import NodeCard from './NodeCard';
  * @param {Function} props.onSelectNode
  * @param {Function} props.onMoveNode
  * @param {Function} props.onCanvasClick
+ * @param {Function} props.registerNodeRef Optional (nodeId, element) => void for focus management.
  */
 export default function Canvas({
 	nodes,
@@ -23,18 +24,17 @@ export default function Canvas({
 	onSelectNode,
 	onMoveNode,
 	onCanvasClick,
+	registerNodeRef,
 }) {
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- deselect-on-background-click is a supplementary mouse affordance; keyboard users deselect via the config panel's close control.
-		<div className="wfa-builder-canvas" onClick={onCanvasClick}>
-			{nodes.length === 0 && (
-				<p className="wfa-builder-canvas__empty">
-					{__(
-						'Add a trigger or action from the palette to get started.',
-						'workflow-automate'
-					)}
-				</p>
-			)}
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- deselect-on-background-click is a supplementary mouse affordance; keyboard users deselect via Escape or the config panel's close control.
+		<div
+			className="wfa-builder-canvas"
+			role="region"
+			aria-label={__('Workflow canvas', 'workflow-automate')}
+			onClick={onCanvasClick}
+		>
+			{nodes.length === 0 && <EmptyCanvasGuide />}
 			{nodes.map((node) => (
 				<NodeCard
 					key={node.id}
@@ -43,8 +43,48 @@ export default function Canvas({
 					hasUnknownType={!knownTypeSlugs.includes(node.type)}
 					onSelect={onSelectNode}
 					onMove={onMoveNode}
+					registerRef={registerNodeRef}
 				/>
 			))}
+		</div>
+	);
+}
+
+/**
+ * Guided empty state for a brand-new workflow (roadmap item 16).
+ */
+function EmptyCanvasGuide() {
+	return (
+		<div className="wfa-builder-canvas__guide" role="status">
+			<h2 className="wfa-builder-canvas__guide-title">
+				{__('Build your workflow', 'workflow-automate')}
+			</h2>
+			<ol className="wfa-builder-canvas__guide-steps">
+				<li>
+					{__(
+						'Add a trigger from the palette on the left (what starts the run).',
+						'workflow-automate'
+					)}
+				</li>
+				<li>
+					{__(
+						'Add one or more actions (what the workflow should do).',
+						'workflow-automate'
+					)}
+				</li>
+				<li>
+					{__(
+						'Select each node to configure it, then save. Activate the workflow from the Workflows list when you are ready.',
+						'workflow-automate'
+					)}
+				</li>
+			</ol>
+			<p className="wfa-builder-canvas__guide-hint">
+				{__(
+					'Tip: use Tab to move between nodes, Enter to select, and arrow keys to nudge a selected node.',
+					'workflow-automate'
+				)}
+			</p>
 		</div>
 	);
 }

@@ -35,7 +35,14 @@ export default function Header({
 		<header className="wfa-builder-header">
 			<div className="wfa-builder-header__left">
 				{listUrl && (
-					<a className="wfa-builder-header__back" href={listUrl}>
+					<a
+						className="wfa-builder-header__back"
+						href={listUrl}
+						aria-label={__(
+							'Back to workflows list',
+							'workflow-automate'
+						)}
+					>
 						{__('← Workflows', 'workflow-automate')}
 					</a>
 				)}

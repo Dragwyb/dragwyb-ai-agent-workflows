@@ -106,6 +106,25 @@ class WorkflowsListTable extends WP_List_Table {
 
 	/**
 	 * {@inheritDoc}
+	 */
+	public function no_items() {
+		$view = $this->currentView();
+
+		if ( 'trash' === $view ) {
+			esc_html_e( 'Trash is empty.', 'workflow-automate' );
+			return;
+		}
+
+		if ( 'all' !== $view ) {
+			esc_html_e( 'No workflows match this filter.', 'workflow-automate' );
+			return;
+		}
+
+		esc_html_e( 'No workflows yet.', 'workflow-automate' );
+	}
+
+	/**
+	 * {@inheritDoc}
 	 *
 	 * @return array<string, string>
 	 */

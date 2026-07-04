@@ -1,4 +1,5 @@
 import { useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 const DRAG_THRESHOLD_PX = 3;
 const NUDGE_STEP = 10;
@@ -24,6 +25,7 @@ const ARROW_DELTAS = {
  * @param {boolean}  props.hasUnknownType
  * @param {Function} props.onSelect
  * @param {Function} props.onMove
+ * @param {Function} [props.registerRef]
  */
 export default function NodeCard({
 	node,
@@ -31,6 +33,7 @@ export default function NodeCard({
 	hasUnknownType,
 	onSelect,
 	onMove,
+	registerRef,
 }) {
 	const draggingRef = useRef(null);
 
@@ -117,18 +120,39 @@ export default function NodeCard({
 		classNames.push('wfa-builder-node--unknown');
 	}
 
+	const ariaLabel = [
+		node.label || node.type,
+		node.category === 'trigger'
+			? __('Trigger', 'workflow-automate')
+			: __('Action', 'workflow-automate'),
+		selected ? __('selected', 'workflow-automate') : '',
+	]
+		.filter(Boolean)
+		.join(', ');
+
 	return (
 		<div
+			ref={(element) => {
+				if (registerRef) {
+					registerRef(node.id, element);
+				}
+			}}
 			className={classNames.join(' ')}
 			style={{ transform: `translate(${node.x}px, ${node.y}px)` }}
 			role="button"
 			tabIndex={0}
 			aria-pressed={selected}
+			aria-label={ariaLabel}
+			data-node-id={node.id}
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-builder-node__label">{node.label}</span>
-			<span className="wfa-builder-node__type">{node.type}</span>
+			<span className="wfa-builder-node__label" aria-hidden="true">
+				{node.label}
+			</span>
+			<span className="wfa-builder-node__type" aria-hidden="true">
+				{node.type}
+			</span>
 		</div>
 	);
 }

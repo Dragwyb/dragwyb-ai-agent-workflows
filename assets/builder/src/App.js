@@ -56,10 +56,45 @@ export default function App() {
 	const latestRef = useRef({ title: '', graph: emptyGraph(), workflowId: 0 });
 	const skipNextAutosaveRef = useRef(false);
 	const autosaveTimeoutRef = useRef(null);
+	const nodeElementsRef = useRef({});
+	const focusNodeIdRef = useRef(null);
 
 	useEffect(() => {
 		latestRef.current = { title, graph, workflowId };
 	}, [title, graph, workflowId]);
+
+	// Escape clears the selection so keyboard users are not stuck in the
+	// config panel (roadmap item 16 accessibility pass).
+	useEffect(() => {
+		const onKeyDown = (event) => {
+			if (event.key === 'Escape') {
+				setSelectedNodeId(null);
+			}
+		};
+
+		window.addEventListener('keydown', onKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', onKeyDown);
+		};
+	}, []);
+
+	// After adding a node, move focus to its card so keyboard users land
+	// on the new element without hunting for it.
+	useEffect(() => {
+		const nodeId = focusNodeIdRef.current;
+
+		if (!nodeId) {
+			return;
+		}
+
+		focusNodeIdRef.current = null;
+		const element = nodeElementsRef.current[nodeId];
+
+		if (element && typeof element.focus === 'function') {
+			element.focus();
+		}
+	}, [graph.nodes]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -213,6 +248,8 @@ export default function App() {
 			config: {},
 		};
 
+		focusNodeIdRef.current = newNode.id;
+
 		setGraph((current) => {
 			const position = defaultNodePosition(current.nodes.length);
 			return {
@@ -226,6 +263,14 @@ export default function App() {
 
 		setSelectedNodeId(newNode.id);
 	};
+
+	const registerNodeRef = useCallback((nodeId, element) => {
+		if (element) {
+			nodeElementsRef.current[nodeId] = element;
+		} else {
+			delete nodeElementsRef.current[nodeId];
+		}
+	}, []);
 
 	const handleMoveNode = (nodeId, x, y) => {
 		setGraph((current) => ({
@@ -269,14 +314,18 @@ export default function App() {
 
 	if (loading) {
 		return (
-			<div className="wfa-builder-loading">
+			<div className="wfa-builder-loading" role="status">
 				{__('Loading…', 'workflow-automate')}
 			</div>
 		);
 	}
 
 	if (loadError) {
-		return <div className="wfa-builder-error">{loadError}</div>;
+		return (
+			<div className="wfa-builder-error" role="alert">
+				{loadError}
+			</div>
+		);
 	}
 
 	const selectedNode =
@@ -309,6 +358,7 @@ export default function App() {
 					selectedNodeId={selectedNodeId}
 					onSelectNode={setSelectedNodeId}
 					onMoveNode={handleMoveNode}
+					registerNodeRef={registerNodeRef}
 					onCanvasClick={(event) => {
 						if (event.target === event.currentTarget) {
 							setSelectedNodeId(null);

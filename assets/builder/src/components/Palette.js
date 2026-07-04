@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Left-hand palette. Purely a source of "add this node type" buttons — it
@@ -55,12 +55,37 @@ function PaletteSection({ title, items, category, onAdd, emptyMessage }) {
 							className="wfa-builder-palette__item"
 							onClick={() => onAdd(item, category)}
 							title={item.description}
+							aria-label={
+								category === 'trigger'
+									? sprintf(
+											/* translators: %s: trigger label */
+											__(
+												'Add trigger: %s',
+												'workflow-automate'
+											),
+											item.label
+										)
+									: sprintf(
+											/* translators: %s: action label */
+											__(
+												'Add action: %s',
+												'workflow-automate'
+											),
+											item.label
+										)
+							}
 						>
-							<span className="wfa-builder-palette__item-label">
+							<span
+								className="wfa-builder-palette__item-label"
+								aria-hidden="true"
+							>
 								{item.label}
 							</span>
 							{item.description && (
-								<span className="wfa-builder-palette__item-description">
+								<span
+									className="wfa-builder-palette__item-description"
+									aria-hidden="true"
+								>
 									{item.description}
 								</span>
 							)}

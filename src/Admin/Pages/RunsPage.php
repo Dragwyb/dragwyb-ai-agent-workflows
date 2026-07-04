@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Admin\EmptyState;
 use WorkflowAutomate\Plugin\Admin\RunsListTable;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
@@ -110,6 +111,28 @@ class RunsPage implements AdminPage {
 
 		$this->renderWorkflowFilterNotice();
 		$this->renderNotice();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filters.
+		$has_filters = ( isset( $_GET['workflow_id'] ) && absint( wp_unslash( $_GET['workflow_id'] ) ) > 0 )
+			|| ( isset( $_GET['status'] ) && '' !== sanitize_key( wp_unslash( $_GET['status'] ) ) );
+
+		if ( ! $table->has_items() && ! $has_filters ) {
+			EmptyState::render(
+				__( 'No runs yet', 'workflow-automate' ),
+				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'workflow-automate' ),
+				array(),
+				array(
+					array(
+						'url' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+						'label' => __( 'Go to Workflows', 'workflow-automate' ),
+						'primary' => true,
+					),
+				)
+			);
+			echo '</div>';
+
+			return;
+		}
 
 		echo '<form method="get">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
