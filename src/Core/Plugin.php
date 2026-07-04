@@ -45,6 +45,7 @@ use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -258,6 +259,13 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			WorkflowTestListenerService::class,
+			static function ( Container $container ): WorkflowTestListenerService {
+				return new WorkflowTestListenerService( $container->get( WorkflowService::class ) );
+			}
+		);
+
+		$this->container->singleton(
 			WorkflowExecutionService::class,
 			static function ( Container $container ): WorkflowExecutionService {
 				return new WorkflowExecutionService(
@@ -390,7 +398,8 @@ class Plugin {
 					$this->container->get( WorkflowService::class ),
 					$this->container->get( NodeTypeRegistry::class ),
 					$this->container->get( WorkflowExecutionService::class ),
-					$this->container->get( SettingsService::class )
+					$this->container->get( SettingsService::class ),
+					$this->container->get( WorkflowTestListenerService::class )
 				);
 
 				$binder->bindActiveWorkflows();

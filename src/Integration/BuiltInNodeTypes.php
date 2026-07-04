@@ -18,11 +18,11 @@ use WorkflowAutomate\Plugin\Integration\Actions\SendEmailAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
 use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
+use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceOrderCompletedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\WpHookTrigger;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 
@@ -52,7 +52,9 @@ class BuiltInNodeTypes {
 	 * @return void
 	 */
 	public function register( NodeTypeRegistry $registry ): void {
-		$registry->registerTrigger( new WpHookTrigger() );
+		foreach ( WordPressHookCatalog::definitions() as $definition ) {
+			$registry->registerTrigger( new CatalogHookTrigger( $definition ) );
+		}
 
 		$registry->registerAction( new HttpRequestAction( $this->connections ) );
 		$registry->registerAction( new SendEmailAction() );

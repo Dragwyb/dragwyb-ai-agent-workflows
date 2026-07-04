@@ -81,3 +81,46 @@ export function createConnection(data) {
 export function getBootstrap() {
 	return window.wfaBuilderSettings || { workflowId: 0, listUrl: '' };
 }
+
+/**
+ * @param {number} id Workflow id.
+ * @return {Promise<Object>}
+ */
+export function startTestListen(id) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/test/listen`,
+		method: 'POST',
+	});
+}
+
+/**
+ * @param {number} id Workflow id.
+ * @return {Promise<Object>}
+ */
+export function stopTestListen(id) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/test/listen`,
+		method: 'DELETE',
+	});
+}
+
+/**
+ * @param {number} id Workflow id.
+ * @return {Promise<Object>}
+ */
+export function fetchTestStatus(id) {
+	return apiFetch({ path: `/wfa/v1/workflows/${id}/test/status` });
+}
+
+/**
+ * @param {number} id Workflow id.
+ * @param {Object} [data]
+ * @return {Promise<Object>}
+ */
+export function runWorkflow(id, data = {}) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/run`,
+		method: 'POST',
+		data,
+	});
+}

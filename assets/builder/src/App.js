@@ -5,6 +5,9 @@ import Header from './components/Header';
 import Palette from './components/Palette';
 import Canvas from './components/Canvas';
 import ConfigPanel from './components/ConfigPanel';
+import PickerSidebar from './components/PickerSidebar';
+import useTestFlow from './hooks/useTestFlow';
+import { defaultConfigFor } from './nodeCatalog';
 import {
 	fetchWorkflow,
 	createWorkflow,
@@ -12,6 +15,7 @@ import {
 	fetchNodeTypes,
 	fetchConnections,
 	getBootstrap,
+	fetchTestStatus,
 } from './api';
 import { generateNodeId, emptyGraph, defaultNodePosition } from './utils';
 
@@ -51,6 +55,9 @@ export default function App() {
 	// 0 = draft, 1 = active, 2 = paused (matches Workflow::STATUS_* / REST).
 	const [workflowStatus, setWorkflowStatus] = useState(0);
 	const [toggleActiveBusy, setToggleActiveBusy] = useState(false);
+	const [picker, setPicker] = useState(null);
+	const [capturedPayload, setCapturedPayload] = useState(null);
+	const [capturedAt, setCapturedAt] = useState(null);
 
 	// Autosave fires from a setTimeout created by a stable useCallback, so it
 	// needs a way to read state as of when it actually runs rather than as
@@ -71,6 +78,11 @@ export default function App() {
 	useEffect(() => {
 		const onKeyDown = (event) => {
 			if (event.key === 'Escape') {
+				if (picker) {
+					setPicker(null);
+					return;
+				}
+
 				setSelectedNodeId(null);
 			}
 		};
@@ -80,7 +92,7 @@ export default function App() {
 		return () => {
 			window.removeEventListener('keydown', onKeyDown);
 		};
-	}, []);
+	}, [picker]);
 
 	// After adding a node, move focus to its card so keyboard users land
 	// on the new element without hunting for it.
@@ -150,6 +162,13 @@ export default function App() {
 				setConnections(
 					Array.isArray(fetchedConnections) ? fetchedConnections : []
 				);
+
+				const settings = workflow.settings || {};
+
+				if (settings.sample_payload) {
+					setCapturedPayload(settings.sample_payload);
+					setCapturedAt(settings.sample_payload_captured_at || null);
+				}
 
 				// The state we just set is data we loaded, not an edit — don't
 				// let the autosave effect below treat it as a change to save.
@@ -276,6 +295,68 @@ export default function App() {
 		}
 	}, [workflowStatus, toggleActiveBusy]);
 
+	const persistBeforeTest = useCallback(async () => {
+		const current = latestRef.current;
+
+		if (!current.workflowId) {
+			return;
+		}
+
+		if (autosaveTimeoutRef.current) {
+			clearTimeout(autosaveTimeoutRef.current);
+		}
+
+		await updateWorkflow(current.workflowId, {
+			title: current.title,
+			graph: current.graph,
+		});
+		setSaveStatus('saved');
+	}, []);
+
+	const testFlow = useTestFlow(workflowId, {
+		persistBeforeTest,
+		onSampleCaptured: (payload) => {
+			setCapturedPayload(payload);
+			fetchTestStatus(workflowId)
+				.then((status) => {
+					setCapturedAt(status.captured_at || null);
+				})
+				.catch(() => {});
+		},
+	});
+
+	// Refresh captured data when a trigger node is selected.
+	useEffect(() => {
+		if (!workflowId || !selectedNodeId) {
+			return;
+		}
+
+		const node = graph.nodes.find((item) => item.id === selectedNodeId);
+
+		if (!node || node.category !== 'trigger') {
+			return;
+		}
+
+		let cancelled = false;
+
+		fetchTestStatus(workflowId)
+			.then((status) => {
+				if (cancelled) {
+					return;
+				}
+
+				if (status.has_sample) {
+					setCapturedPayload(status.sample_payload);
+					setCapturedAt(status.captured_at || null);
+				}
+			})
+			.catch(() => {});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [workflowId, selectedNodeId, graph.nodes]);
+
 	const handleAddNode = (nodeTypeDefinition, category) => {
 		const newNode = {
 			id: generateNodeId(),
@@ -284,10 +365,11 @@ export default function App() {
 			label: nodeTypeDefinition.label,
 			x: 0,
 			y: 0,
-			config: {},
+			config: defaultConfigFor(nodeTypeDefinition),
 		};
 
 		focusNodeIdRef.current = newNode.id;
+		setPicker(null);
 
 		setGraph((current) => {
 			const position = defaultNodePosition(current.nodes);
@@ -301,6 +383,11 @@ export default function App() {
 		});
 
 		setSelectedNodeId(newNode.id);
+	};
+
+	const handleOpenPicker = (kind, appId) => {
+		setPicker({ kind, appId });
+		setSelectedNodeId(null);
 	};
 
 	const registerNodeRef = useCallback((nodeId, element) => {
@@ -374,6 +461,8 @@ export default function App() {
 		? allTypes.find((type) => type.slug === selectedNode.type) || null
 		: null;
 	const knownTypeSlugs = allTypes.map((type) => type.slug);
+	const triggerNode = graph.nodes.find((item) => item.category === 'trigger');
+	const triggerLabel = triggerNode?.label || __('Trigger', 'workflow-automate');
 
 	return (
 		<div className="wfa-builder">
@@ -387,18 +476,22 @@ export default function App() {
 				onSave={handleManualSave}
 				listUrl={bootstrap.listUrl}
 				saveDisabled={saveStatus === 'saving' || toggleActiveBusy}
+				testFlow={testFlow}
 			/>
 			<div className="wfa-builder__body">
 				<Palette
 					triggers={nodeTypes.triggers}
 					actions={nodeTypes.actions}
-					onAdd={handleAddNode}
+					onOpenPicker={handleOpenPicker}
 				/>
 				<Canvas
 					nodes={graph.nodes}
 					knownTypeSlugs={knownTypeSlugs}
 					selectedNodeId={selectedNodeId}
-					onSelectNode={setSelectedNodeId}
+					onSelectNode={(nodeId) => {
+						setPicker(null);
+						setSelectedNodeId(nodeId);
+					}}
 					onMoveNode={handleMoveNode}
 					registerNodeRef={registerNodeRef}
 					onCanvasClick={(event) => {
@@ -407,16 +500,30 @@ export default function App() {
 						}
 					}}
 				/>
-				<ConfigPanel
-					node={selectedNode}
-					nodeType={selectedNodeType}
-					connections={connections}
-					onConnectionsChange={setConnections}
-					onChangeLabel={handleChangeLabel}
-					onChangeConfig={handleChangeConfig}
-					onDelete={handleDeleteNode}
-					onClose={() => setSelectedNodeId(null)}
-				/>
+				{picker ? (
+					<PickerSidebar
+						kind={picker.kind}
+						appId={picker.appId}
+						triggers={nodeTypes.triggers}
+						actions={nodeTypes.actions}
+						onSelect={handleAddNode}
+						onClose={() => setPicker(null)}
+					/>
+				) : (
+					<ConfigPanel
+						node={selectedNode}
+						nodeType={selectedNodeType}
+						connections={connections}
+						onConnectionsChange={setConnections}
+						onChangeLabel={handleChangeLabel}
+						onChangeConfig={handleChangeConfig}
+						onDelete={handleDeleteNode}
+						onClose={() => setSelectedNodeId(null)}
+						capturedPayload={capturedPayload}
+						capturedAt={capturedAt}
+						triggerLabel={triggerLabel}
+					/>
+				)}
 			</div>
 		</div>
 	);

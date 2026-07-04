@@ -14,6 +14,7 @@ use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,11 +77,14 @@ class WorkflowTriggerBinder {
 
 	private SettingsService $settings;
 
-	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings ) {
+	private WorkflowTestListenerService $test_listener;
+
+	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings, WorkflowTestListenerService $test_listener ) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
 		$this->executor = $executor;
 		$this->settings = $settings;
+		$this->test_listener = $test_listener;
 	}
 
 	/**
@@ -96,17 +100,32 @@ class WorkflowTriggerBinder {
 			)
 		);
 
+		$bound_ids = array();
+
 		foreach ( $active['items'] as $workflow ) {
-			$this->bindWorkflow( $workflow );
+			$this->bindWorkflow( $workflow, false );
+			$bound_ids[ $workflow->id() ] = true;
+		}
+
+		foreach ( $this->test_listener->listeningWorkflowIds() as $workflow_id ) {
+			if ( isset( $bound_ids[ $workflow_id ] ) ) {
+				continue;
+			}
+			$workflow = $this->workflows->find( $workflow_id );
+
+			if ( null !== $workflow ) {
+				$this->bindWorkflow( $workflow, true );
+			}
 		}
 	}
 
 	/**
-	 * @param Workflow $workflow An active workflow.
+	 * @param Workflow $workflow      Workflow to bind.
+	 * @param bool     $test_listen   True when binding for builder test-listen capture.
 	 *
 	 * @return void
 	 */
-	private function bindWorkflow( Workflow $workflow ): void {
+	private function bindWorkflow( Workflow $workflow, bool $test_listen ): void {
 		$graph_nodes = $workflow->graph()['nodes'] ?? array();
 
 		if ( ! is_array( $graph_nodes ) ) {
@@ -130,8 +149,13 @@ class WorkflowTriggerBinder {
 
 			$trigger->bind(
 				$config,
-				function ( array $payload, array $bound_config ) use ( $workflow_id ): void {
-					unset( $bound_config ); // Required by the TriggerInterface::bind() callback signature; unused here.
+				function ( array $payload, array $bound_config ) use ( $workflow_id, $test_listen ): void {
+					unset( $bound_config );
+
+					if ( $test_listen ) {
+						$this->test_listener->capturePayload( $workflow_id, $payload );
+						return;
+					}
 
 					if ( $this->settings->backgroundExecutionEnabled() ) {
 						$this->executor->queue( $workflow_id, $payload );

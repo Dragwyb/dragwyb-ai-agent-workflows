@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
+use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
@@ -96,11 +97,38 @@ class NodeTypesController {
 	 * @return array{slug: string, label: string, description: string, config_schema: array<string, mixed>}
 	 */
 	private function serialize( NodeTypeInterface $node_type ): array {
-		return array(
+		$schema = $node_type->configSchema();
+		$data   = array(
 			'slug' => $node_type->slug(),
 			'label' => $node_type->label(),
 			'description' => $node_type->description(),
-			'config_schema' => $node_type->configSchema(),
+			'config_schema' => $schema,
+			'default_config' => $this->defaultConfigFromSchema( $schema ),
 		);
+
+		if ( $node_type instanceof TriggerGroupInterface ) {
+			$data['app'] = $node_type->app();
+			$data['group'] = $node_type->group();
+			$data['group_label'] = $node_type->groupLabel();
+		}
+
+		return $data;
+	}
+
+	/**
+	 * @param array<string, mixed> $schema Node config schema.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function defaultConfigFromSchema( array $schema ): array {
+		$defaults = array();
+
+		foreach ( $schema as $field => $definition ) {
+			if ( is_array( $definition ) && array_key_exists( 'default', $definition ) ) {
+				$defaults[ $field ] = $definition['default'];
+			}
+		}
+
+		return $defaults;
 	}
 }

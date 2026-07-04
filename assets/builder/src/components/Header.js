@@ -1,3 +1,4 @@
+import { useRef, useEffect } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -20,18 +21,7 @@ const WORKFLOW_STATUS_LABELS = {
 };
 
 /**
- * Top bar: back link, editable title, workflow status, save, activate/pause.
- *
- * @param {Object}   props
- * @param {string}   props.title
- * @param {Function} props.onTitleChange
- * @param {string}   props.status              Save status (idle/dirty/saving/saved/error).
- * @param {number}   props.workflowStatus      Workflow lifecycle status (0 draft, 1 active, 2 paused).
- * @param {Function} props.onToggleActive      Activate when draft/paused, pause when active.
- * @param {boolean}  props.toggleActiveBusy    True while a status change request is in flight.
- * @param {Function} props.onSave
- * @param {string}   props.listUrl
- * @param {boolean}  props.saveDisabled
+ * Top bar: back link, editable title, workflow status, test flow, save, activate/pause.
  */
 export default function Header({
 	title,
@@ -43,10 +33,33 @@ export default function Header({
 	onSave,
 	listUrl,
 	saveDisabled,
+	testFlow,
 }) {
 	const isActive = workflowStatus === 1;
 	const statusLabel =
 		WORKFLOW_STATUS_LABELS[workflowStatus] || WORKFLOW_STATUS_LABELS[0];
+	const testWrapRef = useRef(null);
+
+	useEffect(() => {
+		if (!testFlow?.menuOpen) {
+			return undefined;
+		}
+
+		const onPointerDown = (event) => {
+			if (
+				testWrapRef.current &&
+				!testWrapRef.current.contains(event.target)
+			) {
+				testFlow.setMenuOpen(false);
+			}
+		};
+
+		document.addEventListener('mousedown', onPointerDown);
+
+		return () => {
+			document.removeEventListener('mousedown', onPointerDown);
+		};
+	}, [testFlow]);
 
 	return (
 		<header className="wfa-builder-header">
@@ -79,12 +92,61 @@ export default function Header({
 				</span>
 			</div>
 			<div className="wfa-builder-header__right">
+				{testFlow?.statusMessage && (
+					<span
+						className="wfa-builder-header__test-status"
+						role="status"
+					>
+						{testFlow.statusMessage}
+					</span>
+				)}
 				<span
 					className={`wfa-builder-header__status wfa-builder-header__status--${status}`}
 					role="status"
 				>
 					{SAVE_STATUS_LABELS[status] || ''}
 				</span>
+				{testFlow && (
+					<div
+						className="wfa-builder-header__test-wrap"
+						ref={testWrapRef}
+					>
+						<Button
+							isSecondary
+							onClick={() => testFlow.setMenuOpen(!testFlow.menuOpen)}
+							aria-expanded={testFlow.menuOpen}
+							disabled={testFlow.listening}
+						>
+							{testFlow.listening
+								? __('Listening…', 'workflow-automate')
+								: __('Test Flow', 'workflow-automate')}
+						</Button>
+						{testFlow.menuOpen && (
+							<div className="wfa-builder-header__test-menu">
+								<button
+									type="button"
+									className="wfa-builder-header__test-menu-item"
+									onClick={testFlow.listenNew}
+								>
+									{__(
+										'Listen new response',
+										'workflow-automate'
+									)}
+								</button>
+								<button
+									type="button"
+									className="wfa-builder-header__test-menu-item"
+									onClick={testFlow.useExisting}
+								>
+									{__(
+										'Use existing data',
+										'workflow-automate'
+									)}
+								</button>
+							</div>
+						)}
+					</div>
+				)}
 				<Button
 					isPrimary={!isActive}
 					isSecondary={isActive}

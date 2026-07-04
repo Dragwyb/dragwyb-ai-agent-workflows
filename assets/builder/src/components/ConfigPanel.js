@@ -9,6 +9,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 
 import { createConnection } from '../api';
+import CapturedResponse from './CapturedResponse';
+import TokenField, { fieldSupportsVariables } from './TokenField';
 
 /**
  * Per-integration defaults for the inline connection form so switching
@@ -119,6 +121,9 @@ function filterMatchingConnections(connections, nodeTypeSlug, selectedId) {
  * @param {Function}      props.onChangeConfig
  * @param {Function}      props.onDelete
  * @param {Function}      props.onClose
+ * @param {*}             [props.capturedPayload]
+ * @param {string|null}   [props.capturedAt]
+ * @param {string}        [props.triggerLabel]
  */
 export default function ConfigPanel({
 	node,
@@ -129,6 +134,9 @@ export default function ConfigPanel({
 	onChangeConfig,
 	onDelete,
 	onClose,
+	capturedPayload,
+	capturedAt,
+	triggerLabel = 'Trigger',
 }) {
 	if (!node) {
 		return (
@@ -167,6 +175,14 @@ export default function ConfigPanel({
 				onChange={onChangeLabel}
 			/>
 
+			{node.category === 'trigger' && (
+				<CapturedResponse
+					payload={capturedPayload}
+					capturedAt={capturedAt}
+					sourceLabel={node.label || triggerLabel}
+				/>
+			)}
+
 			{!nodeType && (
 				<p className="wfa-builder-config__warning">
 					{__(
@@ -186,6 +202,9 @@ export default function ConfigPanel({
 						connections={connections}
 						nodeTypeSlug={nodeType.slug}
 						nodeTypeLabel={nodeType.label}
+						nodeCategory={node.category}
+						capturedPayload={capturedPayload}
+						triggerLabel={triggerLabel}
 						onConnectionsChange={onConnectionsChange}
 						onChange={(value) => onChangeConfig(fieldName, value)}
 					/>
@@ -210,9 +229,16 @@ function ConfigField({
 	connections,
 	nodeTypeSlug,
 	nodeTypeLabel,
+	nodeCategory,
+	capturedPayload,
+	triggerLabel,
 	onConnectionsChange,
 	onChange,
 }) {
+	if (fieldSchema.hidden) {
+		return null;
+	}
+
 	const label = fieldSchema.label || fieldName;
 	const resolved = value === undefined ? fieldSchema.default : value;
 
@@ -240,6 +266,27 @@ function ConfigField({
 				nodeTypeSlug={nodeTypeSlug}
 				nodeTypeLabel={nodeTypeLabel}
 				onConnectionsChange={onConnectionsChange}
+				onChange={onChange}
+			/>
+		);
+	}
+
+	if (
+		fieldSchema.type === 'string' &&
+		nodeCategory === 'action' &&
+		fieldSupportsVariables(fieldName, fieldSchema)
+	) {
+		return (
+			<TokenField
+				label={label}
+				value={
+					resolved === undefined || resolved === null
+						? ''
+						: String(resolved)
+				}
+				required={Boolean(fieldSchema.required)}
+				payload={capturedPayload}
+				sourceLabel={triggerLabel}
 				onChange={onChange}
 			/>
 		);
