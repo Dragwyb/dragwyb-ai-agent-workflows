@@ -46,8 +46,10 @@ src/
   Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode)
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
   Service/               Application services orchestrating domain + persistence (WorkflowService)
+  Rest/                  WP_REST_Controller subclasses + rest_api_init bootstrap (wfa/v1 namespace)
 docs/
   hooks-reference.md     Public actions/filters reference
+  rest-api.md            REST API endpoint reference (wfa/v1)
   internal/              Development-only docs (analysis, architecture, roadmap) — excluded from release builds
 ```
 

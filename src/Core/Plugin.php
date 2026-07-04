@@ -13,6 +13,7 @@ use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
+use WorkflowAutomate\Plugin\Rest\RestApi;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
@@ -26,9 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Deliberately thin: this class wires the requirements check, registers
  * service bindings against the container, defensively keeps the database
  * schema up to date for already-active installs, and fires an extensibility
- * hook. Feature providers (admin UI, REST API, execution engine, etc.) are
- * registered against the container in their own roadmap increments rather
- * than being added here, so this class never grows into a "God" class.
+ * hook. Feature providers (REST API, admin UI, execution engine, etc.) each
+ * own their own registration logic in their own class; this class only
+ * delegates a single call to each, so it never grows into a "God" class.
  */
 class Plugin {
 
@@ -113,6 +114,7 @@ class Plugin {
 		}
 
 		$this->registerServices();
+		( new RestApi( $this->container ) )->register();
 
 		// Capability-gated so schema upkeep never runs on ordinary front-end
 		// requests; this only protects against tables missing after a
