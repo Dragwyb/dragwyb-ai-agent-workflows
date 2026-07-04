@@ -160,9 +160,9 @@ export default function App() {
 						error && error.message
 							? error.message
 							: __(
-									'Failed to load the workflow.',
-									'workflow-automate'
-								)
+								'Failed to load the workflow.',
+								'workflow-automate'
+							)
 					);
 				}
 			} finally {
@@ -335,9 +335,9 @@ export default function App() {
 			nodes: current.nodes.map((node) =>
 				node.id === selectedNodeId
 					? {
-							...node,
-							config: { ...node.config, [fieldName]: value },
-						}
+						...node,
+						config: { ...node.config, [fieldName]: value },
+					}
 					: node
 			),
 		}));

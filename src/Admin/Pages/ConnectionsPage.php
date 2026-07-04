@@ -181,9 +181,24 @@ class ConnectionsPage implements AdminPage {
 		}
 
 		printf(
-			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',
 			esc_attr( $notices[ $key ]['type'] ),
-			esc_html( $notices[ $key ]['message'] )
+			esc_html( $notices[ $key ]['message'] ),
+			$this->noticeDetailHtml()
 		);
+	}
+
+	/**
+	 * @return string
+	 */
+	private function noticeDetailHtml(): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail from a prior redirect.
+		$detail = isset( $_GET['wfa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['wfa_error'] ) ) : '';
+
+		if ( '' === $detail ) {
+			return '';
+		}
+
+		return sprintf( '<p>%s</p>', esc_html( $detail ) );
 	}
 }

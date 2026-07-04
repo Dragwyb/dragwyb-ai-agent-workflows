@@ -119,7 +119,7 @@
 	background: #fbfbfc;
 }
 
-.wfa-builder-palette__section + .wfa-builder-palette__section {
+.wfa-builder-palette__section+.wfa-builder-palette__section {
 	margin-top: 20px;
 }
 
@@ -214,7 +214,7 @@
 	line-height: 1.5;
 }
 
-.wfa-builder-canvas__guide-steps li + li {
+.wfa-builder-canvas__guide-steps li+li {
 	margin-top: 8px;
 }
 

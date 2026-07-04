@@ -109,7 +109,9 @@ class ConnectionActionsController {
 
 		try {
 			$this->connections->create( $integration_slug, $auth_type, $label, $this->extractCredentialValues() );
-		} catch ( InvalidArgumentException | RuntimeException $e ) {
+		} catch ( InvalidArgumentException $exception ) {
+			$this->redirect( 'error', $exception->getMessage() );
+		} catch ( RuntimeException $e ) {
 			$this->redirect( 'error' );
 		}
 
@@ -127,7 +129,9 @@ class ConnectionActionsController {
 
 		try {
 			$this->connections->update( $id, $label, $this->extractCredentialValues() );
-		} catch ( InvalidArgumentException | RuntimeException $e ) {
+		} catch ( InvalidArgumentException $exception ) {
+			$this->redirect( 'error', $exception->getMessage() );
+		} catch ( RuntimeException $e ) {
 			$this->redirect( 'error' );
 		}
 
@@ -172,18 +176,22 @@ class ConnectionActionsController {
 	 * Redirects to the Connections list with a notice, then exits.
 	 *
 	 * @param string $notice One of the keys understood by ConnectionsPage::notices().
+	 * @param string $detail Optional extra detail (e.g. verification error).
 	 *
 	 * @return void
 	 */
-	private function redirect( string $notice ): void {
+	private function redirect( string $notice, string $detail = '' ): void {
+		$args = array(
+			'page' => ConnectionsPage::SLUG,
+			'wfa_notice' => $notice,
+		);
+
+		if ( '' !== $detail ) {
+			$args['wfa_error'] = $detail;
+		}
+
 		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page' => ConnectionsPage::SLUG,
-					'wfa_notice' => $notice,
-				),
-				admin_url( 'admin.php' )
-			)
+			add_query_arg( $args, admin_url( 'admin.php' ) )
 		);
 		exit;
 	}

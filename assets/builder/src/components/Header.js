@@ -72,9 +72,8 @@ export default function Header({
 					onChange={(event) => onTitleChange(event.target.value)}
 				/>
 				<span
-					className={`wfa-builder-header__workflow-status wfa-builder-header__workflow-status--${
-						isActive ? 'active' : workflowStatus === 2 ? 'paused' : 'draft'
-					}`}
+					className={`wfa-builder-header__workflow-status wfa-builder-header__workflow-status--${isActive ? 'active' : workflowStatus === 2 ? 'paused' : 'draft'
+						}`}
 				>
 					{statusLabel}
 				</span>

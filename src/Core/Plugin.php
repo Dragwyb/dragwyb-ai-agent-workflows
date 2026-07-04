@@ -37,6 +37,7 @@ use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
@@ -299,9 +300,19 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			ConnectionVerifier::class,
+			static function (): ConnectionVerifier {
+				return new ConnectionVerifier();
+			}
+		);
+
+		$this->container->singleton(
 			ConnectionService::class,
 			static function ( Container $container ): ConnectionService {
-				return new ConnectionService( $container->get( ConnectionRepository::class ) );
+				return new ConnectionService(
+					$container->get( ConnectionRepository::class ),
+					$container->get( ConnectionVerifier::class )
+				);
 			}
 		);
 

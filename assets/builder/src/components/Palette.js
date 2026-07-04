@@ -58,21 +58,21 @@ function PaletteSection({ title, items, category, onAdd, emptyMessage }) {
 							aria-label={
 								category === 'trigger'
 									? sprintf(
-											/* translators: %s: trigger label */
-											__(
-												'Add trigger: %s',
-												'workflow-automate'
-											),
-											item.label
-										)
+										/* translators: %s: trigger label */
+										__(
+											'Add trigger: %s',
+											'workflow-automate'
+										),
+										item.label
+									)
 									: sprintf(
-											/* translators: %s: action label */
-											__(
-												'Add action: %s',
-												'workflow-automate'
-											),
-											item.label
-										)
+										/* translators: %s: action label */
+										__(
+											'Add action: %s',
+											'workflow-automate'
+										),
+										item.label
+									)
 							}
 						>
 							<span

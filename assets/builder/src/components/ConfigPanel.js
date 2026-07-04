@@ -263,9 +263,9 @@ function ConnectionField({
 				err && err.message
 					? err.message
 					: __(
-							'Could not save the connection. Check your permissions and try again.',
-							'workflow-automate'
-						)
+						'Could not save the connection. Check your permissions and try again.',
+						'workflow-automate'
+					)
 			);
 		} finally {
 			setSaving(false);
@@ -282,9 +282,9 @@ function ConnectionField({
 				help={
 					needsConnection
 						? __(
-								'Required — add an API key below or pick an existing connection.',
-								'workflow-automate'
-							)
+							'Required — add an API key below or pick an existing connection.',
+							'workflow-automate'
+						)
 						: undefined
 				}
 			/>
