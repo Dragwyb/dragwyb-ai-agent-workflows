@@ -1,6 +1,6 @@
 import { useState, useMemo } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import {
 	appUsesGroups,
@@ -46,6 +46,10 @@ export default function PickerSidebar({
 		: __('Choose a node', 'workflow-automate');
 
 	const handlePick = (item) => {
+		if (item.available === false) {
+			return;
+		}
+
 		onSelect(item, category);
 		onClose();
 	};
@@ -94,14 +98,31 @@ export default function PickerSidebar({
 				<ul className="wfa-builder-picker__list">
 					{items.map((item) => {
 						const meta = getNodeMeta(item.slug, category, appId);
+						const isDisabled = item.available === false;
+						const disabledMessage = isDisabled
+							? sprintf(
+									/* translators: %s: plugin name, e.g. WooCommerce */
+									__(
+										'Activate %s to use this trigger.',
+										'workflow-automate'
+									),
+									item.requires_plugin || __('this plugin', 'workflow-automate')
+								)
+							: '';
 
 						return (
 							<li key={item.slug}>
 								<button
 									type="button"
-									className="wfa-builder-picker__item"
+									className={
+										isDisabled
+											? 'wfa-builder-picker__item wfa-builder-picker__item--disabled'
+											: 'wfa-builder-picker__item'
+									}
 									onClick={() => handlePick(item)}
-									title={item.description}
+									title={isDisabled ? disabledMessage : item.description}
+									disabled={isDisabled}
+									aria-disabled={isDisabled}
 								>
 									<span
 										className="wfa-builder-picker__item-icon"
@@ -113,8 +134,15 @@ export default function PickerSidebar({
 									>
 										{meta.icon}
 									</span>
-									<span className="wfa-builder-picker__item-label">
-										{item.label}
+									<span className="wfa-builder-picker__item-content">
+										<span className="wfa-builder-picker__item-label">
+											{item.label}
+										</span>
+										{isDisabled && (
+											<span className="wfa-builder-picker__item-hint">
+												{disabledMessage}
+											</span>
+										)}
 									</span>
 								</button>
 							</li>

@@ -1,6 +1,6 @@
 import { useState, useMemo } from '@wordpress/element';
 import { TextControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import {
 	getTriggerApps,
@@ -94,14 +94,30 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 			<ul className="wfa-builder-palette__list">
 				{apps.map((app) => {
 					const meta = getNodeMeta(app.id, kind === 'trigger' ? 'trigger' : 'action');
+					const isDisabled = app.available === false;
+					const disabledMessage = isDisabled
+						? sprintf(
+								/* translators: %s: plugin name, e.g. WooCommerce */
+								__(
+									'Activate %s to use this trigger.',
+									'workflow-automate'
+								),
+								app.requiresPlugin || __('this plugin', 'workflow-automate')
+							)
+						: '';
 
 					return (
 						<li key={app.id}>
 							<button
 								type="button"
-								className="wfa-builder-palette__item"
+								className={
+									isDisabled
+										? 'wfa-builder-palette__item wfa-builder-palette__item--disabled'
+										: 'wfa-builder-palette__item'
+								}
 								onClick={() => onOpenPicker(kind, app.id)}
 								aria-label={app.label}
+								title={isDisabled ? disabledMessage : app.label}
 							>
 								<span
 									className="wfa-builder-palette__item-icon"
@@ -120,6 +136,11 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 									>
 										{app.label}
 									</span>
+									{isDisabled && (
+										<span className="wfa-builder-palette__item-hint">
+											{disabledMessage}
+										</span>
+									)}
 								</span>
 							</button>
 						</li>

@@ -31,77 +31,6 @@ function formatPreview(value) {
 }
 
 /**
- * @param {*}      value
- * @param {string} path
- * @param {Array<{ path: string, token: string, preview: string }>} variables
- * @return {void}
- */
-function walkPayload(value, path, variables) {
-	if (value === null || value === undefined) {
-		return;
-	}
-
-	if (Array.isArray(value)) {
-		value.forEach((item, index) => {
-			walkPayload(item, `${path}.${index}`, variables);
-		});
-		return;
-	}
-
-	if (typeof value === 'object') {
-		Object.entries(value).forEach(([key, child]) => {
-			if (!key) {
-				return;
-			}
-
-			walkPayload(child, `${path}.${key}`, variables);
-		});
-		return;
-	}
-
-	variables.push({
-		path,
-		token: `{{${path}}}`,
-		preview: formatPreview(value),
-	});
-}
-
-/**
- * @param {*}      payload Raw captured trigger payload.
- * @param {string} [prefix='trigger']
- * @return {Array<{ path: string, token: string, preview: string }>}
- */
-export function flattenPayloadVariables(payload, prefix = 'trigger') {
-	if (payload === null || payload === undefined) {
-		return [];
-	}
-
-	const variables = [];
-
-	if (Array.isArray(payload)) {
-		payload.forEach((item, index) => {
-			walkPayload(item, `${prefix}.${index}`, variables);
-		});
-	} else if (typeof payload === 'object') {
-		Object.entries(payload).forEach(([key, value]) => {
-			if (!key) {
-				return;
-			}
-
-			walkPayload(value, `${prefix}.${key}`, variables);
-		});
-	} else {
-		variables.push({
-			path: prefix,
-			token: `{{${prefix}}}`,
-			preview: formatPreview(payload),
-		});
-	}
-
-	return variables;
-}
-
-/**
  * @param {*} value
  * @return {boolean}
  */
@@ -238,7 +167,7 @@ export function buildPayloadTree(
  * @param {string} path e.g. trigger.fields.email
  * @return {string}
  */
-export function tokenShortLabel(path) {
+function tokenShortLabel(path) {
 	return path.replace(/^trigger\./, '');
 }
 
@@ -295,7 +224,7 @@ export function segmentValueWithTokens(value) {
  * @param {string}   query
  * @return {boolean}
  */
-export function treeNodeMatchesQuery(node, query) {
+function treeNodeMatchesQuery(node, query) {
 	const needle = query.trim().toLowerCase();
 
 	if (!needle) {

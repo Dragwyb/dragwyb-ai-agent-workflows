@@ -258,12 +258,23 @@
 	color: var(--wfa-accent);
 }
 
-.wfa-builder-palette__item-description {
+.wfa-builder-palette__item-hint {
 	display: block;
 	font-size: 11px;
-	color: #64748b;
+	color: #94a3b8;
 	margin-top: 2px;
 	line-height: 1.35;
+}
+
+.wfa-builder-palette__item--disabled {
+	opacity: 0.72;
+	cursor: default;
+}
+
+.wfa-builder-palette__item--disabled:hover,
+.wfa-builder-palette__item--disabled:focus {
+	border-color: #e8edf5;
+	box-shadow: none;
 }
 
 /* —— Canvas —— */
@@ -956,6 +967,31 @@
 	font-size: 13px;
 	font-weight: 500;
 	color: var(--wfa-accent);
+}
+
+.wfa-builder-picker__item-content {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.wfa-builder-picker__item-hint {
+	font-size: 11px;
+	font-weight: 400;
+	color: #94a3b8;
+	line-height: 1.35;
+}
+
+.wfa-builder-picker__item--disabled {
+	opacity: 0.72;
+	cursor: not-allowed;
+}
+
+.wfa-builder-picker__item--disabled:hover,
+.wfa-builder-picker__item--disabled:focus {
+	border-color: #e8edf5;
+	box-shadow: none;
 }
 
 @media screen and (max-width: 960px) {

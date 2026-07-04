@@ -1,0 +1,107 @@
+<?php
+/**
+ * Optional co-plugin triggers — catalog + availability checks.
+ *
+ * @package WorkflowAutomate\Plugin
+ */
+
+declare(strict_types=1);
+
+namespace WorkflowAutomate\Plugin\Integration;
+
+use WorkflowAutomate\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceOrderCompletedTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
+
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Single source for optional integration triggers. Used by BuiltInNodeTypes
+ * (register when active) and NodeTypesController (expose unavailable entries
+ * to the builder with `available: false`).
+ */
+class IntegrationTriggerCatalog {
+
+	/**
+	 * @return array<int, array{
+	 *     slug: string,
+	 *     app: string,
+	 *     requires_plugin: string,
+	 *     class: class-string,
+	 *     active: bool
+	 * }>
+	 */
+	public static function definitions(): array {
+		$entries = array(
+			array(
+				'slug' => 'elementor_form_submitted_trigger',
+				'app' => 'elementor',
+				'requires_plugin' => 'Elementor Pro',
+				'class' => ElementorFormSubmittedTrigger::class,
+				'active' => self::isElementorProActive(),
+			),
+			array(
+				'slug' => 'woocommerce_order_completed_trigger',
+				'app' => 'woocommerce',
+				'requires_plugin' => 'WooCommerce',
+				'class' => WooCommerceOrderCompletedTrigger::class,
+				'active' => self::isWooCommerceActive(),
+			),
+			array(
+				'slug' => 'contact_form7_submitted_trigger',
+				'app' => 'contact-form-7',
+				'requires_plugin' => 'Contact Form 7',
+				'class' => ContactForm7SubmittedTrigger::class,
+				'active' => self::isContactForm7Active(),
+			),
+			array(
+				'slug' => 'wpforms_submitted_trigger',
+				'app' => 'wpforms',
+				'requires_plugin' => 'WPForms',
+				'class' => WpFormsSubmittedTrigger::class,
+				'active' => self::isWpFormsActive(),
+			),
+		);
+
+		return array_map(
+			static function ( array $entry ): array {
+				$entry['requires_plugin'] = __( $entry['requires_plugin'], 'workflow-automate' );
+
+				return $entry;
+			},
+			$entries
+		);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isWooCommerceActive(): bool {
+		return class_exists( '\WooCommerce', false ) && function_exists( 'WC' );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isElementorProActive(): bool {
+		return defined( 'ELEMENTOR_PRO_VERSION' ) || class_exists( '\ElementorPro\Plugin', false );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isContactForm7Active(): bool {
+		return defined( 'WPCF7_VERSION' ) || class_exists( '\WPCF7_ContactForm', false );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isWpFormsActive(): bool {
+		return function_exists( 'wpforms' ) || defined( 'WPFORMS_VERSION' );
+	}
+}

@@ -3,19 +3,51 @@
  */
 
 /** @type {Set<string>} */
-export const AGENT_SLUGS = new Set([
+const AGENT_SLUGS = new Set([
 	'openai_chat_action',
 	'claude_messages_action',
 	'gemini_generate_content_action',
 ]);
 
-/** @type {Record<string, { id: string, label: string }>} */
-const INTEGRATION_TRIGGER_APPS = {
-	elementor_form_submitted_trigger: { id: 'elementor', label: 'Elementor' },
-	contact_form7_submitted_trigger: { id: 'contact-form-7', label: 'Contact Form 7' },
-	wpforms_submitted_trigger: { id: 'wpforms', label: 'WPForms' },
-	woocommerce_order_completed_trigger: { id: 'woocommerce', label: 'WooCommerce' },
-};
+/** @type {Array<{ id: string, label: string, slugs: string[] }>} */
+const INTEGRATION_TRIGGER_APPS = [
+	{ id: 'elementor', label: 'Elementor', slugs: ['elementor_form_submitted_trigger'] },
+	{ id: 'woocommerce', label: 'WooCommerce', slugs: ['woocommerce_order_completed_trigger'] },
+	{ id: 'contact-form-7', label: 'Contact Form 7', slugs: ['contact_form7_submitted_trigger'] },
+	{ id: 'wpforms', label: 'WPForms', slugs: ['wpforms_submitted_trigger'] },
+];
+
+/**
+ * @param {Array<Object>} triggers
+ * @param {string}      slug
+ * @return {Object|undefined}
+ */
+function findTriggerBySlug(triggers, slug) {
+	return triggers.find((trigger) => trigger.slug === slug);
+}
+
+/**
+ * @param {Array<Object>} triggers
+ * @param {Array<string>} slugs
+ * @return {{ available: boolean, requiresPlugin: string|null }}
+ */
+function integrationAppStatus(triggers, slugs) {
+	const items = slugs
+		.map((slug) => findTriggerBySlug(triggers, slug))
+		.filter(Boolean);
+
+	if (items.length === 0) {
+		return { available: false, requiresPlugin: null };
+	}
+
+	const available = items.some((item) => item.available !== false);
+	const unavailable = items.find((item) => item.available === false);
+
+	return {
+		available,
+		requiresPlugin: unavailable?.requires_plugin || null,
+	};
+}
 
 /** @type {Record<string, { id: string, label: string, slugs: string[] }>} */
 const AGENT_APPS = {
@@ -80,23 +112,29 @@ export function defaultConfigFor(nodeType) {
  * @return {Array<{ id: string, label: string }>}
  */
 export function getTriggerApps(triggers, query = '') {
-	const apps = new Map();
+	const apps = [];
 	const needle = query.trim().toLowerCase();
 
-	triggers.forEach((trigger) => {
-		if (trigger.app === 'wordpress') {
-			apps.set('wordpress', { id: 'wordpress', label: 'WordPress' });
-			return;
-		}
+	if (triggers.some((trigger) => trigger.app === 'wordpress')) {
+		apps.push({
+			id: 'wordpress',
+			label: 'WordPress',
+			available: true,
+		});
+	}
 
-		const mapped = INTEGRATION_TRIGGER_APPS[trigger.slug];
+	INTEGRATION_TRIGGER_APPS.forEach((appDef) => {
+		const status = integrationAppStatus(triggers, appDef.slugs);
 
-		if (mapped) {
-			apps.set(mapped.id, mapped);
-		}
+		apps.push({
+			id: appDef.id,
+			label: appDef.label,
+			available: status.available,
+			requiresPlugin: status.requiresPlugin || appDef.label,
+		});
 	});
 
-	return [...apps.values()].filter((app) => {
+	return apps.filter((app) => {
 		if (!needle) {
 			return true;
 		}
@@ -187,11 +225,15 @@ export function getItemsForPicker(kind, appId, groupId, triggers, actions) {
 			);
 		}
 
-		const slug = Object.keys(INTEGRATION_TRIGGER_APPS).find(
-			(key) => INTEGRATION_TRIGGER_APPS[key].id === appId
-		);
+		const appDef = INTEGRATION_TRIGGER_APPS.find((app) => app.id === appId);
 
-		return slug ? triggers.filter((trigger) => trigger.slug === slug) : [];
+		if (!appDef) {
+			return [];
+		}
+
+		return appDef.slugs
+			.map((slug) => findTriggerBySlug(triggers, slug))
+			.filter(Boolean);
 	}
 
 	if (kind === 'agent') {

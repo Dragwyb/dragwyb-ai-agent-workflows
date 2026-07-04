@@ -19,10 +19,6 @@ use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
 use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceOrderCompletedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 
@@ -66,48 +62,13 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new ClaudeMessagesAction( $this->connections ) );
 		$registry->registerAction( new GoogleSheetsAppendRowAction( $this->connections ) );
 
-		if ( self::isWooCommerceActive() ) {
-			$registry->registerTrigger( new WooCommerceOrderCompletedTrigger() );
+		foreach ( IntegrationTriggerCatalog::definitions() as $definition ) {
+			if ( ! $definition['active'] ) {
+				continue;
+			}
+
+			$class = $definition['class'];
+			$registry->registerTrigger( new $class() );
 		}
-
-		if ( self::isElementorProActive() ) {
-			$registry->registerTrigger( new ElementorFormSubmittedTrigger() );
-		}
-
-		if ( self::isContactForm7Active() ) {
-			$registry->registerTrigger( new ContactForm7SubmittedTrigger() );
-		}
-
-		if ( self::isWpFormsActive() ) {
-			$registry->registerTrigger( new WpFormsSubmittedTrigger() );
-		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	private static function isWooCommerceActive(): bool {
-		return class_exists( '\WooCommerce', false ) && function_exists( 'WC' );
-	}
-
-	/**
-	 * @return bool
-	 */
-	private static function isElementorProActive(): bool {
-		return defined( 'ELEMENTOR_PRO_VERSION' ) || class_exists( '\ElementorPro\Plugin', false );
-	}
-
-	/**
-	 * @return bool
-	 */
-	private static function isContactForm7Active(): bool {
-		return defined( 'WPCF7_VERSION' ) || class_exists( '\WPCF7_ContactForm', false );
-	}
-
-	/**
-	 * @return bool
-	 */
-	private static function isWpFormsActive(): bool {
-		return function_exists( 'wpforms' ) || defined( 'WPFORMS_VERSION' );
 	}
 }

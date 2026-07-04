@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
+use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
@@ -83,9 +84,36 @@ class NodeTypesController {
 	 * @return WP_REST_Response
 	 */
 	public function getItems( $request ) {
+		$registered_triggers = $this->registry->triggers();
+		$registered_slugs    = array();
+
+		foreach ( $registered_triggers as $trigger ) {
+			$registered_slugs[ $trigger->slug() ] = true;
+		}
+
+		$serialized_triggers = array_map(
+			array( $this, 'serialize' ),
+			$registered_triggers
+		);
+
+		foreach ( IntegrationTriggerCatalog::definitions() as $definition ) {
+			if ( isset( $registered_slugs[ $definition['slug'] ] ) ) {
+				continue;
+			}
+
+			$class    = $definition['class'];
+			$instance = new $class();
+
+			$serialized_triggers[] = $this->serializeUnavailable(
+				$instance,
+				$definition['app'],
+				$definition['requires_plugin']
+			);
+		}
+
 		return rest_ensure_response(
 			array(
-				'triggers' => array_map( array( $this, 'serialize' ), $this->registry->triggers() ),
+				'triggers' => $serialized_triggers,
 				'actions' => array_map( array( $this, 'serialize' ), $this->registry->actions() ),
 			)
 		);
@@ -104,6 +132,7 @@ class NodeTypesController {
 			'description' => $node_type->description(),
 			'config_schema' => $schema,
 			'default_config' => $this->defaultConfigFromSchema( $schema ),
+			'available' => true,
 		);
 
 		if ( $node_type instanceof TriggerGroupInterface ) {
@@ -113,6 +142,32 @@ class NodeTypesController {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * @param NodeTypeInterface $node_type        Trigger metadata source.
+	 * @param string            $app              Palette app id.
+	 * @param string            $requires_plugin  Human plugin name for the builder hint.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function serializeUnavailable(
+		NodeTypeInterface $node_type,
+		string $app,
+		string $requires_plugin
+	): array {
+		$schema = $node_type->configSchema();
+
+		return array(
+			'slug' => $node_type->slug(),
+			'label' => $node_type->label(),
+			'description' => $node_type->description(),
+			'config_schema' => $schema,
+			'default_config' => $this->defaultConfigFromSchema( $schema ),
+			'app' => $app,
+			'available' => false,
+			'requires_plugin' => $requires_plugin,
+		);
 	}
 
 	/**
