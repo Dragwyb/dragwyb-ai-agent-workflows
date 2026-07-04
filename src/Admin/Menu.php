@@ -96,8 +96,16 @@ class Menu {
 		$this->registerHook( $hook, $first );
 
 		foreach ( array_slice( $this->pages, 1 ) as $page ) {
+			// Pages that should not appear in the plugin menu must still stay
+			// in WordPress's $submenu so user_can_access_admin_page() allows
+			// them. Registering under options.php is the standard pattern for
+			// a capability-checked admin screen with no menu row. Do not use
+			// remove_submenu_page() — that removes the page from $submenu and
+			// causes "Sorry, you are not allowed to access this page."
+			$parent_slug = $page->showInMenu() ? $first->slug() : 'options.php';
+
 			$hook = add_submenu_page(
-				$first->slug(),
+				$parent_slug,
 				$page->pageTitle(),
 				$page->menuTitle(),
 				$page->capability(),
@@ -106,13 +114,6 @@ class Menu {
 			);
 
 			$this->registerHook( $hook, $page );
-
-			// Still fully registered (route + capability check both apply);
-			// only its row in the visible menu is removed. See
-			// AdminPage::showInMenu() for why a page would opt out.
-			if ( ! $page->showInMenu() ) {
-				remove_submenu_page( $first->slug(), $page->slug() );
-			}
 		}
 	}
 

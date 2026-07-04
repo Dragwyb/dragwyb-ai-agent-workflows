@@ -51,9 +51,12 @@ class WorkflowsController extends WP_REST_Controller {
 	/**
 	 * Cached item schema. See get_item_schema().
 	 *
+	 * Must be protected (or public): WP_REST_Controller declares $schema as
+	 * protected, and PHP forbids a child from narrowing that visibility.
+	 *
 	 * @var array<string, mixed>|null
 	 */
-	private ?array $schema = null;
+	protected $schema = null;
 
 	public function __construct( WorkflowService $workflows, WorkflowExecutionService $executor ) {
 		$this->namespace = 'wfa/v1';

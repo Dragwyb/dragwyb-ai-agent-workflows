@@ -70,14 +70,13 @@ interface AdminPage {
 	public function enqueueAssets(): void;
 
 	/**
-	 * Whether this page should appear as a row in the admin menu.
+	 * Whether this page should appear as a row under the plugin's admin menu.
 	 *
-	 * A page can still be registered (and therefore reachable at its own
-	 * `admin.php?page=` URL, with its own capability check) while returning
-	 * `false` here — used for screens that are only ever navigated to via a
-	 * link from elsewhere in the plugin (e.g. the workflow builder, opened
-	 * from a row action on the workflows list) rather than being a
-	 * top-level destination in their own right.
+	 * When false, Menu registers the page under options.php so it remains a
+	 * valid, capability-checked admin screen (reachable via admin.php?page=…)
+	 * without adding a visible row under the plugin menu. Do not implement
+	 * "hidden" pages by calling remove_submenu_page() — WordPress denies
+	 * access to pages that are no longer present in $submenu.
 	 *
 	 * @return bool
 	 */
