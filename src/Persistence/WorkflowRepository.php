@@ -315,6 +315,11 @@ class WorkflowRepository {
 			$params[] = (int) $args['status'];
 		}
 
+		if ( ! empty( $args['search'] ) ) {
+			$where[] = 'title LIKE %s';
+			$params[] = '%' . $wpdb->esc_like( (string) $args['search'] ) . '%';
+		}
+
 		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
 		$table = $this->table();
 

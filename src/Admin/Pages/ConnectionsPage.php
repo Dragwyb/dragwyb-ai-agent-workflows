@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
 use WorkflowAutomate\Plugin\Admin\ConnectionsListTable;
 use WorkflowAutomate\Plugin\Admin\EmptyState;
+use WorkflowAutomate\Plugin\Admin\ListTableUi;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -39,9 +41,12 @@ class ConnectionsPage implements AdminPage {
 
 	private SettingsService $settings;
 
-	public function __construct( ConnectionService $connections, SettingsService $settings ) {
+	private ConnectionActionsController $connectionActions;
+
+	public function __construct( ConnectionService $connections, SettingsService $settings, ConnectionActionsController $connectionActions ) {
 		$this->connections = $connections;
 		$this->settings = $settings;
+		$this->connectionActions = $connectionActions;
 	}
 
 	/**
@@ -133,10 +138,17 @@ class ConnectionsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get">';
+		echo '<form method="get" class="wfa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
-		$table->display();
+		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
+
+		ListTableUi::openBulkForm( $this->slug(), 'wfa_connection_bulk_action', 'wfa_connection_bulk' );
+		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
+		$table->display();
+		ListTableUi::closeBulkForm();
+
+		$table->renderRowActionForms();
 
 		echo '</div>';
 	}
@@ -159,6 +171,10 @@ class ConnectionsPage implements AdminPage {
 			),
 			'deleted' => array(
 				'message' => __( 'Connection deleted.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'bulk_deleted' => array(
+				'message' => __( 'Selected connections deleted.', 'workflow-automate' ),
 				'type' => 'success',
 			),
 			'error' => array(

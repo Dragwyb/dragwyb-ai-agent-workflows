@@ -11,6 +11,8 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\EmptyState;
+use WorkflowAutomate\Plugin\Admin\ListTableUi;
+use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Admin\WorkflowsListTable;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -43,9 +45,12 @@ class WorkflowsPage implements AdminPage {
 
 	private SettingsService $settings;
 
-	public function __construct( WorkflowService $workflows, SettingsService $settings ) {
+	private WorkflowActionsController $workflowActions;
+
+	public function __construct( WorkflowService $workflows, SettingsService $settings, WorkflowActionsController $workflowActions ) {
 		$this->workflows = $workflows;
 		$this->settings = $settings;
+		$this->workflowActions = $workflowActions;
 	}
 
 	/**
@@ -140,7 +145,7 @@ class WorkflowsPage implements AdminPage {
 
 			// Keep the status views (especially Trash) reachable when the
 			// "all" list is empty but trashed workflows still exist.
-			echo '<form method="get">';
+			echo '<form method="get" class="wfa-list-table-filters-form">';
 			printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 			$table->views();
 			echo '</form>';
@@ -149,11 +154,24 @@ class WorkflowsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get">';
+		echo '<form method="get" class="wfa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
-		$table->views();
-		$table->display();
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view selector.
+		$view = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
+		if ( 'all' !== $view ) {
+			printf( '<input type="hidden" name="status" value="%s" />', esc_attr( $view ) );
+		}
+		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
+
+		$table->views();
+
+		ListTableUi::openBulkForm( $this->slug(), 'wfa_workflow_bulk_action', 'wfa_workflow_bulk' );
+		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
+		$table->display();
+		ListTableUi::closeBulkForm();
+
+		$table->renderRowActionForms();
 
 		echo '</div>';
 	}

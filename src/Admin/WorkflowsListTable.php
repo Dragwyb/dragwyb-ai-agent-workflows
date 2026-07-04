@@ -46,6 +46,8 @@ class WorkflowsListTable extends WP_List_Table {
 
 	private SettingsService $settings;
 
+	private RowActionForms $rowForms;
+
 	public function __construct( WorkflowService $workflows, SettingsService $settings ) {
 		parent::__construct(
 			array(
@@ -57,6 +59,7 @@ class WorkflowsListTable extends WP_List_Table {
 
 		$this->workflows = $workflows;
 		$this->settings = $settings;
+		$this->rowForms = new RowActionForms();
 	}
 
 	/**
@@ -64,10 +67,41 @@ class WorkflowsListTable extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
+			'cb' => '<input type="checkbox" />',
 			'title' => __( 'Title', 'workflow-automate' ),
 			'status' => __( 'Status', 'workflow-automate' ),
 			'run_count' => __( 'Runs', 'workflow-automate' ),
 			'updated_at' => __( 'Last Updated', 'workflow-automate' ),
+		);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function get_bulk_actions() {
+		if ( 'trash' === $this->currentView() ) {
+			return array(
+				'restore' => __( 'Restore', 'workflow-automate' ),
+				'delete' => __( 'Delete Permanently', 'workflow-automate' ),
+			);
+		}
+
+		return array(
+			'trash' => __( 'Move to Trash', 'workflow-automate' ),
+		);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @param Workflow $item Row.
+	 *
+	 * @return string
+	 */
+	protected function column_cb( $item ) {
+		return sprintf(
+			'<input type="checkbox" name="workflows[]" value="%d" />',
+			$item->id()
 		);
 	}
 
@@ -90,6 +124,11 @@ class WorkflowsListTable extends WP_List_Table {
 			$args['only_trashed'] = true;
 		} elseif ( in_array( $view, array( 'draft', 'active', 'paused' ), true ) ) {
 			$args['status'] = $this->statusFromSlug( $view );
+		}
+
+		$search = $this->currentSearch();
+		if ( '' !== $search ) {
+			$args['search'] = $search;
 		}
 
 		$result = $this->workflows->list( $args );
@@ -176,6 +215,42 @@ class WorkflowsListTable extends WP_List_Table {
 	}
 
 	/**
+	 * Search filter field for the GET filter form.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function filterFields(): array {
+		return array(
+			array(
+				'name' => 's',
+				'type' => 'search',
+				'label' => __( 'Search workflows', 'workflow-automate' ),
+				'placeholder' => __( 'Search by title…', 'workflow-automate' ),
+				'value' => $this->currentSearch(),
+			),
+		);
+	}
+
+	/**
+	 * @return array<string, scalar>
+	 */
+	public function preservedFilters(): array {
+		$view = $this->currentView();
+
+		return array(
+			'status' => 'all' === $view ? '' : $view,
+			's' => $this->currentSearch(),
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function renderRowActionForms(): void {
+		$this->rowForms->render();
+	}
+
+	/**
 	 * @param int $id Workflow id.
 	 *
 	 * @return string
@@ -247,22 +322,24 @@ class WorkflowsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $id, string $label ): string {
+		$form_id = 'wfa-workflow-action-' . $op . '-' . $id;
 		$nonce_field = wp_nonce_field( 'wfa_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
 
-		return sprintf(
-			'<form method="post" action="%1$s" class="wfa-row-action-form">'
+		$form_markup = sprintf(
+			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
 				. '<input type="hidden" name="action" value="wfa_workflow_action" />'
-				. '<input type="hidden" name="op" value="%2$s" />'
-				. '<input type="hidden" name="workflow_id" value="%3$d" />'
-				. '%4$s'
-				. '<button type="submit" class="wfa-row-action-button">%5$s</button>'
+				. '<input type="hidden" name="op" value="%3$s" />'
+				. '<input type="hidden" name="workflow_id" value="%4$d" />'
+				. '%5$s'
 				. '</form>',
+			esc_attr( $form_id ),
 			esc_url( admin_url( 'admin-post.php' ) ),
 			esc_attr( $op ),
 			$id,
-			$nonce_field,
-			esc_html( $label )
+			$nonce_field
 		);
+
+		return $this->rowForms->registerButton( $form_id, $form_markup, $label );
 	}
 
 	/**
@@ -333,5 +410,13 @@ class WorkflowsListTable extends WP_List_Table {
 		$requested = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
 
 		return in_array( $requested, self::VIEWS, true ) ? $requested : 'all';
+	}
+
+	/**
+	 * @return string
+	 */
+	private function currentSearch(): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only search filter.
+		return isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 	}
 }

@@ -484,14 +484,18 @@ class Plugin {
 		$connections = $this->container->get( ConnectionService::class );
 		$webhooks = $this->container->get( WebhookService::class );
 
-		$workflows_page = new WorkflowsPage( $workflows, $settings );
-		$runs_page = new RunsPage( $runs, $workflow_repository, $settings );
+		$workflow_actions = new WorkflowActionsController( $workflows, WorkflowsPage::SLUG );
+		$workflows_page = new WorkflowsPage( $workflows, $settings, $workflow_actions );
+		$run_actions = new RunActionsController( $executor, $runs, $this->container->get( WorkflowRunLogRepository::class ) );
+		$runs_page = new RunsPage( $runs, $workflow_repository, $settings, $run_actions );
 		$builder_page = new BuilderPage();
 		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
 		$settings_page = new SettingsPage( $settings );
-		$connections_page = new ConnectionsPage( $connections, $settings );
+		$connection_actions = new ConnectionActionsController( $connections );
+		$connections_page = new ConnectionsPage( $connections, $settings, $connection_actions );
 		$connection_form_page = new ConnectionFormPage( $connections );
-		$webhooks_page = new WebhooksPage( $webhooks, $workflows, $settings );
+		$webhook_actions = new WebhookActionsController( $webhooks );
+		$webhooks_page = new WebhooksPage( $webhooks, $workflows, $settings, $webhook_actions );
 		$webhook_form_page = new WebhookFormPage( $webhooks, $workflows, $settings );
 
 		( new Menu(
@@ -507,10 +511,10 @@ class Plugin {
 				$webhook_form_page,
 			)
 		) )->register();
-		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
-		( new RunActionsController( $executor ) )->register();
+		( $workflow_actions )->register();
+		$run_actions->register();
 		( new SettingsController( $settings, $retention ) )->register();
-		( new ConnectionActionsController( $connections ) )->register();
-		( new WebhookActionsController( $webhooks ) )->register();
+		$connection_actions->register();
+		$webhook_actions->register();
 	}
 }

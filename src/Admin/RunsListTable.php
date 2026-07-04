@@ -55,6 +55,8 @@ class RunsListTable extends WP_List_Table {
 
 	private SettingsService $settings;
 
+	private RowActionForms $rowForms;
+
 	/**
 	 * Workflow titles for the current page of rows, keyed by workflow id.
 	 * Populated once in prepare_items() via a single batch lookup, rather
@@ -63,6 +65,11 @@ class RunsListTable extends WP_List_Table {
 	 * @var array<int, string>
 	 */
 	private array $workflowTitles = array();
+
+	/**
+	 * @var array<int, string> Workflow id => title for the filter dropdown.
+	 */
+	private array $workflowFilterOptions = array();
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings ) {
 		parent::__construct(
@@ -76,6 +83,7 @@ class RunsListTable extends WP_List_Table {
 		$this->runs = $runs;
 		$this->workflows = $workflows;
 		$this->settings = $settings;
+		$this->rowForms = new RowActionForms();
 	}
 
 	/**
@@ -83,12 +91,36 @@ class RunsListTable extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
+			'cb' => '<input type="checkbox" />',
 			'id' => __( 'Run', 'workflow-automate' ),
 			'workflow' => __( 'Workflow', 'workflow-automate' ),
 			'status' => __( 'Status', 'workflow-automate' ),
 			'attempt' => __( 'Attempt', 'workflow-automate' ),
 			'started_at' => __( 'Started', 'workflow-automate' ),
 			'duration' => __( 'Duration', 'workflow-automate' ),
+		);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function get_bulk_actions() {
+		return array(
+			'delete' => __( 'Delete', 'workflow-automate' ),
+		);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @param WorkflowRun $item Row.
+	 *
+	 * @return string
+	 */
+	protected function column_cb( $item ) {
+		return sprintf(
+			'<input type="checkbox" name="runs[]" value="%d" />',
+			$item->id()
 		);
 	}
 
@@ -120,6 +152,7 @@ class RunsListTable extends WP_List_Table {
 
 		$this->items = $result['items'];
 		$this->workflowTitles = $this->resolveWorkflowTitles( $this->items );
+		$this->workflowFilterOptions = $this->loadWorkflowFilterOptions();
 
 		$this->set_pagination_args(
 			array(
@@ -156,6 +189,69 @@ class RunsListTable extends WP_List_Table {
 		}
 
 		return $titles;
+	}
+
+	/**
+	 * @return array<int, string>
+	 */
+	private function loadWorkflowFilterOptions(): array {
+		$result = $this->workflows->paginate(
+			array(
+				'page' => 1,
+				'per_page' => 100,
+			)
+		);
+
+		$options = array();
+
+		foreach ( $result['items'] as $workflow ) {
+			$options[ $workflow->id() ] = $workflow->title();
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Filter dropdown definitions for the GET filter form.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function filterFields(): array {
+		$options = array(
+			'0' => __( 'All workflows', 'workflow-automate' ),
+		);
+
+		foreach ( $this->workflowFilterOptions as $id => $title ) {
+			$options[ (string) $id ] = $title;
+		}
+
+		return array(
+			array(
+				'name' => 'workflow_id',
+				'label' => __( 'Filter by workflow', 'workflow-automate' ),
+				'value' => (string) $this->currentWorkflowFilter(),
+				'options' => $options,
+			),
+		);
+	}
+
+	/**
+	 * GET filter values to preserve on bulk POST redirects.
+	 *
+	 * @return array<string, scalar>
+	 */
+	public function preservedFilters(): array {
+		return array(
+			'workflow_id' => $this->currentWorkflowFilter(),
+			'status' => 'all' === $this->currentView() ? '' : $this->currentView(),
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function renderRowActionForms(): void {
+		$this->rowForms->render();
 	}
 
 	/**
@@ -196,8 +292,15 @@ class RunsListTable extends WP_List_Table {
 		);
 
 		if ( in_array( $item->status(), self::RERUNNABLE_STATUSES, true ) ) {
-			$actions['rerun'] = $this->rerunForm( $item->id() );
+			$actions['rerun'] = $this->actionForm( 'rerun', $item->id(), __( 'Re-run', 'workflow-automate' ) );
 		}
+
+		$actions['delete'] = $this->actionForm(
+			'delete',
+			$item->id(),
+			__( 'Delete', 'workflow-automate' ),
+			__( 'Delete this run permanently? This cannot be undone.', 'workflow-automate' )
+		);
 
 		$label = sprintf(
 			'<a href="%1$s"><strong>#%2$d</strong></a>',
@@ -293,29 +396,32 @@ class RunsListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Renders a small standalone POST form styled as a row-action link,
-	 * matching WorkflowsListTable::actionForm()'s CSRF reasoning.
-	 *
-	 * @param int $run_id Run id.
+	 * @param string      $op      One of 'rerun', 'delete'.
+	 * @param int         $run_id  Run id.
+	 * @param string      $label   Visible button label.
+	 * @param string|null $confirm Optional browser confirm message.
 	 *
 	 * @return string
 	 */
-	private function rerunForm( int $run_id ): string {
-		$nonce_field = wp_nonce_field( 'wfa_run_action_rerun_' . $run_id, '_wpnonce', true, false );
+	private function actionForm( string $op, int $run_id, string $label, ?string $confirm = null ): string {
+		$form_id = 'wfa-run-action-' . $op . '-' . $run_id;
+		$nonce_field = wp_nonce_field( 'wfa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 
-		return sprintf(
-			'<form method="post" action="%1$s" class="wfa-row-action-form">'
+		$form_markup = sprintf(
+			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
 				. '<input type="hidden" name="action" value="wfa_run_action" />'
-				. '<input type="hidden" name="op" value="rerun" />'
-				. '<input type="hidden" name="run_id" value="%2$d" />'
-				. '%3$s'
-				. '<button type="submit" class="wfa-row-action-button">%4$s</button>'
+				. '<input type="hidden" name="op" value="%3$s" />'
+				. '<input type="hidden" name="run_id" value="%4$d" />'
+				. '%5$s'
 				. '</form>',
+			esc_attr( $form_id ),
 			esc_url( admin_url( 'admin-post.php' ) ),
+			esc_attr( $op ),
 			$run_id,
-			$nonce_field,
-			esc_html__( 'Re-run', 'workflow-automate' )
+			$nonce_field
 		);
+
+		return $this->rowForms->registerButton( $form_id, $form_markup, $label, 'wfa-row-action-button', $confirm );
 	}
 
 	/**
@@ -326,9 +432,21 @@ class RunsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function viewLink( string $view, string $label, string $current ): string {
-		$url = 'all' === $view
-			? remove_query_arg( 'status' )
-			: add_query_arg( 'status', $view );
+		$args = array( 'page' => RunsPage::SLUG );
+
+		if ( 'all' !== $view ) {
+			$args['status'] = $view;
+		}
+
+		$workflow_id = $this->currentWorkflowFilter();
+		if ( $workflow_id > 0 ) {
+			$args['workflow_id'] = $workflow_id;
+		}
+
+		$url = add_query_arg( $args, admin_url( 'admin.php' ) );
+		if ( 'all' === $view ) {
+			$url = remove_query_arg( 'status', $url );
+		}
 
 		$class = $view === $current ? ' class="current"' : '';
 

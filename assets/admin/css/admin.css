@@ -215,3 +215,34 @@
 	padding: 2px 6px;
 	border-radius: 3px;
 }
+
+/*
+ * List-table filters and bulk actions (standard wp-admin pattern).
+ */
+.wfa-list-table-filters-form {
+	margin: 8px 0 12px;
+}
+
+.wfa-list-table-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.wfa-list-table-filters input[type="search"],
+.wfa-list-table-filters select {
+	max-width: 240px;
+}
+
+.wfa-list-table-bulk-form {
+	margin-top: 8px;
+}
+
+.wfa-admin-page .check-column {
+	width: 2.2em;
+}
+
+.wfa-detached-row-action-forms {
+	display: none;
+}

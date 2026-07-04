@@ -53,6 +53,27 @@ class WorkflowActionsController {
 	 */
 	public function register(): void {
 		add_action( 'admin_post_wfa_workflow_action', array( $this, 'handle' ) );
+		add_action( 'admin_init', array( $this, 'maybeHandleWorkflowsBulkFromList' ), 5 );
+	}
+
+	/**
+	 * Early router so bulk POST is handled before any admin output.
+	 *
+	 * @return void
+	 */
+	public function maybeHandleWorkflowsBulkFromList(): void {
+		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- page routing only.
+		$page = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
+
+		if ( $this->redirectSlug !== $page ) {
+			return;
+		}
+
+		$this->handleWorkflowsBulkFromList();
 	}
 
 	/**
@@ -79,6 +100,77 @@ class WorkflowActionsController {
 		$success = $this->perform( $op, $workflow_id );
 
 		$this->redirect( $success ? $this->successNotice( $op ) : 'error' );
+	}
+
+	/**
+	 * Handles bulk actions from the Workflows list table form.
+	 *
+	 * @return void
+	 */
+	public function handleWorkflowsBulkFromList(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
+		if ( empty( $_POST['wfa_workflow_bulk'] ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+		}
+
+		if ( ! ListTableUi::verifyBulkNonce( 'wfa_workflow_bulk_action' ) ) {
+			$this->redirect( 'error', $this->bulkRedirectArgs() );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
+			? sanitize_key( wp_unslash( $_POST['action2'] ) )
+			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+
+		if ( ! in_array( $bulk_action, self::ALLOWED_OPS, true ) ) {
+			$this->redirect( 'error', $this->bulkRedirectArgs() );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
+		$ids = isset( $_POST['workflows'] ) && is_array( $_POST['workflows'] )
+			? array_map( 'absint', wp_unslash( $_POST['workflows'] ) )
+			: array();
+
+		$ids = array_values( array_filter( $ids ) );
+
+		if ( array() === $ids ) {
+			$this->redirect( 'error', $this->bulkRedirectArgs() );
+		}
+
+		$success = 0;
+		foreach ( $ids as $workflow_id ) {
+			if ( $this->perform( $bulk_action, $workflow_id ) ) {
+				++$success;
+			}
+		}
+
+		$this->redirect( $success > 0 ? $this->successNotice( $bulk_action ) : 'error', $this->bulkRedirectArgs() );
+	}
+
+	/**
+	 * @return array<string, scalar>
+	 */
+	private function bulkRedirectArgs(): array {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- read-only redirect filters.
+		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- read-only redirect filters.
+		$search = isset( $_POST['s'] ) ? sanitize_text_field( wp_unslash( $_POST['s'] ) ) : '';
+
+		$args = array();
+
+		if ( '' !== $status && in_array( $status, array( 'all', 'draft', 'active', 'paused', 'trash' ), true ) && 'all' !== $status ) {
+			$args['status'] = $status;
+		}
+
+		if ( '' !== $search ) {
+			$args['s'] = $search;
+		}
+
+		return $args;
 	}
 
 	/**
@@ -136,16 +228,20 @@ class WorkflowActionsController {
 	/**
 	 * Redirects back to the Workflows list with a notice, then exits.
 	 *
-	 * @param string $notice One of the keys understood by WorkflowsPage::renderNotice().
+	 * @param string               $notice One of the keys understood by WorkflowsPage::renderNotice().
+	 * @param array<string, scalar> $extra  Optional query args to preserve.
 	 *
 	 * @return void
 	 */
-	private function redirect( string $notice ): void {
+	private function redirect( string $notice, array $extra = array() ): void {
 		wp_safe_redirect(
 			add_query_arg(
-				array(
-					'page' => $this->redirectSlug,
-					'wfa_notice' => $notice,
+				array_merge(
+					array(
+						'page' => $this->redirectSlug,
+						'wfa_notice' => $notice,
+					),
+					$extra
 				),
 				admin_url( 'admin.php' )
 			)
