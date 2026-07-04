@@ -14,9 +14,11 @@ use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
 use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+use WorkflowAutomate\Plugin\Integration\BuiltInNodeTypes;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
+use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
@@ -117,6 +119,7 @@ class Plugin {
 		}
 
 		$this->registerServices();
+		$this->registerNodeTypes();
 		( new RestApi( $this->container ) )->register();
 		$this->registerAdmin();
 
@@ -174,6 +177,46 @@ class Plugin {
 					$container->get( WorkflowRepository::class ),
 					$container->get( WorkflowNodeRepository::class )
 				);
+			}
+		);
+	}
+
+	/**
+	 * Registers the node type registry and, on `init`, fires the extension
+	 * point that populates it.
+	 *
+	 * The `wfa/nodes/register` action is deliberately fired on `init` rather
+	 * than directly from here (this method itself runs during our own
+	 * `plugins_loaded` callback): by `init`, every other plugin's
+	 * `plugins_loaded` callback has already run, so third-party code hooking
+	 * `wfa/nodes/register` from inside its own `plugins_loaded` handler is
+	 * guaranteed to have registered before this fires. Firing immediately
+	 * here would make that depend on plugin load order.
+	 *
+	 * @return void
+	 */
+	private function registerNodeTypes(): void {
+		$this->container->singleton(
+			NodeTypeRegistry::class,
+			static function (): NodeTypeRegistry {
+				return new NodeTypeRegistry();
+			}
+		);
+
+		add_action( 'wfa/nodes/register', array( BuiltInNodeTypes::class, 'register' ) );
+
+		add_action(
+			'init',
+			function (): void {
+				/**
+				 * Fires once, letting core and third-party code register
+				 * trigger and action node types into the registry.
+				 *
+				 * @since 0.1.0
+				 *
+				 * @param NodeTypeRegistry $registry The plugin's node type registry.
+				 */
+				do_action( 'wfa/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
 		);
 	}

@@ -44,8 +44,10 @@ src/
   Core/                  Bootstrap: Plugin, Container, Requirements, Activator, Deactivator, Uninstaller, Options
   Database/              Migration base class/runner, table-name helper, migrations (dbDelta-based schema)
   Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode)
+  Domain/Contracts/      Public extension interfaces (TriggerInterface, ActionInterface)
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
-  Service/               Application services orchestrating domain + persistence (WorkflowService)
+  Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry)
+  Integration/           Built-in trigger/action node types (Triggers/, Actions/), registered via wfa/nodes/register
   Rest/                  WP_REST_Controller subclasses + rest_api_init bootstrap (wfa/v1 namespace)
   Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers
 assets/

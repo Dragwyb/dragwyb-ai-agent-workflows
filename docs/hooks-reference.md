@@ -25,6 +25,29 @@ add_action(
 );
 ```
 
+### `wfa/nodes/register`
+
+Fires once, on `init`, to let core and third-party code register trigger and action node types into the plugin's `NodeTypeRegistry`. Fired on `init` (rather than during this plugin's own `plugins_loaded` handler) specifically so that any plugin hooking this action from inside its own `plugins_loaded` callback is guaranteed to have already registered by the time this fires, regardless of plugin load order.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$registry` | `WorkflowAutomate\Plugin\Service\NodeTypeRegistry` | The registry to register trigger/action instances into. |
+
+**Example**
+
+```php
+add_action(
+	'wfa/nodes/register',
+	function ( $registry ) {
+		$registry->registerAction( new My_Custom_Action() );
+	}
+);
+```
+
+A custom action implements `WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface`; a custom trigger implements `WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface`. Both are documented in their own source files.
+
 ---
 
-No filters are exposed yet. Node/integration registration filters (`wfa/nodes/register`, `wfa/integrations/register`) and workflow execution lifecycle actions (`wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, `wfa/node/after_execute`) are planned in `docs/internal/architecture.md` §2.6 and will be documented here as they ship.
+No filters are exposed yet. An `wfa/integrations/register` filter and workflow execution lifecycle actions (`wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, `wfa/node/after_execute`) are planned in `docs/internal/architecture.md` §2.6 and will be documented here as they ship.

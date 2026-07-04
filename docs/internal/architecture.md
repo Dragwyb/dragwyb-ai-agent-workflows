@@ -67,7 +67,7 @@ One repository per aggregate root, all writes through `$wpdb->prepare()` / `$wpd
 
 Application services orchestrate domain + persistence, each with one responsibility:
 
-- `WorkflowService` (CRUD, activate/deactivate), `WorkflowExecutionService` (runs a workflow start-to-finish), `NodeExecutionService` (runs a single node via the Integration layer), `TriggerRegistry` / `ActionRegistry` (registration of node types), `IntegrationManager` (resolves an integration by slug), `RunLogService` (writes/queries logs, retention pruning), `ConnectionService` (credential lifecycle, encryption at rest).
+- `WorkflowService` (CRUD, activate/deactivate), `WorkflowExecutionService` (runs a workflow start-to-finish), `NodeExecutionService` (runs a single node via the Integration layer), `NodeTypeRegistry` (registration/lookup of trigger and action node types — implemented as one unified registry rather than separate `TriggerRegistry`/`ActionRegistry` classes, since both kinds share identical registration/lookup mechanics), `IntegrationManager` (resolves an integration by slug), `RunLogService` (writes/queries logs, retention pruning), `ConnectionService` (credential lifecycle, encryption at rest).
 
 ### Admin/UI layer
 
@@ -80,8 +80,12 @@ Application services orchestrate domain + persistence, each with one responsibil
 
 ### Integration layer
 
-- `IntegrationInterface` (trigger) and `ActionInterface` (action) contracts; one class per third-party integration; a `NodeTypeRegistry` lets core and third parties register new node types without editing core files.
-- HTTP-calling integrations own their own validated outbound requests. There is **no generic open admin proxy** endpoint (see `bitpi-analysis.md` §1.3 Security, SSRF finding) — this is a deliberate divergence, not an oversight.
+- `TriggerInterface` (trigger) and `ActionInterface` (action) contracts, both under `WorkflowAutomate\Plugin\Domain\Contracts`; one class per third-party integration; a `NodeTypeRegistry` lets core and third parties register new node types without editing core files, via the public `wfa/nodes/register` action.
+- HTTP-calling integrations own their own validated outbound requests, via `wp_safe_remote_request()` (WordPress's own SSRF-guarding helper) rather than the unguarded `wp_remote_request()`. There is **no generic open admin proxy** endpoint (see `bitpi-analysis.md` §1.3 Security, SSRF finding) — this is a deliberate divergence, not an oversight.
+
+### Implementation note (added when the node type registry shipped)
+
+`NodeTypeRegistry` is a plain PHP collection with no WordPress hook knowledge of its own; `Core\Plugin` is responsible for firing `wfa/nodes/register` (on `init`, not directly during its own `plugins_loaded` handler — see the PHPDoc on `Plugin::registerNodeTypes()` for why load-order makes that distinction matter for third-party registrations). Built-in node types (`Integration\Triggers\WpHookTrigger`, `Integration\Actions\HttpRequestAction`) register themselves on that same action rather than being wired directly into the container, so the extension point is exercised by our own code, not just documented for third parties.
 
 ### Background processing layer
 
