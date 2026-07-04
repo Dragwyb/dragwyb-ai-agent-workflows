@@ -12,6 +12,28 @@ For how connections themselves are stored and encrypted, see `docs/internal/arch
 
 **Config fields:** `hook_name` (required), `priority`, `accepted_args`.
 
+## WooCommerce Order Completed — trigger (`woocommerce_order_completed_trigger`)
+
+**What it is:** Starts a workflow when a WooCommerce order is marked `completed` (`woocommerce_order_status_completed`). Roadmap item 15's first demand-driven integration.
+
+**Availability:** Registered only when WooCommerce is active (`class_exists( 'WooCommerce' )` and `function_exists( 'WC' )` at `init`). Sites without WooCommerce never see this node in the builder palette. If WooCommerce is later deactivated, existing workflows that use this trigger stop firing (the type is no longer in the registry); the saved graph is preserved and the builder shows the usual "type not currently registered" warning.
+
+**Credentials:** None. WooCommerce is a co-installed WordPress plugin, not a remote API — there is nothing to store in `wfa_connections`.
+
+**Config fields:** None (the event is fixed to "order completed").
+
+**Trigger payload** (passed to actions as the run's trigger data):
+
+| Key | Notes |
+| --- | --- |
+| `source` | Always `"woocommerce"` |
+| `event` | Always `"order_completed"` |
+| `order_id` | Always present |
+| `status`, `currency`, `total`, `subtotal`, `customer_id` | When the order object is available |
+| `billing_email`, `billing_first_name`, `billing_last_name`, `billing_phone` | When available |
+| `payment_method`, `order_key` | When available |
+| `items` | Array of `{product_id, variation_id, name, quantity, total}` |
+
 ## HTTP Request — action (`http_request_action`)
 
 **What it is:** Sends a single outbound HTTP request to a URL the workflow author configures — this is the plugin's general-purpose "talk to any API" building block, not an integration with one specific named service.

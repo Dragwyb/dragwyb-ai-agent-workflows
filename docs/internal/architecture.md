@@ -129,6 +129,10 @@ Deferred/out of scope for this item: an admin-visible queue/retry status (belong
 
 `wfa/integrations/register` (§2.6) remains deferred. Both new/changed node types here are still registered as individual `TriggerInterface`/`ActionInterface` implementations via the existing `NodeTypeRegistry`, exactly like item 5's originals — nothing yet needs a layer of abstraction *above* individual node types (e.g. a bundle of several related triggers/actions sharing one connection type), so introducing `IntegrationInterface` now would still be speculative. This will be revisited if roadmap item 15 (additional integrations) surfaces a real need for it.
 
+### Implementation note (roadmap item 15 — additional integrations)
+
+First demand-driven integration: `WooCommerceOrderCompletedTrigger` (`woocommerce_order_completed_trigger`), registered from `BuiltInNodeTypes` **only when WooCommerce is active**. That optional-registration pattern is the whole increment's architectural contribution — co-plugin integrations must not appear in the palette (or bind hooks) on sites that do not have the co-plugin. Still no `IntegrationInterface`: one trigger with no shared connection type or multi-node bundle does not justify a layer above `NodeTypeRegistry`. Further integrations (forms plugins, more WooCommerce events/actions) follow the same "one integration per increment, register only when the co-plugin is present" rule.
+
 ---
 
 ## 2.3 Database Schema Redesign

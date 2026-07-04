@@ -288,3 +288,27 @@ This item is also where architecture §2.5's "Security/API Keys: connection mana
 **Refactor:** During design, considered a single `wfa_manage` cap — rejected because it would not deliver the granular delegation opportunity #7 describes. Also considered checking `manage_options || wfa_*` at every call site — rejected in favor of the `user_has_cap` filter so call sites stay one-line and cannot forget the fallback.
 
 **Deferred / follow-up:** Same PHPCS/PHPUnit/PHPStan CLI gap as items 1–13, plus no running WordPress in this session — flagged for a manual smoke test (as administrator, confirm all screens still work; create a role with only `wfa_manage_runs`, confirm only Runs is visible and Workflows/Settings/etc. are not; grant only `wfa_manage_workflows` and confirm the builder REST routes work; confirm a user with `manage_options` but no explicit `wfa_*` on their role still has full access via the fallback). No UI for assigning capabilities inside this plugin — use WordPress's own role tools. Per-workflow ownership ("only edit workflows I created") is out of scope.
+
+### 15. Additional integrations — done (WooCommerce Order Completed)
+
+**Built:** `src/Integration/Triggers/WooCommerceOrderCompletedTrigger.php` — binds `woocommerce_order_status_completed`, builds a structured trigger payload (order id, totals, billing fields, line items) via defensive `method_exists()` checks against the WooCommerce order object (falls back to `wc_get_order()` / `order_id`-only when needed). `BuiltInNodeTypes` registers it **only when** `class_exists( '\WooCommerce', false ) && function_exists( 'WC' )`. Docs: `docs/integrations.md`, architecture §2.2 item-15 note, `docs/rest-api.md` (optional trigger in the node-types example), `README.md`.
+
+**Design decisions worth recording explicitly:**
+
+- **One integration this increment: WooCommerce order completed.** Roadmap item 15 is explicitly "one integration per increment"; WooCommerce is named in the roadmap and is the highest-demand co-plugin for automation. Forms-plugin integrations (CF7, WPForms, etc.) are the natural next increments under the same pattern.
+- **Register only when the co-plugin is active.** Sites without WooCommerce must not see a dead node type in the palette or bind a hook that never fires. Deactivating WooCommerce later leaves saved graphs intact; the builder already shows "type not currently registered" for missing types (item 6).
+- **Still no `IntegrationInterface` / `wfa/integrations/register`.** One optional trigger with no shared credentials or multi-node bundle does not justify a layer above `NodeTypeRegistry` — same call architecture §2.2 / §2.6 already made for items 11–12. Revisit when an integration ships several related node types that share setup.
+- **Structured payload, not raw hook args.** Unlike `WpHookTrigger` (which forwards the variadic argument list), this trigger normalizes order data into named keys so actions can use `order_id` / `billing_email` without knowing WooCommerce's hook signature. No secrets are included (no payment tokens).
+- **Empty `configSchema()`.** The event is fixed to "completed"; an order-status picker would be a second, broader "order status changed" trigger, not a config field on this one.
+
+**Self-review:** Confirmed registration runs on `wfa/nodes/register` (`init`), after active plugins are loaded. Confirmed `class_exists( …, false )` avoids autoloading a missing WooCommerce. Confirmed `buildPayload()` never assumes `WC_Order` type hints (this plugin does not depend on WooCommerce stubs) and degrades to `{source, event, order_id}` when the order cannot be loaded. Confirmed no new REST routes, admin screens, or capabilities were required.
+
+**Security review:** No new public surface. Trigger only fires from WooCommerce's own authenticated admin/checkout flows (not a public ingress). Payload fields are order metadata already visible to shop managers — no payment card data, no credentials. Hook binding uses a fixed hook name (not user-supplied), so there is no hook-injection vector of the kind `WpHookTrigger`'s free-form `hook_name` has (and that trigger already documents).
+
+**Performance review:** `isWooCommerceActive()` is two function/class checks once per request at node registration. `buildPayload()` / `lineItems()` run only when an order actually completes, and only read in-memory order object methods — no extra SQL beyond what WooCommerce already loaded for the status transition.
+
+**Standards review:** `declare(strict_types=1)`, ABSPATH guard, full PHPDoc, same `TriggerInterface` shape as `WpHookTrigger`. WPCS conformance is manual-only, same known CLI gap as items 1–14.
+
+**Refactor:** None required beyond the optional-registration helper on `BuiltInNodeTypes` (kept private and WooCommerce-specific rather than a generic "if plugin active" registry — a generic helper would be premature until a second co-plugin integration exists to share it).
+
+**Deferred / follow-up:** Same PHPCS/PHPUnit/PHPStan CLI gap; smoke-test with WooCommerce active (complete an order, confirm a run is queued with the structured payload) and inactive (confirm the trigger is absent from `GET /wfa/v1/node-types`). Further integrations (Contact Form 7, WPForms, more WooCommerce events/actions such as "order refunded" or "update order status") each get their own increment under this same optional-registration pattern. `IntegrationInterface` remains deferred.

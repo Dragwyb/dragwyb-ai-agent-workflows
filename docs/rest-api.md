@@ -102,7 +102,8 @@ Read-only. Lists every trigger and action node type currently registered against
 ```json
 {
   "triggers": [
-    { "slug": "wp_hook_trigger", "label": "WordPress Hook", "description": "…", "config_schema": { "hook_name": { "type": "string", "label": "Hook name", "required": true } } }
+    { "slug": "wp_hook_trigger", "label": "WordPress Hook", "description": "…", "config_schema": { "hook_name": { "type": "string", "label": "Hook name", "required": true } } },
+    { "slug": "woocommerce_order_completed_trigger", "label": "WooCommerce Order Completed", "description": "…", "config_schema": {} }
   ],
   "actions": [
     { "slug": "http_request_action", "label": "HTTP Request", "description": "…", "config_schema": { "url": { "type": "string", "label": "Request URL", "required": true }, "method": { "type": "string", "label": "HTTP method", "default": "GET" }, "connection_id": { "type": "connection", "label": "Authenticate with connection (optional)", "default": 0 } } },
@@ -112,6 +113,8 @@ Read-only. Lists every trigger and action node type currently registered against
 ```
 
 `config_schema` mirrors `Domain\Contracts\NodeTypeInterface::configSchema()` on the PHP side field-for-field; the builder renders its node configuration panel generically from this shape, so a third-party node type registered via `wfa/nodes/register` needs no front-end changes to show up there. The one field `type` that needs an extra data source to render meaningfully is `connection` — see below.
+
+Optional co-plugin triggers (e.g. `woocommerce_order_completed_trigger`) appear in this list only when that co-plugin is active on the site — see `docs/integrations.md`.
 
 ## Connections — `wfa/v1/connections`
 
