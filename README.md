@@ -47,6 +47,9 @@ src/
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
   Service/               Application services orchestrating domain + persistence (WorkflowService)
   Rest/                  WP_REST_Controller subclasses + rest_api_init bootstrap (wfa/v1 namespace)
+  Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers
+assets/
+  admin/css/             Admin screen CSS, enqueued only on the plugin's own screens
 docs/
   hooks-reference.md     Public actions/filters reference
   rest-api.md            REST API endpoint reference (wfa/v1)

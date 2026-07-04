@@ -223,7 +223,9 @@ class WorkflowRepository {
 	 *
 	 * @param array<string, mixed> $args {
 	 *     @type int  $status          Optional status filter.
-	 *     @type bool $include_trashed Whether to include soft-deleted rows. Default false.
+	 *     @type bool $include_trashed Whether to include soft-deleted rows alongside active ones. Default false.
+	 *     @type bool $only_trashed    Whether to return *only* soft-deleted rows (a dedicated "Trash" view). Takes
+	 *                                 precedence over `include_trashed` when true. Default false.
 	 *     @type int  $page            1-indexed page number. Default 1.
 	 *     @type int  $per_page        Rows per page, clamped to [1, 100]. Default 20.
 	 * }
@@ -241,7 +243,9 @@ class WorkflowRepository {
 		$where = array();
 		$params = array();
 
-		if ( empty( $args['include_trashed'] ) ) {
+		if ( ! empty( $args['only_trashed'] ) ) {
+			$where[] = 'deleted_at IS NOT NULL';
+		} elseif ( empty( $args['include_trashed'] ) ) {
 			$where[] = 'deleted_at IS NULL';
 		}
 

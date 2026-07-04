@@ -1,0 +1,42 @@
+/**
+ * Workflow Automate — admin screen styles.
+ *
+ * Enqueued only on the plugin's own admin screens (see Menu::enqueueAssets()),
+ * never site-wide or across all of wp-admin.
+ */
+
+.wfa-admin-page .wfa-workflows-table .column-run_count,
+.wfa-admin-page .wfa-workflows-table .column-updated_at {
+	width: 160px;
+}
+
+/*
+ * Row-action buttons are rendered as <button type="submit"> inside small
+ * inline forms (POST, nonce-protected) rather than <a href> links, so that
+ * trash/restore/delete never happen on a GET request. This resets the
+ * button chrome so they read visually the same as core's own <a> row
+ * actions.
+ */
+.wfa-row-action-form {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+
+.wfa-row-action-button {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+	color: #2271b1;
+	cursor: pointer;
+	font-size: inherit;
+	font-family: inherit;
+	text-decoration: none;
+}
+
+.wfa-row-action-button:hover,
+.wfa-row-action-button:focus {
+	color: #135e96;
+	text-decoration: underline;
+}

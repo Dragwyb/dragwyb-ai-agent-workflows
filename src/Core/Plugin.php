@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Core;
 
+use WorkflowAutomate\Plugin\Admin\Menu;
+use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
+use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
@@ -115,6 +118,7 @@ class Plugin {
 
 		$this->registerServices();
 		( new RestApi( $this->container ) )->register();
+		$this->registerAdmin();
 
 		// Capability-gated so schema upkeep never runs on ordinary front-end
 		// requests; this only protects against tables missing after a
@@ -172,5 +176,19 @@ class Plugin {
 				);
 			}
 		);
+	}
+
+	/**
+	 * Registers the admin menu/screens and the admin-post action handler
+	 * that backs their row actions.
+	 *
+	 * @return void
+	 */
+	private function registerAdmin(): void {
+		$workflows = $this->container->get( WorkflowService::class );
+		$workflows_page = new WorkflowsPage( $workflows );
+
+		( new Menu( array( $workflows_page ) ) )->register();
+		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
 	}
 }
