@@ -48,6 +48,9 @@ export default function App() {
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState('');
 	const [saveStatus, setSaveStatus] = useState('idle');
+	// 0 = draft, 1 = active, 2 = paused (matches Workflow::STATUS_* / REST).
+	const [workflowStatus, setWorkflowStatus] = useState(0);
+	const [toggleActiveBusy, setToggleActiveBusy] = useState(false);
 
 	// Autosave fires from a setTimeout created by a stable useCallback, so it
 	// needs a way to read state as of when it actually runs rather than as
@@ -136,6 +139,9 @@ export default function App() {
 				}
 
 				setTitle(workflow.title || '');
+				setWorkflowStatus(
+					typeof workflow.status === 'number' ? workflow.status : 0
+				);
 				setGraph(normalizeGraph(workflow.graph));
 				setNodeTypes({
 					triggers: types.triggers || [],
@@ -236,6 +242,39 @@ export default function App() {
 
 		persist();
 	}, [persist]);
+
+	const handleToggleActive = useCallback(async () => {
+		const current = latestRef.current;
+
+		if (!current.workflowId || toggleActiveBusy) {
+			return;
+		}
+
+		// Active (1) → Pause (2). Draft (0) or Paused (2) → Active (1).
+		const nextStatus = workflowStatus === 1 ? 2 : 1;
+
+		setToggleActiveBusy(true);
+
+		try {
+			// Persist title/graph first so activating never runs an outdated
+			// graph if the user just edited and autosave has not fired yet.
+			if (autosaveTimeoutRef.current) {
+				clearTimeout(autosaveTimeoutRef.current);
+			}
+
+			await updateWorkflow(current.workflowId, {
+				title: current.title,
+				graph: current.graph,
+				status: nextStatus,
+			});
+			setWorkflowStatus(nextStatus);
+			setSaveStatus('saved');
+		} catch (error) {
+			setSaveStatus('error');
+		} finally {
+			setToggleActiveBusy(false);
+		}
+	}, [workflowStatus, toggleActiveBusy]);
 
 	const handleAddNode = (nodeTypeDefinition, category) => {
 		const newNode = {
@@ -342,9 +381,12 @@ export default function App() {
 				title={title}
 				onTitleChange={setTitle}
 				status={saveStatus}
+				workflowStatus={workflowStatus}
+				onToggleActive={handleToggleActive}
+				toggleActiveBusy={toggleActiveBusy}
 				onSave={handleManualSave}
 				listUrl={bootstrap.listUrl}
-				saveDisabled={saveStatus === 'saving'}
+				saveDisabled={saveStatus === 'saving' || toggleActiveBusy}
 			/>
 			<div className="wfa-builder__body">
 				<Palette

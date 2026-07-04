@@ -29,7 +29,7 @@ export function createWorkflow(data) {
 
 /**
  * @param {number} id   Workflow id.
- * @param {Object} data Attributes to update (title and/or graph).
+ * @param {Object} data Attributes to update (title, graph, and/or status).
  * @return {Promise<Object>} The updated workflow resource.
  */
 export function updateWorkflow(id, data) {

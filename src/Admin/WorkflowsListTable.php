@@ -161,8 +161,15 @@ class WorkflowsListTable extends WP_List_Table {
 			$actions = array(
 				'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
 				'runs' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'workflow-automate' ) ),
-				'trash' => $this->actionForm( 'trash', $item->id(), __( 'Trash', 'workflow-automate' ) ),
 			);
+
+			if ( Workflow::STATUS_ACTIVE === $item->status() ) {
+				$actions['pause'] = $this->actionForm( 'pause', $item->id(), __( 'Pause', 'workflow-automate' ) );
+			} else {
+				$actions['activate'] = $this->actionForm( 'activate', $item->id(), __( 'Activate', 'workflow-automate' ) );
+			}
+
+			$actions['trash'] = $this->actionForm( 'trash', $item->id(), __( 'Trash', 'workflow-automate' ) );
 		}
 
 		return $title . $this->row_actions( $actions );
@@ -233,7 +240,7 @@ class WorkflowsListTable extends WP_List_Table {
 	/**
 	 * Renders a small standalone POST form styled as a row-action link.
 	 *
-	 * @param string $op    One of 'trash', 'restore', 'delete'.
+	 * @param string $op    One of 'trash', 'restore', 'delete', 'activate', 'pause'.
 	 * @param int    $id    Workflow id.
 	 * @param string $label Visible button label.
 	 *

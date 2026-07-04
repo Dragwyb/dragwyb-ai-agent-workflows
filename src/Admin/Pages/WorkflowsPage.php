@@ -197,6 +197,14 @@ class WorkflowsPage implements AdminPage {
 				'message' => __( 'Workflow permanently deleted.', 'workflow-automate' ),
 				'type' => 'success',
 			),
+			'activated' => array(
+				'message' => __( 'Workflow activated. It will run when its trigger fires.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'paused' => array(
+				'message' => __( 'Workflow paused. Triggers will not start new runs until it is activated again.', 'workflow-automate' ),
+				'type' => 'success',
+			),
 			'error' => array(
 				'message' => __( 'That workflow action could not be completed.', 'workflow-automate' ),
 				'type' => 'error',

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin;
 
 use WorkflowAutomate\Plugin\Core\Capabilities;
+use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
@@ -28,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WorkflowActionsController {
 
-	private const ALLOWED_OPS = array( 'trash', 'restore', 'delete' );
+	private const ALLOWED_OPS = array( 'trash', 'restore', 'delete', 'activate', 'pause' );
 
 	private WorkflowService $workflows;
 
@@ -104,6 +105,12 @@ class WorkflowActionsController {
 			case 'delete':
 				return $this->workflows->delete( $workflow_id, true );
 
+			case 'activate':
+				return null !== $this->workflows->changeStatus( $workflow_id, Workflow::STATUS_ACTIVE );
+
+			case 'pause':
+				return null !== $this->workflows->changeStatus( $workflow_id, Workflow::STATUS_PAUSED );
+
 			default:
 				return false;
 		}
@@ -117,6 +124,10 @@ class WorkflowActionsController {
 				return 'restored';
 			case 'delete':
 				return 'deleted';
+			case 'activate':
+				return 'activated';
+			case 'pause':
+				return 'paused';
 			default:
 				return 'error';
 		}
