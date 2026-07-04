@@ -12,6 +12,9 @@ namespace WorkflowAutomate\Plugin\Rest;
 use InvalidArgumentException;
 use RuntimeException;
 use WorkflowAutomate\Plugin\Domain\Workflow;
+use WorkflowAutomate\Plugin\Domain\WorkflowRun;
+use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
+use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 use WP_Error;
 use WP_REST_Controller;
@@ -32,10 +35,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Node-level endpoints (`workflow_nodes`) are intentionally out of scope
  * for this increment and will be added when the visual builder needs them.
+ *
+ * A dedicated, paginated `wfa/v1/runs` resource (for the run history UI) is
+ * deferred to that later roadmap item; `run_item()` here only exists so the
+ * synchronous execution engine (roadmap item 7) is testable/usable before
+ * that UI exists, and returns a single run's outcome plus its logs inline
+ * rather than a browsable collection.
  */
 class WorkflowsController extends WP_REST_Controller {
 
 	private WorkflowService $workflows;
+
+	private WorkflowExecutionService $executor;
 
 	/**
 	 * Cached item schema. See get_item_schema().
@@ -44,10 +55,11 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private ?array $schema = null;
 
-	public function __construct( WorkflowService $workflows ) {
+	public function __construct( WorkflowService $workflows, WorkflowExecutionService $executor ) {
 		$this->namespace = 'wfa/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
+		$this->executor = $executor;
 	}
 
 	/**
@@ -127,6 +139,24 @@ class WorkflowsController extends WP_REST_Controller {
 				array(
 					'methods' => WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'restore_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args' => array(
+						'id' => array(
+							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
+							'type' => 'integer',
+						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/run',
+			array(
+				array(
+					'methods' => WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'run_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
 					'args' => array(
 						'id' => array(
@@ -384,6 +414,62 @@ class WorkflowsController extends WP_REST_Controller {
 		$workflow = $this->workflows->find( $id, true );
 
 		return rest_ensure_response( $this->prepare_item_for_response( $workflow, $request ) );
+	}
+
+	/**
+	 * Runs a workflow synchronously ("run now"/test action) and returns its
+	 * outcome, including per-node logs so the result is inspectable without
+	 * a run history UI. Blocks for as long as the workflow takes to finish
+	 * executing every node — see WorkflowExecutionService for why that is
+	 * an accepted characteristic of this increment, not an oversight.
+	 *
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function run_item( $request ) {
+		$id = (int) $request['id'];
+
+		try {
+			$run = $this->executor->run( $id );
+		} catch ( InvalidArgumentException $exception ) {
+			return $this->notFoundError();
+		} catch ( RuntimeException $exception ) {
+			return new WP_Error( 'wfa_rest_run_failed', $exception->getMessage(), array( 'status' => 500 ) );
+		}
+
+		return rest_ensure_response( $this->serializeRun( $run ) );
+	}
+
+	/**
+	 * @param WorkflowRun $run The completed run.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function serializeRun( WorkflowRun $run ): array {
+		return array(
+			'id' => $run->id(),
+			'workflow_id' => $run->workflowId(),
+			'status' => $run->status(),
+			'started_at' => null === $run->startedAt() ? null : mysql_to_rfc3339( $run->startedAt() ),
+			'finished_at' => null === $run->finishedAt() ? null : mysql_to_rfc3339( $run->finishedAt() ),
+			'logs' => array_map( array( $this, 'serializeRunLog' ), $this->executor->logsFor( $run->id() ) ),
+		);
+	}
+
+	/**
+	 * @param WorkflowRunLog $log A single node's outcome within the run.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function serializeRunLog( WorkflowRunLog $log ): array {
+		return array(
+			'node_id' => $log->nodeId(),
+			'status' => $log->status(),
+			'message' => $log->message(),
+			'output' => $log->output(),
+			'duration_ms' => $log->durationMs(),
+		);
 	}
 
 	/**

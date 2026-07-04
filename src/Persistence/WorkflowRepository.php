@@ -219,6 +219,26 @@ class WorkflowRepository {
 	}
 
 	/**
+	 * Atomically increments `run_count` by one. Uses `run_count = run_count
+	 * + 1` at the SQL level rather than a read-then-write round trip so
+	 * concurrent runs of the same workflow can never lose an increment.
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return bool
+	 */
+	public function incrementRunCount( int $id ): bool {
+		global $wpdb;
+
+		$table = $this->table();
+		$sql = "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+
+		$updated = $wpdb->query( $wpdb->prepare( $sql, current_time( 'mysql', true ), $id ) );
+
+		return false !== $updated;
+	}
+
+	/**
 	 * Returns a paginated, optionally filtered list of workflows.
 	 *
 	 * @param array<string, mixed> $args {

@@ -15,6 +15,8 @@ use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Domain\WorkflowNode;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
+use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
+use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,9 +35,20 @@ class WorkflowService {
 
 	private WorkflowNodeRepository $nodes;
 
-	public function __construct( WorkflowRepository $workflows, WorkflowNodeRepository $nodes ) {
+	private WorkflowRunRepository $runs;
+
+	private WorkflowRunLogRepository $runLogs;
+
+	public function __construct(
+		WorkflowRepository $workflows,
+		WorkflowNodeRepository $nodes,
+		WorkflowRunRepository $runs,
+		WorkflowRunLogRepository $runLogs
+	) {
 		$this->workflows = $workflows;
 		$this->nodes = $nodes;
+		$this->runs = $runs;
+		$this->runLogs = $runLogs;
 	}
 
 	/**
@@ -134,12 +147,17 @@ class WorkflowService {
 	 *
 	 * @param int  $id   Workflow id.
 	 * @param bool $hard When true, permanently deletes the workflow and its
-	 *                   nodes instead of soft-deleting (trashing) it.
+	 *                   nodes, runs, and run logs instead of soft-deleting
+	 *                   (trashing) it.
 	 *
 	 * @return bool
 	 */
 	public function delete( int $id, bool $hard = false ): bool {
 		if ( $hard ) {
+			// Logs are keyed by run id, not workflow id, so their ids must
+			// be resolved before the runs themselves are removed.
+			$this->runLogs->deleteByRunIds( $this->runs->idsForWorkflow( $id ) );
+			$this->runs->deleteByWorkflow( $id );
 			$this->nodes->deleteByWorkflow( $id );
 
 			return $this->workflows->delete( $id );
@@ -242,5 +260,95 @@ class WorkflowService {
 	 */
 	public function nodesFor( int $workflow_id ): array {
 		return $this->nodes->findByWorkflow( $workflow_id );
+	}
+
+	/**
+	 * Reconciles `wfa_workflow_nodes` rows with a workflow's current
+	 * `graph_json` (the builder's source of truth for node identity and
+	 * configuration): existing nodes are updated, new ones inserted, and
+	 * ones no longer present in the graph are removed.
+	 *
+	 * The builder (roadmap item 6) only ever writes the whole graph as JSON
+	 * via update(); nothing keeps `wfa_workflow_nodes` in sync with it as
+	 * that happens, since nothing read that table until the execution
+	 * engine needed real, stable node ids to log run outcomes against.
+	 * Rather than pay a sync cost on every autosave, this is called lazily,
+	 * right before a run needs it (see WorkflowExecutionService::run()).
+	 *
+	 * @param int $workflow_id Workflow id.
+	 *
+	 * @return WorkflowNode[] The workflow's nodes, freshly synced. Empty if the workflow does not exist.
+	 */
+	public function syncNodesFromGraph( int $workflow_id ): array {
+		$workflow = $this->workflows->find( $workflow_id, true );
+
+		if ( null === $workflow ) {
+			return array();
+		}
+
+		$graph_nodes = $workflow->graph()['nodes'] ?? array();
+		$graph_nodes = is_array( $graph_nodes ) ? $graph_nodes : array();
+
+		$existing_by_client_id = array();
+
+		foreach ( $this->nodes->findByWorkflow( $workflow_id ) as $node ) {
+			$existing_by_client_id[ $node->clientNodeId() ] = $node;
+		}
+
+		$seen = array();
+		$synced = array();
+
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) || empty( $graph_node['type'] ) ) {
+				continue; // Defensively skip a malformed graph entry rather than fail the whole sync.
+			}
+
+			$client_node_id = (string) $graph_node['id'];
+			$seen[ $client_node_id ] = true;
+
+			$attributes = array(
+				'node_type' => (string) $graph_node['type'],
+				'label' => isset( $graph_node['label'] ) ? (string) $graph_node['label'] : null,
+				'config' => isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : null,
+			);
+
+			if ( isset( $existing_by_client_id[ $client_node_id ] ) ) {
+				$node = $this->nodes->update( $existing_by_client_id[ $client_node_id ]->id(), $attributes );
+			} else {
+				$node = $this->nodes->insert(
+					array_merge(
+						array(
+							'workflow_id' => $workflow_id,
+							'client_node_id' => $client_node_id,
+						),
+						$attributes
+					)
+				);
+			}
+
+			if ( null !== $node ) {
+				$synced[] = $node;
+			}
+		}
+
+		foreach ( $existing_by_client_id as $client_node_id => $node ) {
+			if ( ! isset( $seen[ $client_node_id ] ) ) {
+				$this->nodes->delete( $node->id() );
+			}
+		}
+
+		return $synced;
+	}
+
+	/**
+	 * Records that a workflow has just run, for the `run_count` column
+	 * shown in the admin list table.
+	 *
+	 * @param int $workflow_id Workflow id.
+	 *
+	 * @return void
+	 */
+	public function incrementRunCount( int $workflow_id ): void {
+		$this->workflows->incrementRunCount( $workflow_id );
 	}
 }

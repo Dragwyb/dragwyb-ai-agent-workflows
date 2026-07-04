@@ -48,6 +48,66 @@ add_action(
 
 A custom action implements `WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface`; a custom trigger implements `WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface`. Both are documented in their own source files.
 
+### `wfa/workflow/before_run`
+
+Fires immediately before a workflow run starts (both a manual "run now" and an automatic, trigger-fired run — see `WorkflowAutomate\Plugin\Integration\WorkflowTriggerBinder`), before the `wfa_workflow_runs` row is even created.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$workflow_id` | `int` | The workflow about to run. |
+| `$trigger_payload` | `array` | Data the triggering event provided; empty for a manual run. |
+
+### `wfa/workflow/after_run`
+
+Fires immediately after a workflow run finishes, whatever its final status (`success`, `failed`, or `partial`).
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$run` | `WorkflowAutomate\Plugin\Domain\WorkflowRun` | The completed run. |
+| `$trigger_payload` | `array` | Data the triggering event provided; empty for a manual run. |
+
+### `wfa/node/before_execute`
+
+Fires immediately before a single node (an action; trigger nodes do not go through this) executes.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$node` | `WorkflowAutomate\Plugin\Domain\WorkflowNode` | The node about to execute. |
+| `$context` | `array` | Runtime data available to this node (trigger payload, prior node outputs). |
+
+### `wfa/node/after_execute`
+
+Fires immediately after a single node executes, whether it succeeded or failed.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$node` | `WorkflowAutomate\Plugin\Domain\WorkflowNode` | The node that just executed. |
+| `$result` | `array` | Its outcome — at minimum `{success: bool, error?: string}`. |
+| `$context` | `array` | Runtime data that was available to this node. |
+
+**Example**
+
+```php
+add_action(
+	'wfa/node/after_execute',
+	function ( $node, $result, $context ) {
+		if ( empty( $result['success'] ) ) {
+			error_log( sprintf( 'Workflow node %s failed: %s', $node->nodeType(), $result['error'] ?? 'unknown' ) );
+		}
+	},
+	10,
+	3
+);
+```
+
 ---
 
-No filters are exposed yet. An `wfa/integrations/register` filter and workflow execution lifecycle actions (`wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, `wfa/node/after_execute`) are planned in `docs/internal/architecture.md` §2.6 and will be documented here as they ship.
+No filters are exposed yet. An `wfa/integrations/register` filter is planned in `docs/internal/architecture.md` §2.6 and will be documented here as it ships.

@@ -50,11 +50,11 @@ src/
   autoload.php           Fallback PSR-4 autoloader (see "Local setup" above)
   Core/                  Bootstrap: Plugin, Container, Requirements, Activator, Deactivator, Uninstaller, Options
   Database/              Migration base class/runner, table-name helper, migrations (dbDelta-based schema)
-  Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode)
+  Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode, WorkflowRun, WorkflowRunLog)
   Domain/Contracts/      Public extension interfaces (TriggerInterface, ActionInterface)
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
-  Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry)
-  Integration/           Built-in trigger/action node types (Triggers/, Actions/), registered via wfa/nodes/register
+  Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry, NodeExecutionService, WorkflowExecutionService)
+  Integration/           Built-in trigger/action node types (Triggers/, Actions/), registered via wfa/nodes/register; WorkflowTriggerBinder binds active workflows' triggers to their real event source on init
   Rest/                  WP_REST_Controller subclasses + rest_api_init bootstrap (wfa/v1 namespace)
   Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers
   Admin/Pages/           WorkflowsPage (list) and BuilderPage (visual editor shell)

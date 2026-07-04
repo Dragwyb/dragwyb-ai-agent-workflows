@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Database;
 
 use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowNodesTable;
+use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
+use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowRunsTable;
 use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowsTable;
 
 // Prevent direct file access.
@@ -30,6 +32,8 @@ class SchemaMigrations {
 		return array(
 			CreateWorkflowsTable::class,
 			CreateWorkflowNodesTable::class,
+			CreateWorkflowRunsTable::class,
+			CreateWorkflowRunLogsTable::class,
 		);
 	}
 }

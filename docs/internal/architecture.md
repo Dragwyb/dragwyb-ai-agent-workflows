@@ -87,6 +87,12 @@ Application services orchestrate domain + persistence, each with one responsibil
 
 `NodeTypeRegistry` is a plain PHP collection with no WordPress hook knowledge of its own; `Core\Plugin` is responsible for firing `wfa/nodes/register` (on `init`, not directly during its own `plugins_loaded` handler — see the PHPDoc on `Plugin::registerNodeTypes()` for why load-order makes that distinction matter for third-party registrations). Built-in node types (`Integration\Triggers\WpHookTrigger`, `Integration\Actions\HttpRequestAction`) register themselves on that same action rather than being wired directly into the container, so the extension point is exercised by our own code, not just documented for third parties.
 
+### Implementation note (roadmap item 7 — execution engine)
+
+`WorkflowExecutionService` and `NodeExecutionService` shipped as designed above, plus a new `Integration\WorkflowTriggerBinder` that was not originally named in this section: something has to actually call `TriggerInterface::bind()` for the registry/trigger contracts built in item 5 to have any real effect, and item 5's own follow-up notes explicitly deferred that wiring to "the execution engine." `WorkflowTriggerBinder::bindActiveWorkflows()` runs on `init` (priority 20, strictly after node type registration) on every request, binding every active workflow's trigger node(s) to `WorkflowExecutionService::run()`. Because a WordPress hook this plugin should react to could fire from any request context (front-end, admin, REST, cron, AJAX), this cost is paid broadly by design, not by oversight; the mitigation is a cheap early exit when no workflows are active, and a `MAX_ACTIVE_WORKFLOWS` cap on the initial single-page query, flagged there as a scaling limit to revisit rather than solved prematurely.
+
+Node execution is intentionally simple in this first increment, since the builder does not yet persist connections between nodes (item 6, deferred): a run skips trigger nodes, then executes every remaining node once in graph order, stopping at the first failure ("fail fast"). Both are documented as placeholders — for real DAG-based ordering, and for a configurable per-workflow on-failure behavior (§2.5 Settings) — rather than a permanent design.
+
 ### Background processing layer
 
 - Scheduled/queued work (webhook processing, retries, log pruning) runs via WP-Cron-driven batches with an idempotent "claim a batch" pattern in the repository layer, so overlapping cron runs cannot double-process the same rows. This avoids both the reference product's fully custom queue and any reliance on a paid "cloud cron" add-on. Action Scheduler is evaluated as a future upgrade path (documented in the roadmap) rather than a v1 hard dependency, to keep the bootstrap increment self-contained.
@@ -186,6 +192,10 @@ Standard tag + pivot pattern, mirroring the reference's functional need without 
 
 Tables are created via WordPress's own `dbDelta()` rather than a custom fluent schema-builder DSL. `dbDelta()` does not reliably manage `FOREIGN KEY` constraints, so no table declares one; cascade-on-delete (e.g. removing a workflow's nodes when the workflow is hard-deleted) is instead enforced explicitly in the repository/service layer (`WorkflowService::delete()`). Migrations are tracked by fully-qualified class name in a single option (`applied_migrations`), applied once each, and reversed (in a future increment's opt-in "remove data on uninstall" flow) by calling each migration's `down()` in reverse order.
 
+### Implementation note (roadmap item 7 — execution engine)
+
+`wfa_workflow_runs` and `wfa_workflow_run_logs` shipped as designed above. One gap left open since item 6 needed closing first: the builder only ever writes a workflow's whole graph as JSON onto `wfa_workflows.graph_json`, so `wfa_workflow_nodes` (created in item 2) sat unused, with nothing keeping it in sync — but `wfa_workflow_run_logs.node_id` needs a real, stable row id to reference. `WorkflowService::syncNodesFromGraph()` reconciles `wfa_workflow_nodes` from `graph_json` (insert/update/delete by `client_node_id`) lazily, immediately before a run needs it, rather than on every builder autosave, since nothing else reads that table. Hard-deleting a workflow now also cascades into `wfa_workflow_runs` and `wfa_workflow_run_logs` (resolving run ids first, since logs are keyed by run id, not workflow id), matching the same explicit-cascade approach as nodes.
+
 ### Options (prefix `wfa_option_`)
 
 `db_version`, `installed_at`, `global_settings` (retention days, notification email), `encryption_key_id` (see Security). No option ever stores raw secrets in plaintext.
@@ -226,6 +236,8 @@ Documented in full in `/docs/hooks-reference.md` once implemented; planned exten
 - `wfa/nodes/register` — filter for third parties to register trigger/action classes into the `NodeTypeRegistry`
 - `wfa/integrations/register` — filter for registering a new `IntegrationInterface` implementation
 - Public interfaces: `WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface`, `ActionInterface`
+
+> **Implementation note (roadmap item 7 — execution engine):** `wfa/workflow/before_run`, `wfa/workflow/after_run`, `wfa/node/before_execute`, and `wfa/node/after_execute` all shipped with the execution engine and are documented in `docs/hooks-reference.md`. `wfa/integrations/register` remains planned — there is no `IntegrationInterface` yet, since only two directly-`NodeTypeRegistry`-registered node types exist so far (`WpHookTrigger`, `HttpRequestAction`); that filter is deferred until a real third-party-integration increment needs a layer above individual node types.
 
 ---
 

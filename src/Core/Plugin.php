@@ -16,10 +16,15 @@ use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
 use WorkflowAutomate\Plugin\Integration\BuiltInNodeTypes;
+use WorkflowAutomate\Plugin\Integration\WorkflowTriggerBinder;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
+use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
+use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
+use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
@@ -121,6 +126,7 @@ class Plugin {
 
 		$this->registerServices();
 		$this->registerNodeTypes();
+		$this->registerExecutionEngine();
 		( new RestApi( $this->container ) )->register();
 		$this->registerAdmin();
 
@@ -172,11 +178,47 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			WorkflowRunRepository::class,
+			static function (): WorkflowRunRepository {
+				return new WorkflowRunRepository();
+			}
+		);
+
+		$this->container->singleton(
+			WorkflowRunLogRepository::class,
+			static function (): WorkflowRunLogRepository {
+				return new WorkflowRunLogRepository();
+			}
+		);
+
+		$this->container->singleton(
 			WorkflowService::class,
 			static function ( Container $container ): WorkflowService {
 				return new WorkflowService(
 					$container->get( WorkflowRepository::class ),
-					$container->get( WorkflowNodeRepository::class )
+					$container->get( WorkflowNodeRepository::class ),
+					$container->get( WorkflowRunRepository::class ),
+					$container->get( WorkflowRunLogRepository::class )
+				);
+			}
+		);
+
+		$this->container->singleton(
+			NodeExecutionService::class,
+			static function ( Container $container ): NodeExecutionService {
+				return new NodeExecutionService( $container->get( NodeTypeRegistry::class ) );
+			}
+		);
+
+		$this->container->singleton(
+			WorkflowExecutionService::class,
+			static function ( Container $container ): WorkflowExecutionService {
+				return new WorkflowExecutionService(
+					$container->get( WorkflowService::class ),
+					$container->get( NodeTypeRegistry::class ),
+					$container->get( NodeExecutionService::class ),
+					$container->get( WorkflowRunRepository::class ),
+					$container->get( WorkflowRunLogRepository::class )
 				);
 			}
 		);
@@ -219,6 +261,33 @@ class Plugin {
 				 */
 				do_action( 'wfa/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
+		);
+	}
+
+	/**
+	 * Binds every active workflow's trigger(s) to their real event source,
+	 * so live events actually start a run (see WorkflowTriggerBinder).
+	 *
+	 * Deliberately runs on `init` at priority 20, after registerNodeTypes()'s
+	 * own `init` callback (default priority 10, see its docblock) has
+	 * populated the node type registry — binding needs to look up each
+	 * node's type in that registry, so it must run strictly after.
+	 *
+	 * @return void
+	 */
+	private function registerExecutionEngine(): void {
+		add_action(
+			'init',
+			function (): void {
+				$binder = new WorkflowTriggerBinder(
+					$this->container->get( WorkflowService::class ),
+					$this->container->get( NodeTypeRegistry::class ),
+					$this->container->get( WorkflowExecutionService::class )
+				);
+
+				$binder->bindActiveWorkflows();
+			},
+			20
 		);
 	}
 

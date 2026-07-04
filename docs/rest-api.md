@@ -41,6 +41,33 @@ Moves the workflow to the trash (soft delete). Pass `force=true` as a query para
 
 Restores a previously trashed workflow and returns it.
 
+### `POST /wfa/v1/workflows/{id}/run`
+
+Runs the workflow synchronously ("run now"/test action) and returns its outcome once every node has finished executing — the request blocks for the full duration of the run; there is no queued/background mode yet (see `docs/internal/roadmap.md` item 8). Works regardless of the workflow's status (draft/active/paused), since testing a workflow before activating it is a valid use case; a workflow's *automatic* trigger only fires for workflows with `status: 1` (active).
+
+**Response**
+
+```json
+{
+  "id": 42,
+  "workflow_id": 7,
+  "status": "success",
+  "started_at": "2026-07-04T10:15:00+00:00",
+  "finished_at": "2026-07-04T10:15:01+00:00",
+  "logs": [
+    {
+      "node_id": 103,
+      "status": "success",
+      "message": null,
+      "output": { "success": true, "status_code": 200, "body": "…" },
+      "duration_ms": 842
+    }
+  ]
+}
+```
+
+`status` is one of `queued`, `running`, `success`, `failed`, `partial` (a run is `partial` when some, but not all, of its nodes succeeded before execution stopped at the first failure — see `WorkflowExecutionService`). A dedicated, paginated `wfa/v1/runs` resource for browsing run history is deferred to a later roadmap item (Logging & execution history UI); this action endpoint exists so the engine is usable/testable before that UI ships.
+
 ### Workflow object schema
 
 | Field | Type | Notes |
@@ -56,7 +83,7 @@ Restores a previously trashed workflow and returns it.
 | `created_at` | string (date-time) | Read-only. |
 | `updated_at` | string (date-time) | Read-only. |
 
-Node-level endpoints (`workflow_nodes`) are not yet exposed over REST; they will be documented here once a later increment (the execution engine) needs them. The visual builder (item 6) does not need them either — it reads/writes a workflow's entire node graph as the single `graph` field above, not as separate node resources.
+Node-level endpoints (`workflow_nodes`) are still not exposed over REST — the visual builder (item 6) reads/writes a workflow's entire node graph as the single `graph` field above, not as separate node resources, and the execution engine (item 7) reconciles `wfa_workflow_nodes` from that same `graph` field internally (see `WorkflowService::syncNodesFromGraph()`) rather than requiring the client to manage node rows directly. They may still be added later if a use case needs to address a single node without rewriting the whole graph.
 
 ## Node types — `wfa/v1/node-types`
 
