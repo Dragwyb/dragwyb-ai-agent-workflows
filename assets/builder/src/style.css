@@ -1,0 +1,256 @@
+.wfa-builder-loading,
+.wfa-builder-error {
+	padding: 40px;
+	font-size: 14px;
+}
+
+.wfa-builder-error {
+	color: #b32d2e;
+}
+
+.wfa-builder {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 100px);
+	min-height: 480px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	margin-top: 12px;
+}
+
+.wfa-builder-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 10px 16px;
+	border-bottom: 1px solid #dcdcde;
+	background: #f6f7f7;
+	flex: 0 0 auto;
+}
+
+.wfa-builder-header__left {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	min-width: 0;
+}
+
+.wfa-builder-header__back {
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+.wfa-builder-header__title {
+	font-size: 16px;
+	font-weight: 600;
+	border: 1px solid transparent;
+	background: transparent;
+	padding: 4px 8px;
+	border-radius: 2px;
+	min-width: 220px;
+}
+
+.wfa-builder-header__title:hover,
+.wfa-builder-header__title:focus {
+	border-color: #8c8f94;
+	background: #fff;
+}
+
+.wfa-builder-header__right {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex: 0 0 auto;
+}
+
+.wfa-builder-header__status {
+	font-size: 12px;
+	color: #646970;
+	white-space: nowrap;
+}
+
+.wfa-builder-header__status--error {
+	color: #b32d2e;
+}
+
+.wfa-builder-header__status--saved {
+	color: #007017;
+}
+
+.wfa-builder__body {
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.wfa-builder-palette {
+	width: 220px;
+	flex: 0 0 auto;
+	overflow-y: auto;
+	border-right: 1px solid #dcdcde;
+	padding: 12px;
+	background: #fbfbfc;
+}
+
+.wfa-builder-palette__section + .wfa-builder-palette__section {
+	margin-top: 20px;
+}
+
+.wfa-builder-palette__heading {
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #646970;
+	margin: 0 0 8px;
+}
+
+.wfa-builder-palette__empty {
+	font-size: 12px;
+	color: #8c8f94;
+	font-style: italic;
+}
+
+.wfa-builder-palette__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.wfa-builder-palette__item {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+	text-align: left;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	padding: 8px 10px;
+	margin-bottom: 6px;
+	cursor: pointer;
+}
+
+.wfa-builder-palette__item:hover,
+.wfa-builder-palette__item:focus {
+	border-color: #2271b1;
+	outline: none;
+}
+
+.wfa-builder-palette__item-label {
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.wfa-builder-palette__item-description {
+	font-size: 11px;
+	color: #646970;
+	margin-top: 2px;
+}
+
+.wfa-builder-canvas {
+	position: relative;
+	flex: 1 1 auto;
+	overflow: auto;
+	background-image: radial-gradient(#dcdcde 1px, transparent 1px);
+	background-size: 16px 16px;
+	background-color: #fdfdfd;
+}
+
+.wfa-builder-canvas__empty {
+	position: absolute;
+	top: 40px;
+	left: 40px;
+	color: #8c8f94;
+	font-style: italic;
+	max-width: 280px;
+}
+
+.wfa-builder-node {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 180px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 10px 12px;
+	background: #fff;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+}
+
+.wfa-builder-node:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.wfa-builder-node--selected {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.wfa-builder-node--unknown {
+	border-style: dashed;
+	border-color: #b32d2e;
+}
+
+.wfa-builder-node__label {
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.wfa-builder-node__type {
+	font-size: 11px;
+	color: #646970;
+}
+
+.wfa-builder-config {
+	width: 300px;
+	flex: 0 0 auto;
+	overflow-y: auto;
+	border-left: 1px solid #dcdcde;
+	padding: 16px;
+	background: #fbfbfc;
+}
+
+.wfa-builder-config--empty {
+	color: #8c8f94;
+	font-style: italic;
+	font-size: 13px;
+}
+
+.wfa-builder-config__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+.wfa-builder-config__header h2 {
+	font-size: 14px;
+	margin: 0;
+}
+
+.wfa-builder-config__warning {
+	font-size: 12px;
+	color: #b32d2e;
+	background: #fcf0f1;
+	border: 1px solid #f2b8b8;
+	border-radius: 3px;
+	padding: 8px;
+}
+
+.wfa-builder-config__field-error {
+	font-size: 11px;
+	color: #b32d2e;
+	margin: 2px 0 0;
+}
+
+.wfa-builder-config__delete {
+	margin-top: 16px;
+}

@@ -10,6 +10,7 @@
     "node_modules/**",
     "build/**",
     "dist/**",
+    "assets/builder/build/**",
     "docs/internal/**"
   ]
 }

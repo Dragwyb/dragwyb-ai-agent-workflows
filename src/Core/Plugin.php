@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Core;
 
 use WorkflowAutomate\Plugin\Admin\Menu;
+use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
 use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
@@ -230,8 +231,9 @@ class Plugin {
 	private function registerAdmin(): void {
 		$workflows = $this->container->get( WorkflowService::class );
 		$workflows_page = new WorkflowsPage( $workflows );
+		$builder_page = new BuilderPage();
 
-		( new Menu( array( $workflows_page ) ) )->register();
+		( new Menu( array( $workflows_page, $builder_page ) ) )->register();
 		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
 	}
 }

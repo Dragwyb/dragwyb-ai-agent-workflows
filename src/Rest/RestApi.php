@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Container;
+use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
@@ -50,5 +51,8 @@ class RestApi {
 	public function registerRoutes(): void {
 		$workflows_controller = new WorkflowsController( $this->container->get( WorkflowService::class ) );
 		$workflows_controller->register_routes();
+
+		$node_types_controller = new NodeTypesController( $this->container->get( NodeTypeRegistry::class ) );
+		$node_types_controller->register_routes();
 	}
 }

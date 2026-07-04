@@ -56,4 +56,25 @@ Restores a previously trashed workflow and returns it.
 | `created_at` | string (date-time) | Read-only. |
 | `updated_at` | string (date-time) | Read-only. |
 
-Node-level endpoints (`workflow_nodes`) are not yet exposed over REST; they will be documented here once a later increment (the visual builder or execution engine) needs them.
+Node-level endpoints (`workflow_nodes`) are not yet exposed over REST; they will be documented here once a later increment (the execution engine) needs them. The visual builder (item 6) does not need them either — it reads/writes a workflow's entire node graph as the single `graph` field above, not as separate node resources.
+
+## Node types — `wfa/v1/node-types`
+
+### `GET /wfa/v1/node-types`
+
+Read-only. Lists every trigger and action node type currently registered against the server-side `NodeTypeRegistry` (see `docs/hooks-reference.md` — `wfa/nodes/register`). This is what powers the visual builder's node palette; there is no corresponding write endpoint because node types are only ever registered in PHP.
+
+**Response**
+
+```json
+{
+  "triggers": [
+    { "slug": "wp_hook_trigger", "label": "WordPress Hook", "description": "…", "config_schema": { "hook_name": { "type": "string", "label": "Hook name", "required": true } } }
+  ],
+  "actions": [
+    { "slug": "http_request_action", "label": "HTTP Request", "description": "…", "config_schema": { "url": { "type": "string", "label": "Request URL", "required": true }, "method": { "type": "string", "label": "HTTP method", "default": "GET" } } }
+  ]
+}
+```
+
+`config_schema` mirrors `Domain\Contracts\NodeTypeInterface::configSchema()` on the PHP side field-for-field; the builder renders its node configuration panel generically from this shape, so a third-party node type registered via `wfa/nodes/register` needs no front-end changes to show up there.

@@ -106,6 +106,13 @@ class Menu {
 			);
 
 			$this->registerHook( $hook, $page );
+
+			// Still fully registered (route + capability check both apply);
+			// only its row in the visible menu is removed. See
+			// AdminPage::showInMenu() for why a page would opt out.
+			if ( ! $page->showInMenu() ) {
+				remove_submenu_page( $first->slug(), $page->slug() );
+			}
 		}
 	}
 

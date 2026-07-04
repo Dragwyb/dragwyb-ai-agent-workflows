@@ -68,4 +68,18 @@ interface AdminPage {
 	 * @return void
 	 */
 	public function enqueueAssets(): void;
+
+	/**
+	 * Whether this page should appear as a row in the admin menu.
+	 *
+	 * A page can still be registered (and therefore reachable at its own
+	 * `admin.php?page=` URL, with its own capability check) while returning
+	 * `false` here — used for screens that are only ever navigated to via a
+	 * link from elsewhere in the plugin (e.g. the workflow builder, opened
+	 * from a row action on the workflows list) rather than being a
+	 * top-level destination in their own right.
+	 *
+	 * @return bool
+	 */
+	public function showInMenu(): bool;
 }

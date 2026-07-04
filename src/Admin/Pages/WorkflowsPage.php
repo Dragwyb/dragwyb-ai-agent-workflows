@@ -13,6 +13,8 @@ use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\WorkflowsListTable;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
+// BuilderPage lives in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -20,12 +22,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * The plugin's top-level admin screen: a list of workflows with per-row
- * trash/restore/delete actions. Creating and editing a workflow's content
- * is intentionally out of scope here — it lands with the visual builder
- * (roadmap item 6), which is the only screen that will have anywhere
- * meaningful to send a user after those actions.
+ * edit/trash/restore/delete actions. Creating and editing a workflow's
+ * actual content happens on the visual builder screen (`BuilderPage`,
+ * roadmap item 6) — this screen only ever links out to it via "Add New"
+ * and "Edit".
  */
 class WorkflowsPage implements AdminPage {
+
+	/**
+	 * Public so `BuilderPage` can link back to this page without needing an
+	 * instantiated `WorkflowsPage` (see `BuilderPage::SLUG` for the same
+	 * pattern used in reverse, for the "Add New"/"Edit" links below).
+	 */
+	public const SLUG = 'wfa-dashboard';
 
 	private WorkflowService $workflows;
 
@@ -37,7 +46,7 @@ class WorkflowsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function slug(): string {
-		return 'wfa-dashboard';
+		return self::SLUG;
 	}
 
 	/**
@@ -59,6 +68,13 @@ class WorkflowsPage implements AdminPage {
 	 */
 	public function capability(): string {
 		return 'manage_options';
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function showInMenu(): bool {
+		return true;
 	}
 
 	/**
@@ -86,6 +102,11 @@ class WorkflowsPage implements AdminPage {
 
 		echo '<div class="wrap wfa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
+		printf(
+			'<a href="%s" class="page-title-action">%s</a>',
+			esc_url( admin_url( 'admin.php?page=' . BuilderPage::SLUG ) ),
+			esc_html__( 'Add New', 'workflow-automate' )
+		);
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();

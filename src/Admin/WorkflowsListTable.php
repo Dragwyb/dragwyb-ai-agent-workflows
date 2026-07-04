@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Admin;
 
+use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 use WP_List_Table;
@@ -120,20 +121,41 @@ class WorkflowsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_title( $item ) {
-		$title = '<strong>' . esc_html( $item->title() ) . '</strong>';
-
 		if ( $item->isTrashed() ) {
+			$title = '<strong>' . esc_html( $item->title() ) . '</strong>';
 			$actions = array(
 				'restore' => $this->actionForm( 'restore', $item->id(), __( 'Restore', 'workflow-automate' ) ),
 				'delete' => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'workflow-automate' ) ),
 			);
 		} else {
+			$edit_url = $this->editUrl( $item->id() );
+			$title = sprintf(
+				'<strong><a href="%1$s">%2$s</a></strong>',
+				esc_url( $edit_url ),
+				esc_html( $item->title() )
+			);
 			$actions = array(
+				'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
 				'trash' => $this->actionForm( 'trash', $item->id(), __( 'Trash', 'workflow-automate' ) ),
 			);
 		}
 
 		return $title . $this->row_actions( $actions );
+	}
+
+	/**
+	 * @param int $id Workflow id.
+	 *
+	 * @return string
+	 */
+	private function editUrl( int $id ): string {
+		return add_query_arg(
+			array(
+				'page' => BuilderPage::SLUG,
+				'workflow' => $id,
+			),
+			admin_url( 'admin.php' )
+		);
 	}
 
 	/**
