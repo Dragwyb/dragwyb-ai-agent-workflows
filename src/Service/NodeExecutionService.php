@@ -94,6 +94,9 @@ class NodeExecutionService {
 		}
 
 		$config = $node->config() ?? array();
+		// Substitute {{trigger.fields.email}} (and similar) tokens so actions
+		// can use form/order data without each integration reimplementing it.
+		$config = ( new ConfigInterpolator() )->interpolateConfig( $config, $context );
 
 		try {
 			$result = $action->execute( $config, $context );

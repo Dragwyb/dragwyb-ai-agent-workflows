@@ -58,6 +58,22 @@ export function fetchConnections() {
 }
 
 /**
+ * Creates a connection from the builder (inline API key entry). The secret
+ * is sent once over HTTPS and stored encrypted server-side; it is never
+ * returned in the response.
+ *
+ * @param {{label: string, integration_slug: string, auth_type: string, credentials: Object}} data
+ * @return {Promise<Object>} Credential-free connection summary.
+ */
+export function createConnection(data) {
+	return apiFetch({
+		path: '/wfa/v1/connections',
+		method: 'POST',
+		data,
+	});
+}
+
+/**
  * Bootstrap data localized by BuilderPage::enqueueAssets().
  *
  * @return {{workflowId: number, listUrl: string}} Bootstrap settings.

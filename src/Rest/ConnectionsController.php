@@ -1,6 +1,6 @@
 <?php
 /**
- * Connections (picker) REST controller.
+ * Connections REST controller (list + create for the builder).
  *
  * @package WorkflowAutomate\Plugin
  */
@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Rest;
 
+use InvalidArgumentException;
+use RuntimeException;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Connection;
 use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
@@ -24,25 +26,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Exposes a minimal, credential-free list of stored connections so the
- * builder's config panel can render a "connection" field (item 12) as a
- * picker — e.g. for `HttpRequestAction::configSchema()`'s `connection_id`
- * field. Read-only, same reasoning as `NodeTypesController`: connections
- * are only ever created/edited/deleted through the admin UI's
- * `admin-post.php` forms (`ConnectionActionsController`), never over this
- * REST API, so there is no corresponding write route.
- *
- * Deliberately returns only `id`, `label`, `integration_slug`, and
- * `auth_type` — never `encryptedCredentials()` or anything derived from
- * it. There is no "displayCredentials" here even in masked form; a picker
- * only needs to tell connections apart by name, not show what's inside
- * them.
- *
- * Fetches a single page of up to 100 connections (the repository's own
- * max `per_page`) rather than adding real pagination to this endpoint —
- * acceptable for a picker at today's expected scale; if a site ever
- * accumulates more connections than that, this is the first place to
- * revisit.
+ * Credential-free list of connections for the builder picker, plus a create
+ * route so authors can add an API key inline on a node (without leaving the
+ * builder for the Connections admin screen). Responses never include
+ * decrypted secrets — only id/label/auth metadata.
  */
 class ConnectionsController {
 
@@ -59,7 +46,7 @@ class ConnectionsController {
 	}
 
 	/**
-	 * Registers the route.
+	 * Registers the routes.
 	 *
 	 * @return void
 	 */
@@ -68,10 +55,38 @@ class ConnectionsController {
 			self::API_NAMESPACE,
 			self::ROUTE,
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getItems' ),
-				'permission_callback' => array( $this, 'permissionsCheck' ),
-				'args' => array(),
+				array(
+					'methods' => WP_REST_Server::READABLE,
+					'callback' => array( $this, 'getItems' ),
+					'permission_callback' => array( $this, 'permissionsCheck' ),
+					'args' => array(),
+				),
+				array(
+					'methods' => WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'createItem' ),
+					'permission_callback' => array( $this, 'createPermissionsCheck' ),
+					'args' => array(
+						'label' => array(
+							'type' => 'string',
+							'required' => true,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'integration_slug' => array(
+							'type' => 'string',
+							'required' => true,
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'auth_type' => array(
+							'type' => 'string',
+							'required' => true,
+							'enum' => ConnectionAuthTypes::VALID,
+						),
+						'credentials' => array(
+							'type' => 'object',
+							'required' => true,
+						),
+					),
+				),
 			)
 		);
 	}
@@ -82,12 +97,30 @@ class ConnectionsController {
 	 * @return true|WP_Error
 	 */
 	public function permissionsCheck( $request ) {
-		// Builder authors (workflows) need the picker; connection managers
-		// may also list connections over REST. Either cap is enough.
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
 				'wfa_rest_forbidden',
 				__( 'Sorry, you are not allowed to view connections.', 'workflow-automate' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Creating from the builder is allowed for workflow authors as well as
+	 * connection managers — otherwise inline API-key entry cannot work.
+	 *
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function createPermissionsCheck( $request ) {
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
+			return new WP_Error(
+				'wfa_rest_forbidden',
+				__( 'Sorry, you are not allowed to create connections.', 'workflow-automate' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -109,6 +142,53 @@ class ConnectionsController {
 		);
 
 		return rest_ensure_response( array_map( array( $this, 'serialize' ), $page['items'] ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function createItem( $request ) {
+		$credentials = $request->get_param( 'credentials' );
+
+		if ( ! is_array( $credentials ) ) {
+			return new WP_Error(
+				'wfa_rest_invalid',
+				__( 'Credentials must be an object of field values.', 'workflow-automate' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// Only accept known credential field names for the chosen auth type;
+		// never store arbitrary keys from the client.
+		$auth_type = (string) $request->get_param( 'auth_type' );
+		$allowed   = array_keys( ConnectionAuthTypes::fields( $auth_type ) );
+		$filtered  = array();
+
+		foreach ( $allowed as $field ) {
+			if ( isset( $credentials[ $field ] ) ) {
+				$filtered[ $field ] = (string) $credentials[ $field ];
+			}
+		}
+
+		try {
+			$connection = $this->connections->create(
+				(string) $request->get_param( 'integration_slug' ),
+				$auth_type,
+				(string) $request->get_param( 'label' ),
+				$filtered
+			);
+		} catch ( InvalidArgumentException $exception ) {
+			return new WP_Error( 'wfa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+		} catch ( RuntimeException $exception ) {
+			return new WP_Error( 'wfa_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
+		}
+
+		$response = rest_ensure_response( $this->serialize( $connection ) );
+		$response->set_status( 201 );
+
+		return $response;
 	}
 
 	/**

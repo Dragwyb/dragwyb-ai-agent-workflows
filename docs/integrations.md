@@ -64,6 +64,101 @@ If a future increment adds a *direct* API-based email provider integration (bypa
 
 **Config fields:** `to` (required, comma-separated), `subject` (required), `message` (required), `headers` (optional, e.g. `From`/`Reply-To`/`Content-Type`).
 
+## Elementor Form Submitted — trigger (`elementor_form_submitted_trigger`)
+
+**What it is:** Starts a workflow when an Elementor Pro form is submitted (`elementor_pro/forms/new_record`).
+
+**Availability:** Registered only when Elementor Pro is active (`ELEMENTOR_PRO_VERSION` or `\ElementorPro\Plugin`). Elementor Free does not include the Forms widget/API this trigger uses.
+
+**Credentials:** None.
+
+**Config fields:** `form_name` (optional). When set, only that form name fires the workflow; when empty, every Elementor Pro form submission starts a run.
+
+**Trigger payload:**
+
+| Key | Notes |
+| --- | --- |
+| `source` | Always `"elementor"` |
+| `event` | Always `"form_submitted"` |
+| `form_name`, `form_id` | From the form settings |
+| `fields` | Map of field id → submitted value |
+| `fields_by_label` | Map of field title/label → submitted value |
+
+Use tokens in action fields, e.g. `{{trigger.fields.email}}` or `{{trigger.form_name}}` (see Config tokens below).
+
+## Slack (Incoming Webhook) — action (`slack_incoming_webhook_action`)
+
+**What it is:** Posts a text message to a Slack channel using a Slack Incoming Webhook URL.
+
+**Credentials:** The webhook URL is stored in the node config (not Connections). Create the webhook in Slack (Apps → Incoming Webhooks) and paste the `https://hooks.slack.com/...` URL. URLs that do not start with `https://hooks.slack.com/` are rejected.
+
+**Config fields:** `webhook_url` (required), `message` (required; supports `{{trigger.*}}` tokens).
+
+## OpenAI Chat — action (`openai_chat_action`)
+
+**What it is:** Calls OpenAI's Chat Completions API (`https://api.openai.com/v1/chat/completions`) and returns the assistant message content.
+
+**Credentials:** Required `connection_id` pointing at a Connections entry with auth type API Key or Bearer Token (your OpenAI secret key). Create the connection under **Connections**, then pick it on the node.
+
+**Config fields:** `connection_id` (required), `model` (default `gpt-4o-mini`), `system_prompt` (optional), `prompt` (required; supports tokens).
+
+**Result keys:** `content` (assistant reply), `model`, `status_code`.
+
+## Contact Form 7 Submitted — trigger (`contact_form_7_submitted_trigger`)
+
+**Availability:** When Contact Form 7 is active (`WPCF7_VERSION` / `WPCF7_ContactForm`).
+
+**Config:** `form_id` (optional). Payload: `source`, `event`, `form_id`, `form_title`, `fields` (CF7 field names → values). Hook: `wpcf7_mail_sent`.
+
+## WPForms Submitted — trigger (`wpforms_submitted_trigger`)
+
+**Availability:** When WPForms is active.
+
+**Config:** `form_id` (optional). Payload: `source`, `event`, `form_id`, `form_title`, `entry_id`, `fields`, `fields_by_label`. Hook: `wpforms_process_complete`.
+
+## Telegram Send Message — action (`telegram_send_message_action`)
+
+**Credentials:** Connections entry with the bot token (API Key).
+
+**Config:** `connection_id`, `chat_id`, `message` (tokens supported). Calls `https://api.telegram.org/bot<token>/sendMessage`.
+
+## WhatsApp Cloud Send Message — action (`whatsapp_cloud_send_message_action`)
+
+**Credentials:** Meta permanent access token in Connections.
+
+**Config:** `connection_id`, `phone_number_id` (Meta phone number id), `to` (digits with country code, no `+`), `message`. Calls Graph API `/{phone-number-id}/messages`.
+
+## Google Gemini — action (`gemini_generate_content_action`)
+
+**Credentials:** Gemini API key in Connections.
+
+**Config:** `connection_id`, `model` (default `gemini-1.5-flash`), `prompt`. Returns `content`.
+
+## Anthropic Claude — action (`claude_messages_action`)
+
+**Credentials:** Anthropic API key in Connections (sent as `x-api-key`).
+
+**Config:** `connection_id`, `model` (default `claude-3-5-haiku-latest`), `system_prompt`, `prompt`, `max_tokens`. Returns `content`.
+
+## Google Sheets Append Row — action (`google_sheets_append_row_action`)
+
+**Credentials:** Google OAuth **access token** (or service-account access token) in Connections as Bearer Token / API Key. The spreadsheet must be shared with that Google account. Full OAuth consent UI is not built yet — paste a valid access token into Connections.
+
+**Config:** `connection_id`, `spreadsheet_id`, `range` (e.g. `Sheet1!A1`), `values` (comma-separated cells, tokens supported).
+
+## Config tokens (`{{…}}`)
+
+Before any action runs, string config fields are scanned for `{{dot.path}}` tokens and replaced from the run context:
+
+| Token example | Resolves to |
+| --- | --- |
+| `{{trigger.fields.email}}` | Elementor (or other) field value by field id |
+| `{{trigger.fields_by_label.Email}}` | Same by field label |
+| `{{trigger.form_name}}` | Form name |
+| `{{trigger.billing_email}}` | WooCommerce billing email, etc. |
+
+Missing paths become an empty string. Arrays are JSON-encoded.
+
 ## Inbound Webhooks (not a node type)
 
 **What it is:** A public `POST` endpoint (`/wp-json/wfa/v1/webhooks/{public_id}`) that starts a linked workflow when an external service calls it. Webhooks are managed under the admin **Webhooks** menu (not as a builder node type): each row in `wfa_webhooks` has an unguessable UUID `public_id`, an optional HMAC signing secret, an optional IP allow-list, and a `workflow_id`.

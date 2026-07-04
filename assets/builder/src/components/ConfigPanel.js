@@ -8,22 +8,16 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import { createConnection } from '../api';
+
 /**
- * Right-hand panel for the currently selected node. Fields are rendered
- * generically from the node type's `configSchema()` (mirrors the shape
- * defined in Domain\Contracts\NodeTypeInterface on the PHP side) rather
- * than needing a bespoke React component per node type — this is what lets
- * third-party node types (registered via `wfa/nodes/register`) show up in
- * the builder with zero front-end changes. The one exception is the
- * `connection` field type (item 12): it still needs no per-*node-type*
- * component, but it does need the connections list itself, which is why
- * that one extra prop is threaded through from App.js rather than fetched
- * by this component directly.
+ * Right-hand panel for the currently selected node.
  *
  * @param {Object}        props
  * @param {Object}        props.node
  * @param {Object|null}   props.nodeType
  * @param {Array<Object>} props.connections
+ * @param {Function}      props.onConnectionsChange
  * @param {Function}      props.onChangeLabel
  * @param {Function}      props.onChangeConfig
  * @param {Function}      props.onDelete
@@ -33,6 +27,7 @@ export default function ConfigPanel({
 	node,
 	nodeType,
 	connections,
+	onConnectionsChange,
 	onChangeLabel,
 	onChangeConfig,
 	onDelete,
@@ -92,6 +87,9 @@ export default function ConfigPanel({
 						fieldSchema={nodeType.config_schema[fieldName]}
 						value={node.config ? node.config[fieldName] : undefined}
 						connections={connections}
+						nodeTypeSlug={nodeType.slug}
+						nodeTypeLabel={nodeType.label}
+						onConnectionsChange={onConnectionsChange}
 						onChange={(value) => onChangeConfig(fieldName, value)}
 					/>
 				))}
@@ -108,7 +106,16 @@ export default function ConfigPanel({
 	);
 }
 
-function ConfigField({ fieldName, fieldSchema, value, connections, onChange }) {
+function ConfigField({
+	fieldName,
+	fieldSchema,
+	value,
+	connections,
+	nodeTypeSlug,
+	nodeTypeLabel,
+	onConnectionsChange,
+	onChange,
+}) {
 	const label = fieldSchema.label || fieldName;
 	const resolved = value === undefined ? fieldSchema.default : value;
 
@@ -131,7 +138,11 @@ function ConfigField({ fieldName, fieldSchema, value, connections, onChange }) {
 			<ConnectionField
 				label={label}
 				value={resolved}
+				required={Boolean(fieldSchema.required)}
 				connections={connections || []}
+				nodeTypeSlug={nodeTypeSlug}
+				nodeTypeLabel={nodeTypeLabel}
+				onConnectionsChange={onConnectionsChange}
 				onChange={onChange}
 			/>
 		);
@@ -152,21 +163,49 @@ function ConfigField({ fieldName, fieldSchema, value, connections, onChange }) {
 }
 
 /**
- * Renders a "connection" field (item 12) as a `<select>` of every stored
- * connection, identified by its stored id — never its credentials, which
- * this component never receives in the first place (see
- * `ConnectionsController`, which the `connections` prop ultimately comes
- * from). `0`/"None" is always the first option since every consumer of
- * this field type (e.g. `HttpRequestAction`) treats an unset connection as
- * "send unauthenticated", not as an error.
+ * Connection picker with inline "add API key" form so authors configure
+ * credentials on the node without leaving the builder.
  *
  * @param {Object}        props
  * @param {string}        props.label
  * @param {*}             props.value
+ * @param {boolean}       props.required
  * @param {Array<Object>} props.connections
+ * @param {string}        props.nodeTypeSlug
+ * @param {string}        props.nodeTypeLabel
+ * @param {Function}      props.onConnectionsChange
  * @param {Function}      props.onChange
  */
-function ConnectionField({ label, value, connections, onChange }) {
+function ConnectionField({
+	label,
+	value,
+	required,
+	connections,
+	nodeTypeSlug,
+	nodeTypeLabel,
+	onConnectionsChange,
+	onChange,
+}) {
+	const selectedId = Number(value || 0);
+	const needsConnection = required && selectedId <= 0;
+
+	const [showAddForm, setShowAddForm] = useState(needsConnection);
+	const [connectionLabel, setConnectionLabel] = useState(
+		nodeTypeLabel
+			? `${nodeTypeLabel}`
+			: __('New connection', 'workflow-automate')
+	);
+	const [authType, setAuthType] = useState('api_key');
+	const [secret, setSecret] = useState('');
+	const [saving, setSaving] = useState(false);
+	const [error, setError] = useState('');
+
+	useEffect(() => {
+		if (needsConnection) {
+			setShowAddForm(true);
+		}
+	}, [needsConnection]);
+
 	const options = [
 		{ value: '0', label: __('None', 'workflow-automate') },
 		...connections.map((connection) => ({
@@ -175,23 +214,166 @@ function ConnectionField({ label, value, connections, onChange }) {
 		})),
 	];
 
+	const secretFieldName = authType === 'bearer_token' ? 'token' : 'api_key';
+	const secretFieldLabel =
+		authType === 'bearer_token'
+			? __('Bearer token / access token', 'workflow-automate')
+			: __('API key', 'workflow-automate');
+
+	const handleSaveConnection = async () => {
+		const trimmedSecret = secret.trim();
+		const trimmedLabel = connectionLabel.trim();
+
+		if (!trimmedLabel) {
+			setError(__('Enter a name for this connection.', 'workflow-automate'));
+			return;
+		}
+
+		if (!trimmedSecret) {
+			setError(__('Enter your API key or token.', 'workflow-automate'));
+			return;
+		}
+
+		setSaving(true);
+		setError('');
+
+		try {
+			const created = await createConnection({
+				label: trimmedLabel,
+				integration_slug: nodeTypeSlug || 'custom',
+				auth_type: authType,
+				credentials: {
+					[secretFieldName]: trimmedSecret,
+				},
+			});
+
+			const nextList = Array.isArray(connections)
+				? [created, ...connections]
+				: [created];
+
+			if (typeof onConnectionsChange === 'function') {
+				onConnectionsChange(nextList);
+			}
+
+			onChange(created.id);
+			setSecret('');
+			setShowAddForm(false);
+		} catch (err) {
+			setError(
+				err && err.message
+					? err.message
+					: __(
+							'Could not save the connection. Check your permissions and try again.',
+							'workflow-automate'
+						)
+			);
+		} finally {
+			setSaving(false);
+		}
+	};
+
 	return (
-		<SelectControl
-			label={label}
-			value={String(value || 0)}
-			options={options}
-			onChange={(nextValue) => onChange(Number(nextValue))}
-		/>
+		<div className="wfa-builder-config__connection">
+			<SelectControl
+				label={label}
+				value={String(selectedId)}
+				options={options}
+				onChange={(nextValue) => onChange(Number(nextValue))}
+				help={
+					needsConnection
+						? __(
+								'Required — add an API key below or pick an existing connection.',
+								'workflow-automate'
+							)
+						: undefined
+				}
+			/>
+
+			{!showAddForm && (
+				<Button
+					variant="secondary"
+					className="wfa-builder-config__add-connection"
+					onClick={() => setShowAddForm(true)}
+				>
+					{__('+ Add API key here', 'workflow-automate')}
+				</Button>
+			)}
+
+			{showAddForm && (
+				<div className="wfa-builder-config__connection-form">
+					<p className="wfa-builder-config__connection-form-title">
+						{__(
+							'Add credentials for this node',
+							'workflow-automate'
+						)}
+					</p>
+					<TextControl
+						label={__('Connection name', 'workflow-automate')}
+						value={connectionLabel}
+						onChange={setConnectionLabel}
+					/>
+					<SelectControl
+						label={__('Auth type', 'workflow-automate')}
+						value={authType}
+						options={[
+							{
+								value: 'api_key',
+								label: __('API Key', 'workflow-automate'),
+							},
+							{
+								value: 'bearer_token',
+								label: __('Bearer Token', 'workflow-automate'),
+							},
+						]}
+						onChange={setAuthType}
+					/>
+					<TextControl
+						label={secretFieldLabel}
+						type="password"
+						value={secret}
+						autoComplete="off"
+						onChange={setSecret}
+						help={__(
+							'Saved encrypted. You will not see it again after saving.',
+							'workflow-automate'
+						)}
+					/>
+					{error && (
+						<p className="wfa-builder-config__field-error" role="alert">
+							{error}
+						</p>
+					)}
+					<div className="wfa-builder-config__connection-form-actions">
+						<Button
+							isPrimary
+							onClick={handleSaveConnection}
+							disabled={saving}
+						>
+							{saving
+								? __('Saving…', 'workflow-automate')
+								: __('Save & use connection', 'workflow-automate')}
+						</Button>
+						{!needsConnection && (
+							<Button
+								variant="tertiary"
+								onClick={() => {
+									setShowAddForm(false);
+									setError('');
+									setSecret('');
+								}}
+								disabled={saving}
+							>
+								{__('Cancel', 'workflow-automate')}
+							</Button>
+						)}
+					</div>
+				</div>
+			)}
+		</div>
 	);
 }
 
 /**
- * Object/array fields are edited as raw JSON text. This keeps the panel
- * generic for arbitrary structured config (e.g. HTTP headers) without
- * building a key/value editor widget in this shell increment; invalid JSON
- * is kept local to the textarea (with an inline error) instead of being
- * committed to the graph, so a typo can't corrupt saved config.
- *
  * @param {Object}   props
  * @param {string}   props.label
  * @param {*}        props.value

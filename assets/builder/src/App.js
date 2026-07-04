@@ -411,6 +411,7 @@ export default function App() {
 					node={selectedNode}
 					nodeType={selectedNodeType}
 					connections={connections}
+					onConnectionsChange={setConnections}
 					onChangeLabel={handleChangeLabel}
 					onChangeConfig={handleChangeConfig}
 					onDelete={handleDeleteNode}
