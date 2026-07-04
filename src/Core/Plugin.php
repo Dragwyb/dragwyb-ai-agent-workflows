@@ -9,8 +9,11 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Core;
 
+use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
 use WorkflowAutomate\Plugin\Admin\Menu;
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
+use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
+use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
 use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
@@ -22,12 +25,14 @@ use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
 use WorkflowAutomate\Plugin\Integration\BuiltInNodeTypes;
 use WorkflowAutomate\Plugin\Integration\WorkflowTriggerBinder;
+use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
+use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
@@ -261,6 +266,20 @@ class Plugin {
 				);
 			}
 		);
+
+		$this->container->singleton(
+			ConnectionRepository::class,
+			static function (): ConnectionRepository {
+				return new ConnectionRepository();
+			}
+		);
+
+		$this->container->singleton(
+			ConnectionService::class,
+			static function ( Container $container ): ConnectionService {
+				return new ConnectionService( $container->get( ConnectionRepository::class ) );
+			}
+		);
 	}
 
 	/**
@@ -397,11 +416,11 @@ class Plugin {
 	 * that back their row/page actions.
 	 *
 	 * Page order matters here: Menu::registerMenu() treats the first entry
-	 * as the top-level menu item, so WorkflowsPage must stay first. RunsPage
-	 * and SettingsPage — the other two menu-visible pages (see
+	 * as the top-level menu item, so WorkflowsPage must stay first. RunsPage,
+	 * SettingsPage, and ConnectionsPage — the other menu-visible pages (see
 	 * RunDetailPage::showInMenu()) — are added right after it, in the order
-	 * they were introduced by the roadmap. The two hidden pages
-	 * (BuilderPage, RunDetailPage) can go anywhere after that.
+	 * they were introduced by the roadmap. The hidden pages (BuilderPage,
+	 * RunDetailPage, ConnectionFormPage) can go anywhere after that.
 	 *
 	 * @return void
 	 */
@@ -412,16 +431,20 @@ class Plugin {
 		$executor = $this->container->get( WorkflowExecutionService::class );
 		$settings = $this->container->get( SettingsService::class );
 		$retention = $this->container->get( RunRetentionService::class );
+		$connections = $this->container->get( ConnectionService::class );
 
 		$workflows_page = new WorkflowsPage( $workflows, $settings );
 		$runs_page = new RunsPage( $runs, $workflow_repository, $settings );
 		$builder_page = new BuilderPage();
 		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
 		$settings_page = new SettingsPage( $settings );
+		$connections_page = new ConnectionsPage( $connections, $settings );
+		$connection_form_page = new ConnectionFormPage( $connections );
 
-		( new Menu( array( $workflows_page, $runs_page, $settings_page, $builder_page, $run_detail_page ) ) )->register();
+		( new Menu( array( $workflows_page, $runs_page, $settings_page, $connections_page, $builder_page, $run_detail_page, $connection_form_page ) ) )->register();
 		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
 		( new RunActionsController( $executor ) )->register();
 		( new SettingsController( $settings, $retention ) )->register();
+		( new ConnectionActionsController( $connections ) )->register();
 	}
 }

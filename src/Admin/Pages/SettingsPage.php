@@ -30,8 +30,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * saving data.
  *
  * The "Security/API Keys" tab `docs/internal/architecture.md` §2.5
- * describes is deliberately not built here: it is an entry point into
- * connection management, which does not exist until roadmap item 11.
+ * describes is deliberately not built here, even after roadmap item 11
+ * (Connections) shipped: that bullet's entire purpose was "an entry point
+ * into connection management," and `ConnectionsPage` is now its own
+ * top-level admin menu entry (see `Core\Plugin::registerAdmin()`) — a
+ * Settings tab that just links to a page already in the main plugin menu
+ * would be a redundant second entry point to the exact same screen, not a
+ * distinct settings group. See `docs/internal/architecture.md` §2.5's
+ * "Implementation note (roadmap item 11)" for the full reasoning.
  */
 class SettingsPage implements AdminPage {
 

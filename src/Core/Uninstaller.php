@@ -42,6 +42,7 @@ class Uninstaller {
 		'applied_migrations',
 		'remove_data_on_uninstall',
 		'global_settings',
+		'encryption_key_id',
 	);
 
 	/**

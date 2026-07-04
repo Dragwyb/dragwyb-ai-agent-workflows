@@ -15,7 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Verifies the site meets the plugin's minimum PHP and WordPress versions.
+ * Verifies the site meets the plugin's minimum PHP and WordPress versions,
+ * plus (since roadmap item 11) that the `openssl` extension the connection
+ * credential encryption feature depends on (see `Core\Encryption`) is
+ * actually available.
  *
  * The PHP version gate in the main plugin file already protects against
  * fatal parse errors on unsupported PHP. This class re-checks at activation
@@ -56,6 +59,13 @@ class Requirements {
 					WFA_MIN_WP_VERSION,
 					$wp_version
 				)
+			);
+		}
+
+		if ( ! Encryption::isAvailable() ) {
+			$errors->add(
+				'wfa_openssl_missing',
+				__( 'Workflow Automate requires the PHP openssl extension (used to encrypt stored connection credentials) to be enabled.', 'workflow-automate' )
 			);
 		}
 
