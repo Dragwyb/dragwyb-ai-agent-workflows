@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Core;
 
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,8 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Runs once when the plugin is activated.
  *
  * Responsible for activation-time concerns: verifying the environment,
- * creating/updating the database schema, and stamping installation
- * metadata.
+ * creating/updating the database schema, stamping installation metadata,
+ * and scheduling the recurring background-queue cron event.
  */
 class Activator {
 
@@ -51,5 +52,29 @@ class Activator {
 		}
 
 		Options::update( 'db_version', WFA_VERSION );
+
+		self::scheduleBackgroundQueue();
+	}
+
+	/**
+	 * Schedules the recurring cron event BackgroundRunner runs on.
+	 *
+	 * The `cron_schedules` filter that defines BackgroundRunner::CRON_SCHEDULE
+	 * is normally registered by Plugin::load() on `plugins_loaded`, but
+	 * activation happens via WordPress re-including this plugin's main file
+	 * and firing `activate_{plugin}` directly from within the plugins
+	 * admin screen's own request — a point at which `plugins_loaded` has
+	 * already fired for this request without this (not-yet-active) plugin
+	 * present. Without registering the filter here first, wp_schedule_event()
+	 * would not recognize the custom schedule and would fail silently.
+	 *
+	 * @return void
+	 */
+	private static function scheduleBackgroundQueue(): void {
+		add_filter( 'cron_schedules', array( BackgroundRunner::class, 'registerCronSchedule' ) ); // phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval -- interval is intentionally short; see BackgroundRunner::CRON_SCHEDULE docblock.
+
+		if ( ! wp_next_scheduled( BackgroundRunner::CRON_HOOK ) ) {
+			wp_schedule_event( time(), BackgroundRunner::CRON_SCHEDULE, BackgroundRunner::CRON_HOOK );
+		}
 	}
 }

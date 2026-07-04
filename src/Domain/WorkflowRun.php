@@ -49,17 +49,35 @@ class WorkflowRun {
 
 	private string $status;
 
+	/**
+	 * @var array<string, mixed>|null
+	 */
+	private ?array $triggerPayload;
+
+	private int $attempts;
+
+	private ?string $nextAttemptAt;
+
+	private ?string $claimToken;
+
 	private ?string $startedAt;
 
 	private ?string $finishedAt;
 
 	private string $createdAt;
 
+	/**
+	 * @param array<string, mixed>|null $triggerPayload Data the triggering event provided; null/empty for a manual run.
+	 */
 	public function __construct(
 		int $id,
 		int $workflowId,
 		?int $parentRunId,
 		string $status,
+		?array $triggerPayload,
+		int $attempts,
+		?string $nextAttemptAt,
+		?string $claimToken,
 		?string $startedAt,
 		?string $finishedAt,
 		string $createdAt
@@ -68,6 +86,10 @@ class WorkflowRun {
 		$this->workflowId = $workflowId;
 		$this->parentRunId = $parentRunId;
 		$this->status = $status;
+		$this->triggerPayload = $triggerPayload;
+		$this->attempts = $attempts;
+		$this->nextAttemptAt = $nextAttemptAt;
+		$this->claimToken = $claimToken;
 		$this->startedAt = $startedAt;
 		$this->finishedAt = $finishedAt;
 		$this->createdAt = $createdAt;
@@ -86,10 +108,29 @@ class WorkflowRun {
 			(int) $row->workflow_id,
 			null !== $row->parent_run_id ? (int) $row->parent_run_id : null,
 			(string) $row->status,
+			self::decodeJsonObjectOrNull( $row->trigger_payload_json ),
+			(int) $row->attempts,
+			$row->next_attempt_at,
+			null !== $row->claim_token ? (string) $row->claim_token : null,
 			$row->started_at,
 			$row->finished_at,
 			(string) $row->created_at
 		);
+	}
+
+	/**
+	 * @param null|string $json Raw JSON string, possibly null.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	private static function decodeJsonObjectOrNull( ?string $json ): ?array {
+		if ( null === $json || '' === $json ) {
+			return null;
+		}
+
+		$decoded = json_decode( $json, true );
+
+		return is_array( $decoded ) ? $decoded : null;
 	}
 
 	public function id(): int {
@@ -106,6 +147,39 @@ class WorkflowRun {
 
 	public function status(): string {
 		return $this->status;
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	public function triggerPayload(): array {
+		return $this->triggerPayload ?? array();
+	}
+
+	/**
+	 * 1-indexed: this run is "attempt N" of its retry chain (see
+	 * `parentRunId()` — each retry is a new row, not a mutation of the
+	 * original).
+	 *
+	 * @return int
+	 */
+	public function attempts(): int {
+		return $this->attempts;
+	}
+
+	public function nextAttemptAt(): ?string {
+		return $this->nextAttemptAt;
+	}
+
+	/**
+	 * Set only for a run that went through
+	 * `WorkflowRunRepository::claimBatch()` (the background/queued path);
+	 * always null for a synchronous `WorkflowExecutionService::run()` call.
+	 *
+	 * @return string|null
+	 */
+	public function claimToken(): ?string {
+		return $this->claimToken;
 	}
 
 	public function startedAt(): ?string {

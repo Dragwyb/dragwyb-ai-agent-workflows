@@ -89,13 +89,29 @@ Application services orchestrate domain + persistence, each with one responsibil
 
 ### Implementation note (roadmap item 7 — execution engine)
 
-`WorkflowExecutionService` and `NodeExecutionService` shipped as designed above, plus a new `Integration\WorkflowTriggerBinder` that was not originally named in this section: something has to actually call `TriggerInterface::bind()` for the registry/trigger contracts built in item 5 to have any real effect, and item 5's own follow-up notes explicitly deferred that wiring to "the execution engine." `WorkflowTriggerBinder::bindActiveWorkflows()` runs on `init` (priority 20, strictly after node type registration) on every request, binding every active workflow's trigger node(s) to `WorkflowExecutionService::run()`. Because a WordPress hook this plugin should react to could fire from any request context (front-end, admin, REST, cron, AJAX), this cost is paid broadly by design, not by oversight; the mitigation is a cheap early exit when no workflows are active, and a `MAX_ACTIVE_WORKFLOWS` cap on the initial single-page query, flagged there as a scaling limit to revisit rather than solved prematurely.
+`WorkflowExecutionService` and `NodeExecutionService` shipped as designed above, plus a new `Integration\WorkflowTriggerBinder` that was not originally named in this section: something has to actually call `TriggerInterface::bind()` for the registry/trigger contracts built in item 5 to have any real effect, and item 5's own follow-up notes explicitly deferred that wiring to "the execution engine." `WorkflowTriggerBinder::bindActiveWorkflows()` runs on `init` (priority 20, strictly after node type registration) on every request, binding every active workflow's trigger node(s) to what was, at the time item 7 shipped, `WorkflowExecutionService::run()` — since roadmap item 8, it binds to `queue()` instead; see that item's note below. Because a WordPress hook this plugin should react to could fire from any request context (front-end, admin, REST, cron, AJAX), this cost is paid broadly by design, not by oversight; the mitigation is a cheap early exit when no workflows are active, and a `MAX_ACTIVE_WORKFLOWS` cap on the initial single-page query, flagged there as a scaling limit to revisit rather than solved prematurely.
 
 Node execution is intentionally simple in this first increment, since the builder does not yet persist connections between nodes (item 6, deferred): a run skips trigger nodes, then executes every remaining node once in graph order, stopping at the first failure ("fail fast"). Both are documented as placeholders — for real DAG-based ordering, and for a configurable per-workflow on-failure behavior (§2.5 Settings) — rather than a permanent design.
 
 ### Background processing layer
 
 - Scheduled/queued work (webhook processing, retries, log pruning) runs via WP-Cron-driven batches with an idempotent "claim a batch" pattern in the repository layer, so overlapping cron runs cannot double-process the same rows. This avoids both the reference product's fully custom queue and any reliance on a paid "cloud cron" add-on. Action Scheduler is evaluated as a future upgrade path (documented in the roadmap) rather than a v1 hard dependency, to keep the bootstrap increment self-contained.
+
+### Implementation note (roadmap item 8 — background/queued execution)
+
+Inbound webhooks do not exist yet (roadmap item 13), so the concrete thing this item moves off the request thread is the live-trigger path built in item 7: `WorkflowTriggerBinder` now calls `WorkflowExecutionService::queue()` (one fast `INSERT`, status `queued`) instead of `run()`. A new `Service\BackgroundRunner`, on a custom once-a-minute `cron_schedules` entry (`wfa_every_minute` — WordPress core's finest built-in interval is hourly), claims and executes a bounded batch every tick.
+
+The queue *is* `wfa_workflow_runs` — its `status` column already modeled exactly this (`queued` → `running` → terminal), so rather than add a separate queue table, roadmap item 8 extended it additively (`Migrations\AddQueueColumnsToWorkflowRunsTable`, run against the already-shipped table from item 7) with `trigger_payload_json` (a queued run executes in a later request than the one that queued it, so the payload has to be persisted, unlike the synchronous path), `attempts` / `next_attempt_at` (retry/backoff), and `claim_token`.
+
+Claiming is a single atomic `UPDATE ... ORDER BY id ASC LIMIT n` (native MySQL, no transaction needed) stamping matched rows with a fresh, unique `claim_token`, followed by a `SELECT ... WHERE claim_token = ?` — this is the "idempotent claim a batch" pattern this section originally called for: two overlapping cron ticks cannot claim the same row, and each tick can identify precisely the rows it claimed regardless of what any other tick does. The same claim query also reclaims `running` rows that have sat unfinished for more than 10 minutes, on the assumption their worker was killed by a request timeout or a fatal error before it could call `finish()` — otherwise such a row would be stranded forever (no longer `queued`, so never claimable again). A reclaimed row re-executes from the beginning; there is no per-node resume, so this is a known, documented at-least-once trade-off, not a bug.
+
+`BackgroundRunner::processBatch()` additionally caps itself to a 20-second wall-clock budget per tick (`Service\BackgroundRunner::TIME_BUDGET_SECONDS`) and puts back any runs it claimed but did not get to (`WorkflowRunRepository::requeue()`) so they retry on the very next tick rather than waiting out the full 10-minute stale-claim window. This exists because a single claimed run can include slow outbound HTTP calls (`Integration\Actions\HttpRequestAction`), and a batch of `BATCH_SIZE = 10` such runs could otherwise exceed a typical host's PHP request time limit.
+
+Retry/backoff (`WorkflowExecutionService::maybeScheduleRetry()`) only applies to the background path (`executeClaimedRun()`), never to a manual synchronous "run now" test (`run()`) — a deliberate choice: a user watching a manual test expects one deterministic result, not a silent retry minutes later with no UI (yet — item 9) to see it happen. A failed or partial background run is retried as a *new* row linked via `parent_run_id` (the column item 7 already reserved "for re-runs"), doubling backoff from 60 seconds up to a 1-hour cap, up to 5 total attempts, after which it is left in its final state.
+
+One WordPress activation-lifecycle subtlety worth recording: `Core\Activator::activate()` registers the `cron_schedules` filter itself, immediately before calling `wp_schedule_event()`, rather than relying on `Plugin::load()` to have already done so. Activation runs via WordPress re-including the plugin's main file and firing `activate_{plugin}` directly from inside the plugins admin screen's own request — a point at which `plugins_loaded` (and therefore `Plugin::load()`) has already fired for that request without this not-yet-active plugin present. Registering the filter later, only in `Plugin::load()`, would make `wp_schedule_event()` silently fail to recognize the custom schedule on first activation.
+
+Deferred/out of scope for this item: an admin-visible queue/retry status (belongs to item 9, Logging & execution history UI); a per-workflow or global on/off toggle for background vs. synchronous execution (`docs/internal/architecture.md` §2.4 already names this as a future "Advanced" setting — item 10); Action Scheduler as a queue backend (still evaluated as a future upgrade path, not needed yet at expected v1 scale).
 
 ---
 
@@ -139,12 +155,16 @@ Indexes: `KEY (workflow_id)`, `UNIQUE KEY (workflow_id, client_node_id)`.
 | --- | --- | --- |
 | `id` | BIGINT UNSIGNED PK | |
 | `workflow_id` | BIGINT UNSIGNED | FK cascade delete |
-| `parent_run_id` | BIGINT UNSIGNED NULL | for re-runs |
+| `parent_run_id` | BIGINT UNSIGNED NULL | for re-runs and retries |
 | `status` | VARCHAR(20) | `queued`, `running`, `success`, `failed`, `partial` |
+| `trigger_payload_json` | LONGTEXT NULL | added in roadmap item 8; the data a queued run needs to execute later, out-of-request |
+| `attempts` | TINYINT UNSIGNED | added in roadmap item 8; 1-indexed retry counter |
+| `next_attempt_at` | DATETIME NULL | added in roadmap item 8; a queued row is not claimable until this time |
+| `claim_token` | VARCHAR(36) NULL | added in roadmap item 8; identifies which background-worker invocation claimed this row |
 | `started_at`, `finished_at` | DATETIME NULL | |
 | `created_at` | DATETIME | |
 
-Indexes: `KEY (workflow_id, created_at)`, `KEY (status)` — directly targets the reference product's thin-indexing weakness for history filtering.
+Indexes: `KEY (workflow_id, created_at)`, `KEY (status)` — directly targets the reference product's thin-indexing weakness for history filtering — plus, added in roadmap item 8, `KEY (status, next_attempt_at)` and `KEY (claim_token)` to keep the background queue's claim query cheap regardless of table size.
 
 ### `wfa_workflow_run_logs`
 

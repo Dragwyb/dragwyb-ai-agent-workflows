@@ -22,10 +22,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Runs a workflow start-to-finish, synchronously, within the current
- * request. Background/queued execution (retries, webhook batching) is a
- * separate later roadmap item; this class is the engine both that future
- * item and any "run now" entry point build on.
+ * Runs a workflow's nodes start-to-finish. Two ways a run comes to exist:
+ *
+ * - `run()`: synchronous, within the current request. Used by the "run
+ *   now"/test REST action, where a human is waiting for an immediate
+ *   result. Never retried automatically — a deliberate, explicit test
+ *   should not silently re-fire later without the user asking for that.
+ * - `queue()` + `executeClaimedRun()`: background/queued, per roadmap item
+ *   8. `queue()` just records a `queued` row and returns immediately;
+ *   `BackgroundRunner` claims it later (see
+ *   `WorkflowRunRepository::claimBatch()`) and calls `executeClaimedRun()`
+ *   from a WP-Cron request instead of the request that triggered it. This
+ *   is what `Integration\WorkflowTriggerBinder` uses, since a live
+ *   WordPress hook could fire during any front-end/admin/REST request and
+ *   must not block it on potentially slow node execution (see
+ *   docs/internal/architecture.md §6 performance requirements). Failed or
+ *   partial background runs are retried with backoff, up to a limit — see
+ *   `maybeScheduleRetry()`.
+ *
+ * Both paths share `executeNodes()` so they can never drift apart in how a
+ * run actually executes.
  *
  * Node ordering and failure handling are both intentionally simple for this
  * increment, since the builder (roadmap item 6) does not yet persist
@@ -42,6 +58,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   configurable.
  */
 class WorkflowExecutionService {
+
+	/**
+	 * A background run is retried up to this many times in total (i.e. up
+	 * to 4 retries after the original attempt) before being left in its
+	 * final failed/partial state.
+	 */
+	private const MAX_ATTEMPTS = 5;
+
+	/**
+	 * Backoff base, in seconds: attempt 2 waits ~1 minute, attempt 3 ~2
+	 * minutes, attempt 4 ~4 minutes, attempt 5 ~8 minutes (doubling),
+	 * capped by MAX_BACKOFF_SECONDS.
+	 */
+	private const BASE_BACKOFF_SECONDS = 60;
+
+	private const MAX_BACKOFF_SECONDS = HOUR_IN_SECONDS;
 
 	private WorkflowService $workflows;
 
@@ -68,13 +100,11 @@ class WorkflowExecutionService {
 	}
 
 	/**
-	 * Runs a workflow. Usable both for a "run now"/test action and as the
-	 * callback a live trigger binds to (see Integration\WorkflowTriggerBinder).
+	 * Runs a workflow synchronously and returns once it has finished. Used
+	 * for a "run now"/test action.
 	 *
 	 * Deliberately not restricted to active workflows: a manual "test this
-	 * workflow" action is valid for a draft workflow too. It is
-	 * WorkflowTriggerBinder's job to only bind triggers for active
-	 * workflows, which is what gates the *automatic* path.
+	 * workflow" action is valid for a draft workflow too.
 	 *
 	 * @param int                   $workflow_id     Workflow id.
 	 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
@@ -89,8 +119,106 @@ class WorkflowExecutionService {
 			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
 		}
 
+		$run = $this->runs->insert(
+			array(
+				'workflow_id' => $workflow_id,
+				'status' => WorkflowRun::STATUS_RUNNING,
+				'trigger_payload' => $trigger_payload,
+			)
+		);
+
+		if ( null === $run ) {
+			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'workflow-automate' ) );
+		}
+
+		return $this->executeNodes( $run );
+	}
+
+	/**
+	 * Records a workflow to run in the background instead of executing it
+	 * now. Returns as soon as the queued row exists; the actual node
+	 * execution happens later, out-of-request, when BackgroundRunner claims
+	 * it (see WorkflowRunRepository::claimBatch()).
+	 *
+	 * @param int                  $workflow_id     Workflow id.
+	 * @param array<string, mixed> $trigger_payload Data the triggering event provided.
+	 *
+	 * @throws InvalidArgumentException When the workflow does not exist.
+	 * @throws RuntimeException         When the run could not be recorded.
+	 *
+	 * @return WorkflowRun The queued (not yet executed) run.
+	 */
+	public function queue( int $workflow_id, array $trigger_payload = array() ): WorkflowRun {
+		if ( null === $this->workflows->find( $workflow_id ) ) {
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
+		}
+
+		$run = $this->runs->insert(
+			array(
+				'workflow_id' => $workflow_id,
+				'status' => WorkflowRun::STATUS_QUEUED,
+				'trigger_payload' => $trigger_payload,
+			)
+		);
+
+		if ( null === $run ) {
+			throw new RuntimeException( esc_html__( 'Failed to queue the workflow run.', 'workflow-automate' ) );
+		}
+
+		return $run;
+	}
+
+	/**
+	 * Executes a run that BackgroundRunner has already claimed (its status
+	 * is `running` and it owns a `claim_token` — see
+	 * WorkflowRunRepository::claimBatch()). Not meant to be called with any
+	 * other kind of run; use run() for a fresh synchronous run instead.
+	 *
+	 * Unlike run(), a failed or partial outcome here schedules a retry
+	 * (see maybeScheduleRetry()) rather than being final immediately.
+	 *
+	 * @param WorkflowRun $run The claimed run.
+	 *
+	 * @return WorkflowRun The finished run.
+	 */
+	public function executeClaimedRun( WorkflowRun $run ): WorkflowRun {
+		if ( null === $this->workflows->find( $run->workflowId() ) ) {
+			// The workflow was hard-deleted or trashed after this run was
+			// queued; nothing to execute against.
+			$this->runLogs->insert(
+				array(
+					'run_id' => $run->id(),
+					'node_id' => null,
+					'status' => WorkflowRunLog::STATUS_ERROR,
+					'message' => __( 'The workflow was deleted or trashed before this queued run could execute.', 'workflow-automate' ),
+				)
+			);
+
+			return $this->runs->finish( $run->id(), WorkflowRun::STATUS_FAILED ) ?? $run;
+		}
+
+		$finished = $this->executeNodes( $run );
+
+		$this->maybeScheduleRetry( $finished );
+
+		return $finished;
+	}
+
+	/**
+	 * Shared execution loop used by both run() and executeClaimedRun().
+	 *
+	 * @param WorkflowRun $run A run row that already exists and is ready to execute (status `running`).
+	 *
+	 * @throws RuntimeException When the run could not be finalized.
+	 *
+	 * @return WorkflowRun The finished run.
+	 */
+	private function executeNodes( WorkflowRun $run ): WorkflowRun {
+		$workflow_id = $run->workflowId();
+		$trigger_payload = $run->triggerPayload();
+
 		/**
-		 * Fires immediately before a workflow run starts.
+		 * Fires immediately before a workflow run starts executing nodes.
 		 *
 		 * @since 0.1.0
 		 *
@@ -100,17 +228,6 @@ class WorkflowExecutionService {
 		do_action( 'wfa/workflow/before_run', $workflow_id, $trigger_payload );
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
-
-		$run = $this->runs->insert(
-			array(
-				'workflow_id' => $workflow_id,
-				'status' => WorkflowRun::STATUS_RUNNING,
-			)
-		);
-
-		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'workflow-automate' ) );
-		}
 
 		$context = array(
 			'trigger' => $trigger_payload,
@@ -176,6 +293,44 @@ class WorkflowExecutionService {
 		do_action( 'wfa/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
+	}
+
+	/**
+	 * Schedules a retry for a background run that ended in `failed` or
+	 * `partial`, as a new `queued` row linked via `parent_run_id`, unless
+	 * the attempt limit has already been reached. No-op for `success`.
+	 *
+	 * Retrying re-executes every node from the start; there is no
+	 * per-node resume, so a workflow whose first few nodes already
+	 * succeeded will run them again on retry. This is the same "no partial
+	 * resume" trade-off already documented for fail-fast execution, applied
+	 * consistently rather than solved separately here.
+	 *
+	 * @param WorkflowRun $run The just-finished run.
+	 *
+	 * @return void
+	 */
+	private function maybeScheduleRetry( WorkflowRun $run ): void {
+		if ( ! in_array( $run->status(), array( WorkflowRun::STATUS_FAILED, WorkflowRun::STATUS_PARTIAL ), true ) ) {
+			return;
+		}
+
+		if ( $run->attempts() >= self::MAX_ATTEMPTS ) {
+			return;
+		}
+
+		$delay = min( self::MAX_BACKOFF_SECONDS, self::BASE_BACKOFF_SECONDS * ( 2 ** ( $run->attempts() - 1 ) ) );
+
+		$this->runs->insert(
+			array(
+				'workflow_id' => $run->workflowId(),
+				'parent_run_id' => $run->id(),
+				'status' => WorkflowRun::STATUS_QUEUED,
+				'trigger_payload' => $run->triggerPayload(),
+				'attempts' => $run->attempts() + 1,
+				'next_attempt_at' => gmdate( 'Y-m-d H:i:s', time() + $delay ),
+			)
+		);
 	}
 
 	/**

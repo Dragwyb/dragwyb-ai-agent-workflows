@@ -23,8 +23,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Closes the loop the node type registry (roadmap item 5) deliberately left
  * open: something has to call TriggerInterface::bind() for it to have any
  * effect. This class does so, once per request, for every active
- * workflow's trigger node(s), wiring each one to actually start a run (via
- * WorkflowExecutionService) when its underlying event fires.
+ * workflow's trigger node(s), wiring each one to queue a run (via
+ * WorkflowExecutionService::queue()) when its underlying event fires.
+ *
+ * Queues rather than runs synchronously: the WordPress hook a trigger binds
+ * to could be firing in the middle of an arbitrary front-end/admin/REST
+ * request that has nothing to do with this plugin, so blocking it on
+ * potentially slow node execution (outbound HTTP calls, etc.) is not
+ * acceptable — see docs/internal/architecture.md §6 performance
+ * requirements. A WP-Cron-driven BackgroundRunner (roadmap item 8) executes
+ * the queued run out-of-request shortly after.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
  * rather than the `wfa_workflow_nodes` table: binding must happen as early
@@ -115,7 +123,7 @@ class WorkflowTriggerBinder {
 				$config,
 				function ( array $payload, array $bound_config ) use ( $workflow_id ): void {
 					unset( $bound_config ); // Required by the TriggerInterface::bind() callback signature; unused here.
-					$this->executor->run( $workflow_id, $payload );
+					$this->executor->queue( $workflow_id, $payload );
 				}
 			);
 		}

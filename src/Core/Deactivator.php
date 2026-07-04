@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Core;
 
+use WorkflowAutomate\Plugin\Service\BackgroundRunner;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -18,9 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Runs when the plugin is deactivated.
  *
  * Deactivation never deletes plugin data (see Uninstaller for the opt-in
- * data removal flow). This class currently has nothing to clean up because
- * no scheduled events or rewrite rules exist yet; later increments that add
- * WP-Cron events or rewrite rules must extend this method to clear them.
+ * data removal flow); it only clears the recurring cron event so a
+ * deactivated plugin does not keep waking WP-Cron up every minute. Any
+ * runs already `queued` are left as-is — they simply resume processing if
+ * the plugin is reactivated later, no different from any other pending
+ * plugin data.
  */
 class Deactivator {
 
@@ -30,6 +34,6 @@ class Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
-		// Intentionally empty for this increment. See class docblock.
+		wp_clear_scheduled_hook( BackgroundRunner::CRON_HOOK );
 	}
 }

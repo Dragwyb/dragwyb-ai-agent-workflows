@@ -34,15 +34,18 @@ class WorkflowRunRepository {
 	}
 
 	/**
-	 * Starts a new run row. Callers are expected to pass a status of
-	 * WorkflowRun::STATUS_RUNNING immediately, since this engine is
-	 * synchronous (there is no separate "queued" phase yet — see
-	 * WorkflowExecutionService).
+	 * Starts a new run row, either to execute immediately (status
+	 * `running`, the synchronous path from `WorkflowExecutionService::run()`)
+	 * or to be picked up later by `claimBatch()` (status `queued`, the
+	 * background path from `queue()` and from retry scheduling).
 	 *
 	 * @param array<string, mixed> $attributes {
-	 *     @type int      $workflow_id    Required.
-	 *     @type int|null $parent_run_id  Optional, for re-runs.
-	 *     @type string   $status         One of WorkflowRun::VALID_STATUSES.
+	 *     @type int                    $workflow_id      Required.
+	 *     @type int|null               $parent_run_id    Optional, set on retry rows to link back to the attempt that spawned them.
+	 *     @type string                 $status           One of WorkflowRun::VALID_STATUSES. Default `queued`.
+	 *     @type array<string,mixed>    $trigger_payload  Optional. Persisted as JSON so a background-claimed run can rebuild its execution context.
+	 *     @type int                    $attempts         Optional, 1-indexed. Default 1.
+	 *     @type string                 $next_attempt_at  Optional MySQL datetime (GMT). When set, `claimBatch()` will not claim the row until this time.
 	 * }
 	 *
 	 * @return WorkflowRun|null Null if the insert failed.
@@ -50,17 +53,24 @@ class WorkflowRunRepository {
 	public function insert( array $attributes ): ?WorkflowRun {
 		global $wpdb;
 
+		$status = (string) ( $attributes['status'] ?? WorkflowRun::STATUS_QUEUED );
 		$now = current_time( 'mysql', true );
 
 		$data = array(
 			'workflow_id' => (int) $attributes['workflow_id'],
 			'parent_run_id' => isset( $attributes['parent_run_id'] ) ? (int) $attributes['parent_run_id'] : null,
-			'status' => (string) ( $attributes['status'] ?? WorkflowRun::STATUS_QUEUED ),
-			'started_at' => $now,
+			'status' => $status,
+			'trigger_payload_json' => ! empty( $attributes['trigger_payload'] ) ? wp_json_encode( $attributes['trigger_payload'] ) : null,
+			'attempts' => isset( $attributes['attempts'] ) ? max( 1, (int) $attributes['attempts'] ) : 1,
+			'next_attempt_at' => isset( $attributes['next_attempt_at'] ) ? (string) $attributes['next_attempt_at'] : null,
+			// A queued row has not started yet; its clock starts when
+			// claimBatch() claims it. A row created as `running` (the
+			// synchronous path) starts immediately.
+			'started_at' => WorkflowRun::STATUS_RUNNING === $status ? $now : null,
 			'created_at' => $now,
 		);
 
-		$formats = array( '%d', '%d', '%s', '%s', '%s' );
+		$formats = array( '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s' );
 
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
@@ -69,6 +79,102 @@ class WorkflowRunRepository {
 		}
 
 		return $this->find( (int) $wpdb->insert_id );
+	}
+
+	/**
+	 * Atomically claims up to `$limit` runs that are ready to execute, and
+	 * returns them. "Ready" means either a fresh `queued` row whose
+	 * `next_attempt_at` (if any) has passed, or a `running` row that has
+	 * been running for longer than `$stale_after_minutes` — recovered on
+	 * the assumption its worker crashed or was killed by a request
+	 * timeout before it could call finish() (see BackgroundRunner). A
+	 * reclaimed stale row is re-executed from the beginning; there is no
+	 * per-node resume support, so this can duplicate already-succeeded
+	 * side effects in that specific failure scenario — a known limitation,
+	 * not a bug, of a synchronous, non-idempotent node execution model.
+	 *
+	 * Race safety: this uses a single atomic `UPDATE ... ORDER BY id LIMIT`
+	 * statement (native MySQL syntax) to flip matching rows to `running`
+	 * and stamp them with a fresh, unique `claim_token`. Because it is one
+	 * statement, two overlapping cron invocations cannot both claim the
+	 * same row — MySQL's row locking during the UPDATE serializes them,
+	 * and the loser's WHERE clause will no longer match. The immediately
+	 * following SELECT filters on that same token, so each invocation only
+	 * ever sees the exact rows it just claimed itself.
+	 *
+	 * @param int $limit               Maximum number of runs to claim.
+	 * @param int $stale_after_minutes Minutes after which a `running` row is considered abandoned and eligible for reclaim.
+	 *
+	 * @return WorkflowRun[]
+	 */
+	public function claimBatch( int $limit, int $stale_after_minutes ): array {
+		global $wpdb;
+
+		$table = $this->table();
+		$now = current_time( 'mysql', true );
+		$claim_token = wp_generate_uuid4();
+		$stale_before = gmdate( 'Y-m-d H:i:s', time() - ( $stale_after_minutes * MINUTE_IN_SECONDS ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; all values are passed through wpdb->prepare() below.
+		$sql = "UPDATE {$table}
+			SET status = %s, claim_token = %s, started_at = %s
+			WHERE
+				( status = %s AND ( next_attempt_at IS NULL OR next_attempt_at <= %s ) )
+				OR ( status = %s AND started_at IS NOT NULL AND started_at <= %s )
+			ORDER BY id ASC
+			LIMIT %d";
+
+		$wpdb->query(
+			$wpdb->prepare(
+				$sql,
+				WorkflowRun::STATUS_RUNNING,
+				$claim_token,
+				$now,
+				WorkflowRun::STATUS_QUEUED,
+				$now,
+				WorkflowRun::STATUS_RUNNING,
+				$stale_before,
+				$limit
+			)
+		);
+
+		if ( 0 === (int) $wpdb->rows_affected ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$select_sql = "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC";
+		$rows = $wpdb->get_results( $wpdb->prepare( $select_sql, $claim_token ) );
+
+		return array_map( array( WorkflowRun::class, 'fromRow' ), $rows );
+	}
+
+	/**
+	 * Reverts a claimed row back to `queued` without touching its retry
+	 * bookkeeping, so the next cron tick can pick it up again immediately
+	 * instead of waiting for stale-claim recovery. Used by BackgroundRunner
+	 * when it runs out of time budget partway through a claimed batch.
+	 *
+	 * @param int $id Run id.
+	 *
+	 * @return bool
+	 */
+	public function requeue( int $id ): bool {
+		global $wpdb;
+
+		$updated = $wpdb->update(
+			$this->table(),
+			array(
+				'status' => WorkflowRun::STATUS_QUEUED,
+				'claim_token' => null,
+				'started_at' => null,
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s', '%s' ),
+			array( '%d' )
+		);
+
+		return false !== $updated;
 	}
 
 	/**

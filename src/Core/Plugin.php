@@ -22,6 +22,7 @@ use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
+use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
@@ -127,6 +128,7 @@ class Plugin {
 		$this->registerServices();
 		$this->registerNodeTypes();
 		$this->registerExecutionEngine();
+		$this->registerBackgroundProcessing();
 		( new RestApi( $this->container ) )->register();
 		$this->registerAdmin();
 
@@ -222,6 +224,16 @@ class Plugin {
 				);
 			}
 		);
+
+		$this->container->singleton(
+			BackgroundRunner::class,
+			static function ( Container $container ): BackgroundRunner {
+				return new BackgroundRunner(
+					$container->get( WorkflowRunRepository::class ),
+					$container->get( WorkflowExecutionService::class )
+				);
+			}
+		);
 	}
 
 	/**
@@ -289,6 +301,38 @@ class Plugin {
 			},
 			20
 		);
+	}
+
+	/**
+	 * Wires the WP-Cron-driven background queue: registers the custom
+	 * recurring schedule BackgroundRunner needs, and binds its
+	 * processBatch() method to the cron hook that fires it.
+	 *
+	 * The recurring event itself is scheduled on activation (see
+	 * Activator) and cleared on deactivation (see Deactivator), not here —
+	 * this method runs on every `plugins_loaded`, so scheduling from here
+	 * too would just mean redundantly checking wp_next_scheduled() on
+	 * every request. The one exception is the capability-gated defensive
+	 * re-check below, mirroring the migration re-check in load(): it only
+	 * protects against the scheduled event having been lost (e.g. a manual
+	 * file update that skipped the activation hook), so it is fine for it
+	 * to only run for a logged-in administrator viewing wp-admin.
+	 *
+	 * @return void
+	 */
+	private function registerBackgroundProcessing(): void {
+		add_filter( 'cron_schedules', array( BackgroundRunner::class, 'registerCronSchedule' ) ); // phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval -- interval is intentionally short; see BackgroundRunner::CRON_SCHEDULE docblock.
+
+		add_action(
+			BackgroundRunner::CRON_HOOK,
+			function (): void {
+				$this->container->get( BackgroundRunner::class )->processBatch();
+			}
+		);
+
+		if ( is_admin() && current_user_can( 'manage_options' ) && ! wp_next_scheduled( BackgroundRunner::CRON_HOOK ) ) {
+			wp_schedule_event( time(), BackgroundRunner::CRON_SCHEDULE, BackgroundRunner::CRON_HOOK );
+		}
 	}
 
 	/**
