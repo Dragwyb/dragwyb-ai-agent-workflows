@@ -9,6 +9,12 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Core;
 
+use WorkflowAutomate\Plugin\Database\MigrationRunner;
+use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
+use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
+use WorkflowAutomate\Plugin\Service\WorkflowService;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -17,11 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Boots the plugin on `plugins_loaded`.
  *
- * Deliberately thin: this class only wires the requirements check and the
- * service container, then fires an extensibility hook. Feature providers
- * (admin UI, REST API, execution engine, etc.) are registered against the
- * container in their own roadmap increments rather than being added here,
- * so this class never grows into a "God" class.
+ * Deliberately thin: this class wires the requirements check, registers
+ * service bindings against the container, defensively keeps the database
+ * schema up to date for already-active installs, and fires an extensibility
+ * hook. Feature providers (admin UI, REST API, execution engine, etc.) are
+ * registered against the container in their own roadmap increments rather
+ * than being added here, so this class never grows into a "God" class.
  */
 class Plugin {
 
@@ -105,6 +112,15 @@ class Plugin {
 			return;
 		}
 
+		$this->registerServices();
+
+		// Capability-gated so schema upkeep never runs on ordinary front-end
+		// requests; this only protects against tables missing after a
+		// manual file update that skipped the activation hook.
+		if ( is_admin() && current_user_can( 'manage_options' ) ) {
+			( new MigrationRunner( SchemaMigrations::all() ) )->run();
+		}
+
 		/**
 		 * Fires once the plugin has finished loading and confirmed its
 		 * environment requirements are met.
@@ -123,5 +139,36 @@ class Plugin {
 	 */
 	public function container(): Container {
 		return $this->container;
+	}
+
+	/**
+	 * Registers repository and service bindings against the container.
+	 *
+	 * @return void
+	 */
+	private function registerServices(): void {
+		$this->container->singleton(
+			WorkflowRepository::class,
+			static function (): WorkflowRepository {
+				return new WorkflowRepository();
+			}
+		);
+
+		$this->container->singleton(
+			WorkflowNodeRepository::class,
+			static function (): WorkflowNodeRepository {
+				return new WorkflowNodeRepository();
+			}
+		);
+
+		$this->container->singleton(
+			WorkflowService::class,
+			static function ( Container $container ): WorkflowService {
+				return new WorkflowService(
+					$container->get( WorkflowRepository::class ),
+					$container->get( WorkflowNodeRepository::class )
+				);
+			}
+		);
 	}
 }

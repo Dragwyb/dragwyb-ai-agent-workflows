@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Core;
 
+use WorkflowAutomate\Plugin\Database\MigrationRunner;
+use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -17,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Runs once when the plugin is activated.
  *
- * Responsible only for activation-time concerns: verifying the environment
- * and stamping installation metadata. Database schema creation is introduced
- * in a later roadmap increment and will be invoked from here once it exists.
+ * Responsible for activation-time concerns: verifying the environment,
+ * creating/updating the database schema, and stamping installation
+ * metadata.
  */
 class Activator {
 
@@ -40,6 +43,8 @@ class Activator {
 				array( 'back_link' => true )
 			);
 		}
+
+		( new MigrationRunner( SchemaMigrations::all() ) )->run();
 
 		if ( false === Options::get( 'installed_at' ) ) {
 			Options::add( 'installed_at', time(), true );

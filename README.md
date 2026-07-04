@@ -42,6 +42,10 @@ uninstall.php           WordPress-invoked cleanup entry point
 src/
   autoload.php           Fallback PSR-4 autoloader (see "Local setup" above)
   Core/                  Bootstrap: Plugin, Container, Requirements, Activator, Deactivator, Uninstaller, Options
+  Database/              Migration base class/runner, table-name helper, migrations (dbDelta-based schema)
+  Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode)
+  Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
+  Service/               Application services orchestrating domain + persistence (WorkflowService)
 docs/
   hooks-reference.md     Public actions/filters reference
   internal/              Development-only docs (analysis, architecture, roadmap) — excluded from release builds

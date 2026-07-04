@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Core;
 
+use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -37,6 +39,7 @@ class Uninstaller {
 	private const OWNED_OPTIONS = array(
 		'installed_at',
 		'db_version',
+		'applied_migrations',
 		'remove_data_on_uninstall',
 	);
 
@@ -50,8 +53,22 @@ class Uninstaller {
 			return;
 		}
 
+		self::dropTables();
+
 		foreach ( self::OWNED_OPTIONS as $option ) {
 			Options::delete( $option );
+		}
+	}
+
+	/**
+	 * Reverses every migration, in reverse application order, dropping all
+	 * plugin-owned tables.
+	 *
+	 * @return void
+	 */
+	private static function dropTables(): void {
+		foreach ( array_reverse( SchemaMigrations::all() ) as $migration_class ) {
+			( new $migration_class() )->down();
 		}
 	}
 }

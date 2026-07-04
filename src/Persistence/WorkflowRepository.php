@@ -1,0 +1,270 @@
+<?php
+/**
+ * Workflow repository.
+ *
+ * @package WorkflowAutomate\Plugin
+ */
+
+declare(strict_types=1);
+
+namespace WorkflowAutomate\Plugin\Persistence;
+
+use WorkflowAutomate\Plugin\Database\Table;
+use WorkflowAutomate\Plugin\Domain\Workflow;
+
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * All `wfa_workflows` access goes through this class. Every query is built
+ * with `$wpdb->prepare()` or the `$wpdb` helper methods; the table name
+ * itself is never user input, so its direct interpolation into SQL strings
+ * is safe (each occurrence is annotated for WPCS accordingly).
+ */
+class WorkflowRepository {
+
+	private const MAX_PER_PAGE = 100;
+
+	private const DEFAULT_PER_PAGE = 20;
+
+	/**
+	 * @return string
+	 */
+	private function table(): string {
+		return Table::name( 'workflows' );
+	}
+
+	/**
+	 * Creates a new workflow row.
+	 *
+	 * @param array<string, mixed> $attributes {
+	 *     @type string                    $title    Required title.
+	 *     @type int                       $status   One of Workflow::VALID_STATUSES.
+	 *     @type array<string, mixed>      $graph    Builder graph.
+	 *     @type array<string, mixed>|null $settings Per-workflow settings.
+	 * }
+	 *
+	 * @return Workflow|null Null if the insert failed.
+	 */
+	public function insert( array $attributes ): ?Workflow {
+		global $wpdb;
+
+		$now = current_time( 'mysql', true );
+
+		$data = array(
+			'title' => (string) $attributes['title'],
+			'status' => (int) ( $attributes['status'] ?? Workflow::STATUS_DRAFT ),
+			'definition_version' => (int) ( $attributes['definition_version'] ?? 1 ),
+			'graph_json' => wp_json_encode( $attributes['graph'] ?? array() ),
+			'settings_json' => isset( $attributes['settings'] ) ? wp_json_encode( $attributes['settings'] ) : null,
+			'run_count' => 0,
+			'created_at' => $now,
+			'updated_at' => $now,
+		);
+
+		$formats = array( '%s', '%d', '%d', '%s', '%s', '%d', '%s', '%s' );
+
+		$inserted = $wpdb->insert( $this->table(), $data, $formats );
+
+		if ( false === $inserted ) {
+			return null;
+		}
+
+		return $this->find( (int) $wpdb->insert_id, true );
+	}
+
+	/**
+	 * Updates an existing workflow row. Only the provided keys are touched.
+	 *
+	 * @param int                   $id         Workflow id.
+	 * @param array<string, mixed>  $attributes Any of: title, status, definition_version, graph, settings.
+	 *
+	 * @return Workflow|null Null if the workflow does not exist or the update failed.
+	 */
+	public function update( int $id, array $attributes ): ?Workflow {
+		global $wpdb;
+
+		$data = array();
+		$formats = array();
+
+		if ( array_key_exists( 'title', $attributes ) ) {
+			$data['title'] = (string) $attributes['title'];
+			$formats[] = '%s';
+		}
+
+		if ( array_key_exists( 'status', $attributes ) ) {
+			$data['status'] = (int) $attributes['status'];
+			$formats[] = '%d';
+		}
+
+		if ( array_key_exists( 'definition_version', $attributes ) ) {
+			$data['definition_version'] = (int) $attributes['definition_version'];
+			$formats[] = '%d';
+		}
+
+		if ( array_key_exists( 'graph', $attributes ) ) {
+			$data['graph_json'] = wp_json_encode( $attributes['graph'] );
+			$formats[] = '%s';
+		}
+
+		if ( array_key_exists( 'settings', $attributes ) ) {
+			$data['settings_json'] = null === $attributes['settings'] ? null : wp_json_encode( $attributes['settings'] );
+			$formats[] = '%s';
+		}
+
+		if ( array() === $data ) {
+			return $this->find( $id, true );
+		}
+
+		$data['updated_at'] = current_time( 'mysql', true );
+		$formats[] = '%s';
+
+		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
+
+		if ( false === $updated ) {
+			return null;
+		}
+
+		return $this->find( $id, true );
+	}
+
+	/**
+	 * Marks a workflow as trashed without deleting the row.
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return bool
+	 */
+	public function softDelete( int $id ): bool {
+		global $wpdb;
+
+		$updated = $wpdb->update(
+			$this->table(),
+			array(
+				'deleted_at' => current_time( 'mysql', true ),
+				'updated_at' => current_time( 'mysql', true ),
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+
+		return false !== $updated;
+	}
+
+	/**
+	 * Clears a workflow's trashed state.
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return bool
+	 */
+	public function restore( int $id ): bool {
+		global $wpdb;
+
+		$updated = $wpdb->update(
+			$this->table(),
+			array(
+				'deleted_at' => null,
+				'updated_at' => current_time( 'mysql', true ),
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+
+		return false !== $updated;
+	}
+
+	/**
+	 * Permanently removes a workflow row. Callers are responsible for
+	 * cascading deletion of dependent rows (see WorkflowService::delete()).
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return bool
+	 */
+	public function delete( int $id ): bool {
+		global $wpdb;
+
+		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
+
+		return false !== $deleted && $deleted > 0;
+	}
+
+	/**
+	 * Finds a single workflow by id.
+	 *
+	 * @param int  $id              Workflow id.
+	 * @param bool $include_trashed Whether to also match soft-deleted rows.
+	 *
+	 * @return Workflow|null
+	 */
+	public function find( int $id, bool $include_trashed = false ): ?Workflow {
+		global $wpdb;
+
+		$table = $this->table();
+		$sql = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$params = array( $id );
+
+		if ( ! $include_trashed ) {
+			$sql .= ' AND deleted_at IS NULL';
+		}
+
+		$row = $wpdb->get_row( $wpdb->prepare( $sql, $params ) );
+
+		return $row ? Workflow::fromRow( $row ) : null;
+	}
+
+	/**
+	 * Returns a paginated, optionally filtered list of workflows.
+	 *
+	 * @param array<string, mixed> $args {
+	 *     @type int  $status          Optional status filter.
+	 *     @type bool $include_trashed Whether to include soft-deleted rows. Default false.
+	 *     @type int  $page            1-indexed page number. Default 1.
+	 *     @type int  $per_page        Rows per page, clamped to [1, 100]. Default 20.
+	 * }
+	 *
+	 * @return array{items: Workflow[], total: int, page: int, per_page: int}
+	 */
+	public function paginate( array $args = array() ): array {
+		global $wpdb;
+
+		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
+		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
+		$offset = ( $page - 1 ) * $per_page;
+
+		$where = array();
+		$params = array();
+
+		if ( empty( $args['include_trashed'] ) ) {
+			$where[] = 'deleted_at IS NULL';
+		}
+
+		if ( isset( $args['status'] ) ) {
+			$where[] = 'status = %d';
+			$params[] = (int) $args['status'];
+		}
+
+		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
+		$table = $this->table();
+
+		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
+		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+
+		$list_sql = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
+		$list_params = array_merge( $params, array( $per_page, $offset ) );
+		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+
+		return array(
+			'items' => array_map( array( Workflow::class, 'fromRow' ), $rows ),
+			'total' => $total,
+			'page' => $page,
+			'per_page' => $per_page,
+		);
+	}
+}

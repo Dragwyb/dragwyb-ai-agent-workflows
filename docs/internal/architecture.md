@@ -178,6 +178,10 @@ Indexes: `KEY (run_id)`.
 
 Standard tag + pivot pattern, mirroring the reference's functional need without reusing its structure.
 
+### Implementation note (added when the migration layer shipped)
+
+Tables are created via WordPress's own `dbDelta()` rather than a custom fluent schema-builder DSL. `dbDelta()` does not reliably manage `FOREIGN KEY` constraints, so no table declares one; cascade-on-delete (e.g. removing a workflow's nodes when the workflow is hard-deleted) is instead enforced explicitly in the repository/service layer (`WorkflowService::delete()`). Migrations are tracked by fully-qualified class name in a single option (`applied_migrations`), applied once each, and reversed (in a future increment's opt-in "remove data on uninstall" flow) by calling each migration's `down()` in reverse order.
+
 ### Options (prefix `wfa_option_`)
 
 `db_version`, `installed_at`, `global_settings` (retention days, notification email), `encryption_key_id` (see Security). No option ever stores raw secrets in plaintext.
