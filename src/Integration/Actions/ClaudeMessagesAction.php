@@ -25,7 +25,7 @@ class ClaudeMessagesAction implements ActionInterface {
 
 	private const API_URL = 'https://api.anthropic.com/v1/messages';
 
-	private const DEFAULT_MODEL = 'claude-3-5-haiku-latest';
+	private const DEFAULT_MODEL = 'claude-sonnet-4-5';
 
 	private const API_VERSION = '2023-06-01';
 
@@ -70,9 +70,11 @@ class ClaudeMessagesAction implements ActionInterface {
 				'default' => 0,
 			),
 			'model' => array(
-				'type' => 'string',
+				'type' => 'dynamic_select',
 				'label' => __( 'Model', 'workflow-automate' ),
 				'default' => self::DEFAULT_MODEL,
+				'options_source' => 'ai_models',
+				'connection_field' => 'connection_id',
 			),
 			'system_prompt' => array(
 				'type' => 'string',

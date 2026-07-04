@@ -35,6 +35,7 @@ use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
+use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
@@ -321,6 +322,13 @@ class Plugin {
 					$container->get( ConnectionRepository::class ),
 					$container->get( ConnectionVerifier::class )
 				);
+			}
+		);
+
+		$this->container->singleton(
+			AiModelsService::class,
+			static function ( Container $container ): AiModelsService {
+				return new AiModelsService( $container->get( ConnectionService::class ) );
 			}
 		);
 

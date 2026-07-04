@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Connection;
+use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WP_Error;
@@ -41,8 +42,11 @@ class ConnectionsController {
 
 	private ConnectionService $connections;
 
-	public function __construct( ConnectionService $connections ) {
+	private AiModelsService $ai_models;
+
+	public function __construct( ConnectionService $connections, AiModelsService $ai_models ) {
 		$this->connections = $connections;
+		$this->ai_models   = $ai_models;
 	}
 
 	/**
@@ -85,6 +89,27 @@ class ConnectionsController {
 							'type' => 'object',
 							'required' => true,
 						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::API_NAMESPACE,
+			self::ROUTE . '/(?P<id>[\d]+)/models',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'getModels' ),
+				'permission_callback' => array( $this, 'permissionsCheck' ),
+				'args' => array(
+					'id' => array(
+						'type' => 'integer',
+						'required' => true,
+					),
+					'node_type' => array(
+						'type' => 'string',
+						'required' => true,
+						'sanitize_callback' => 'sanitize_key',
 					),
 				),
 			)
@@ -189,6 +214,28 @@ class ConnectionsController {
 		$response->set_status( 201 );
 
 		return $response;
+	}
+
+	/**
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function getModels( $request ) {
+		$connection_id = (int) $request['id'];
+		$node_type     = (string) $request->get_param( 'node_type' );
+
+		if ( null === $this->connections->find( $connection_id ) ) {
+			return new WP_Error(
+				'wfa_rest_not_found',
+				__( 'Connection not found.', 'workflow-automate' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$result = $this->ai_models->listForConnection( $connection_id, $node_type );
+
+		return rest_ensure_response( $result );
 	}
 
 	/**

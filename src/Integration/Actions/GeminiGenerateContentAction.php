@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class GeminiGenerateContentAction implements ActionInterface {
 
-	private const DEFAULT_MODEL = 'gemini-1.5-flash';
+	private const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 	private const TIMEOUT_SECONDS = 60;
 
@@ -66,9 +66,11 @@ class GeminiGenerateContentAction implements ActionInterface {
 				'default' => 0,
 			),
 			'model' => array(
-				'type' => 'string',
+				'type' => 'dynamic_select',
 				'label' => __( 'Model', 'workflow-automate' ),
 				'default' => self::DEFAULT_MODEL,
+				'options_source' => 'ai_models',
+				'connection_field' => 'connection_id',
 			),
 			'prompt' => array(
 				'type' => 'string',

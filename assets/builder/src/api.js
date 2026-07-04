@@ -83,6 +83,17 @@ export function getBootstrap() {
 }
 
 /**
+ * @param {number} connectionId
+ * @param {string} nodeType
+ * @return {Promise<{options: Array<{value: string, label: string}>, error: string|null}>}
+ */
+export function fetchConnectionModels(connectionId, nodeType) {
+	return apiFetch({
+		path: `/wfa/v1/connections/${connectionId}/models?node_type=${encodeURIComponent(nodeType)}`,
+	});
+}
+
+/**
  * @param {number} id Workflow id.
  * @return {Promise<Object>}
  */

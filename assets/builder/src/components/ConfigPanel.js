@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection } from '../api';
+import { createConnection, fetchConnectionModels } from '../api';
 import CapturedResponse from './CapturedResponse';
 import TokenField, { fieldSupportsVariables } from './TokenField';
 
@@ -203,6 +203,7 @@ export default function ConfigPanel({
 						nodeTypeSlug={nodeType.slug}
 						nodeTypeLabel={nodeType.label}
 						nodeCategory={node.category}
+						nodeConfig={node.config || {}}
 						capturedPayload={capturedPayload}
 						triggerLabel={triggerLabel}
 						onConnectionsChange={onConnectionsChange}
@@ -230,6 +231,7 @@ function ConfigField({
 	nodeTypeSlug,
 	nodeTypeLabel,
 	nodeCategory,
+	nodeConfig,
 	capturedPayload,
 	triggerLabel,
 	onConnectionsChange,
@@ -241,6 +243,33 @@ function ConfigField({
 
 	const label = fieldSchema.label || fieldName;
 	const resolved = value === undefined ? fieldSchema.default : value;
+
+	if (
+		fieldSchema.type === 'dynamic_select' &&
+		fieldSchema.options_source === 'ai_models'
+	) {
+		const connectionField = fieldSchema.connection_field || 'connection_id';
+		const connectionId = Number(nodeConfig[connectionField] || 0);
+
+		return (
+			<AiModelField
+				label={label}
+				value={
+					resolved === undefined || resolved === null
+						? ''
+						: String(resolved)
+				}
+				defaultValue={
+					fieldSchema.default === undefined || fieldSchema.default === null
+						? ''
+						: String(fieldSchema.default)
+				}
+				connectionId={connectionId}
+				nodeTypeSlug={nodeTypeSlug}
+				onChange={onChange}
+			/>
+		);
+	}
 
 	if (fieldSchema.type === 'boolean') {
 		return (
@@ -302,6 +331,150 @@ function ConfigField({
 			}
 			required={Boolean(fieldSchema.required)}
 			onChange={onChange}
+		/>
+	);
+}
+
+/**
+ * Model picker loaded from the provider API for the selected connection.
+ *
+ * @param {Object}   props
+ * @param {string}   props.label
+ * @param {string}   props.value
+ * @param {string}   props.defaultValue
+ * @param {number}   props.connectionId
+ * @param {string}   props.nodeTypeSlug
+ * @param {Function} props.onChange
+ */
+function AiModelField({
+	label,
+	value,
+	defaultValue,
+	connectionId,
+	nodeTypeSlug,
+	onChange,
+}) {
+	const [options, setOptions] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState('');
+
+	useEffect(() => {
+		if (!connectionId || connectionId <= 0) {
+			setOptions([]);
+			setError('');
+			setLoading(false);
+			return undefined;
+		}
+
+		let cancelled = false;
+
+		setLoading(true);
+		setError('');
+
+		fetchConnectionModels(connectionId, nodeTypeSlug)
+			.then((result) => {
+				if (cancelled) {
+					return;
+				}
+
+				setOptions(Array.isArray(result.options) ? result.options : []);
+				setError(result.error || '');
+			})
+			.catch((err) => {
+				if (cancelled) {
+					return;
+				}
+
+				setOptions([]);
+				setError(
+					err && err.message
+						? err.message
+						: __('Could not load models.', 'workflow-automate')
+				);
+			})
+			.finally(() => {
+				if (!cancelled) {
+					setLoading(false);
+				}
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [connectionId, nodeTypeSlug]);
+
+	if (!connectionId || connectionId <= 0) {
+		return (
+			<TextControl
+				label={label}
+				value={value || defaultValue}
+				onChange={onChange}
+				help={__(
+					'Select a connection above to load available models from the API.',
+					'workflow-automate'
+				)}
+			/>
+		);
+	}
+
+	if (loading) {
+		return (
+			<SelectControl
+				label={label}
+				value={value || defaultValue}
+				options={[
+					{
+						value: value || defaultValue || '',
+						label: __('Loading models…', 'workflow-automate'),
+					},
+				]}
+				disabled
+				onChange={onChange}
+			/>
+		);
+	}
+
+	if (options.length === 0) {
+		return (
+			<TextControl
+				label={label}
+				value={value || defaultValue}
+				onChange={onChange}
+				help={
+					error ||
+					__(
+						'No models returned. Enter a model id manually.',
+						'workflow-automate'
+					)
+				}
+			/>
+		);
+	}
+
+	const selectOptions = options.map((option) => ({
+		value: option.value,
+		label: option.label,
+	}));
+
+	const currentValue = value || defaultValue;
+	const hasCurrent = selectOptions.some(
+		(option) => option.value === currentValue
+	);
+
+	if (currentValue && !hasCurrent) {
+		selectOptions.unshift({
+			value: currentValue,
+			label: currentValue,
+		});
+	}
+
+	return (
+		<SelectControl
+			label={label}
+			value={currentValue}
+			options={selectOptions}
+			onChange={onChange}
+			help={error || undefined}
 		/>
 	);
 }

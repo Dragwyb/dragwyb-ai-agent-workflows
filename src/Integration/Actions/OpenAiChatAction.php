@@ -32,7 +32,7 @@ class OpenAiChatAction implements ActionInterface {
 
 	private const API_URL = 'https://api.openai.com/v1/chat/completions';
 
-	private const DEFAULT_MODEL = 'gpt-4o-mini';
+	private const DEFAULT_MODEL = 'gpt-5';
 
 	private const TIMEOUT_SECONDS = 60;
 
@@ -75,9 +75,11 @@ class OpenAiChatAction implements ActionInterface {
 				'default' => 0,
 			),
 			'model' => array(
-				'type' => 'string',
+				'type' => 'dynamic_select',
 				'label' => __( 'Model', 'workflow-automate' ),
 				'default' => self::DEFAULT_MODEL,
+				'options_source' => 'ai_models',
+				'connection_field' => 'connection_id',
 			),
 			'system_prompt' => array(
 				'type' => 'string',
