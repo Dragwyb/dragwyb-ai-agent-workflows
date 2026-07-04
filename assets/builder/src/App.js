@@ -290,7 +290,7 @@ export default function App() {
 		focusNodeIdRef.current = newNode.id;
 
 		setGraph((current) => {
-			const position = defaultNodePosition(current.nodes.length);
+			const position = defaultNodePosition(current.nodes);
 			return {
 				...current,
 				nodes: [

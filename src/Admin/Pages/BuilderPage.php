@@ -91,6 +91,13 @@ class BuilderPage implements AdminPage {
 
 		$asset = require $asset_file;
 
+		wp_enqueue_style(
+			'wfa-builder-font',
+			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
+			array(),
+			null
+		);
+
 		wp_enqueue_script(
 			'wfa-builder',
 			WFA_PLUGIN_URL . 'assets/builder/build/index.js',
@@ -106,7 +113,7 @@ class BuilderPage implements AdminPage {
 			wp_enqueue_style(
 				'wfa-builder',
 				WFA_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components' ),
+				array( 'wp-components', 'wfa-builder-font' ),
 				$asset['version']
 			);
 			wp_style_add_data( 'wfa-builder', 'rtl', 'replace' );
@@ -154,7 +161,7 @@ class BuilderPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
 		}
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap wfa-admin-page wfa-builder-page">';
 		echo '<div id="wfa-builder-root"></div>';
 		echo '</div>';
 	}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	Button,
 	SelectControl,
@@ -6,9 +6,106 @@ import {
 	TextareaControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { createConnection } from '../api';
+
+/**
+ * Per-integration defaults for the inline connection form so switching
+ * nodes does not leak labels or auth types (e.g. Gemini → Telegram).
+ *
+ * @type {Record<string, {authType?: string, secretLabel?: string, secretFieldName?: string, hideAuthTypeSelect?: boolean}>}
+ */
+const INTEGRATION_CONNECTION_SETTINGS = {
+	telegram_send_message_action: {
+		authType: 'api_key',
+		secretLabel: __('Bot token', 'workflow-automate'),
+		secretFieldName: 'api_key',
+		hideAuthTypeSelect: true,
+	},
+	openai_chat_action: {
+		authType: 'api_key',
+		secretLabel: __('OpenAI API key', 'workflow-automate'),
+	},
+	claude_messages_action: {
+		authType: 'api_key',
+		secretLabel: __('Anthropic API key', 'workflow-automate'),
+	},
+	gemini_generate_content_action: {
+		authType: 'api_key',
+		secretLabel: __('Google AI API key', 'workflow-automate'),
+	},
+	whatsapp_cloud_send_message_action: {
+		authType: 'bearer_token',
+		secretLabel: __('Access token', 'workflow-automate'),
+	},
+};
+
+/**
+ * Acceptable `integration_slug` values on saved connections for each node type.
+ * Connections created from the admin Connections screen often use short names
+ * (e.g. `gemini`) instead of the full node type slug.
+ *
+ * @type {Record<string, string[]>}
+ */
+const INTEGRATION_SLUG_ALIASES = {
+	gemini_generate_content_action: [
+		'gemini',
+		'google_gemini',
+		'google_gemini_api',
+		'google_ai',
+	],
+	openai_chat_action: ['openai', 'open_ai'],
+	claude_messages_action: ['claude', 'anthropic'],
+	telegram_send_message_action: ['telegram'],
+	whatsapp_cloud_send_message_action: ['whatsapp', 'whatsapp_cloud'],
+	google_sheets_append_row_action: [
+		'google_sheets',
+		'google_sheets_api',
+		'sheets',
+	],
+};
+
+/**
+ * @param {Object} connection
+ * @param {string} nodeTypeSlug
+ * @return {boolean}
+ */
+function connectionMatchesNodeType(connection, nodeTypeSlug) {
+	const slug = connection.integration_slug || '';
+
+	if (slug === nodeTypeSlug) {
+		return true;
+	}
+
+	const aliases = INTEGRATION_SLUG_ALIASES[nodeTypeSlug] || [];
+
+	return aliases.includes(slug);
+}
+
+/**
+ * @param {Array<Object>} connections
+ * @param {string}      nodeTypeSlug
+ * @param {number}      selectedId
+ * @return {Array<Object>}
+ */
+function filterMatchingConnections(connections, nodeTypeSlug, selectedId) {
+	const list = (connections || []).filter((connection) =>
+		connectionMatchesNodeType(connection, nodeTypeSlug)
+	);
+
+	if (selectedId > 0 && !list.some((connection) => connection.id === selectedId)) {
+		const selected = (connections || []).find(
+			(connection) => connection.id === selectedId
+		);
+
+		if (selected) {
+			return [selected, ...list];
+		}
+	}
+
+	return list;
+}
 
 /**
  * Right-hand panel for the currently selected node.
@@ -82,7 +179,7 @@ export default function ConfigPanel({
 			{nodeType &&
 				Object.keys(nodeType.config_schema || {}).map((fieldName) => (
 					<ConfigField
-						key={fieldName}
+						key={`${node.id}-${fieldName}`}
 						fieldName={fieldName}
 						fieldSchema={nodeType.config_schema[fieldName]}
 						value={node.config ? node.config[fieldName] : undefined}
@@ -186,39 +283,81 @@ function ConnectionField({
 	onConnectionsChange,
 	onChange,
 }) {
+	const integrationSettings =
+		INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] || {};
+	const defaultAuthType = integrationSettings.authType || 'api_key';
+
 	const selectedId = Number(value || 0);
 	const needsConnection = required && selectedId <= 0;
 
-	const [showAddForm, setShowAddForm] = useState(needsConnection);
+	const matchingConnections = useMemo(
+		() => filterMatchingConnections(connections, nodeTypeSlug, selectedId),
+		[connections, nodeTypeSlug, selectedId]
+	);
+
+	const [showAddForm, setShowAddForm] = useState(
+		needsConnection && matchingConnections.length === 0
+	);
 	const [connectionLabel, setConnectionLabel] = useState(
 		nodeTypeLabel
 			? `${nodeTypeLabel}`
 			: __('New connection', 'workflow-automate')
 	);
-	const [authType, setAuthType] = useState('api_key');
+	const [authType, setAuthType] = useState(defaultAuthType);
 	const [secret, setSecret] = useState('');
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState('');
 
 	useEffect(() => {
-		if (needsConnection) {
-			setShowAddForm(true);
+		setConnectionLabel(
+			nodeTypeLabel
+				? `${nodeTypeLabel}`
+				: __('New connection', 'workflow-automate')
+		);
+		setAuthType(defaultAuthType);
+		setSecret('');
+		setError('');
+
+		if (selectedId > 0) {
+			setShowAddForm(false);
+			return;
 		}
-	}, [needsConnection]);
+
+		setShowAddForm(needsConnection && matchingConnections.length === 0);
+	}, [
+		nodeTypeSlug,
+		nodeTypeLabel,
+		defaultAuthType,
+		needsConnection,
+		selectedId,
+		matchingConnections.length,
+	]);
+
+	// Auto-select when exactly one saved connection matches this node type.
+	useEffect(() => {
+		if (!required || selectedId > 0 || matchingConnections.length !== 1) {
+			return;
+		}
+
+		onChange(matchingConnections[0].id);
+	}, [required, selectedId, matchingConnections, onChange]);
 
 	const options = [
 		{ value: '0', label: __('None', 'workflow-automate') },
-		...connections.map((connection) => ({
+		...matchingConnections.map((connection) => ({
 			value: String(connection.id),
 			label: `${connection.label} (${connection.auth_type_label})`,
 		})),
 	];
 
-	const secretFieldName = authType === 'bearer_token' ? 'token' : 'api_key';
+	const secretFieldName =
+		integrationSettings.secretFieldName ||
+		(authType === 'bearer_token' ? 'token' : 'api_key');
 	const secretFieldLabel =
-		authType === 'bearer_token'
+		integrationSettings.secretLabel ||
+		(authType === 'bearer_token'
 			? __('Bearer token / access token', 'workflow-automate')
-			: __('API key', 'workflow-automate');
+			: __('API key', 'workflow-automate'));
 
 	const handleSaveConnection = async () => {
 		const trimmedSecret = secret.trim();
@@ -278,7 +417,14 @@ function ConnectionField({
 				label={label}
 				value={String(selectedId)}
 				options={options}
-				onChange={(nextValue) => onChange(Number(nextValue))}
+				onChange={(nextValue) => {
+					const id = Number(nextValue);
+					onChange(id);
+
+					if (id > 0) {
+						setShowAddForm(false);
+					}
+				}}
 				help={
 					needsConnection
 						? __(
@@ -289,44 +435,75 @@ function ConnectionField({
 				}
 			/>
 
-			{!showAddForm && (
+			{!showAddForm && selectedId <= 0 && (
 				<Button
 					variant="secondary"
 					className="wfa-builder-config__add-connection"
-					onClick={() => setShowAddForm(true)}
+					onClick={() => {
+						setSecret('');
+						setError('');
+						setAuthType(defaultAuthType);
+						setShowAddForm(true);
+					}}
 				>
 					{__('+ Add API key here', 'workflow-automate')}
+				</Button>
+			)}
+
+			{!showAddForm && selectedId > 0 && (
+				<Button
+					variant="link"
+					className="wfa-builder-config__add-connection"
+					onClick={() => {
+						setSecret('');
+						setError('');
+						setAuthType(defaultAuthType);
+						setShowAddForm(true);
+					}}
+				>
+					{__('Use a different API key', 'workflow-automate')}
 				</Button>
 			)}
 
 			{showAddForm && (
 				<div className="wfa-builder-config__connection-form">
 					<p className="wfa-builder-config__connection-form-title">
-						{__(
-							'Add credentials for this node',
-							'workflow-automate'
-						)}
+						{nodeTypeLabel
+							? sprintf(
+								/* translators: %s: integration label */
+								__(
+									'Credentials for %s',
+									'workflow-automate'
+								),
+								nodeTypeLabel
+							)
+							: __(
+								'Add credentials for this node',
+								'workflow-automate'
+							)}
 					</p>
 					<TextControl
 						label={__('Connection name', 'workflow-automate')}
 						value={connectionLabel}
 						onChange={setConnectionLabel}
 					/>
-					<SelectControl
-						label={__('Auth type', 'workflow-automate')}
-						value={authType}
-						options={[
-							{
-								value: 'api_key',
-								label: __('API Key', 'workflow-automate'),
-							},
-							{
-								value: 'bearer_token',
-								label: __('Bearer Token', 'workflow-automate'),
-							},
-						]}
-						onChange={setAuthType}
-					/>
+					{!integrationSettings.hideAuthTypeSelect && (
+						<SelectControl
+							label={__('Auth type', 'workflow-automate')}
+							value={authType}
+							options={[
+								{
+									value: 'api_key',
+									label: __('API Key', 'workflow-automate'),
+								},
+								{
+									value: 'bearer_token',
+									label: __('Bearer Token', 'workflow-automate'),
+								},
+							]}
+							onChange={setAuthType}
+						/>
+					)}
 					<TextControl
 						label={secretFieldLabel}
 						type="password"

@@ -1,12 +1,15 @@
 import { __ } from '@wordpress/i18n';
 
 import NodeCard from './NodeCard';
+import {
+	NODE_WIDTH,
+	NODE_HEIGHT,
+	sortNodesForFlow,
+} from '../utils';
 
 /**
- * Renders the graph's nodes as absolutely-positioned cards. Connection
- * drawing between nodes is intentionally out of scope for this shell (see
- * roadmap item 6 notes) — `graph.connections` is preserved untouched so
- * adding that interaction later doesn't require a data migration.
+ * Renders the graph's nodes as absolutely-positioned cards with SVG
+ * connectors between them in visual flow order.
  *
  * @param {Object}   props
  * @param {Array}    props.nodes
@@ -26,6 +29,8 @@ export default function Canvas({
 	onCanvasClick,
 	registerNodeRef,
 }) {
+	const flowNodes = sortNodesForFlow(nodes);
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- deselect-on-background-click is a supplementary mouse affordance; keyboard users deselect via Escape or the config panel's close control.
 		<div
@@ -34,6 +39,40 @@ export default function Canvas({
 			aria-label={__('Workflow canvas', 'workflow-automate')}
 			onClick={onCanvasClick}
 		>
+			{nodes.length > 1 && (
+				<svg
+					className="wfa-builder-canvas__edges"
+					aria-hidden="true"
+					focusable="false"
+				>
+					{flowNodes.slice(0, -1).map((node, index) => {
+						const next = flowNodes[index + 1];
+						const x1 = node.x + NODE_WIDTH / 2;
+						const y1 = node.y + NODE_HEIGHT;
+						const x2 = next.x + NODE_WIDTH / 2;
+						const y2 = next.y;
+						const midY = y1 + (y2 - y1) / 2;
+						const path = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+						const isSelected =
+							node.id === selectedNodeId ||
+							next.id === selectedNodeId;
+
+						return (
+							<path
+								key={`${node.id}-${next.id}`}
+								className={
+									isSelected
+										? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--selected'
+										: 'wfa-builder-canvas__edge'
+								}
+								d={path}
+								fill="none"
+							/>
+						);
+					})}
+				</svg>
+			)}
+
 			{nodes.length === 0 && <EmptyCanvasGuide />}
 			{nodes.map((node) => (
 				<NodeCard
