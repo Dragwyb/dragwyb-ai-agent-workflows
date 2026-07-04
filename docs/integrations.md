@@ -42,6 +42,29 @@ If a future increment adds a *direct* API-based email provider integration (bypa
 
 **Config fields:** `to` (required, comma-separated), `subject` (required), `message` (required), `headers` (optional, e.g. `From`/`Reply-To`/`Content-Type`).
 
+## Inbound Webhooks (not a node type)
+
+**What it is:** A public `POST` endpoint (`/wp-json/wfa/v1/webhooks/{public_id}`) that starts a linked workflow when an external service calls it. Webhooks are managed under the admin **Webhooks** menu (not as a builder node type): each row in `wfa_webhooks` has an unguessable UUID `public_id`, an optional HMAC signing secret, an optional IP allow-list, and a `workflow_id`.
+
+**Credentials / secrets:**
+
+| Secret | Storage | Use |
+| --- | --- | --- |
+| Signing secret | Encrypted at rest via `Core\Encryption` (same key material as connections) in `wfa_webhooks.signing_secret` | Callers must send `X-WFA-Signature: sha256=<hex>` where `<hex>` is `hash_hmac('sha256', <raw body>, <secret>)`. Verified with `hash_equals()`. |
+| IP allow-list | Plaintext JSON array of IPv4/IPv6 addresses and/or IPv4 CIDRs | Request `REMOTE_ADDR` must match an entry (or the list is empty = any IP). Deliberately does **not** trust `X-Forwarded-For`. |
+
+Site Settings → Advanced can require a signing secret on *every* webhook (`require_webhook_signing`). When that is on, ingress rejects webhooks that have no secret, and the admin forms refuse to save without one.
+
+On success the plugin queues the workflow (default) or runs it synchronously (when background execution is disabled), with trigger payload:
+
+```json
+{ "source": "webhook", "client_ip": "…", "body": { /* parsed JSON, or { "raw": "…" } */ } }
+```
+
+Only **active** workflows run; draft/paused/missing/unlinked webhooks return `409`. Unknown `public_id` returns `404`. Bad signature returns `401`. IP denied returns `403`.
+
+See `docs/rest-api.md` for the exact response shape.
+
 ---
 
 ## Connections picker — `wfa/v1/connections`

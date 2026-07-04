@@ -51,14 +51,14 @@ class SettingsService {
 	 * Every stored setting, merged with defaults for any key never saved
 	 * (a fresh install, or one that predates a later setting being added).
 	 *
-	 * @return array{on_node_failure: string, display_timestamps_in_utc: bool, retention_days: int, background_execution_enabled: bool}
+	 * @return array{on_node_failure: string, display_timestamps_in_utc: bool, retention_days: int, background_execution_enabled: bool, require_webhook_signing: bool}
 	 */
 	public function all(): array {
 		return array_merge( $this->defaults(), (array) Options::get( self::OPTION_NAME, array() ) );
 	}
 
 	/**
-	 * @return array{on_node_failure: string, display_timestamps_in_utc: bool, retention_days: int, background_execution_enabled: bool}
+	 * @return array{on_node_failure: string, display_timestamps_in_utc: bool, retention_days: int, background_execution_enabled: bool, require_webhook_signing: bool}
 	 */
 	private function defaults(): array {
 		return array(
@@ -66,6 +66,7 @@ class SettingsService {
 			'display_timestamps_in_utc' => false,
 			'retention_days' => self::DEFAULT_RETENTION_DAYS,
 			'background_execution_enabled' => true,
+			'require_webhook_signing' => false,
 		);
 	}
 
@@ -115,6 +116,19 @@ class SettingsService {
 	}
 
 	/**
+	 * Whether every inbound webhook must have a signing secret configured
+	 * (roadmap item 13). When true, ingress rejects webhooks that have no
+	 * secret, and the admin create/edit forms refuse to save without one.
+	 * Default false — signing remains optional per-webhook unless an
+	 * operator turns this on.
+	 *
+	 * @return bool
+	 */
+	public function requireWebhookSigning(): bool {
+		return (bool) $this->all()['require_webhook_signing'];
+	}
+
+	/**
 	 * Whether Uninstaller::uninstall() should remove all plugin data. This
 	 * reads the same standalone option Uninstaller itself checks directly
 	 * — surfaced here too so the admin screen has one place to read
@@ -160,6 +174,18 @@ class SettingsService {
 	public function updateBackgroundExecutionEnabled( bool $background_execution_enabled ): void {
 		$current = $this->all();
 		$current['background_execution_enabled'] = $background_execution_enabled;
+
+		Options::update( self::OPTION_NAME, $current );
+	}
+
+	/**
+	 * @param bool $require_webhook_signing New value.
+	 *
+	 * @return void
+	 */
+	public function updateRequireWebhookSigning( bool $require_webhook_signing ): void {
+		$current = $this->all();
+		$current['require_webhook_signing'] = $require_webhook_signing;
 
 		Options::update( self::OPTION_NAME, $current );
 	}

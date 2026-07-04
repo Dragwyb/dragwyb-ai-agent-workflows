@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 use WorkflowAutomate\Plugin\Core\Container;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
@@ -62,5 +63,8 @@ class RestApi {
 
 		$connections_controller = new ConnectionsController( $this->container->get( ConnectionService::class ) );
 		$connections_controller->register_routes();
+
+		$webhook_ingress_controller = new WebhookIngressController( $this->container->get( WebhookService::class ) );
+		$webhook_ingress_controller->register_routes();
 	}
 }

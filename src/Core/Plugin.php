@@ -17,15 +17,19 @@ use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
 use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
 use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
+use WorkflowAutomate\Plugin\Admin\Pages\WebhookFormPage;
+use WorkflowAutomate\Plugin\Admin\Pages\WebhooksPage;
 use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
 use WorkflowAutomate\Plugin\Admin\RunActionsController;
 use WorkflowAutomate\Plugin\Admin\SettingsController;
+use WorkflowAutomate\Plugin\Admin\WebhookActionsController;
 use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
 use WorkflowAutomate\Plugin\Database\MigrationRunner;
 use WorkflowAutomate\Plugin\Database\SchemaMigrations;
 use WorkflowAutomate\Plugin\Integration\BuiltInNodeTypes;
 use WorkflowAutomate\Plugin\Integration\WorkflowTriggerBinder;
 use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
+use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
@@ -37,6 +41,7 @@ use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
+use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
@@ -207,13 +212,21 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			WebhookRepository::class,
+			static function (): WebhookRepository {
+				return new WebhookRepository();
+			}
+		);
+
+		$this->container->singleton(
 			WorkflowService::class,
 			static function ( Container $container ): WorkflowService {
 				return new WorkflowService(
 					$container->get( WorkflowRepository::class ),
 					$container->get( WorkflowNodeRepository::class ),
 					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class )
+					$container->get( WorkflowRunLogRepository::class ),
+					$container->get( WebhookRepository::class )
 				);
 			}
 		);
@@ -278,6 +291,18 @@ class Plugin {
 			ConnectionService::class,
 			static function ( Container $container ): ConnectionService {
 				return new ConnectionService( $container->get( ConnectionRepository::class ) );
+			}
+		);
+
+		$this->container->singleton(
+			WebhookService::class,
+			static function ( Container $container ): WebhookService {
+				return new WebhookService(
+					$container->get( WebhookRepository::class ),
+					$container->get( WorkflowService::class ),
+					$container->get( WorkflowExecutionService::class ),
+					$container->get( SettingsService::class )
+				);
 			}
 		);
 	}
@@ -419,10 +444,11 @@ class Plugin {
 	 *
 	 * Page order matters here: Menu::registerMenu() treats the first entry
 	 * as the top-level menu item, so WorkflowsPage must stay first. RunsPage,
-	 * SettingsPage, and ConnectionsPage — the other menu-visible pages (see
-	 * RunDetailPage::showInMenu()) — are added right after it, in the order
-	 * they were introduced by the roadmap. The hidden pages (BuilderPage,
-	 * RunDetailPage, ConnectionFormPage) can go anywhere after that.
+	 * SettingsPage, ConnectionsPage, and WebhooksPage — the other
+	 * menu-visible pages (see RunDetailPage::showInMenu()) — are added
+	 * right after it, in the order they were introduced by the roadmap.
+	 * The hidden pages (BuilderPage, RunDetailPage, ConnectionFormPage,
+	 * WebhookFormPage) can go anywhere after that.
 	 *
 	 * @return void
 	 */
@@ -434,6 +460,7 @@ class Plugin {
 		$settings = $this->container->get( SettingsService::class );
 		$retention = $this->container->get( RunRetentionService::class );
 		$connections = $this->container->get( ConnectionService::class );
+		$webhooks = $this->container->get( WebhookService::class );
 
 		$workflows_page = new WorkflowsPage( $workflows, $settings );
 		$runs_page = new RunsPage( $runs, $workflow_repository, $settings );
@@ -442,11 +469,26 @@ class Plugin {
 		$settings_page = new SettingsPage( $settings );
 		$connections_page = new ConnectionsPage( $connections, $settings );
 		$connection_form_page = new ConnectionFormPage( $connections );
+		$webhooks_page = new WebhooksPage( $webhooks, $workflows, $settings );
+		$webhook_form_page = new WebhookFormPage( $webhooks, $workflows, $settings );
 
-		( new Menu( array( $workflows_page, $runs_page, $settings_page, $connections_page, $builder_page, $run_detail_page, $connection_form_page ) ) )->register();
+		( new Menu(
+			array(
+				$workflows_page,
+				$runs_page,
+				$settings_page,
+				$connections_page,
+				$webhooks_page,
+				$builder_page,
+				$run_detail_page,
+				$connection_form_page,
+				$webhook_form_page,
+			)
+		) )->register();
 		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
 		( new RunActionsController( $executor ) )->register();
 		( new SettingsController( $settings, $retention ) )->register();
 		( new ConnectionActionsController( $connections ) )->register();
+		( new WebhookActionsController( $webhooks ) )->register();
 	}
 }

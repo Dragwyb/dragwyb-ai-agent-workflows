@@ -216,11 +216,13 @@ Indexes: `KEY (run_id)`.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | BIGINT UNSIGNED PK | |
-| `workflow_id` | BIGINT UNSIGNED NULL | FK set null |
+| `workflow_id` | BIGINT UNSIGNED NULL | FK set null (application-level on hard-delete) |
 | `public_id` | CHAR(36) UNIQUE | UUID used in the public URL |
-| `signing_secret` | VARCHAR(191) NULL | HMAC secret for optional signature verification |
-| `ip_allow_list_json` | TEXT NULL | |
+| `signing_secret` | TEXT | Encrypted HMAC secret, or `''` when unsigned |
+| `ip_allow_list_json` | TEXT | JSON array of IPs/CIDRs; `[]` = any IP |
 | `created_at` | DATETIME | |
+
+> **Implementation note (roadmap item 13 — inbound webhooks):** Shipped as designed above, with one column-type correction: `signing_secret` is `TEXT` rather than `VARCHAR(191)` because field-level AES ciphertext from `Core\Encryption` (same primitive as connections) does not fit reliably in 191 characters. Empty string means "no signing configured," not a SQL NULL, so admin forms and ingress can treat "configured?" as a simple non-empty check. `WebhookService` owns CRUD + ingress validation (IP allow-list, HMAC via `X-WFA-Signature: sha256=…`, site-wide `require_webhook_signing` setting). Public ingress is `POST /wfa/v1/webhooks/{public_id}` (`Rest\WebhookIngressController`, `permission_callback` = `__return_true` — the only public route). Admin UI is a top-level Webhooks menu page + hidden form page, same pattern as Connections. Hard-deleting a workflow nulls `workflow_id` on linked webhooks rather than deleting them, so a public URL is never silently recycled.
 
 ### `wfa_tags` / `wfa_workflow_tag`
 
@@ -279,7 +281,7 @@ All settings are sanitized on save (`sanitize_text_field`, `absint`, allow-lists
 > - **General:** on-node-failure behavior (`SettingsService::shouldContinueOnFailure()`) now genuinely gates `WorkflowExecutionService::executeNodes()`'s fail-fast loop — closing the exact gap item 7's own docblock flagged ("sensible default until a … setting … exists to make it configurable"). "Timezone display" shipped as a UTC-vs-site-timezone toggle for every plugin-rendered timestamp (`RunTimestamp::format()`, used by `RunsListTable`, `RunDetailPage`, and `WorkflowsListTable`), not just run history — "General" implied plugin-wide scope, not screen-specific.
 > - **Logging/Retention:** `retention_days` (default 14, 0 meaning "keep forever") is enforced by a new daily WP-Cron job (`RunRetentionService::CRON_HOOK`, scheduled like `BackgroundRunner`'s own queue but on WordPress's built-in `daily` schedule rather than a custom one), plus an on-demand "Purge now" button calling the exact same method. Deleting is scoped to *finished* runs only (`WorkflowRunRepository::idsFinishedBefore()`), never `queued`/`running` ones, and capped at `MAX_PRUNE_BATCH` (5000) rows per pass for the same reason `BackgroundRunner::BATCH_SIZE` is capped — a large backlog is caught up over several daily ticks, not one unbounded query.
 > - **Security/API Keys:** not built as a Settings tab, even after roadmap item 11 (Connections) shipped — see that item's own note below for why.
-> - **Advanced:** background-execution toggle (`SettingsService::backgroundExecutionEnabled()`) closes item 8's own explicitly-deferred gap — `WorkflowTriggerBinder` now calls `WorkflowExecutionService::run()` instead of `queue()` when disabled. The uninstall opt-in data-removal setting (`remove_data_on_uninstall`, added in item 1 but never exposed in a UI until now) got its own "danger zone"-styled sub-section here rather than a fourth tab, since it is a single checkbox, not a group of related settings. "Webhook signing requirement toggle" was **not** built, for the same "nothing to gate yet" reason as Security/API Keys — webhooks ship in item 13.
+> - **Advanced:** background-execution toggle (`SettingsService::backgroundExecutionEnabled()`) closes item 8's own explicitly-deferred gap — `WorkflowTriggerBinder` now calls `WorkflowExecutionService::run()` instead of `queue()` when disabled. The uninstall opt-in data-removal setting (`remove_data_on_uninstall`, added in item 1 but never exposed in a UI until now) got its own "danger zone"-styled sub-section here rather than a fourth tab, since it is a single checkbox, not a group of related settings. "Webhook signing requirement toggle" (`require_webhook_signing`) shipped with roadmap item 13 — see that item's implementation note under §2.3.
 > - The "notification email" key the Options section above once anticipated as part of `global_settings` was not built either: neither this section's own bullets nor roadmap item 10's stated scope name it, and adding real outbound-email-on-failure logic would be a distinct notifications feature, not a "settings screen." Left as a documented future addition rather than a half-built inert field.
 
 > **Implementation note (roadmap item 11 — connections + credential encryption):** The "Security/API Keys: connection management entry point" bullet above is resolved by `ConnectionsPage` itself, not by a fourth Settings tab. `ConnectionsPage` is a full top-level entry in the plugin's own admin menu (`Core\Plugin::registerAdmin()`), reachable exactly like Workflows/Runs/Settings — so a Settings tab whose only content is a link to that same page would be a second, redundant door to one screen, not a distinct group of settings. This is a straightforward reconciliation between this section's original assumption (written before the final admin menu shape existed) and how the menu actually turned out, the same kind of implementation-driven correction items 5, 6, and 10 already made to this document.
@@ -311,7 +313,7 @@ Documented in full in `/docs/hooks-reference.md` once implemented; planned exten
 - REST controllers with explicit schemas/permissions (opportunity #3).
 - Indexed run/log tables from the first migration (opportunity #6).
 - Custom capabilities planned for workflow management, layered on top of `manage_options` fallback (opportunity #7) — introduced once the roles/permissions roadmap item is reached.
-- Webhook signing secret + IP allow-list columns designed in from the start (opportunity #9), even if enforcement ships incrementally.
+- Webhook signing secret + IP allow-list columns designed in from the start (opportunity #9) — enforced in roadmap item 13 (`WebhookService::ingest()`): optional per-webhook HMAC (`X-WFA-Signature`), optional IP allow-list (exact IP + IPv4 CIDR, `REMOTE_ADDR` only), plus a site-wide `require_webhook_signing` Advanced setting.
 - Uninstall data removal is opt-in via a settings checkbox, never silent (opportunity #11).
 
 ---

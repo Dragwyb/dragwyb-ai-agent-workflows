@@ -124,11 +124,14 @@ class SettingsController {
 	 * @return void
 	 */
 	private function handleAdvanced(): void {
-		// The hidden fallback input in SettingsPage::renderAdvancedTab() guarantees this key is always present, checked or not.
+		// The hidden fallback inputs in SettingsPage::renderAdvancedTab() guarantee these keys are always present, checked or not.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in handle().
 		$background_execution_enabled = ! empty( $_POST['background_execution_enabled'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in handle().
+		$require_webhook_signing = ! empty( $_POST['require_webhook_signing'] );
 
 		$this->settings->updateBackgroundExecutionEnabled( $background_execution_enabled );
+		$this->settings->updateRequireWebhookSigning( $require_webhook_signing );
 
 		$this->redirect( 'advanced', 'saved' );
 	}

@@ -50,14 +50,14 @@ src/
   autoload.php           Fallback PSR-4 autoloader (see "Local setup" above)
   Core/                  Bootstrap: Plugin, Container, Requirements, Activator, Deactivator, Uninstaller, Options, Encryption
   Database/              Migration base class/runner, table-name helper, migrations (dbDelta-based schema)
-  Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode, WorkflowRun, WorkflowRunLog, Connection)
+  Domain/                Plain, persistence-agnostic entities (Workflow, WorkflowNode, WorkflowRun, WorkflowRunLog, Connection, Webhook)
   Domain/Contracts/      Public extension interfaces (TriggerInterface, ActionInterface)
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
-  Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry, NodeExecutionService, WorkflowExecutionService, BackgroundRunner, SettingsService, RunRetentionService, ConnectionAuthTypes, ConnectionService)
+  Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry, NodeExecutionService, WorkflowExecutionService, BackgroundRunner, SettingsService, RunRetentionService, ConnectionAuthTypes, ConnectionService, WebhookService)
   Integration/           Built-in trigger/action node types (Triggers/, Actions/: WpHookTrigger, HttpRequestAction, SendEmailAction), registered via wfa/nodes/register (BuiltInNodeTypes); WorkflowTriggerBinder binds active workflows' triggers to WorkflowExecutionService::queue()/run() (per SettingsService::backgroundExecutionEnabled()) on init
-  Rest/                  WP_REST_Controller subclass (WorkflowsController) plus plain read-only route classes (NodeTypesController, ConnectionsController) + rest_api_init bootstrap (wfa/v1 namespace)
-  Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers (WorkflowActionsController, RunActionsController, SettingsController, ConnectionActionsController), status badge/duration/timestamp display helpers (RunStatusBadge, RunDuration, RunTimestamp, ConnectionStatusBadge)
-  Admin/Pages/           WorkflowsPage (list), BuilderPage (visual editor shell), RunsPage (execution history list), RunDetailPage (single run + node log), SettingsPage (General/Retention/Advanced tabs), ConnectionsPage (list), ConnectionFormPage (create/edit)
+  Rest/                  WP_REST_Controller subclass (WorkflowsController) plus plain route classes (NodeTypesController, ConnectionsController, public WebhookIngressController) + rest_api_init bootstrap (wfa/v1 namespace)
+  Admin/                 Admin menu bootstrap, AdminPage contract, screens, list tables, admin-post handlers (WorkflowActionsController, RunActionsController, SettingsController, ConnectionActionsController, WebhookActionsController), status badge/duration/timestamp display helpers (RunStatusBadge, RunDuration, RunTimestamp, ConnectionStatusBadge)
+  Admin/Pages/           WorkflowsPage (list), BuilderPage (visual editor shell), RunsPage (execution history list), RunDetailPage (single run + node log), SettingsPage (General/Retention/Advanced tabs), ConnectionsPage (list), ConnectionFormPage (create/edit), WebhooksPage (list), WebhookFormPage (create/edit)
 assets/
   admin/css/             Admin screen CSS, enqueued only on the plugin's own screens
   builder/src/           React builder app source (built with @wordpress/scripts; see "Local setup")

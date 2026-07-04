@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Domain\WorkflowNode;
+use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
@@ -39,16 +40,20 @@ class WorkflowService {
 
 	private WorkflowRunLogRepository $runLogs;
 
+	private WebhookRepository $webhooks;
+
 	public function __construct(
 		WorkflowRepository $workflows,
 		WorkflowNodeRepository $nodes,
 		WorkflowRunRepository $runs,
-		WorkflowRunLogRepository $runLogs
+		WorkflowRunLogRepository $runLogs,
+		WebhookRepository $webhooks
 	) {
 		$this->workflows = $workflows;
 		$this->nodes = $nodes;
 		$this->runs = $runs;
 		$this->runLogs = $runLogs;
+		$this->webhooks = $webhooks;
 	}
 
 	/**
@@ -159,6 +164,11 @@ class WorkflowService {
 			$this->runLogs->deleteByRunIds( $this->runs->idsForWorkflow( $id ) );
 			$this->runs->deleteByWorkflow( $id );
 			$this->nodes->deleteByWorkflow( $id );
+			// Application-level ON DELETE SET NULL for inbound webhooks
+			// (roadmap item 13) — the webhook row stays so its public_id
+			// is not silently recycled, but ingress returns 409 until it
+			// is re-linked or deleted.
+			$this->webhooks->nullifyWorkflow( $id );
 
 			return $this->workflows->delete( $id );
 		}

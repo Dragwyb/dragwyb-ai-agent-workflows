@@ -122,3 +122,34 @@ Read-only. Lists every stored `Connection` (see `docs/internal/architecture.md` 
 ```
 
 Returns at most 100 connections (no pagination parameters yet) — see `src/Rest/ConnectionsController.php` for the rationale; this is a picker data source, not the admin list table (which does paginate, at 20 per page, via its own non-REST `WP_List_Table` screen).
+
+## Inbound webhooks — `wfa/v1/webhooks/{public_id}`
+
+### `POST /wfa/v1/webhooks/{public_id}`
+
+**Public.** No WordPress authentication, cookie, or nonce is required — callers are external services. Security is the unguessable `public_id` UUID, plus optional per-webhook HMAC signing and IP allow-list (see `docs/integrations.md`). This is the only route in the plugin whose `permission_callback` is `__return_true`.
+
+**Path parameter:** `public_id` — 36-character UUID from the Webhooks admin screen.
+
+**Headers (optional, depending on webhook config):**
+
+| Header | Value |
+| --- | --- |
+| `X-WFA-Signature` | `sha256=<hex>` where `<hex>` is `hash_hmac('sha256', <raw request body>, <signing secret>)` |
+| `Content-Type` | Prefer `application/json`; non-JSON bodies are stored as `{ "raw": "…" }` in the trigger payload |
+
+**Success responses**
+
+- `202 Accepted` when the run was queued for background execution (default):
+
+```json
+{ "run_id": 42, "status": "queued", "queued": true }
+```
+
+- `200 OK` when background execution is disabled and the run finished in-request:
+
+```json
+{ "run_id": 42, "status": "success", "queued": false }
+```
+
+**Error responses** (all `WP_Error` JSON): `404` unknown webhook, `403` IP denied or signing required but missing, `401` invalid signature, `409` workflow inactive/unlinked, `500` internal failure.

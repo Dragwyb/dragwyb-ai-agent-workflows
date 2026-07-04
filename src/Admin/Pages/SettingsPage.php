@@ -266,6 +266,7 @@ class SettingsPage implements AdminPage {
 	 */
 	private function renderAdvancedTab(): void {
 		$background_enabled = $this->settings->backgroundExecutionEnabled();
+		$require_webhook_signing = $this->settings->requireWebhookSigning();
 		$remove_data = $this->settings->removeDataOnUninstall();
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
@@ -287,6 +288,16 @@ class SettingsPage implements AdminPage {
 			esc_html__( 'Run live-triggered workflows in the background via WP-Cron', 'workflow-automate' )
 		);
 		echo '<p class="description">' . esc_html__( 'Recommended. Disabling this runs triggered workflows immediately, on the same request that fired them — only useful on hosts where WP-Cron is unreliable or disabled.', 'workflow-automate' ) . '</p>';
+		echo '</td></tr>';
+
+		echo '<tr><th scope="row">' . esc_html__( 'Webhook signing', 'workflow-automate' ) . '</th><td>';
+		echo '<input type="hidden" name="require_webhook_signing" value="0" />';
+		printf(
+			'<label><input type="checkbox" name="require_webhook_signing" value="1" %1$s /> %2$s</label>',
+			checked( true, $require_webhook_signing, false ),
+			esc_html__( 'Require a signing secret on every inbound webhook', 'workflow-automate' )
+		);
+		echo '<p class="description">' . esc_html__( 'When enabled, webhooks without a signing secret cannot be created or called. Individual webhooks can still require signing when this is off.', 'workflow-automate' ) . '</p>';
 		echo '</td></tr>';
 
 		echo '</tbody></table>';

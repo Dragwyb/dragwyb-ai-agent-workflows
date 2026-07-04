@@ -149,3 +149,27 @@
 	padding: 2px 6px;
 	border-radius: 3px;
 }
+
+/*
+ * Webhooks (roadmap item 13). Public URLs are long; keep them readable
+ * in the list table and on the edit form without blowing out the layout.
+ */
+.wfa-webhooks-table .column-created_at {
+	width: 160px;
+}
+
+.wfa-webhooks-table .column-signing,
+.wfa-webhooks-table .column-ip_allow_list {
+	width: 120px;
+}
+
+.wfa-webhook-url {
+	word-break: break-all;
+	font-size: 12px;
+}
+
+.wfa-webhook-current-value code {
+	background: #f0f0f1;
+	padding: 2px 6px;
+	border-radius: 3px;
+}
