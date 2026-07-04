@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Built-in "HTTP Request" action.
  *
