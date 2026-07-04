@@ -105,12 +105,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 			return null;
 		}
 
-		$form_name = (string) $record->get_form_settings( 'form_name' );
-		$form_id   = (string) $record->get_form_settings( 'id' );
-		$raw_fields = $record->get( 'fields' );
+		$form_name     = (string) $record->get_form_settings( 'form_name' );
+		$form_id       = (string) $record->get_form_settings( 'id' );
+		$form_post_id  = (string) $record->get_form_settings( 'form_post_id' );
+		$raw_fields    = $record->get( 'fields' );
 
-		$fields       = array();
-		$fields_by_label = array();
+		$fields = array();
 
 		if ( is_array( $raw_fields ) ) {
 			foreach ( $raw_fields as $field_id => $field ) {
@@ -130,12 +130,6 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 				if ( '' !== $id ) {
 					$fields[ $id ] = $value;
 				}
-
-				$label = isset( $field['title'] ) ? trim( (string) $field['title'] ) : '';
-
-				if ( '' !== $label ) {
-					$fields_by_label[ $label ] = $value;
-				}
 			}
 		}
 
@@ -144,8 +138,8 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 			'event' => 'form_submitted',
 			'form_name' => $form_name,
 			'form_id' => $form_id,
+			'form_post_id' => $form_post_id,
 			'fields' => $fields,
-			'fields_by_label' => $fields_by_label,
 		);
 	}
 }

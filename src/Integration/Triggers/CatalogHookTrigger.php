@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Integration\Triggers;
 
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use WorkflowAutomate\Plugin\Service\TriggerPayloadNormalizer;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -82,8 +83,9 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 
 		add_action(
 			$hook_name,
-			static function ( ...$args ) use ( $on_fire, $config ) {
-				$on_fire( $args, $config );
+			static function ( ...$args ) use ( $on_fire, $config, $hook_name ) {
+				$payload = TriggerPayloadNormalizer::normalize( $hook_name, $args );
+				$on_fire( $payload, $config );
 			},
 			$priority,
 			$accepted_args

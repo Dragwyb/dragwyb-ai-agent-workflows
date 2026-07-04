@@ -93,6 +93,8 @@ class WorkflowTriggerBinder {
 	 * @return void
 	 */
 	public function bindActiveWorkflows(): void {
+		$listening_ids = array_fill_keys( $this->test_listener->listeningWorkflowIds(), true );
+
 		$active = $this->workflows->list(
 			array(
 				'status' => Workflow::STATUS_ACTIVE,
@@ -103,14 +105,17 @@ class WorkflowTriggerBinder {
 		$bound_ids = array();
 
 		foreach ( $active['items'] as $workflow ) {
-			$this->bindWorkflow( $workflow, false );
-			$bound_ids[ $workflow->id() ] = true;
+			$workflow_id = $workflow->id();
+			$test_listen = isset( $listening_ids[ $workflow_id ] );
+			$this->bindWorkflow( $workflow, $test_listen );
+			$bound_ids[ $workflow_id ] = true;
 		}
 
-		foreach ( $this->test_listener->listeningWorkflowIds() as $workflow_id ) {
+		foreach ( array_keys( $listening_ids ) as $workflow_id ) {
 			if ( isset( $bound_ids[ $workflow_id ] ) ) {
 				continue;
 			}
+
 			$workflow = $this->workflows->find( $workflow_id );
 
 			if ( null !== $workflow ) {

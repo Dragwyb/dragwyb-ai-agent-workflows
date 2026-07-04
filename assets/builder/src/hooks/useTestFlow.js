@@ -12,19 +12,37 @@ const POLL_MS = 2000;
 const LISTEN_TIMEOUT_MS = 120000;
 
 /**
+ * @param {string|null|undefined} capturedAt
+ * @param {string|null|undefined} startedAt
+ * @return {boolean}
+ */
+function isCaptureAfterListenStart(capturedAt, startedAt) {
+	if (!capturedAt || !startedAt) {
+		return false;
+	}
+
+	return String(capturedAt) >= String(startedAt);
+}
+
+/**
  * Test flow: listen for a new trigger payload or run with saved sample data.
  *
  * @param {number} workflowId
  * @param {Object} options
  * @param {Function} options.persistBeforeTest Save title/graph before testing.
+ * @param {Function} [options.hasTrigger]      Returns true when graph has a trigger node.
  * @param {Function} [options.onSampleCaptured]
  */
-export default function useTestFlow(workflowId, { persistBeforeTest, onSampleCaptured }) {
+export default function useTestFlow(
+	workflowId,
+	{ persistBeforeTest, hasTrigger, onSampleCaptured }
+) {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [listening, setListening] = useState(false);
 	const [statusMessage, setStatusMessage] = useState('');
 	const pollRef = useRef(null);
 	const timeoutRef = useRef(null);
+	const listenStartedAtRef = useRef(null);
 
 	const clearTimers = useCallback(() => {
 		if (pollRef.current) {
@@ -46,12 +64,23 @@ export default function useTestFlow(workflowId, { persistBeforeTest, onSampleCap
 		pollRef.current = setInterval(async () => {
 			try {
 				const status = await fetchTestStatus(workflowId);
+				const startedAt = listenStartedAtRef.current;
 
-				if (!status.listening && status.has_sample) {
+				if (status.listening) {
+					return;
+				}
+
+				if (
+					status.has_sample &&
+					isCaptureAfterListenStart(status.captured_at, startedAt)
+				) {
 					clearTimers();
 					setListening(false);
 					setStatusMessage(
-						__('Sample captured. You can use existing data to test.', 'workflow-automate')
+						__(
+							'Sample captured. You can use existing data to test.',
+							'workflow-automate'
+						)
 					);
 
 					if (onSampleCaptured) {
@@ -72,6 +101,7 @@ export default function useTestFlow(workflowId, { persistBeforeTest, onSampleCap
 		timeoutRef.current = setTimeout(async () => {
 			clearTimers();
 			setListening(false);
+			listenStartedAtRef.current = null;
 
 			try {
 				await stopTestListen(workflowId);
@@ -80,10 +110,48 @@ export default function useTestFlow(workflowId, { persistBeforeTest, onSampleCap
 			}
 
 			setStatusMessage(
-				__('Listen timed out. Fire your trigger and try again.', 'workflow-automate')
+				__(
+					'Listen timed out. Fire your trigger and try again.',
+					'workflow-automate'
+				)
 			);
 		}, LISTEN_TIMEOUT_MS);
 	}, [workflowId, clearTimers, onSampleCaptured]);
+
+	const beginListening = useCallback(
+		(startedAt) => {
+			listenStartedAtRef.current = startedAt || null;
+			setListening(true);
+			setStatusMessage(
+				__('Listening for the next trigger response…', 'workflow-automate')
+			);
+			pollUntilCaptured();
+		},
+		[pollUntilCaptured]
+	);
+
+	// Resume polling when the builder reloads while a listen session is active.
+	useEffect(() => {
+		if (!workflowId) {
+			return undefined;
+		}
+
+		let cancelled = false;
+
+		fetchTestStatus(workflowId)
+			.then((status) => {
+				if (cancelled || !status.listening) {
+					return;
+				}
+
+				beginListening(status.started_at || null);
+			})
+			.catch(() => {});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [workflowId, beginListening]);
 
 	const listenNew = useCallback(async () => {
 		setMenuOpen(false);
@@ -92,25 +160,40 @@ export default function useTestFlow(workflowId, { persistBeforeTest, onSampleCap
 			return;
 		}
 
+		if (hasTrigger && !hasTrigger()) {
+			setStatusMessage(
+				__(
+					'Add a trigger block first, then listen again.',
+					'workflow-automate'
+				)
+			);
+			return;
+		}
+
 		setStatusMessage(__('Saving…', 'workflow-automate'));
 
 		try {
 			await persistBeforeTest();
-			setStatusMessage(
-				__('Listening for the next trigger response…', 'workflow-automate')
-			);
-			setListening(true);
-			await startTestListen(workflowId);
-			pollUntilCaptured();
+
+			const status = await startTestListen(workflowId);
+
+			if (!status.listening) {
+				throw new Error(
+					__('Server did not enter listen mode.', 'workflow-automate')
+				);
+			}
+
+			beginListening(status.started_at || null);
 		} catch (error) {
 			setListening(false);
+			listenStartedAtRef.current = null;
 			setStatusMessage(
 				error && error.message
 					? error.message
 					: __('Could not start listening.', 'workflow-automate')
 			);
 		}
-	}, [workflowId, persistBeforeTest, pollUntilCaptured]);
+	}, [workflowId, persistBeforeTest, hasTrigger, beginListening]);
 
 	const useExisting = useCallback(async () => {
 		setMenuOpen(false);
@@ -149,6 +232,7 @@ export default function useTestFlow(workflowId, { persistBeforeTest, onSampleCap
 	const stopListening = useCallback(async () => {
 		clearTimers();
 		setListening(false);
+		listenStartedAtRef.current = null;
 
 		if (workflowId) {
 			try {

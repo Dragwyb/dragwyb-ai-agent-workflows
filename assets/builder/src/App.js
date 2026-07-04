@@ -315,6 +315,10 @@ export default function App() {
 
 	const testFlow = useTestFlow(workflowId, {
 		persistBeforeTest,
+		hasTrigger: () =>
+			latestRef.current.graph.nodes.some(
+				(node) => node.category === 'trigger'
+			),
 		onSampleCaptured: (payload) => {
 			setCapturedPayload(payload);
 			fetchTestStatus(workflowId)
