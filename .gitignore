@@ -1,0 +1,36 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Build output
+/build/
+/dist/
+/assets/dist/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs and caches
+*.log
+.phpunit.result.cache
+.phpcs-cache
+.eslintcache
+
+# Composer / npm lock optional local overrides
+composer.phar
+
+# Release packaging
+/release/
+/*.zip
+
+# Internal docs must never ship in distributable packages
+# (build scripts should also exclude /docs/internal/ explicitly)

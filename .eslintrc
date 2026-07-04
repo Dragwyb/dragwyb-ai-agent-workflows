@@ -1,0 +1,15 @@
+{
+  "root": true,
+  "extends": ["plugin:@wordpress/eslint-plugin/recommended"],
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "ignorePatterns": [
+    "vendor/**",
+    "node_modules/**",
+    "build/**",
+    "dist/**",
+    "docs/internal/**"
+  ]
+}

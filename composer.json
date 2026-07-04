@@ -1,0 +1,28 @@
+{
+  "name": "workflow-automate/plugin",
+  "description": "WordPress workflow automation plugin (scaffolding — identifiers finalized in Phase Two).",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "wp-coding-standards/wpcs": "^3.1",
+    "phpcompatibility/phpcompatibility-wp": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "WorkflowAutomate\\Plugin\\": "src/"
+    }
+  },
+  "scripts": {
+    "phpcs": "phpcs",
+    "phpcbf": "phpcbf"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

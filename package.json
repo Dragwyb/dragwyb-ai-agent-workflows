@@ -1,0 +1,13 @@
+{
+  "name": "workflow-automate",
+  "private": true,
+  "description": "WordPress workflow automation plugin front-end tooling (scaffolding — identifiers finalized in Phase Two).",
+  "scripts": {
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@wordpress/eslint-plugin": "^22.0.0",
+    "eslint": "^8.57.0"
+  }
+}
