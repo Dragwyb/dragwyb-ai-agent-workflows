@@ -8,9 +8,11 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, getBootstrap } from '../api';
+import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, getBootstrap, testWorkflowNode} from '../api';
 import CapturedResponse from './CapturedResponse';
+import NodeTestResult from './NodeTestResult';
 import TokenField, { fieldSupportsVariables } from './TokenField';
+import { buildVariableSources } from '../utils/variableSources';
 
 const GOOGLE_SHEETS_OAUTH_SETTINGS = {
 	authType: 'oauth2',
@@ -81,17 +83,87 @@ const INTEGRATION_SLUG_ALIASES = {
 	claude_messages_action: ['claude', 'anthropic'],
 	telegram_send_message_action: ['telegram'],
 	whatsapp_cloud_send_message_action: ['whatsapp', 'whatsapp_cloud'],
+	google_sheets_append_row_action: [
+		'google_sheets',
+		'google_sheets_api',
+		'sheets',
+	],
+	ai_agent_action: [
+		'openai',
+		'open_ai',
+		'gemini',
+		'google_gemini',
+		'google_ai',
+		'claude',
+		'anthropic',
+		'ai_agent',
+	],
 };
+
+/** @type {Set<string>} */
+const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
+	'provider',
+	'connection_id',
+	'model',
+	'memory_enabled',
+]);
+
+/** @type {Set<string>} */
+const CHAT_MODEL_ATTACHMENT_FIELDS = new Set(['connection_id', 'model']);
+
+/** @type {Record<string, string>} */
+const AGENT_PROVIDER_NODE_SLUGS = {
+	openai: 'openai_chat_action',
+	gemini: 'gemini_generate_content_action',
+	claude: 'claude_messages_action',
+};
+
+/** @type {Record<string, string>} */
+const AGENT_PROVIDER_DEFAULT_MODELS = {
+	openai: 'gpt-4o-mini',
+	gemini: 'gemini-2.0-flash',
+	claude: 'claude-sonnet-4-20250514',
+};
+
+/** @type {Record<string, { secretLabel: string }>} */
+const AGENT_PROVIDER_CONNECTION_SETTINGS = {
+	openai: {
+		secretLabel: __('OpenAI API key', 'workflow-automate'),
+	},
+	gemini: {
+		secretLabel: __('Google AI API key', 'workflow-automate'),
+	},
+	claude: {
+		secretLabel: __('Anthropic API key', 'workflow-automate'),
+	},
+};
+
+/**
+ * @param {string} nodeTypeSlug
+ * @param {Object} nodeConfig
+ * @return {string}
+ */
+function resolveConnectionNodeSlug(nodeTypeSlug, nodeConfig = {}) {
+	if (nodeTypeSlug !== 'ai_agent_action') {
+		return nodeTypeSlug;
+	}
+
+	const provider = String(nodeConfig.provider || 'openai').toLowerCase();
+
+	return AGENT_PROVIDER_NODE_SLUGS[provider] || AGENT_PROVIDER_NODE_SLUGS.openai;
+}
 
 /**
  * @param {Object} connection
  * @param {string} nodeTypeSlug
+ * @param {Object} [nodeConfig]
  * @return {boolean}
  */
-function connectionMatchesNodeType(connection, nodeTypeSlug) {
+function connectionMatchesNodeType(connection, nodeTypeSlug, nodeConfig = {}) {
+	const effectiveSlug = resolveConnectionNodeSlug(nodeTypeSlug, nodeConfig);
 	const slug = connection.integration_slug || '';
 
-	if (slug === nodeTypeSlug) {
+	if (slug === effectiveSlug || slug === nodeTypeSlug) {
 		return true;
 	}
 
@@ -99,7 +171,10 @@ function connectionMatchesNodeType(connection, nodeTypeSlug) {
 		return GOOGLE_SHEETS_SLUG_ALIASES.includes(slug) || isGoogleSheetsAction(slug);
 	}
 
-	const aliases = INTEGRATION_SLUG_ALIASES[nodeTypeSlug] || [];
+	const aliases = [
+		...(INTEGRATION_SLUG_ALIASES[nodeTypeSlug] || []),
+		...(INTEGRATION_SLUG_ALIASES[effectiveSlug] || []),
+	];
 
 	return aliases.includes(slug);
 }
@@ -110,9 +185,9 @@ function connectionMatchesNodeType(connection, nodeTypeSlug) {
  * @param {number}      selectedId
  * @return {Array<Object>}
  */
-function filterMatchingConnections(connections, nodeTypeSlug, selectedId) {
+function filterMatchingConnections(connections, nodeTypeSlug, selectedId, nodeConfig = {}) {
 	const list = (connections || []).filter((connection) =>
-		connectionMatchesNodeType(connection, nodeTypeSlug)
+		connectionMatchesNodeType(connection, nodeTypeSlug, nodeConfig)
 	);
 
 	if (selectedId > 0 && !list.some((connection) => connection.id === selectedId)) {
@@ -143,6 +218,10 @@ function filterMatchingConnections(connections, nodeTypeSlug, selectedId) {
  * @param {*}             [props.capturedPayload]
  * @param {string|null}   [props.capturedAt]
  * @param {string}        [props.triggerLabel]
+ * @param {Array<Object>} [props.graphNodes]
+ * @param {number}        [props.workflowId]
+ * @param {Object}        [props.graph]
+ * @param {Function}      [props.onPersistBeforeTest]
  */
 export default function ConfigPanel({
 	node,
@@ -156,7 +235,70 @@ export default function ConfigPanel({
 	capturedPayload,
 	capturedAt,
 	triggerLabel = 'Trigger',
+	graphNodes = [],
+	workflowId = 0,
+	graph = { nodes: [], connections: [] },
+	onPersistBeforeTest,
 }) {
+	const [testing, setTesting] = useState(false);
+	const [testResult, setTestResult] = useState(null);
+	const nodeLabels = useMemo(() => {
+		const labels = {};
+
+		graphNodes.forEach((graphNode) => {
+			labels[graphNode.id] = graphNode.label || graphNode.type;
+		});
+
+		return labels;
+	}, [graphNodes]);
+
+	const variableSources = useMemo(
+		() =>
+			buildVariableSources({
+				graphNodes,
+				currentNodeId: node?.id || null,
+				triggerPayload: capturedPayload,
+				triggerLabel,
+			}),
+		[graphNodes, node?.id, capturedPayload, triggerLabel]
+	);
+
+	useEffect(() => {
+		setTestResult(null);
+	}, [node?.id, node?.type]);
+
+	const handleTestNode = async () => {
+		if (!workflowId || !node?.id) {
+			return;
+		}
+
+		setTesting(true);
+		setTestResult(null);
+
+		try {
+			if (onPersistBeforeTest) {
+				await onPersistBeforeTest();
+			}
+
+			const result = await testWorkflowNode(workflowId, {
+				node_id: node.id,
+				graph,
+			});
+
+			setTestResult(result);
+		} catch (error) {
+			setTestResult({
+				success: false,
+				error:
+					error && error.message
+						? error.message
+						: __('Could not test this node.', 'workflow-automate'),
+			});
+		} finally {
+			setTesting(false);
+		}
+	};
+
 	if (!node) {
 		return (
 			<aside
@@ -194,6 +336,42 @@ export default function ConfigPanel({
 				onChange={onChangeLabel}
 			/>
 
+			{node.parent_agent_id && node.attachment_type === 'tool' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'This tool is attached to your AI Agent. Remove it from the agent or delete it here.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.attachment_type === 'chat_model' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Chat model linked to your agent. Add an API key and pick a model below.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.attachment_type === 'memory' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Simple memory keeps conversation context for this agent run.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.type === 'ai_agent_action' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Use + on the canvas for Chat Model, Memory, and Tools — not the left palette.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
 			{node.category === 'trigger' && (
 				<CapturedResponse
 					payload={capturedPayload}
@@ -212,7 +390,26 @@ export default function ConfigPanel({
 			)}
 
 			{nodeType &&
-				Object.keys(nodeType.config_schema || {}).map((fieldName) => (
+				node.attachment_type !== 'memory' &&
+				Object.keys(nodeType.config_schema || {})
+					.filter((fieldName) => {
+						if (
+							node.type === 'ai_agent_action' &&
+							AGENT_SIDEBAR_HIDDEN_FIELDS.has(fieldName)
+						) {
+							return false;
+						}
+
+						if (
+							node.attachment_type === 'chat_model' &&
+							!CHAT_MODEL_ATTACHMENT_FIELDS.has(fieldName)
+						) {
+							return false;
+						}
+
+						return true;
+					})
+					.map((fieldName) => (
 					<ConfigField
 						key={`${node.id}-${fieldName}`}
 						fieldName={fieldName}
@@ -224,21 +421,42 @@ export default function ConfigPanel({
 						nodeId={node.id}
 						nodeCategory={node.category}
 						nodeConfig={node.config || {}}
-						capturedPayload={capturedPayload}
-						triggerLabel={triggerLabel}
+						variableSources={variableSources}
+						nodeLabels={nodeLabels}
 						onConnectionsChange={onConnectionsChange}
 						onChange={(value) => onChangeConfig(fieldName, value)}
 					/>
 				))}
 
-			<Button
-				isDestructive
-				variant="secondary"
-				onClick={onDelete}
-				className="wfa-builder-config__delete"
-			>
-				{__('Delete node', 'workflow-automate')}
-			</Button>
+			{testResult && (
+				<NodeTestResult
+					success={Boolean(testResult.success)}
+					error={testResult.error || null}
+					input={testResult.input || null}
+					output={testResult.output || null}
+				/>
+			)}
+
+			<div className="wfa-builder-config__actions">
+				<Button
+					variant="secondary"
+					onClick={handleTestNode}
+					isBusy={testing}
+					disabled={testing || !workflowId}
+					className="wfa-builder-config__test"
+				>
+					{__('Test node', 'workflow-automate')}
+				</Button>
+
+				<Button
+					isDestructive
+					variant="secondary"
+					onClick={onDelete}
+					className="wfa-builder-config__delete"
+				>
+					{__('Delete node', 'workflow-automate')}
+				</Button>
+			</div>
 		</aside>
 	);
 }
@@ -253,8 +471,8 @@ function ConfigField({
 	nodeId,
 	nodeCategory,
 	nodeConfig,
-	capturedPayload,
-	triggerLabel,
+	variableSources,
+	nodeLabels,
 	onConnectionsChange,
 	onChange,
 }) {
@@ -263,7 +481,33 @@ function ConfigField({
 	}
 
 	const label = fieldSchema.label || fieldName;
+	const help = fieldSchema.help || '';
 	const resolved = value === undefined ? fieldSchema.default : value;
+	const connectionNodeSlug = resolveConnectionNodeSlug(
+		nodeTypeSlug,
+		nodeConfig
+	);
+
+	if (fieldSchema.type === 'select') {
+		const options = (fieldSchema.options || []).map((option) => ({
+			label: option.label || option.value,
+			value: String(option.value ?? ''),
+		}));
+
+		return (
+			<SelectControl
+				label={label}
+				help={help || undefined}
+				value={
+					resolved === undefined || resolved === null
+						? ''
+						: String(resolved)
+				}
+				options={options}
+				onChange={onChange}
+			/>
+		);
+	}
 
 	if (
 		fieldSchema.type === 'dynamic_select' &&
@@ -286,7 +530,7 @@ function ConfigField({
 						: String(fieldSchema.default)
 				}
 				connectionId={connectionId}
-				nodeTypeSlug={nodeTypeSlug}
+				nodeTypeSlug={connectionNodeSlug}
 				onChange={onChange}
 			/>
 		);
@@ -313,9 +557,10 @@ function ConfigField({
 				value={resolved}
 				required={Boolean(fieldSchema.required)}
 				connections={connections || []}
-				nodeTypeSlug={nodeTypeSlug}
+				nodeTypeSlug={connectionNodeSlug}
 				nodeTypeLabel={nodeTypeLabel}
 				nodeId={nodeId}
+				nodeConfig={nodeConfig}
 				onConnectionsChange={onConnectionsChange}
 				onChange={onChange}
 			/>
@@ -336,8 +581,8 @@ function ConfigField({
 						: String(resolved)
 				}
 				required={Boolean(fieldSchema.required)}
-				payload={capturedPayload}
-				sourceLabel={triggerLabel}
+				variableSources={variableSources}
+				nodeLabels={nodeLabels}
 				onChange={onChange}
 			/>
 		);
@@ -523,13 +768,16 @@ function ConnectionField({
 	nodeTypeSlug,
 	nodeTypeLabel,
 	nodeId,
+	nodeConfig = {},
 	onConnectionsChange,
 	onChange,
 }) {
 	const bootstrap = getBootstrap();
 	const integrationSettings = isGoogleSheetsAction(nodeTypeSlug)
 		? GOOGLE_SHEETS_OAUTH_SETTINGS
-		: INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] || {};
+		: INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] ||
+			AGENT_PROVIDER_CONNECTION_SETTINGS[nodeConfig.provider] ||
+			{};
 	const defaultAuthType = integrationSettings.authType || 'api_key';
 	const isGoogleOAuth = Boolean(integrationSettings.oauthConnection);
 
@@ -537,8 +785,14 @@ function ConnectionField({
 	const needsConnection = required && selectedId <= 0;
 
 	const matchingConnections = useMemo(
-		() => filterMatchingConnections(connections, nodeTypeSlug, selectedId),
-		[connections, nodeTypeSlug, selectedId]
+		() =>
+			filterMatchingConnections(
+				connections,
+				nodeTypeSlug,
+				selectedId,
+				nodeConfig
+			),
+		[connections, nodeTypeSlug, selectedId, nodeConfig]
 	);
 
 	const selectedConnection = matchingConnections.find(

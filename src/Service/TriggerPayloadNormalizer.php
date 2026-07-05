@@ -125,7 +125,9 @@ class TriggerPayloadNormalizer {
 		if ( $post instanceof \WP_Post ) {
 			$payload = array_merge( $payload, self::postFields( $post ) );
 		} elseif ( $post_id > 0 ) {
-			$payload['post_content'] = self::loadPostContent( $post_id );
+			$content = self::loadPostContent( $post_id );
+			$payload['post_content']      = $content;
+			$payload['post_content_text'] = self::humanReadablePostContent( $content );
 		}
 
 		return $payload;
@@ -138,10 +140,12 @@ class TriggerPayloadNormalizer {
 	 */
 	private static function postFields( \WP_Post $post ): array {
 		$post_id = (int) $post->ID;
+		$content = self::loadPostContent( $post_id );
 
 		return array(
 			'post_title' => (string) $post->post_title,
-			'post_content' => self::loadPostContent( $post_id ),
+			'post_content' => $content,
+			'post_content_text' => self::humanReadablePostContent( $content ),
 			'post_excerpt' => (string) $post->post_excerpt,
 			'post_status' => (string) $post->post_status,
 			'post_type' => (string) $post->post_type,
@@ -180,6 +184,10 @@ class TriggerPayloadNormalizer {
 	 */
 	private static function ensurePostContent( array $payload ): array {
 		if ( isset( $payload['post_content'] ) && '' !== (string) $payload['post_content'] ) {
+			if ( ! isset( $payload['post_content_text'] ) || '' === (string) $payload['post_content_text'] ) {
+				$payload['post_content_text'] = self::humanReadablePostContent( (string) $payload['post_content'] );
+			}
+
 			return $payload;
 		}
 
@@ -190,10 +198,40 @@ class TriggerPayloadNormalizer {
 		}
 
 		if ( $post_id > 0 ) {
-			$payload['post_content'] = self::loadPostContent( $post_id );
+			$content = self::loadPostContent( $post_id );
+			$payload['post_content']      = $content;
+			$payload['post_content_text'] = self::humanReadablePostContent( $content );
 		}
 
 		return $payload;
+	}
+
+	/**
+	 * Strips Gutenberg block comments and HTML tags for human-readable text.
+	 *
+	 * @param string $content Raw post content.
+	 *
+	 * @return string
+	 */
+	public static function plainTextFromPostContent( string $content ): string {
+		if ( '' === $content ) {
+			return '';
+		}
+
+		$plain = (string) preg_replace( '/<!--\s*\/?wp:[^>]*-->/', '', $content );
+		$plain = wp_strip_all_tags( $plain );
+		$plain = html_entity_decode( $plain, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+		return trim( (string) preg_replace( '/\s+/u', ' ', $plain ) );
+	}
+
+	/**
+	 * @param string $content Raw post content.
+	 *
+	 * @return string
+	 */
+	private static function humanReadablePostContent( string $content ): string {
+		return self::plainTextFromPostContent( $content );
 	}
 
 	/**

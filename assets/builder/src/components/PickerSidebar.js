@@ -6,6 +6,7 @@ import {
 	appUsesGroups,
 	appUsesGroupedSections,
 	categoryForKind,
+	getAgentToolPickerSections,
 	getAppLabel,
 	getGroupedItemsForPicker,
 	getGroupsForApp,
@@ -16,13 +17,14 @@ import {
 import { getNodeMeta } from '../nodeMeta';
 
 /**
- * Right sidebar for picking a trigger, agent, or action after choosing an app.
+ * Right sidebar for picking a trigger, agent, action, or agent attachment.
  *
  * @param {Object}        props
- * @param {'trigger'|'agent'|'action'} props.kind
+ * @param {'trigger'|'agent'|'action'|'agent-tool'|'agent-chat-model'} props.kind
  * @param {string}        props.appId
  * @param {Array<Object>} props.triggers
  * @param {Array<Object>} props.actions
+ * @param {boolean}       [props.hasExistingTrigger]
  * @param {Function}      props.onSelect   ( nodeType, category ) => void
  * @param {Function}      props.onClose
  */
@@ -31,6 +33,7 @@ export default function PickerSidebar({
 	appId,
 	triggers,
 	actions,
+	hasExistingTrigger = false,
 	onSelect,
 	onClose,
 }) {
@@ -54,16 +57,34 @@ export default function PickerSidebar({
 		() => getItemsForPicker(kind, appId, groupId, subAppId, triggers, actions),
 		[kind, appId, groupId, subAppId, triggers, actions]
 	);
+	const toolSections = useMemo(
+		() => (kind === 'agent-tool' ? getAgentToolPickerSections(actions) : []),
+		[kind, actions]
+	);
 	const showGroups = usesGroups && !groupId;
 	const showCommunicationList = kind === 'action' && appId === 'communication' && !subAppId;
 	const category = categoryForKind(kind);
 	const appLabel = getAppLabel(kind, appId, subAppId);
 	const metaAppId = subAppId || appId;
-	const title = showGroups
-		? __('Choose a group', 'workflow-automate')
-		: usesGroupedSections
-			? appLabel
-			: __('Choose a node', 'workflow-automate');
+	const title =
+		kind === 'agent-chat-model'
+			? __('Select chat model', 'workflow-automate')
+			: kind === 'agent-tool'
+				? __('Add tool to agent', 'workflow-automate')
+				: showGroups
+					? __('Choose a group', 'workflow-automate')
+					: usesGroupedSections
+						? appLabel
+						: __('Choose a node', 'workflow-automate');
+	const replaceHint =
+		kind === 'trigger' && hasExistingTrigger && !showGroups
+			? __('Selecting a trigger replaces your current one.', 'workflow-automate')
+			: kind === 'agent-chat-model'
+				? __(
+					'Pick a provider — configure API key and model on the canvas node.',
+					'workflow-automate'
+				)
+				: '';
 	const showBack = (usesGroups && groupId) || subAppId;
 
 	const handlePick = (item) => {
@@ -82,6 +103,63 @@ export default function PickerSidebar({
 		}
 
 		setGroupId(null);
+	};
+
+	const renderItem = (item, itemAppId = metaAppId) => {
+		const meta = getNodeMeta(
+			item.slug,
+			category,
+			item.pickerAppId || itemAppId
+		);
+		const isDisabled = item.available === false;
+		const disabledMessage = isDisabled
+			? sprintf(
+					/* translators: %s: plugin name, e.g. WooCommerce */
+					__(
+						'Activate %s to use this trigger.',
+						'workflow-automate'
+					),
+					item.requires_plugin || __('this plugin', 'workflow-automate')
+				)
+			: '';
+
+		return (
+			<li key={item.slug}>
+				<button
+					type="button"
+					className={
+						isDisabled
+							? 'wfa-builder-picker__item wfa-builder-picker__item--disabled'
+							: 'wfa-builder-picker__item'
+					}
+					onClick={() => handlePick(item)}
+					title={isDisabled ? disabledMessage : item.description}
+					disabled={isDisabled}
+					aria-disabled={isDisabled}
+				>
+					<span
+						className="wfa-builder-picker__item-icon"
+						style={{
+							backgroundColor: meta.bg,
+							color: meta.accent,
+						}}
+						aria-hidden="true"
+					>
+						{meta.icon}
+					</span>
+					<span className="wfa-builder-picker__item-content">
+						<span className="wfa-builder-picker__item-label">
+							{getPickerItemLabel(item, itemAppId)}
+						</span>
+						{isDisabled && (
+							<span className="wfa-builder-picker__item-hint">
+								{disabledMessage}
+							</span>
+						)}
+					</span>
+				</button>
+			</li>
+		);
 	};
 
 	return (
@@ -108,6 +186,10 @@ export default function PickerSidebar({
 				/>
 			</div>
 
+			{replaceHint && (
+				<p className="wfa-builder-picker__hint">{replaceHint}</p>
+			)}
+
 			{showGroups ? (
 				<ul className="wfa-builder-picker__list">
 					{groups.map((group) => (
@@ -124,6 +206,17 @@ export default function PickerSidebar({
 						</li>
 					))}
 				</ul>
+			) : kind === 'agent-tool' ? (
+				toolSections.map((section) => (
+					<div key={section.id} className="wfa-builder-picker__section">
+						<h3 className="wfa-builder-picker__section-title">
+							{section.label}
+						</h3>
+						<ul className="wfa-builder-picker__list">
+							{section.items.map((item) => renderItem(item))}
+						</ul>
+					</div>
+				))
 			) : usesGroupedSections && groupedItems ? (
 				groupedItems.map((group) => (
 					<div key={group.id} className="wfa-builder-picker__section">
@@ -131,15 +224,7 @@ export default function PickerSidebar({
 							{group.label}
 						</h3>
 						<ul className="wfa-builder-picker__list">
-							{group.items.map((item) => (
-								<PickerItem
-									key={item.slug}
-									item={item}
-									appId={metaAppId}
-									category={category}
-									onPick={handlePick}
-								/>
-							))}
+							{group.items.map((item) => renderItem(item, metaAppId))}
 						</ul>
 					</div>
 				))
@@ -153,15 +238,7 @@ export default function PickerSidebar({
 								onOpen={() => setSubAppId(subApp.id)}
 							/>
 						))}
-					{items.map((item) => (
-						<PickerItem
-							key={item.slug}
-							item={item}
-							appId={metaAppId}
-							category={category}
-							onPick={handlePick}
-						/>
-					))}
+					{items.map((item) => renderItem(item))}
 				</ul>
 			)}
 		</aside>
@@ -195,56 +272,6 @@ function PickerSubApp({ subApp, onOpen }) {
 				</span>
 				<span className="wfa-builder-picker__item-chevron" aria-hidden="true">
 					›
-				</span>
-			</button>
-		</li>
-	);
-}
-
-function PickerItem({ item, appId, category, onPick }) {
-	const meta = getNodeMeta(item.slug, category, appId);
-	const isDisabled = item.available === false;
-	const disabledMessage = isDisabled
-		? sprintf(
-				/* translators: %s: plugin name, e.g. WooCommerce */
-				__('Activate %s to use this trigger.', 'workflow-automate'),
-				item.requires_plugin || __('this plugin', 'workflow-automate')
-			)
-		: '';
-
-	return (
-		<li>
-			<button
-				type="button"
-				className={
-					isDisabled
-						? 'wfa-builder-picker__item wfa-builder-picker__item--disabled'
-						: 'wfa-builder-picker__item'
-				}
-				onClick={() => onPick(item)}
-				title={isDisabled ? disabledMessage : item.description}
-				disabled={isDisabled}
-				aria-disabled={isDisabled}
-			>
-				<span
-					className="wfa-builder-picker__item-icon"
-					style={{
-						backgroundColor: meta.bg,
-						color: meta.accent,
-					}}
-					aria-hidden="true"
-				>
-					{meta.icon}
-				</span>
-				<span className="wfa-builder-picker__item-content">
-					<span className="wfa-builder-picker__item-label">
-						{getPickerItemLabel(item, appId)}
-					</span>
-					{isDisabled && (
-						<span className="wfa-builder-picker__item-hint">
-							{disabledMessage}
-						</span>
-					)}
 				</span>
 			</button>
 		</li>

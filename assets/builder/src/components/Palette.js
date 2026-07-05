@@ -97,13 +97,13 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 					const isDisabled = app.available === false;
 					const disabledMessage = isDisabled
 						? sprintf(
-								/* translators: %s: plugin name, e.g. WooCommerce */
-								__(
-									'Activate %s to use this trigger.',
-									'workflow-automate'
-								),
-								app.requiresPlugin || __('this plugin', 'workflow-automate')
-							)
+							/* translators: %s: plugin name, e.g. WooCommerce */
+							__(
+								'Activate %s to use this trigger.',
+								'workflow-automate'
+							),
+							app.requiresPlugin || __('this plugin', 'workflow-automate')
+						)
 						: '';
 
 					return (

@@ -77,6 +77,11 @@ class GeminiGenerateContentAction implements ActionInterface {
 				'label' => __( 'Prompt (supports {{trigger.fields.*}} tokens)', 'workflow-automate' ),
 				'required' => true,
 			),
+			'system_prompt' => array(
+				'type' => 'string',
+				'label' => __( 'System prompt (optional)', 'workflow-automate' ),
+				'default' => '',
+			),
 		);
 	}
 
@@ -113,17 +118,35 @@ class GeminiGenerateContentAction implements ActionInterface {
 			rawurlencode( $api_key )
 		);
 
-		$body = wp_json_encode(
-			array(
-				'contents' => array(
-					array(
-						'parts' => array(
-							array( 'text' => $prompt ),
-						),
+		$request = array(
+			'contents' => array(
+				array(
+					'parts' => array(
+						array( 'text' => $prompt ),
 					),
 				),
-			)
+			),
 		);
+
+		$thinking_config = $this->thinkingConfigForModel( $model );
+
+		if ( null !== $thinking_config ) {
+			$request['generationConfig'] = array(
+				'thinkingConfig' => $thinking_config,
+			);
+		}
+
+		$system_prompt = isset( $config['system_prompt'] ) ? trim( (string) $config['system_prompt'] ) : '';
+
+		if ( '' !== $system_prompt ) {
+			$request['systemInstruction'] = array(
+				'parts' => array(
+					array( 'text' => $system_prompt ),
+				),
+			);
+		}
+
+		$body = wp_json_encode( $request );
 
 		if ( ! is_string( $body ) ) {
 			return array(
@@ -147,12 +170,8 @@ class GeminiGenerateContentAction implements ActionInterface {
 			return $result;
 		}
 
-		$content = '';
 		$decoded = $result['response'] ?? array();
-
-		if ( is_array( $decoded ) && isset( $decoded['candidates'][0]['content']['parts'][0]['text'] ) ) {
-			$content = (string) $decoded['candidates'][0]['content']['parts'][0]['text'];
-		}
+		$content = $this->extractGeminiText( is_array( $decoded ) ? $decoded : array() );
 
 		return array(
 			'success' => true,
@@ -160,5 +179,95 @@ class GeminiGenerateContentAction implements ActionInterface {
 			'model' => $model,
 			'content' => $content,
 		);
+	}
+
+	/**
+	 * Returns user-facing text, skipping Gemini "thought" parts when present.
+	 *
+	 * @param array<string, mixed> $decoded Gemini API JSON body.
+	 *
+	 * @return string
+	 */
+	private function extractGeminiText( array $decoded ): string {
+		if ( ! isset( $decoded['candidates'][0]['content']['parts'] ) || ! is_array( $decoded['candidates'][0]['content']['parts'] ) ) {
+			return '';
+		}
+
+		$parts      = $decoded['candidates'][0]['content']['parts'];
+		$text_parts = array();
+
+		foreach ( $parts as $part ) {
+			if ( ! is_array( $part ) || ! isset( $part['text'] ) || ! is_string( $part['text'] ) ) {
+				continue;
+			}
+
+			$text = trim( $part['text'] );
+
+			if ( '' === $text ) {
+				continue;
+			}
+
+			$text_parts[] = array(
+				'text' => $text,
+				'thought' => ! empty( $part['thought'] ),
+			);
+		}
+
+		if ( array() === $text_parts ) {
+			return '';
+		}
+
+		$non_thought = array_values(
+			array_filter(
+				$text_parts,
+				static function ( array $entry ): bool {
+					return ! $entry['thought'];
+				}
+			)
+		);
+
+		if ( 1 === count( $non_thought ) ) {
+			return $non_thought[0]['text'];
+		}
+
+		if ( count( $non_thought ) > 1 ) {
+			return $non_thought[ count( $non_thought ) - 1 ]['text'];
+		}
+
+		$thought_tokens = 0;
+
+		if ( isset( $decoded['usageMetadata']['thoughtsTokenCount'] ) ) {
+			$thought_tokens = (int) $decoded['usageMetadata']['thoughtsTokenCount'];
+		}
+
+		// Thinking models return reasoning first and the answer last.
+		if ( count( $text_parts ) > 1 || $thought_tokens > 0 ) {
+			return $text_parts[ count( $text_parts ) - 1 ]['text'];
+		}
+
+		return $text_parts[0]['text'];
+	}
+
+	/**
+	 * Minimizes internal reasoning tokens so workflow output stays concise.
+	 *
+	 * @param string $model Gemini model id.
+	 *
+	 * @return array<string, int|string>|null
+	 */
+	private function thinkingConfigForModel( string $model ): ?array {
+		if ( preg_match( '/gemini-3/i', $model ) ) {
+			return array(
+				'thinkingLevel' => 'minimal',
+			);
+		}
+
+		if ( preg_match( '/gemini-2[.-]5/i', $model ) ) {
+			return array(
+				'thinkingBudget' => 0,
+			);
+		}
+
+		return null;
 	}
 }

@@ -48,6 +48,7 @@ use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
 use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
@@ -265,6 +266,18 @@ class Plugin {
 			WorkflowTestListenerService::class,
 			static function ( Container $container ): WorkflowTestListenerService {
 				return new WorkflowTestListenerService( $container->get( WorkflowService::class ) );
+			}
+		);
+
+		$this->container->singleton(
+			WorkflowNodeTestService::class,
+			static function ( Container $container ): WorkflowNodeTestService {
+				return new WorkflowNodeTestService(
+					$container->get( WorkflowService::class ),
+					$container->get( NodeExecutionService::class ),
+					$container->get( NodeTypeRegistry::class ),
+					$container->get( WorkflowTestListenerService::class )
+				);
 			}
 		);
 

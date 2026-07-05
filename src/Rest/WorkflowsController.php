@@ -167,10 +167,6 @@ class WorkflowsController extends WP_REST_Controller {
 							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
 							'type' => 'integer',
 						),
-						'payload' => array(
-							'description' => __( 'Optional trigger payload. When omitted, saved sample payload is used if present.', 'workflow-automate' ),
-							'type' => 'object',
-						),
 					),
 				),
 			)
@@ -437,21 +433,9 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function run_item( $request ) {
 		$id = (int) $request['id'];
-		$payload = $request->get_param( 'payload' );
-
-		if ( ! is_array( $payload ) ) {
-			$workflow = $this->workflows->find( $id );
-			$settings = null !== $workflow ? $workflow->settings() : null;
-
-			if ( is_array( $settings ) && isset( $settings['sample_payload'] ) && is_array( $settings['sample_payload'] ) ) {
-				$payload = $settings['sample_payload'];
-			} else {
-				$payload = array();
-			}
-		}
 
 		try {
-			$run = $this->executor->run( $id, $payload );
+			$run = $this->executor->run( $id );
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
 		} catch ( RuntimeException $exception ) {

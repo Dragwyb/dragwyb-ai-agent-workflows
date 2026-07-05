@@ -69,7 +69,13 @@ class ConfigInterpolator {
 				}
 
 				if ( is_scalar( $value ) ) {
-					return (string) $value;
+					$resolved = (string) $value;
+
+					if ( str_contains( $resolved, '<!-- wp:' ) ) {
+						return TriggerPayloadNormalizer::plainTextFromPostContent( $resolved );
+					}
+
+					return $resolved;
 				}
 
 				if ( is_array( $value ) ) {

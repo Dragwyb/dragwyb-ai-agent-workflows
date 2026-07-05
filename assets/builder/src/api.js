@@ -158,6 +158,30 @@ export function fetchTestStatus(id) {
 
 /**
  * @param {number} id Workflow id.
+ * @return {Promise<Object>}
+ */
+export function clearTestSample(id) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/test/sample`,
+		method: 'DELETE',
+	});
+}
+
+/**
+ * @param {number} id Workflow id.
+ * @param {{ node_id: string, graph?: Object }} data
+ * @return {Promise<{ success: boolean, kind: string, output?: Object, error?: string }>}
+ */
+export function testWorkflowNode(id, data) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/test/node`,
+		method: 'POST',
+		data,
+	});
+}
+
+/**
+ * @param {number} id Workflow id.
  * @param {Object} [data]
  * @return {Promise<Object>}
  */
