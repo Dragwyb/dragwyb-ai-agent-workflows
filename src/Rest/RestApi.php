@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 use WorkflowAutomate\Plugin\Core\Container;
 use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Service\ElementorFormsService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WebhookService;
@@ -63,7 +64,10 @@ class RestApi {
 		);
 		$workflows_controller->register_routes();
 
-		$node_types_controller = new NodeTypesController( $this->container->get( NodeTypeRegistry::class ) );
+		$node_types_controller = new NodeTypesController(
+			$this->container->get( NodeTypeRegistry::class ),
+			$this->container->get( ElementorFormsService::class )
+		);
 		$node_types_controller->register_routes();
 
 		$connections_controller = new ConnectionsController(

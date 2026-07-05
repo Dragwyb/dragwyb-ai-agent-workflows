@@ -13,6 +13,7 @@ use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
 use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
+use WorkflowAutomate\Plugin\Service\ElementorFormsService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
@@ -39,8 +40,11 @@ class NodeTypesController {
 
 	private NodeTypeRegistry $registry;
 
-	public function __construct( NodeTypeRegistry $registry ) {
-		$this->registry = $registry;
+	private ElementorFormsService $elementor_forms;
+
+	public function __construct( NodeTypeRegistry $registry, ElementorFormsService $elementor_forms ) {
+		$this->registry        = $registry;
+		$this->elementor_forms = $elementor_forms;
 	}
 
 	/**
@@ -147,6 +151,8 @@ class NodeTypesController {
 			$data['role'] = $role;
 		}
 
+		$this->applyElementorFormSchema( $data );
+
 		return $data;
 	}
 
@@ -181,7 +187,7 @@ class NodeTypesController {
 	): array {
 		$schema = $node_type->configSchema();
 
-		return array(
+		$data = array(
 			'slug' => $node_type->slug(),
 			'label' => $node_type->label(),
 			'description' => $node_type->description(),
@@ -191,6 +197,34 @@ class NodeTypesController {
 			'available' => false,
 			'requires_plugin' => $requires_plugin,
 		);
+
+		$this->applyElementorFormSchema( $data );
+
+		return $data;
+	}
+
+	/**
+	 * @param array<string, mixed> $data Serialized node type payload.
+	 *
+	 * @return void
+	 */
+	private function applyElementorFormSchema( array &$data ): void {
+		if ( 'elementor_form_submitted_trigger' !== ( $data['slug'] ?? '' ) ) {
+			return;
+		}
+
+		if ( ! isset( $data['config_schema']['form_id'] ) || ! is_array( $data['config_schema']['form_id'] ) ) {
+			return;
+		}
+
+		$form_result = $this->elementor_forms->listForms();
+
+		$data['config_schema']['form_id']['type']    = 'select';
+		$data['config_schema']['form_id']['options'] = $this->elementor_forms->formSelectOptions();
+
+		if ( null !== $form_result['error'] ) {
+			$data['config_schema']['form_id']['help'] = $form_result['error'];
+		}
 	}
 
 	/**

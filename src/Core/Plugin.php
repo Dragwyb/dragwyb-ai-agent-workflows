@@ -40,6 +40,7 @@ use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
+use WorkflowAutomate\Plugin\Service\ElementorFormsService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
@@ -351,6 +352,13 @@ class Plugin {
 			AiModelsService::class,
 			static function ( Container $container ): AiModelsService {
 				return new AiModelsService( $container->get( ConnectionService::class ) );
+			}
+		);
+
+		$this->container->singleton(
+			ElementorFormsService::class,
+			static function (): ElementorFormsService {
+				return new ElementorFormsService();
 			}
 		);
 
