@@ -36,6 +36,10 @@ use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
+use WorkflowAutomate\Plugin\Service\Agent\AgentLlmClient;
+use WorkflowAutomate\Plugin\Service\Agent\AgentService;
+use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
+use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
 use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
@@ -257,6 +261,39 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			AgentLlmClient::class,
+			static function (): AgentLlmClient {
+				return new AgentLlmClient();
+			}
+		);
+
+		$this->container->singleton(
+			AgentToolSchemaBuilder::class,
+			static function ( Container $container ): AgentToolSchemaBuilder {
+				return new AgentToolSchemaBuilder( $container->get( NodeTypeRegistry::class ) );
+			}
+		);
+
+		$this->container->singleton(
+			AgentToolExecutor::class,
+			static function ( Container $container ): AgentToolExecutor {
+				return new AgentToolExecutor( $container->get( NodeExecutionService::class ) );
+			}
+		);
+
+		$this->container->singleton(
+			AgentService::class,
+			static function ( Container $container ): AgentService {
+				return new AgentService(
+					$container->get( ConnectionService::class ),
+					$container->get( AgentToolSchemaBuilder::class ),
+					$container->get( AgentToolExecutor::class ),
+					$container->get( AgentLlmClient::class )
+				);
+			}
+		);
+
+		$this->container->singleton(
 			SettingsService::class,
 			static function (): SettingsService {
 				return new SettingsService();
@@ -399,7 +436,8 @@ class Plugin {
 
 		$built_in_node_types = new BuiltInNodeTypes(
 			$this->container->get( ConnectionService::class ),
-			$this->container->get( GoogleOAuthService::class )
+			$this->container->get( GoogleOAuthService::class ),
+			$this->container->get( AgentService::class )
 		);
 
 		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );

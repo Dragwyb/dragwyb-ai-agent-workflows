@@ -22,6 +22,7 @@ use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
+use WorkflowAutomate\Plugin\Service\Agent\AgentService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
@@ -44,9 +45,16 @@ class BuiltInNodeTypes {
 
 	private GoogleOAuthService $google_oauth;
 
-	public function __construct( ConnectionService $connections, GoogleOAuthService $google_oauth ) {
+	private AgentService $agent;
+
+	public function __construct(
+		ConnectionService $connections,
+		GoogleOAuthService $google_oauth,
+		AgentService $agent
+	) {
 		$this->connections  = $connections;
 		$this->google_oauth = $google_oauth;
+		$this->agent        = $agent;
 	}
 
 	/**
@@ -67,7 +75,7 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new WhatsAppCloudSendMessageAction( $this->connections ) );
 		$registry->registerAction( new GeminiGenerateContentAction( $this->connections ) );
 		$registry->registerAction( new ClaudeMessagesAction( $this->connections ) );
-		$registry->registerAction( new AiAgentAction( $this->connections ) );
+		$registry->registerAction( new AiAgentAction( $this->agent ) );
 		$registry->registerAction( new RouterAction() );
 		$registry->registerAction( new ConditionAction() );
 

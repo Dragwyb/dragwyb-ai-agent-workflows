@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Service;
 
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Domain\WorkflowNode;
+use WorkflowAutomate\Plugin\Service\Agent\AgentGraphHelper;
 use WorkflowAutomate\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -123,6 +124,8 @@ class WorkflowNodeTestService {
 		$context = array(
 			'trigger' => $trigger_payload,
 			'nodes' => array(),
+			'workflow_id' => $workflow_id,
+			'graph' => $graph,
 		);
 
 		foreach ( $sorted as $graph_node ) {
@@ -131,12 +134,20 @@ class WorkflowNodeTestService {
 			}
 
 			if ( (string) $graph_node['id'] === $client_node_id ) {
-				$raw = $this->runActionNode( $workflow_id, $graph_node, $context );
+				$node_context = array_merge(
+					$context,
+					array( 'current_node_id' => (string) $graph_node['id'] )
+				);
+				$raw = $this->runActionNode( $workflow_id, $graph_node, $node_context );
 
-				return $this->formatActionTestResponse( $graph_node, $context, $raw );
+				return $this->formatActionTestResponse( $graph_node, $node_context, $raw );
 			}
 
 			if ( $this->isTriggerGraphNode( $graph_node ) ) {
+				continue;
+			}
+
+			if ( AgentGraphHelper::nodeIsAttachment( $graph_node ) ) {
 				continue;
 			}
 
@@ -341,12 +352,30 @@ class WorkflowNodeTestService {
 			'status' => ! empty( $result['success'] ) ? 'success' : 'failed',
 		);
 
-		if ( isset( $result['content'] ) && is_string( $result['content'] ) ) {
+		if ( isset( $result['response'] ) && is_string( $result['response'] ) ) {
+			$output['response'] = $result['response'];
+		} elseif ( isset( $result['content'] ) && is_string( $result['content'] ) ) {
 			$output['response'] = $result['content'];
 		} elseif ( isset( $result['body'] ) && is_string( $result['body'] ) ) {
 			$output['response'] = $result['body'];
 		} elseif ( isset( $result['message'] ) && is_string( $result['message'] ) ) {
 			$output['response'] = $result['message'];
+		}
+
+		if ( isset( $result['iterations'] ) ) {
+			$output['iterations'] = $result['iterations'];
+		}
+
+		if ( isset( $result['finish_reason'] ) && is_string( $result['finish_reason'] ) ) {
+			$output['finish_reason'] = $result['finish_reason'];
+		}
+
+		if ( isset( $result['tool_calls'] ) && is_array( $result['tool_calls'] ) ) {
+			$output['tool_calls'] = $result['tool_calls'];
+		}
+
+		if ( isset( $result['provider'] ) && is_string( $result['provider'] ) ) {
+			$output['provider'] = $result['provider'];
 		}
 
 		if ( isset( $result['model'] ) && is_string( $result['model'] ) && '' !== $result['model'] ) {

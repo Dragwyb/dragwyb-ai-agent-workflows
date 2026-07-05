@@ -15,6 +15,7 @@ use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use WorkflowAutomate\Plugin\Service\Agent\AgentGraphHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -286,9 +287,15 @@ class WorkflowExecutionService {
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
 
+		$workflow = $this->workflows->find( $workflow_id );
+		$graph    = null !== $workflow ? $workflow->graph() : array();
+		$graph_nodes = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
+
 		$context = array(
 			'trigger' => $trigger_payload,
 			'nodes' => array(),
+			'workflow_id' => $workflow_id,
+			'graph' => $graph,
 		);
 
 		$executed = 0;
@@ -299,10 +306,18 @@ class WorkflowExecutionService {
 				continue;
 			}
 
+			if ( AgentGraphHelper::isAgentAttachment( $graph_nodes, $node->clientNodeId() ) ) {
+				continue;
+			}
+
 			++$executed;
 
 			$started_at = microtime( true );
-			$result = $this->nodeExecutor->execute( $node, $context );
+			$node_context = array_merge(
+				$context,
+				array( 'current_node_id' => $node->clientNodeId() )
+			);
+			$result = $this->nodeExecutor->execute( $node, $node_context );
 			$duration_ms = (int) round( ( microtime( true ) - $started_at ) * 1000 );
 
 			$success = ! empty( $result['success'] );

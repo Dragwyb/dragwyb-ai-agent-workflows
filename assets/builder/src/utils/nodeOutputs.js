@@ -7,7 +7,12 @@
 const NODE_OUTPUT_FIELDS = {
 	ai_agent_action: [
 		{ key: 'response', preview: 'Agent reply' },
-		{ key: 'parsed', preview: '{ priority, message }' },
+		{ key: 'parsed', preview: '{ "key": "value" }' },
+		{ key: 'iterations', preview: '1' },
+		{ key: 'finish_reason', preview: 'stop' },
+		{ key: 'tool_calls', preview: '{}' },
+		{ key: 'provider', preview: 'openai' },
+		{ key: 'model', preview: 'gpt-4o-mini' },
 	],
 	router_action: [
 		{ key: 'matched_route', preview: 'high' },
