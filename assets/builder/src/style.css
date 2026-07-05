@@ -564,6 +564,17 @@
 	color: #94a3b8;
 }
 
+.wfa-builder-config__captured-empty {
+	margin: 0;
+	padding: 10px 12px;
+	font-size: 12px;
+	line-height: 1.45;
+	color: #64748b;
+	background: #f8fafc;
+	border: 1px dashed #cbd5e1;
+	border-radius: 8px;
+}
+
 /* —— Variable picker —— */
 
 .wfa-variable-picker {
@@ -912,6 +923,13 @@
 	font-size: 15px;
 	font-weight: 600;
 	color: var(--wfa-accent);
+}
+
+.wfa-builder-picker__hint {
+	margin: 0 0 12px;
+	font-size: 12px;
+	color: #64748b;
+	line-height: 1.4;
 }
 
 .wfa-builder-picker__back {

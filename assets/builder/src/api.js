@@ -125,6 +125,17 @@ export function fetchTestStatus(id) {
 
 /**
  * @param {number} id Workflow id.
+ * @return {Promise<Object>}
+ */
+export function clearTestSample(id) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/test/sample`,
+		method: 'DELETE',
+	});
+}
+
+/**
+ * @param {number} id Workflow id.
  * @param {Object} [data]
  * @return {Promise<Object>}
  */

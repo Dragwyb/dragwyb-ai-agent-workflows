@@ -67,6 +67,17 @@ class WorkflowTestController {
 				'args' => $this->idArgs(),
 			)
 		);
+
+		register_rest_route(
+			self::API_NAMESPACE,
+			'/workflows/(?P<id>[\d]+)/test/sample',
+			array(
+				'methods' => WP_REST_Server::DELETABLE,
+				'callback' => array( $this, 'clear_sample' ),
+				'permission_callback' => array( $this, 'permissions_check' ),
+				'args' => $this->idArgs(),
+			)
+		);
 	}
 
 	/**
@@ -156,6 +167,27 @@ class WorkflowTestController {
 				array( 'status' => 404 )
 			);
 		}
+
+		return rest_ensure_response( $this->listener->status( $id ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function clear_sample( $request ) {
+		$id = (int) $request['id'];
+
+		if ( null === $this->workflows->find( $id ) ) {
+			return new WP_Error(
+				'wfa_rest_not_found',
+				__( 'Workflow not found.', 'workflow-automate' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$this->listener->clearSample( $id );
 
 		return rest_ensure_response( $this->listener->status( $id ) );
 	}

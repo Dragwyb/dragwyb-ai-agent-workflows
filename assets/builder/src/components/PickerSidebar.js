@@ -18,6 +18,7 @@ import { getNodeMeta } from '../nodeMeta';
  * @param {string}        props.appId
  * @param {Array<Object>} props.triggers
  * @param {Array<Object>} props.actions
+ * @param {boolean}       [props.hasExistingTrigger]
  * @param {Function}      props.onSelect   ( nodeType, category ) => void
  * @param {Function}      props.onClose
  */
@@ -26,6 +27,7 @@ export default function PickerSidebar({
 	appId,
 	triggers,
 	actions,
+	hasExistingTrigger = false,
 	onSelect,
 	onClose,
 }) {
@@ -44,6 +46,10 @@ export default function PickerSidebar({
 	const title = showGroups
 		? __('Choose a group', 'workflow-automate')
 		: __('Choose a node', 'workflow-automate');
+	const replaceHint =
+		kind === 'trigger' && hasExistingTrigger && !showGroups
+			? __('Selecting a trigger replaces your current one.', 'workflow-automate')
+			: '';
 
 	const handlePick = (item) => {
 		if (item.available === false) {
@@ -77,6 +83,10 @@ export default function PickerSidebar({
 					onClick={onClose}
 				/>
 			</div>
+
+			{replaceHint && (
+				<p className="wfa-builder-picker__hint">{replaceHint}</p>
+			)}
 
 			{showGroups ? (
 				<ul className="wfa-builder-picker__list">

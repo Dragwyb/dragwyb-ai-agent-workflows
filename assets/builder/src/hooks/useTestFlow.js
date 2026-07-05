@@ -7,6 +7,7 @@ import {
 	fetchTestStatus,
 	runWorkflow,
 } from '../api';
+import { sampleMatchesTrigger } from '../utils/testSample';
 
 const POLL_MS = 2000;
 const LISTEN_TIMEOUT_MS = 120000;
@@ -31,11 +32,12 @@ function isCaptureAfterListenStart(capturedAt, startedAt) {
  * @param {Object} options
  * @param {Function} options.persistBeforeTest Save title/graph before testing.
  * @param {Function} [options.hasTrigger]      Returns true when graph has a trigger node.
+ * @param {Function} [options.getTriggerType]  Returns current trigger slug.
  * @param {Function} [options.onSampleCaptured]
  */
 export default function useTestFlow(
 	workflowId,
-	{ persistBeforeTest, hasTrigger, onSampleCaptured }
+	{ persistBeforeTest, hasTrigger, getTriggerType, onSampleCaptured }
 ) {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [listening, setListening] = useState(false);
@@ -72,7 +74,11 @@ export default function useTestFlow(
 
 				if (
 					status.has_sample &&
-					isCaptureAfterListenStart(status.captured_at, startedAt)
+					isCaptureAfterListenStart(status.captured_at, startedAt) &&
+					sampleMatchesTrigger(
+						status,
+						getTriggerType ? getTriggerType() : null
+					)
 				) {
 					clearTimers();
 					setListening(false);
@@ -84,7 +90,7 @@ export default function useTestFlow(
 					);
 
 					if (onSampleCaptured) {
-						onSampleCaptured(status.sample_payload);
+						onSampleCaptured(status.sample_payload, status);
 					}
 				}
 			} catch (error) {
@@ -116,7 +122,7 @@ export default function useTestFlow(
 				)
 			);
 		}, LISTEN_TIMEOUT_MS);
-	}, [workflowId, clearTimers, onSampleCaptured]);
+	}, [workflowId, clearTimers, onSampleCaptured, getTriggerType]);
 
 	const beginListening = useCallback(
 		(startedAt) => {
@@ -208,6 +214,21 @@ export default function useTestFlow(
 			await persistBeforeTest();
 			const status = await fetchTestStatus(workflowId);
 
+			if (
+				!sampleMatchesTrigger(
+					status,
+					getTriggerType ? getTriggerType() : null
+				)
+			) {
+				setStatusMessage(
+					__(
+						'No saved sample for this trigger. Use “Listen new response” first.',
+						'workflow-automate'
+					)
+				);
+				return;
+			}
+
 			if (!status.has_sample) {
 				setStatusMessage(
 					__(
@@ -227,7 +248,7 @@ export default function useTestFlow(
 					: __('Test run failed.', 'workflow-automate')
 			);
 		}
-	}, [workflowId, persistBeforeTest]);
+	}, [workflowId, persistBeforeTest, getTriggerType]);
 
 	const stopListening = useCallback(async () => {
 		clearTimers();

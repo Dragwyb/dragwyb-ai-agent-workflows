@@ -138,6 +138,7 @@ class WorkflowTriggerBinder {
 		}
 
 		$workflow_id = $workflow->id();
+		$trigger_bound = false;
 
 		foreach ( $graph_nodes as $graph_node ) {
 			if ( ! is_array( $graph_node ) || empty( $graph_node['type'] ) ) {
@@ -150,15 +151,23 @@ class WorkflowTriggerBinder {
 				continue;
 			}
 
+			// One trigger per workflow — ignore extra trigger nodes in legacy graphs.
+			if ( $trigger_bound ) {
+				continue;
+			}
+
+			$trigger_bound = true;
+
 			$config = isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : array();
 
 			$trigger->bind(
 				$config,
-				function ( array $payload, array $bound_config ) use ( $workflow_id, $test_listen ): void {
+				function ( array $payload, array $bound_config ) use ( $workflow_id, $test_listen, $graph_node ): void {
 					unset( $bound_config );
 
 					if ( $test_listen ) {
-						$this->test_listener->capturePayload( $workflow_id, $payload );
+						$trigger_type = isset( $graph_node['type'] ) ? (string) $graph_node['type'] : null;
+						$this->test_listener->capturePayload( $workflow_id, $payload, $trigger_type );
 						return;
 					}
 

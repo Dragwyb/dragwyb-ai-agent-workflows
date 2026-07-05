@@ -16,8 +16,18 @@ import {
 	fetchConnections,
 	getBootstrap,
 	fetchTestStatus,
+	clearTestSample,
 } from './api';
-import { generateNodeId, emptyGraph, defaultNodePosition } from './utils';
+import {
+	generateNodeId,
+	emptyGraph,
+	defaultNodePosition,
+	sortNodesForFlow,
+} from './utils';
+import {
+	capturedSampleFromStatus,
+	sampleMatchesTrigger,
+} from './utils/testSample';
 
 const AUTOSAVE_DELAY_MS = 1500;
 
@@ -34,8 +44,25 @@ function normalizeGraph(graph) {
 		return emptyGraph();
 	}
 
+	const nodes = Array.isArray(graph.nodes) ? [...graph.nodes] : [];
+	const triggerNodes = nodes.filter((node) => node.category === 'trigger');
+
+	// A workflow may only have one trigger — keep the topmost if legacy data has more.
+	if (triggerNodes.length > 1) {
+		const keepId = sortNodesForFlow(triggerNodes)[0].id;
+
+		return {
+			nodes: nodes.filter(
+				(node) => node.category !== 'trigger' || node.id === keepId
+			),
+			connections: Array.isArray(graph.connections)
+				? graph.connections
+				: [],
+		};
+	}
+
 	return {
-		nodes: Array.isArray(graph.nodes) ? graph.nodes : [],
+		nodes,
 		connections: Array.isArray(graph.connections) ? graph.connections : [],
 	};
 }
@@ -164,11 +191,23 @@ export default function App() {
 				);
 
 				const settings = workflow.settings || {};
+				const loadedGraph = normalizeGraph(workflow.graph);
+				const loadedTrigger = loadedGraph.nodes.find(
+					(node) => node.category === 'trigger'
+				);
+				const initialSample = capturedSampleFromStatus(
+					{
+						has_sample: Boolean(settings.sample_payload),
+						sample_payload: settings.sample_payload,
+						sample_payload_trigger_type:
+							settings.sample_payload_trigger_type,
+						captured_at: settings.sample_payload_captured_at,
+					},
+					loadedTrigger?.type || null
+				);
 
-				if (settings.sample_payload) {
-					setCapturedPayload(settings.sample_payload);
-					setCapturedAt(settings.sample_payload_captured_at || null);
-				}
+				setCapturedPayload(initialSample.payload);
+				setCapturedAt(initialSample.capturedAt);
 
 				// The state we just set is data we loaded, not an edit — don't
 				// let the autosave effect below treat it as a change to save.
@@ -319,11 +358,34 @@ export default function App() {
 			latestRef.current.graph.nodes.some(
 				(node) => node.category === 'trigger'
 			),
-		onSampleCaptured: (payload) => {
+		getTriggerType: () => {
+			const trigger = latestRef.current.graph.nodes.find(
+				(node) => node.category === 'trigger'
+			);
+
+			return trigger?.type || null;
+		},
+		onSampleCaptured: (payload, status) => {
+			const triggerNode = latestRef.current.graph.nodes.find(
+				(node) => node.category === 'trigger'
+			);
+
+			if (
+				status &&
+				!sampleMatchesTrigger(status, triggerNode?.type || null)
+			) {
+				return;
+			}
+
 			setCapturedPayload(payload);
 			fetchTestStatus(workflowId)
-				.then((status) => {
-					setCapturedAt(status.captured_at || null);
+				.then((freshStatus) => {
+					const sample = capturedSampleFromStatus(
+						freshStatus,
+						triggerNode?.type || null
+					);
+					setCapturedPayload(sample.payload);
+					setCapturedAt(sample.capturedAt);
 				})
 				.catch(() => {});
 		},
@@ -349,10 +411,9 @@ export default function App() {
 					return;
 				}
 
-				if (status.has_sample) {
-					setCapturedPayload(status.sample_payload);
-					setCapturedAt(status.captured_at || null);
-				}
+				const sample = capturedSampleFromStatus(status, node.type);
+				setCapturedPayload(sample.payload);
+				setCapturedAt(sample.capturedAt);
 			})
 			.catch(() => {});
 
@@ -362,6 +423,42 @@ export default function App() {
 	}, [workflowId, selectedNodeId, graph.nodes]);
 
 	const handleAddNode = (nodeTypeDefinition, category) => {
+		setPicker(null);
+
+		const existingTrigger =
+			category === 'trigger'
+				? latestRef.current.graph.nodes.find(
+					(node) => node.category === 'trigger'
+				)
+				: null;
+
+		if (existingTrigger) {
+			focusNodeIdRef.current = existingTrigger.id;
+			setCapturedPayload(null);
+			setCapturedAt(null);
+
+			if (workflowId) {
+				clearTestSample(workflowId).catch(() => {});
+			}
+
+			setGraph((current) => ({
+				...current,
+				nodes: current.nodes.map((node) =>
+					node.id === existingTrigger.id
+						? {
+							...node,
+							type: nodeTypeDefinition.slug,
+							label: nodeTypeDefinition.label,
+							config: defaultConfigFor(nodeTypeDefinition),
+						}
+						: node
+				),
+			}));
+
+			setSelectedNodeId(existingTrigger.id);
+			return;
+		}
+
 		const newNode = {
 			id: generateNodeId(),
 			type: nodeTypeDefinition.slug,
@@ -373,7 +470,6 @@ export default function App() {
 		};
 
 		focusNodeIdRef.current = newNode.id;
-		setPicker(null);
 
 		setGraph((current) => {
 			const position = defaultNodePosition(current.nodes);
@@ -467,6 +563,7 @@ export default function App() {
 	const knownTypeSlugs = allTypes.map((type) => type.slug);
 	const triggerNode = graph.nodes.find((item) => item.category === 'trigger');
 	const triggerLabel = triggerNode?.label || __('Trigger', 'workflow-automate');
+	const hasExistingTrigger = Boolean(triggerNode);
 
 	return (
 		<div className="wfa-builder">
@@ -510,6 +607,7 @@ export default function App() {
 						appId={picker.appId}
 						triggers={nodeTypes.triggers}
 						actions={nodeTypes.actions}
+						hasExistingTrigger={hasExistingTrigger}
 						onSelect={handleAddNode}
 						onClose={() => setPicker(null)}
 					/>

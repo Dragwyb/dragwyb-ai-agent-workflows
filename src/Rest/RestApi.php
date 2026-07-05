@@ -56,7 +56,8 @@ class RestApi {
 	public function registerRoutes(): void {
 		$workflows_controller = new WorkflowsController(
 			$this->container->get( WorkflowService::class ),
-			$this->container->get( WorkflowExecutionService::class )
+			$this->container->get( WorkflowExecutionService::class ),
+			$this->container->get( WorkflowTestListenerService::class )
 		);
 		$workflows_controller->register_routes();
 

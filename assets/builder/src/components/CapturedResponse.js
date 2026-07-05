@@ -11,6 +11,11 @@ import VariablePicker from './VariablePicker';
  * @param {string}      props.sourceLabel
  */
 export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
+	const hasPayload =
+		payload !== null &&
+		payload !== undefined &&
+		(typeof payload !== 'object' || Object.keys(payload).length > 0);
+
 	const handleSelect = (token) => {
 		if (navigator.clipboard && navigator.clipboard.writeText) {
 			navigator.clipboard.writeText(token);
@@ -27,13 +32,22 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 					</span>
 				)}
 			</div>
-			<VariablePicker
-				payload={payload}
-				sourceLabel={sourceLabel}
-				onSelect={handleSelect}
-				onClose={() => {}}
-				embedded
-			/>
+			{hasPayload ? (
+				<VariablePicker
+					payload={payload}
+					sourceLabel={sourceLabel}
+					onSelect={handleSelect}
+					onClose={() => {}}
+					embedded
+				/>
+			) : (
+				<p className="wfa-builder-config__captured-empty">
+					{__(
+						'No captured data for this trigger yet. Use Test Flow → Listen new response, then fire the trigger.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
 		</div>
 	);
 }
