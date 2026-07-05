@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Integration;
 
+use WorkflowAutomate\Plugin\Integration\Actions\AiAgentAction;
 use WorkflowAutomate\Plugin\Integration\Actions\ClaudeMessagesAction;
+use WorkflowAutomate\Plugin\Integration\Actions\ConditionAction;
 use WorkflowAutomate\Plugin\Integration\Actions\GeminiGenerateContentAction;
 use WorkflowAutomate\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
 use WorkflowAutomate\Plugin\Integration\Actions\HttpRequestAction;
 use WorkflowAutomate\Plugin\Integration\Actions\OpenAiChatAction;
+use WorkflowAutomate\Plugin\Integration\Actions\RouterAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SendEmailAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
 use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
@@ -61,6 +64,9 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new GeminiGenerateContentAction( $this->connections ) );
 		$registry->registerAction( new ClaudeMessagesAction( $this->connections ) );
 		$registry->registerAction( new GoogleSheetsAppendRowAction( $this->connections ) );
+		$registry->registerAction( new AiAgentAction( $this->connections ) );
+		$registry->registerAction( new RouterAction() );
+		$registry->registerAction( new ConditionAction() );
 
 		foreach ( IntegrationTriggerCatalog::definitions() as $definition ) {
 			if ( ! $definition['active'] ) {

@@ -17,7 +17,6 @@ use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -50,8 +49,6 @@ class WorkflowsController extends WP_REST_Controller {
 
 	private WorkflowExecutionService $executor;
 
-	private WorkflowTestListenerService $test_listener;
-
 	/**
 	 * Cached item schema. See get_item_schema().
 	 *
@@ -62,16 +59,11 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	protected $schema = null;
 
-	public function __construct(
-		WorkflowService $workflows,
-		WorkflowExecutionService $executor,
-		WorkflowTestListenerService $test_listener
-	) {
+	public function __construct( WorkflowService $workflows, WorkflowExecutionService $executor ) {
 		$this->namespace = 'wfa/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
 		$this->executor = $executor;
-		$this->test_listener = $test_listener;
 	}
 
 	/**
@@ -174,10 +166,6 @@ class WorkflowsController extends WP_REST_Controller {
 						'id' => array(
 							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
 							'type' => 'integer',
-						),
-						'payload' => array(
-							'description' => __( 'Optional trigger payload. When omitted, saved sample payload is used if present.', 'workflow-automate' ),
-							'type' => 'object',
 						),
 					),
 				),
@@ -445,16 +433,9 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function run_item( $request ) {
 		$id = (int) $request['id'];
-		$payload = $request->get_param( 'payload' );
-
-		if ( ! is_array( $payload ) ) {
-			$workflow = $this->workflows->find( $id );
-			$trigger_type = null !== $workflow ? $this->triggerTypeFromWorkflow( $workflow ) : null;
-			$payload = $this->test_listener->samplePayloadForTrigger( $id, $trigger_type );
-		}
 
 		try {
-			$run = $this->executor->run( $id, $payload );
+			$run = $this->executor->run( $id );
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
 		} catch ( RuntimeException $exception ) {
@@ -662,30 +643,5 @@ class WorkflowsController extends WP_REST_Controller {
 				'default' => false,
 			),
 		);
-	}
-
-	/**
-	 * @param Workflow $workflow Workflow domain object.
-	 *
-	 * @return string|null Trigger node type slug, if present.
-	 */
-	private function triggerTypeFromWorkflow( Workflow $workflow ): ?string {
-		$graph_nodes = $workflow->graph()['nodes'] ?? array();
-
-		if ( ! is_array( $graph_nodes ) ) {
-			return null;
-		}
-
-		foreach ( $graph_nodes as $graph_node ) {
-			if ( ! is_array( $graph_node ) ) {
-				continue;
-			}
-
-			if ( ( $graph_node['category'] ?? '' ) === 'trigger' && ! empty( $graph_node['type'] ) ) {
-				return (string) $graph_node['type'];
-			}
-		}
-
-		return null;
 	}
 }

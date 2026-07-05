@@ -12,6 +12,11 @@ const APP_META = {
 	openai: { icon: 'AI', bg: '#10a37f', accent: '#fff' },
 	anthropic: { icon: 'A', bg: '#d4a574', accent: '#1a1a1a' },
 	'google-ai': { icon: 'G', bg: '#4285f4', accent: '#fff' },
+	'ai-agent': { icon: '🤖', bg: '#ff6b35', accent: '#fff' },
+	router_action: { icon: '⇢', bg: '#fef3c7', accent: '#b45309' },
+	condition_action: { icon: '?', bg: '#ede9fe', accent: '#6d28d9' },
+	send_email_action: { icon: '✉', bg: '#dbeafe', accent: '#1d4ed8' },
+	telegram_send_message_action: { icon: '✈', bg: '#e0f2fe', accent: '#0284c7' },
 	communication: { icon: '✉', bg: '#0ea5e9', accent: '#fff' },
 	integrations: { icon: '⚡', bg: '#6366f1', accent: '#fff' },
 };

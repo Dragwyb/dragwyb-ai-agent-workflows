@@ -5,6 +5,18 @@
 
 /** @type {Record<string, Array<{ key: string, preview?: string }>>} */
 const NODE_OUTPUT_FIELDS = {
+	ai_agent_action: [
+		{ key: 'response', preview: 'Agent reply' },
+		{ key: 'parsed', preview: '{ priority, message }' },
+	],
+	router_action: [
+		{ key: 'matched_route', preview: 'high' },
+		{ key: 'field_value', preview: 'high' },
+	],
+	condition_action: [
+		{ key: 'passed', preview: 'true' },
+		{ key: 'evaluated_value', preview: 'high' },
+	],
 	openai_chat_action: [
 		{ key: 'content', preview: 'Assistant reply' },
 		{ key: 'model', preview: 'gpt-5' },

@@ -141,7 +141,30 @@ class NodeTypesController {
 			$data['group_label'] = $node_type->groupLabel();
 		}
 
+		$role = $this->resolveRole( $node_type->slug() );
+
+		if ( null !== $role ) {
+			$data['role'] = $role;
+		}
+
 		return $data;
+	}
+
+	/**
+	 * @param string $slug Node type slug.
+	 *
+	 * @return string|null agent|tool|action
+	 */
+	private function resolveRole( string $slug ): ?string {
+		if ( 'ai_agent_action' === $slug ) {
+			return 'agent';
+		}
+
+		if ( in_array( $slug, array( 'router_action', 'condition_action' ), true ) ) {
+			return 'tool';
+		}
+
+		return 'action';
 	}
 
 	/**

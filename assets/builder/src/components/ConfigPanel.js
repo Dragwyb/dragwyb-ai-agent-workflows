@@ -68,21 +68,85 @@ const INTEGRATION_SLUG_ALIASES = {
 		'google_sheets_api',
 		'sheets',
 	],
+	ai_agent_action: [
+		'openai',
+		'open_ai',
+		'gemini',
+		'google_gemini',
+		'google_ai',
+		'claude',
+		'anthropic',
+		'ai_agent',
+	],
 };
+
+/** @type {Set<string>} */
+const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
+	'provider',
+	'connection_id',
+	'model',
+	'memory_enabled',
+]);
+
+/** @type {Set<string>} */
+const CHAT_MODEL_ATTACHMENT_FIELDS = new Set(['connection_id', 'model']);
+
+/** @type {Record<string, string>} */
+const AGENT_PROVIDER_NODE_SLUGS = {
+	openai: 'openai_chat_action',
+	gemini: 'gemini_generate_content_action',
+	claude: 'claude_messages_action',
+};
+
+/** @type {Record<string, string>} */
+const AGENT_PROVIDER_DEFAULT_MODELS = {
+	openai: 'gpt-4o-mini',
+	gemini: 'gemini-2.0-flash',
+	claude: 'claude-sonnet-4-20250514',
+};
+
+/** @type {Record<string, { secretLabel: string }>} */
+const AGENT_PROVIDER_CONNECTION_SETTINGS = {
+	openai: {
+		secretLabel: __('OpenAI API key', 'workflow-automate'),
+	},
+	gemini: {
+		secretLabel: __('Google AI API key', 'workflow-automate'),
+	},
+	claude: {
+		secretLabel: __('Anthropic API key', 'workflow-automate'),
+	},
+};
+
+/**
+ * @param {string} nodeTypeSlug
+ * @param {Object} nodeConfig
+ * @return {string}
+ */
+function resolveConnectionNodeSlug(nodeTypeSlug, nodeConfig = {}) {
+	if (nodeTypeSlug !== 'ai_agent_action') {
+		return nodeTypeSlug;
+	}
+
+	const provider = String(nodeConfig.provider || 'openai').toLowerCase();
+
+	return AGENT_PROVIDER_NODE_SLUGS[provider] || AGENT_PROVIDER_NODE_SLUGS.openai;
+}
 
 /**
  * @param {Object} connection
  * @param {string} nodeTypeSlug
  * @return {boolean}
  */
-function connectionMatchesNodeType(connection, nodeTypeSlug) {
+function connectionMatchesNodeType(connection, nodeTypeSlug, nodeConfig = {}) {
+	const effectiveSlug = resolveConnectionNodeSlug(nodeTypeSlug, nodeConfig);
 	const slug = connection.integration_slug || '';
 
-	if (slug === nodeTypeSlug) {
+	if (slug === effectiveSlug || slug === nodeTypeSlug) {
 		return true;
 	}
 
-	const aliases = INTEGRATION_SLUG_ALIASES[nodeTypeSlug] || [];
+	const aliases = INTEGRATION_SLUG_ALIASES[effectiveSlug] || [];
 
 	return aliases.includes(slug);
 }
@@ -93,9 +157,9 @@ function connectionMatchesNodeType(connection, nodeTypeSlug) {
  * @param {number}      selectedId
  * @return {Array<Object>}
  */
-function filterMatchingConnections(connections, nodeTypeSlug, selectedId) {
+function filterMatchingConnections(connections, nodeTypeSlug, selectedId, nodeConfig = {}) {
 	const list = (connections || []).filter((connection) =>
-		connectionMatchesNodeType(connection, nodeTypeSlug)
+		connectionMatchesNodeType(connection, nodeTypeSlug, nodeConfig)
 	);
 
 	if (selectedId > 0 && !list.some((connection) => connection.id === selectedId)) {
@@ -244,6 +308,42 @@ export default function ConfigPanel({
 				onChange={onChangeLabel}
 			/>
 
+			{node.parent_agent_id && node.attachment_type === 'tool' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'This tool is attached to your AI Agent. Remove it from the agent or delete it here.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.attachment_type === 'chat_model' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Chat model linked to your agent. Add an API key and pick a model below.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.attachment_type === 'memory' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Simple memory keeps conversation context for this agent run.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.type === 'ai_agent_action' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Use + on the canvas for Chat Model, Memory, and Tools — not the left palette.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
 			{node.category === 'trigger' && (
 				<CapturedResponse
 					payload={capturedPayload}
@@ -262,7 +362,26 @@ export default function ConfigPanel({
 			)}
 
 			{nodeType &&
-				Object.keys(nodeType.config_schema || {}).map((fieldName) => (
+				node.attachment_type !== 'memory' &&
+				Object.keys(nodeType.config_schema || {})
+					.filter((fieldName) => {
+						if (
+							node.type === 'ai_agent_action' &&
+							AGENT_SIDEBAR_HIDDEN_FIELDS.has(fieldName)
+						) {
+							return false;
+						}
+
+						if (
+							node.attachment_type === 'chat_model' &&
+							!CHAT_MODEL_ATTACHMENT_FIELDS.has(fieldName)
+						) {
+							return false;
+						}
+
+						return true;
+					})
+					.map((fieldName) => (
 					<ConfigField
 						key={`${node.id}-${fieldName}`}
 						fieldName={fieldName}
@@ -332,7 +451,33 @@ function ConfigField({
 	}
 
 	const label = fieldSchema.label || fieldName;
+	const help = fieldSchema.help || '';
 	const resolved = value === undefined ? fieldSchema.default : value;
+	const connectionNodeSlug = resolveConnectionNodeSlug(
+		nodeTypeSlug,
+		nodeConfig
+	);
+
+	if (fieldSchema.type === 'select') {
+		const options = (fieldSchema.options || []).map((option) => ({
+			label: option.label || option.value,
+			value: String(option.value ?? ''),
+		}));
+
+		return (
+			<SelectControl
+				label={label}
+				help={help || undefined}
+				value={
+					resolved === undefined || resolved === null
+						? ''
+						: String(resolved)
+				}
+				options={options}
+				onChange={onChange}
+			/>
+		);
+	}
 
 	if (
 		fieldSchema.type === 'dynamic_select' &&
@@ -355,7 +500,7 @@ function ConfigField({
 						: String(fieldSchema.default)
 				}
 				connectionId={connectionId}
-				nodeTypeSlug={nodeTypeSlug}
+				nodeTypeSlug={connectionNodeSlug}
 				onChange={onChange}
 			/>
 		);
@@ -382,8 +527,9 @@ function ConfigField({
 				value={resolved}
 				required={Boolean(fieldSchema.required)}
 				connections={connections || []}
-				nodeTypeSlug={nodeTypeSlug}
+				nodeTypeSlug={connectionNodeSlug}
 				nodeTypeLabel={nodeTypeLabel}
+				nodeConfig={nodeConfig}
 				onConnectionsChange={onConnectionsChange}
 				onChange={onChange}
 			/>
@@ -590,19 +736,28 @@ function ConnectionField({
 	connections,
 	nodeTypeSlug,
 	nodeTypeLabel,
+	nodeConfig = {},
 	onConnectionsChange,
 	onChange,
 }) {
 	const integrationSettings =
-		INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] || {};
+		INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] ||
+		AGENT_PROVIDER_CONNECTION_SETTINGS[nodeConfig.provider] ||
+		{};
 	const defaultAuthType = integrationSettings.authType || 'api_key';
 
 	const selectedId = Number(value || 0);
 	const needsConnection = required && selectedId <= 0;
 
 	const matchingConnections = useMemo(
-		() => filterMatchingConnections(connections, nodeTypeSlug, selectedId),
-		[connections, nodeTypeSlug, selectedId]
+		() =>
+			filterMatchingConnections(
+				connections,
+				nodeTypeSlug,
+				selectedId,
+				nodeConfig
+			),
+		[connections, nodeTypeSlug, selectedId, nodeConfig]
 	);
 
 	const [showAddForm, setShowAddForm] = useState(
