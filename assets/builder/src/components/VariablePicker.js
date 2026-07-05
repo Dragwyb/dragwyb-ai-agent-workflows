@@ -9,11 +9,13 @@ import {
 } from '../utils/payloadVariables';
 
 /**
- * Tree picker for trigger variables.
+ * Tree picker for trigger + prior-step variables.
  *
  * @param {Object}      props
- * @param {*}           props.payload
- * @param {string}      props.sourceLabel
+ * @param {Array<Object>} [props.sources]  `{ id, label, badge, tree }` list.
+ * @param {*}           [props.payload]   Legacy single trigger payload.
+ * @param {string}      [props.sourceLabel]
+ * @param {Record<string, string>} [props.nodeLabels]
  * @param {Function}    props.onSelect
  * @param {Function}    props.onClose
  * @param {boolean}     [props.embedded]
@@ -21,8 +23,10 @@ import {
  * @param {boolean}     [props.showSearch]
  */
 export default function VariablePicker({
+	sources,
 	payload,
 	sourceLabel,
+	nodeLabels = {},
 	onSelect,
 	onClose,
 	embedded = false,
@@ -30,18 +34,52 @@ export default function VariablePicker({
 	showSearch = false,
 }) {
 	const [query, setQuery] = useState('');
-	const tree = useMemo(
-		() => buildPayloadTree(payload, 'trigger', sourceLabel),
-		[payload, sourceLabel]
-	);
-	const filtered = useMemo(() => {
-		if (!showSearch || !query.trim()) {
-			return tree;
+
+	const resolvedSources = useMemo(() => {
+		if (sources && sources.length > 0) {
+			return sources;
 		}
 
-		return filterTree(tree, query) || tree;
-	}, [tree, query, showSearch]);
-	const hasData = (tree.children || []).length > 0;
+		if (
+			payload !== null &&
+			payload !== undefined &&
+			typeof payload === 'object' &&
+			Object.keys(payload).length > 0
+		) {
+			return [
+				{
+					id: 'trigger',
+					label: sourceLabel || 'Trigger',
+					badge: 1,
+					tree: buildPayloadTree(payload, 'trigger', sourceLabel || 'Trigger'),
+				},
+			];
+		}
+
+		return [];
+	}, [sources, payload, sourceLabel]);
+
+	const filteredSources = useMemo(() => {
+		if (!showSearch || !query.trim()) {
+			return resolvedSources;
+		}
+
+		return resolvedSources
+			.map((source) => {
+				const filtered = filterTree(source.tree, query);
+
+				if (!filtered) {
+					return null;
+				}
+
+				return { ...source, tree: filtered };
+			})
+			.filter(Boolean);
+	}, [resolvedSources, query, showSearch]);
+
+	const hasData = resolvedSources.some(
+		(source) => (source.tree.children || []).length > 0
+	);
 
 	return (
 		<div
@@ -75,30 +113,35 @@ export default function VariablePicker({
 			{!hasData ? (
 				<p className="wfa-variable-picker__empty">
 					{__(
-						'No captured data yet. Use Test Flow → Listen new response.',
+						'No variables yet. Listen for trigger data or add steps above this node.',
 						'workflow-automate'
 					)}
 				</p>
 			) : (
-				<>
-					<div className="wfa-variable-picker__source">
-						<span className="wfa-variable-picker__source-badge">1</span>
-						<span className="wfa-variable-picker__source-label">
-							{sourceLabel}
-						</span>
+				filteredSources.map((source) => (
+					<div key={source.id} className="wfa-variable-picker__source-block">
+						<div className="wfa-variable-picker__source">
+							<span className="wfa-variable-picker__source-badge">
+								{source.badge}
+							</span>
+							<span className="wfa-variable-picker__source-label">
+								{source.label}
+							</span>
+						</div>
+						<ul className="wfa-variable-picker__tree">
+							{(source.tree.children || []).map((child) => (
+								<TreeBranch
+									key={`${source.id}-${child.id}`}
+									node={child}
+									depth={0}
+									defaultOpen
+									nodeLabels={nodeLabels}
+									onSelect={onSelect}
+								/>
+							))}
+						</ul>
 					</div>
-					<ul className="wfa-variable-picker__tree">
-						{(filtered.children || []).map((child) => (
-							<TreeBranch
-								key={child.id}
-								node={child}
-								depth={0}
-								defaultOpen
-								onSelect={onSelect}
-							/>
-						))}
-					</ul>
-				</>
+				))
 			)}
 		</div>
 	);
@@ -109,9 +152,10 @@ export default function VariablePicker({
  * @param {Object}   props.node
  * @param {number}   props.depth
  * @param {boolean}  props.defaultOpen
+ * @param {Record<string, string>} props.nodeLabels
  * @param {Function} props.onSelect
  */
-function TreeBranch({ node, depth, defaultOpen, onSelect }) {
+function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 	const [open, setOpen] = useState(defaultOpen);
 	const children = node.children || [];
 
@@ -126,7 +170,7 @@ function TreeBranch({ node, depth, defaultOpen, onSelect }) {
 					title={node.token}
 				>
 					<span className="wfa-variable-picker__pill">
-						{pathToDisplayLabel(node.path)}
+						{pathToDisplayLabel(node.path, nodeLabels)}
 					</span>
 					{node.preview && (
 						<span className="wfa-variable-picker__preview">
@@ -162,6 +206,7 @@ function TreeBranch({ node, depth, defaultOpen, onSelect }) {
 							node={child}
 							depth={depth + 1}
 							defaultOpen={depth < 1}
+							nodeLabels={nodeLabels}
 							onSelect={onSelect}
 						/>
 					))}

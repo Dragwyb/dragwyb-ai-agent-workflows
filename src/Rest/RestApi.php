@@ -16,6 +16,7 @@ use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
 use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
@@ -75,7 +76,8 @@ class RestApi {
 
 		$test_controller = new WorkflowTestController(
 			$this->container->get( WorkflowService::class ),
-			$this->container->get( WorkflowTestListenerService::class )
+			$this->container->get( WorkflowTestListenerService::class ),
+			$this->container->get( WorkflowNodeTestService::class )
 		);
 		$test_controller->register_routes();
 	}

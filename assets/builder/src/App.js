@@ -23,6 +23,7 @@ import {
 	emptyGraph,
 	defaultNodePosition,
 	sortNodesForFlow,
+	insertNodeInFlow,
 } from './utils';
 import {
 	capturedSampleFromStatus,
@@ -90,15 +91,20 @@ export default function App() {
 	// needs a way to read state as of when it actually runs rather than as
 	// of when it was scheduled — a plain ref mirror avoids stale closures
 	// without having to recreate the timeout on every keystroke.
-	const latestRef = useRef({ title: '', graph: emptyGraph(), workflowId: 0 });
+	const latestRef = useRef({
+		title: '',
+		graph: emptyGraph(),
+		workflowId: 0,
+		selectedNodeId: null,
+	});
 	const skipNextAutosaveRef = useRef(false);
 	const autosaveTimeoutRef = useRef(null);
 	const nodeElementsRef = useRef({});
 	const focusNodeIdRef = useRef(null);
 
 	useEffect(() => {
-		latestRef.current = { title, graph, workflowId };
-	}, [title, graph, workflowId]);
+		latestRef.current = { title, graph, workflowId, selectedNodeId };
+	}, [title, graph, workflowId, selectedNodeId]);
 
 	// Escape clears the selection so keyboard users are not stuck in the
 	// config panel (roadmap item 16 accessibility pass).
@@ -471,14 +477,36 @@ export default function App() {
 
 		focusNodeIdRef.current = newNode.id;
 
+		const insertAfterId = latestRef.current.selectedNodeId;
+
 		setGraph((current) => {
-			const position = defaultNodePosition(current.nodes);
+			const { position, nodes: shiftedNodes } = insertNodeInFlow(
+				current.nodes,
+				insertAfterId
+			);
+			const newNodeWithPosition = {
+				...newNode,
+				x: position.x,
+				y: position.y,
+			};
+			const ordered = sortNodesForFlow(shiftedNodes);
+			let insertIndex = ordered.length;
+
+			if (insertAfterId) {
+				const afterIndex = ordered.findIndex(
+					(node) => node.id === insertAfterId
+				);
+
+				if (afterIndex >= 0) {
+					insertIndex = afterIndex + 1;
+				}
+			}
+
+			ordered.splice(insertIndex, 0, newNodeWithPosition);
+
 			return {
 				...current,
-				nodes: [
-					...current.nodes,
-					{ ...newNode, x: position.x, y: position.y },
-				],
+				nodes: ordered,
 			};
 		});
 
@@ -624,6 +652,10 @@ export default function App() {
 						capturedPayload={capturedPayload}
 						capturedAt={capturedAt}
 						triggerLabel={triggerLabel}
+						graphNodes={graph.nodes}
+						workflowId={workflowId}
+						graph={graph}
+						onPersistBeforeTest={persistBeforeTest}
 					/>
 				)}
 			</div>

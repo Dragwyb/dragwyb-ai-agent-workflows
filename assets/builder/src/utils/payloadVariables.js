@@ -164,19 +164,32 @@ export function buildPayloadTree(
 }
 
 /**
- * @param {string} path e.g. trigger.fields.email
+ * @param {string}              path
+ * @param {Record<string, string>} [nodeLabels] Map of node id → label for nodes.* paths.
  * @return {string}
  */
-function tokenShortLabel(path) {
+function tokenShortLabel(path, nodeLabels = {}) {
+	if (path.startsWith('nodes.')) {
+		const segments = path.split('.');
+		const nodeId = segments[1] || '';
+		const fieldPath = segments.slice(2).join('.');
+
+		if (nodeId && fieldPath) {
+			const stepLabel = nodeLabels[nodeId] || 'step';
+			return `${stepLabel} → ${fieldPath}`;
+		}
+	}
+
 	return path.replace(/^trigger\./, '');
 }
 
 /**
- * @param {string} path e.g. trigger.post_status
- * @return {string} Human label, e.g. "post status"
+ * @param {string}              path e.g. trigger.post_status or nodes.uuid.content
+ * @param {Record<string, string>} [nodeLabels]
+ * @return {string} Human label
  */
-export function pathToDisplayLabel(path) {
-	return tokenShortLabel(path).replace(/_/g, ' ');
+export function pathToDisplayLabel(path, nodeLabels = {}) {
+	return tokenShortLabel(path, nodeLabels).replace(/_/g, ' ').replace(/ → /g, ' → ');
 }
 
 const TOKEN_PATTERN = /\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g;

@@ -8,9 +8,11 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection, fetchConnectionModels } from '../api';
+import { createConnection, fetchConnectionModels, testWorkflowNode } from '../api';
 import CapturedResponse from './CapturedResponse';
+import NodeTestResult from './NodeTestResult';
 import TokenField, { fieldSupportsVariables } from './TokenField';
+import { buildVariableSources } from '../utils/variableSources';
 
 /**
  * Per-integration defaults for the inline connection form so switching
@@ -124,6 +126,10 @@ function filterMatchingConnections(connections, nodeTypeSlug, selectedId) {
  * @param {*}             [props.capturedPayload]
  * @param {string|null}   [props.capturedAt]
  * @param {string}        [props.triggerLabel]
+ * @param {Array<Object>} [props.graphNodes]
+ * @param {number}        [props.workflowId]
+ * @param {Object}        [props.graph]
+ * @param {Function}      [props.onPersistBeforeTest]
  */
 export default function ConfigPanel({
 	node,
@@ -137,7 +143,70 @@ export default function ConfigPanel({
 	capturedPayload,
 	capturedAt,
 	triggerLabel = 'Trigger',
+	graphNodes = [],
+	workflowId = 0,
+	graph = { nodes: [], connections: [] },
+	onPersistBeforeTest,
 }) {
+	const [testing, setTesting] = useState(false);
+	const [testResult, setTestResult] = useState(null);
+	const nodeLabels = useMemo(() => {
+		const labels = {};
+
+		graphNodes.forEach((graphNode) => {
+			labels[graphNode.id] = graphNode.label || graphNode.type;
+		});
+
+		return labels;
+	}, [graphNodes]);
+
+	const variableSources = useMemo(
+		() =>
+			buildVariableSources({
+				graphNodes,
+				currentNodeId: node?.id || null,
+				triggerPayload: capturedPayload,
+				triggerLabel,
+			}),
+		[graphNodes, node?.id, capturedPayload, triggerLabel]
+	);
+
+	useEffect(() => {
+		setTestResult(null);
+	}, [node?.id, node?.type]);
+
+	const handleTestNode = async () => {
+		if (!workflowId || !node?.id) {
+			return;
+		}
+
+		setTesting(true);
+		setTestResult(null);
+
+		try {
+			if (onPersistBeforeTest) {
+				await onPersistBeforeTest();
+			}
+
+			const result = await testWorkflowNode(workflowId, {
+				node_id: node.id,
+				graph,
+			});
+
+			setTestResult(result);
+		} catch (error) {
+			setTestResult({
+				success: false,
+				error:
+					error && error.message
+						? error.message
+						: __('Could not test this node.', 'workflow-automate'),
+			});
+		} finally {
+			setTesting(false);
+		}
+	};
+
 	if (!node) {
 		return (
 			<aside
@@ -204,21 +273,42 @@ export default function ConfigPanel({
 						nodeTypeLabel={nodeType.label}
 						nodeCategory={node.category}
 						nodeConfig={node.config || {}}
-						capturedPayload={capturedPayload}
-						triggerLabel={triggerLabel}
+						variableSources={variableSources}
+						nodeLabels={nodeLabels}
 						onConnectionsChange={onConnectionsChange}
 						onChange={(value) => onChangeConfig(fieldName, value)}
 					/>
 				))}
 
-			<Button
-				isDestructive
-				variant="secondary"
-				onClick={onDelete}
-				className="wfa-builder-config__delete"
-			>
-				{__('Delete node', 'workflow-automate')}
-			</Button>
+			{testResult && (
+				<NodeTestResult
+					success={Boolean(testResult.success)}
+					error={testResult.error || null}
+					input={testResult.input || null}
+					output={testResult.output || null}
+				/>
+			)}
+
+			<div className="wfa-builder-config__actions">
+				<Button
+					variant="secondary"
+					onClick={handleTestNode}
+					isBusy={testing}
+					disabled={testing || !workflowId}
+					className="wfa-builder-config__test"
+				>
+					{__('Test node', 'workflow-automate')}
+				</Button>
+
+				<Button
+					isDestructive
+					variant="secondary"
+					onClick={onDelete}
+					className="wfa-builder-config__delete"
+				>
+					{__('Delete node', 'workflow-automate')}
+				</Button>
+			</div>
 		</aside>
 	);
 }
@@ -232,8 +322,8 @@ function ConfigField({
 	nodeTypeLabel,
 	nodeCategory,
 	nodeConfig,
-	capturedPayload,
-	triggerLabel,
+	variableSources,
+	nodeLabels,
 	onConnectionsChange,
 	onChange,
 }) {
@@ -314,8 +404,8 @@ function ConfigField({
 						: String(resolved)
 				}
 				required={Boolean(fieldSchema.required)}
-				payload={capturedPayload}
-				sourceLabel={triggerLabel}
+				variableSources={variableSources}
+				nodeLabels={nodeLabels}
 				onChange={onChange}
 			/>
 		);

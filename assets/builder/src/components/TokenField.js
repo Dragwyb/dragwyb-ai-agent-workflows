@@ -12,12 +12,12 @@ import {
  * @param {string} path
  * @return {HTMLSpanElement}
  */
-function createPillElement(token, path) {
+function createPillElement(token, path, nodeLabels = {}) {
 	const span = document.createElement('span');
 	span.className = 'wfa-token-field__pill';
 	span.contentEditable = 'false';
 	span.dataset.token = token;
-	span.textContent = pathToDisplayLabel(path);
+	span.textContent = pathToDisplayLabel(path, nodeLabels);
 	return span;
 }
 
@@ -47,13 +47,13 @@ function serializeEditor(editor) {
  * @param {string}      value
  * @return {void}
  */
-function populateEditor(editor, value) {
+function populateEditor(editor, value, nodeLabels = {}) {
 	editor.innerHTML = '';
 
 	segmentValueWithTokens(value).forEach((segment) => {
 		if (segment.type === 'token') {
 			editor.appendChild(
-				createPillElement(segment.value, segment.path || '')
+				createPillElement(segment.value, segment.path || '', nodeLabels)
 			);
 			return;
 		}
@@ -70,10 +70,10 @@ function populateEditor(editor, value) {
  * @param {string}      path
  * @return {void}
  */
-function insertTokenAtCursor(editor, token, path) {
+function insertTokenAtCursor(editor, token, path, nodeLabels = {}) {
 	editor.focus();
 	const selection = window.getSelection();
-	const pill = createPillElement(token, path);
+	const pill = createPillElement(token, path, nodeLabels);
 	const space = document.createTextNode(' ');
 
 	if (!selection || selection.rangeCount === 0) {
@@ -93,14 +93,14 @@ function insertTokenAtCursor(editor, token, path) {
 }
 
 /**
- * Prompt/message field with friendly variable pills; stores {{trigger.*}} tokens.
+ * Prompt/message field with variable pills for trigger + prior steps.
  */
 export default function TokenField({
 	label,
 	value,
 	required,
-	payload,
-	sourceLabel,
+	variableSources = [],
+	nodeLabels = {},
 	onChange,
 }) {
 	const wrapperRef = useRef(null);
@@ -109,11 +109,9 @@ export default function TokenField({
 	const lastSerializedRef = useRef(value || '');
 	const [pickerOpen, setPickerOpen] = useState(false);
 	const [popoverPos, setPopoverPos] = useState(null);
-	const hasPayload =
-		payload !== null &&
-		payload !== undefined &&
-		typeof payload === 'object' &&
-		Object.keys(payload).length > 0;
+	const hasVariables = variableSources.some(
+		(source) => (source.tree?.children || []).length > 0
+	);
 
 	const updatePopoverPosition = useCallback(() => {
 		if (!wrapperRef.current) {
@@ -168,19 +166,19 @@ export default function TokenField({
 				return;
 			}
 
-			insertTokenAtCursor(editor, token, path);
+			insertTokenAtCursor(editor, token, path, nodeLabels);
 			syncFromEditor();
 			editor.focus();
 		},
-		[value, onChange, syncFromEditor]
+		[value, onChange, syncFromEditor, nodeLabels]
 	);
 
 	const openPicker = useCallback(() => {
-		if (hasPayload) {
+		if (hasVariables) {
 			updatePopoverPosition();
 			setPickerOpen(true);
 		}
-	}, [hasPayload, updatePopoverPosition]);
+	}, [hasVariables, updatePopoverPosition]);
 
 	useEffect(() => {
 		const editor = editorRef.current;
@@ -195,9 +193,9 @@ export default function TokenField({
 			return;
 		}
 
-		populateEditor(editor, current);
+		populateEditor(editor, current, nodeLabels);
 		lastSerializedRef.current = current;
-	}, [value]);
+	}, [value, nodeLabels]);
 
 	useEffect(() => {
 		if (!pickerOpen) {
@@ -267,7 +265,7 @@ export default function TokenField({
 				onClick={openPicker}
 			/>
 
-			{pickerOpen && hasPayload && popoverPos && (
+			{pickerOpen && hasVariables && popoverPos && (
 				<div
 					ref={popoverRef}
 					className="wfa-token-field__popover"
@@ -280,8 +278,8 @@ export default function TokenField({
 					}}
 				>
 					<VariablePicker
-						payload={payload}
-						sourceLabel={sourceLabel}
+						sources={variableSources}
+						nodeLabels={nodeLabels}
 						onSelect={insertToken}
 						onClose={() => setPickerOpen(false)}
 						embedded
@@ -290,10 +288,10 @@ export default function TokenField({
 				</div>
 			)}
 
-			{!hasPayload && (
+			{!hasVariables && (
 				<p className="wfa-token-field__hint">
 					{__(
-						'Use Test Flow → Listen new response to load trigger variables.',
+						'Add steps above this node, or use Test Flow → Listen to load trigger variables.',
 						'workflow-automate'
 					)}
 				</p>

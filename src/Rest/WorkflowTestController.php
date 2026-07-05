@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
 use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
@@ -29,9 +30,16 @@ class WorkflowTestController {
 
 	private WorkflowTestListenerService $listener;
 
-	public function __construct( WorkflowService $workflows, WorkflowTestListenerService $listener ) {
-		$this->workflows = $workflows;
-		$this->listener  = $listener;
+	private WorkflowNodeTestService $node_tester;
+
+	public function __construct(
+		WorkflowService $workflows,
+		WorkflowTestListenerService $listener,
+		WorkflowNodeTestService $node_tester
+	) {
+		$this->workflows    = $workflows;
+		$this->listener     = $listener;
+		$this->node_tester  = $node_tester;
 	}
 
 	/**
@@ -76,6 +84,31 @@ class WorkflowTestController {
 				'callback' => array( $this, 'clear_sample' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
 				'args' => $this->idArgs(),
+			)
+		);
+
+		register_rest_route(
+			self::API_NAMESPACE,
+			'/workflows/(?P<id>[\d]+)/test/node',
+			array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( $this, 'test_node' ),
+				'permission_callback' => array( $this, 'permissions_check' ),
+				'args' => array_merge(
+					$this->idArgs(),
+					array(
+						'node_id' => array(
+							'description' => __( 'Client-side node id from the workflow graph.', 'workflow-automate' ),
+							'type' => 'string',
+							'required' => true,
+						),
+						'graph' => array(
+							'description' => __( 'Optional unsaved workflow graph (nodes + connections).', 'workflow-automate' ),
+							'type' => 'object',
+							'required' => false,
+						),
+					)
+				),
 			)
 		);
 	}
@@ -190,5 +223,39 @@ class WorkflowTestController {
 		$this->listener->clearSample( $id );
 
 		return rest_ensure_response( $this->listener->status( $id ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function test_node( $request ) {
+		$id       = (int) $request['id'];
+		$node_id  = sanitize_text_field( (string) $request->get_param( 'node_id' ) );
+		$graph    = $request->get_param( 'graph' );
+		$workflow = $this->workflows->find( $id );
+
+		if ( null === $workflow ) {
+			return new WP_Error(
+				'wfa_rest_not_found',
+				__( 'Workflow not found.', 'workflow-automate' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( '' === $node_id ) {
+			return new WP_Error(
+				'wfa_rest_invalid_param',
+				__( 'A node id is required.', 'workflow-automate' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$graph_override = is_array( $graph ) ? $graph : array();
+
+		return rest_ensure_response(
+			$this->node_tester->testNode( $id, $node_id, $graph_override )
+		);
 	}
 }
