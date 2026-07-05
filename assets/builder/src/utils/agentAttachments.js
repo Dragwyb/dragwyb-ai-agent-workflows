@@ -13,9 +13,6 @@ export const CHAT_MODEL_SLUGS = new Set([
 	'claude_messages_action',
 ]);
 
-/** @type {Set<string>} */
-export const TOOL_NODE_SLUGS = new Set(['router_action', 'condition_action']);
-
 /** @type {Record<string, string>} */
 export const PROVIDER_BY_CHAT_MODEL_SLUG = {
 	openai_chat_action: 'openai',
@@ -51,14 +48,6 @@ export const MEMORY_NODE_HEIGHT = 40;
  */
 export function isAgentNode(node) {
 	return node?.type === AI_AGENT_SLUG;
-}
-
-/**
- * @param {Object} node
- * @return {boolean}
- */
-export function isAgentAttachment(node) {
-	return Boolean(node?.parent_agent_id);
 }
 
 /**
@@ -103,37 +92,35 @@ export function mainCanvasNodes(nodes) {
 
 /**
  * @param {Array<Object>} nodes
- * @param {string} agentId
+ * @param {string}        agentId
  * @return {Object|null}
  */
 export function chatModelForAgent(nodes, agentId) {
 	return (
 		nodes.find(
 			(node) =>
-				node.parent_agent_id === agentId &&
-				isChatModelAttachment(node)
+				node.parent_agent_id === agentId && isChatModelAttachment(node)
 		) || null
 	);
 }
 
 /**
  * @param {Array<Object>} nodes
- * @param {string} agentId
+ * @param {string}        agentId
  * @return {Object|null}
  */
 export function memoryForAgent(nodes, agentId) {
 	return (
 		nodes.find(
 			(node) =>
-				node.parent_agent_id === agentId &&
-				isMemoryAttachment(node)
+				node.parent_agent_id === agentId && isMemoryAttachment(node)
 		) || null
 	);
 }
 
 /**
  * @param {Array<Object>} nodes
- * @param {string} agentId
+ * @param {string}        agentId
  * @return {Array<Object>}
  */
 export function toolsForAgent(nodes, agentId) {
@@ -283,36 +270,9 @@ export function toolInputPortPosition(toolNode) {
 
 /**
  * @param {Array<Object>} nodes
- * @param {string} agentId
+ * @param {string}        agentId
  * @return {Array<Object>}
  */
 export function removeAgentAttachments(nodes, agentId) {
 	return nodes.filter((node) => node.parent_agent_id !== agentId);
-}
-
-/**
- * @param {Array<Object>} nodes
- * @param {string} agentId
- * @return {Array<Object>}
- */
-export function removeChatModelAttachment(nodes, agentId) {
-	return nodes.filter(
-		(node) =>
-			!(
-				node.parent_agent_id === agentId &&
-				isChatModelAttachment(node)
-			)
-	);
-}
-
-/**
- * @param {Array<Object>} nodes
- * @param {string} agentId
- * @return {Array<Object>}
- */
-export function removeMemoryAttachment(nodes, agentId) {
-	return nodes.filter(
-		(node) =>
-			!(node.parent_agent_id === agentId && isMemoryAttachment(node))
-	);
 }

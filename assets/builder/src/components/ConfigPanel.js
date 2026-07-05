@@ -105,7 +105,6 @@ const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
 	'provider',
 	'connection_id',
 	'model',
-	'memory_enabled',
 ]);
 
 /** @type {Set<string>} */
@@ -116,13 +115,6 @@ const AGENT_PROVIDER_NODE_SLUGS = {
 	openai: 'openai_chat_action',
 	gemini: 'gemini_generate_content_action',
 	claude: 'claude_messages_action',
-};
-
-/** @type {Record<string, string>} */
-const AGENT_PROVIDER_DEFAULT_MODELS = {
-	openai: 'gpt-4o-mini',
-	gemini: 'gemini-2.0-flash',
-	claude: 'claude-sonnet-4-20250514',
 };
 
 /** @type {Record<string, { secretLabel: string }>} */

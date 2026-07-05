@@ -59,9 +59,9 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 			return $spreadsheet_id;
 		}
 
-		$values_raw = $this->configString( $config, 'values' );
+		$values = $this->parseValuesFromConfig( $config, 'values' );
 
-		if ( '' === $values_raw ) {
+		if ( array() === $values ) {
 			return array(
 				'success' => false,
 				'error' => __( 'No row values configured.', 'workflow-automate' ),
@@ -71,7 +71,7 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 		$result = $services['rows']->addRow(
 			$spreadsheet_id,
 			$this->requireSheetTitle( $config ),
-			$this->parseIndexedValues( $values_raw ),
+			$values,
 			$this->configString( $config, 'value_input_option', 'USER_ENTERED' )
 		);
 

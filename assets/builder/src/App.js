@@ -21,7 +21,6 @@ import {
 import {
 	generateNodeId,
 	emptyGraph,
-	defaultNodePosition,
 	sortNodesForFlow,
 	insertNodeInFlow,
 } from './utils';
@@ -218,12 +217,12 @@ export default function App() {
 						nodes: previous.nodes.map((node) =>
 							node.id === oauthNodeId
 								? {
-									...node,
-									config: {
-										...(node.config || {}),
-										connection_id: oauthConnectionId,
-									},
-								}
+										...node,
+										config: {
+											...(node.config || {}),
+											connection_id: oauthConnectionId,
+										},
+									}
 								: node
 						),
 					}));
@@ -270,9 +269,9 @@ export default function App() {
 						error && error.message
 							? error.message
 							: __(
-								'Failed to load the workflow.',
-								'workflow-automate'
-							)
+									'Failed to load the workflow.',
+									'workflow-automate'
+								)
 					);
 				}
 			} finally {
@@ -439,7 +438,7 @@ export default function App() {
 					setCapturedPayload(sample.payload);
 					setCapturedAt(sample.capturedAt);
 				})
-				.catch(() => { });
+				.catch(() => {});
 		},
 	});
 
@@ -467,7 +466,7 @@ export default function App() {
 				setCapturedPayload(sample.payload);
 				setCapturedAt(sample.capturedAt);
 			})
-			.catch(() => { });
+			.catch(() => {});
 
 		return () => {
 			cancelled = true;
@@ -480,8 +479,8 @@ export default function App() {
 		const existingTrigger =
 			category === 'trigger'
 				? latestRef.current.graph.nodes.find(
-					(node) => node.category === 'trigger'
-				)
+						(node) => node.category === 'trigger'
+					)
 				: null;
 
 		if (existingTrigger) {
@@ -490,7 +489,7 @@ export default function App() {
 			setCapturedAt(null);
 
 			if (workflowId) {
-				clearTestSample(workflowId).catch(() => { });
+				clearTestSample(workflowId).catch(() => {});
 			}
 
 			setGraph((current) => ({
@@ -498,11 +497,11 @@ export default function App() {
 				nodes: current.nodes.map((node) =>
 					node.id === existingTrigger.id
 						? {
-							...node,
-							type: nodeTypeDefinition.slug,
-							label: nodeTypeDefinition.label,
-							config: defaultConfigFor(nodeTypeDefinition),
-						}
+								...node,
+								type: nodeTypeDefinition.slug,
+								label: nodeTypeDefinition.label,
+								config: defaultConfigFor(nodeTypeDefinition),
+							}
 						: node
 				),
 			}));
@@ -526,7 +525,9 @@ export default function App() {
 		const insertAfterId = latestRef.current.selectedNodeId;
 
 		setGraph((current) => {
-			const mainNodes = current.nodes.filter((node) => !node.parent_agent_id);
+			const mainNodes = current.nodes.filter(
+				(node) => !node.parent_agent_id
+			);
 			const { position, nodes: shiftedNodes } = insertNodeInFlow(
 				mainNodes,
 				insertAfterId
@@ -603,32 +604,19 @@ export default function App() {
 
 		focusNodeIdRef.current = newMemory.id;
 
-		setGraph((current) => {
-			const withoutMemory = current.nodes.filter(
-				(node) =>
-					!(
-						node.parent_agent_id === agentId &&
-						node.attachment_type === 'memory'
-					)
-			);
-
-			const nodes = withoutMemory.map((node) =>
-				node.id === agentId
-					? {
-						...node,
-						config: {
-							...node.config,
-							memory_enabled: true,
-						},
-					}
-					: node
-			);
-
-			return {
-				...current,
-				nodes: [...nodes, newMemory],
-			};
-		});
+		setGraph((current) => ({
+			...current,
+			nodes: [
+				...current.nodes.filter(
+					(node) =>
+						!(
+							node.parent_agent_id === agentId &&
+							node.attachment_type === 'memory'
+						)
+				),
+				newMemory,
+			],
+		}));
 
 		setSelectedNodeId(newMemory.id);
 	};
@@ -824,30 +812,13 @@ export default function App() {
 				nodes = nodes.map((node) =>
 					node.id === deletingNode.parent_agent_id
 						? {
-							...node,
-							config: {
-								...node.config,
-								connection_id: 0,
-								model: '',
-							},
-						}
-						: node
-				);
-			}
-
-			if (
-				deletingNode?.attachment_type === 'memory' &&
-				deletingNode.parent_agent_id
-			) {
-				nodes = nodes.map((node) =>
-					node.id === deletingNode.parent_agent_id
-						? {
-							...node,
-							config: {
-								...node.config,
-								memory_enabled: false,
-							},
-						}
+								...node,
+								config: {
+									...node.config,
+									connection_id: 0,
+									model: '',
+								},
+							}
 						: node
 				);
 			}
@@ -884,7 +855,8 @@ export default function App() {
 		: null;
 	const knownTypeSlugs = allTypes.map((type) => type.slug);
 	const triggerNode = graph.nodes.find((item) => item.category === 'trigger');
-	const triggerLabel = triggerNode?.label || __('Trigger', 'workflow-automate');
+	const triggerLabel =
+		triggerNode?.label || __('Trigger', 'workflow-automate');
 	const hasExistingTrigger = Boolean(triggerNode);
 
 	return (
@@ -936,13 +908,16 @@ export default function App() {
 						onSelect={
 							picker.kind === 'agent-tool'
 								? (item) =>
-									handleAttachAgentTool(item, picker.agentId)
-								: picker.kind === 'agent-chat-model'
-									? (item) =>
-										handleAttachAgentChatModel(
+										handleAttachAgentTool(
 											item,
 											picker.agentId
 										)
+								: picker.kind === 'agent-chat-model'
+									? (item) =>
+											handleAttachAgentChatModel(
+												item,
+												picker.agentId
+											)
 									: handleAddNode
 						}
 						onClose={() => setPicker(null)}

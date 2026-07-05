@@ -17,7 +17,6 @@ export default function AgentNodeCard({
 	hasMemory,
 	chatModelId,
 	onSelect,
-	onMove,
 	onAddChatModel,
 	onAddMemory,
 	onAddTool,

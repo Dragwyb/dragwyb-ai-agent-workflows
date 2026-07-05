@@ -57,6 +57,11 @@ const NODE_OUTPUT_FIELDS = {
 		{ key: 'updated_range', preview: 'Sheet1!A1' },
 		{ key: 'status_code', preview: '200' },
 	],
+	google_sheets_create_spreadsheet_action: [
+		{ key: 'spreadsheet_id', preview: 'abc123' },
+		{ key: 'spreadsheet_url', preview: 'https://docs.google.com/spreadsheets/d/…' },
+		{ key: 'updated_range', preview: 'Sheet1!A1:E1' },
+	],
 };
 
 /**

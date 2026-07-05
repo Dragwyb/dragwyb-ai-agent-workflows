@@ -39,11 +39,11 @@ export default function PickerSidebar({
 }) {
 	const [groupId, setGroupId] = useState(null);
 	const [subAppId, setSubAppId] = useState(null);
-	const usesGroups = appUsesGroups(kind, appId, triggers);
+	const usesGroups = appUsesGroups(kind, appId);
 	const usesGroupedSections = appUsesGroupedSections(kind, appId, subAppId);
 	const groups = useMemo(
-		() => getGroupsForApp(kind, appId, triggers, actions),
-		[kind, appId, triggers, actions]
+		() => getGroupsForApp(kind, appId, triggers),
+		[kind, appId, triggers]
 	);
 	const subApps = useMemo(
 		() => getSubAppsForPicker(kind, appId, actions),

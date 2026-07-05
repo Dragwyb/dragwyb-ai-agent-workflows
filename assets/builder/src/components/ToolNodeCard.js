@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
 import { getNodeMeta } from '../nodeMeta';
-import { TOOL_NODE_HEIGHT } from '../utils/agentAttachments';
 
 /**
  * Compact tool card attached below an AI Agent.

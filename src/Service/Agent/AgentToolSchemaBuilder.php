@@ -141,10 +141,13 @@ class AgentToolSchemaBuilder {
 			}
 
 			$label = (string) ( $field_def['label'] ?? $field_key );
+			$description = isset( $field_def['description'] ) && is_string( $field_def['description'] ) && '' !== trim( $field_def['description'] )
+				? trim( $field_def['description'] )
+				: $label;
 
 			$properties[ $field_key ] = array(
 				'type'        => 'object' === $field_type ? 'string' : $field_type,
-				'description' => $label,
+				'description' => $description,
 			);
 
 			if ( ! empty( $field_def['required'] ) ) {

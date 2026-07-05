@@ -465,10 +465,9 @@ export function getSubAppsForPicker(kind, appId, actions) {
  * @param {'trigger'|'agent'|'action'} kind
  * @param {string}                     appId
  * @param {Array<Object>}              triggers
- * @param {Array<Object>}              actions
  * @return {Array<{ id: string, label: string }>}
  */
-export function getGroupsForApp(kind, appId, triggers, actions) {
+export function getGroupsForApp(kind, appId, triggers) {
 	if (kind === 'trigger' && appId === 'wordpress') {
 		const groups = new Map();
 
@@ -568,11 +567,9 @@ export function getItemsForPicker(
 /**
  * @param {'trigger'|'agent'|'action'} kind
  * @param {string}                     appId
- * @param {Array<Object>}              triggers
- * @param {Array<Object>}              actions
  * @return {boolean}
  */
-export function appUsesGroups(kind, appId, triggers) {
+export function appUsesGroups(kind, appId) {
 	return kind === 'trigger' && appId === 'wordpress';
 }
 

@@ -107,10 +107,6 @@ class AiAgentAction implements ActionInterface {
 
 		$result = $this->agent->execute( $config, $context, $agent_node_id );
 
-		if ( ! empty( $result['success'] ) ) {
-			$result['success'] = true;
-		}
-
 		return $result;
 	}
 }

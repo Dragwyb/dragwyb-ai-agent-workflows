@@ -27,7 +27,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 	}
 
 	public function description(): string {
-		return __( 'Creates a new Google spreadsheet.', 'workflow-automate' );
+		return __( 'Creates a new Google spreadsheet. Pass values (and optional header_row) to write post/trigger data into the first sheet tab.', 'workflow-automate' );
 	}
 
 	public function configSchema(): array {
@@ -36,13 +36,23 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 			'title' => array(
 				'type' => 'string',
 				'label' => __( 'Spreadsheet title', 'workflow-automate' ),
+				'description' => __( 'Name for the new spreadsheet file.', 'workflow-automate' ),
 				'required' => true,
+				'agent_fillable' => true,
 			),
 			'sheet_title' => array(
 				'type' => 'string',
 				'label' => __( 'First sheet tab name', 'workflow-automate' ),
 				'default' => 'Sheet1',
+				'agent_fillable' => true,
 			),
+			'header_row' => array(
+				'type' => 'string',
+				'label' => __( 'Header row', 'workflow-automate' ),
+				'description' => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'workflow-automate' ),
+				'agent_fillable' => true,
+			),
+			'values' => $this->optionalValuesField(),
 		);
 	}
 
@@ -64,12 +74,62 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 			);
 		}
 
-		return $this->formatResult(
-			$services['spreads']->createSpreadsheet(
-				$title,
-				$this->configString( $config, 'sheet_title', 'Sheet1' )
-			)
-		);
+		$sheet_title = $this->requireSheetTitle( $config );
+		$result      = $services['spreads']->createSpreadsheet( $title, $sheet_title );
+		$formatted   = $this->formatResult( $result );
+
+		if ( empty( $formatted['success'] ) ) {
+			return $formatted;
+		}
+
+		$response       = is_array( $result['response'] ?? null ) ? $result['response'] : array();
+		$spreadsheet_id = (string) ( $response['spreadsheetId'] ?? '' );
+
+		if ( '' !== $spreadsheet_id ) {
+			$formatted['spreadsheet_id'] = $spreadsheet_id;
+		}
+
+		if ( ! empty( $response['spreadsheetUrl'] ) ) {
+			$formatted['spreadsheet_url'] = (string) $response['spreadsheetUrl'];
+		}
+
+		if ( '' === $spreadsheet_id ) {
+			return $formatted;
+		}
+
+		$header_row = $this->parseValuesFromConfig( $config, 'header_row' );
+
+		if ( array() !== $header_row ) {
+			$header_result = $services['rows']->addRow( $spreadsheet_id, $sheet_title, $header_row );
+
+			if ( empty( $header_result['success'] ) ) {
+				$formatted['header_row_error'] = isset( $header_result['error'] )
+					? (string) $header_result['error']
+					: __( 'Failed to write the header row.', 'workflow-automate' );
+			}
+		}
+
+		$values = $this->parseValuesFromConfig( $config, 'values' );
+
+		if ( array() === $values ) {
+			return $formatted;
+		}
+
+		$row_result = $services['rows']->addRow( $spreadsheet_id, $sheet_title, $values );
+
+		if ( empty( $row_result['success'] ) ) {
+			$formatted['row_error'] = isset( $row_result['error'] )
+				? (string) $row_result['error']
+				: __( 'Spreadsheet was created but the data row could not be written.', 'workflow-automate' );
+
+			return $formatted;
+		}
+
+		if ( isset( $row_result['response']['updates']['updatedRange'] ) ) {
+			$formatted['updated_range'] = (string) $row_result['response']['updates']['updatedRange'];
+		}
+
+		return $formatted;
 	}
 }
 

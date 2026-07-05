@@ -73,6 +73,70 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	}
 
 	/**
+	 * Optional row values for agent-driven tools (e.g. create spreadsheet + seed row).
+	 *
+	 * @return array{type: string, label: string, description?: string, agent_fillable?: bool}
+	 */
+	protected function optionalValuesField(): array {
+		return array(
+			'type' => 'string',
+			'label' => __( 'Row values', 'workflow-automate' ),
+			'description' => __( 'Comma-separated cell values for a data row (map fields from trigger/post data). Optional.', 'workflow-automate' ),
+			'agent_fillable' => true,
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $config Node config.
+	 * @param string               $key    Config key holding values.
+	 *
+	 * @return array<int, string>
+	 */
+	protected function parseValuesFromConfig( array $config, string $key = 'values' ): array {
+		if ( ! array_key_exists( $key, $config ) ) {
+			return array();
+		}
+
+		$raw = $config[ $key ];
+
+		if ( is_array( $raw ) ) {
+			$values = array();
+
+			foreach ( $raw as $index => $value ) {
+				if ( ! is_int( $index ) && ! is_string( $index ) ) {
+					continue;
+				}
+
+				$values[ (int) $index ] = is_scalar( $value ) ? (string) $value : ( wp_json_encode( $value ) ?: '' );
+			}
+
+			if ( array() !== $values ) {
+				ksort( $values );
+
+				return $values;
+			}
+
+			return array();
+		}
+
+		$string = trim( (string) $raw );
+
+		if ( '' === $string ) {
+			return array();
+		}
+
+		if ( str_starts_with( $string, '[' ) ) {
+			$decoded = json_decode( $string, true );
+
+			if ( is_array( $decoded ) ) {
+				return $this->parseValuesFromConfig( array( $key => $decoded ), $key );
+			}
+		}
+
+		return $this->parseIndexedValues( $string );
+	}
+
+	/**
 	 * @param array<string, mixed> $config Node config.
 	 *
 	 * @return array{success: bool, error?: string}|array{commons: GoogleSheetCommons, spreadsheets: GoogleSpreadsheetService, sheets: GoogleSheetService, rows: GoogleRowService}
