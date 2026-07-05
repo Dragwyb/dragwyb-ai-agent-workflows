@@ -14,6 +14,7 @@ use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Connection;
 use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,8 +47,11 @@ class ConnectionFormPage implements AdminPage {
 
 	private ConnectionService $connections;
 
-	public function __construct( ConnectionService $connections ) {
-		$this->connections = $connections;
+	private GoogleOAuthService $google_oauth;
+
+	public function __construct( ConnectionService $connections, GoogleOAuthService $google_oauth ) {
+		$this->connections  = $connections;
+		$this->google_oauth = $google_oauth;
 	}
 
 	/**
@@ -109,6 +113,7 @@ class ConnectionFormPage implements AdminPage {
 		$id = isset( $_GET['connection'] ) ? absint( wp_unslash( $_GET['connection'] ) ) : 0;
 
 		echo '<div class="wrap wfa-admin-page">';
+		$this->renderNotice();
 
 		if ( $id > 0 ) {
 			$connection = $this->connections->find( $id );
@@ -141,6 +146,10 @@ class ConnectionFormPage implements AdminPage {
 			$integration_slug = isset( $_GET['integration_slug'] ) ? sanitize_key( wp_unslash( $_GET['integration_slug'] ) ) : '';
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only prefill from the step-1 GET form; re-validated/sanitized again on the real POST submit.
 			$label = isset( $_GET['label'] ) ? sanitize_text_field( wp_unslash( $_GET['label'] ) ) : '';
+
+			if ( ConnectionAuthTypes::OAUTH2 === $auth_type ) {
+				$this->renderOAuthSetupHelp();
+			}
 
 			$this->renderCreateForm( $auth_type, $integration_slug, $label );
 		} else {
@@ -235,8 +244,12 @@ class ConnectionFormPage implements AdminPage {
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $auth_type ) ) . '</p>';
 		echo '</td></tr>';
 
-		foreach ( ConnectionAuthTypes::fields( $auth_type ) as $field => $meta ) {
+		foreach ( ConnectionAuthTypes::editableFields( $auth_type ) as $field => $meta ) {
 			$this->renderFieldRow( $field, $meta['label'], ! empty( $meta['secret'] ), '', false );
+		}
+
+		if ( ConnectionAuthTypes::OAUTH2 === $auth_type ) {
+			$this->renderOAuthCallbackRow();
 		}
 
 		echo '</tbody></table>';
@@ -274,7 +287,17 @@ class ConnectionFormPage implements AdminPage {
 		echo '</td></tr>';
 
 		foreach ( $this->connections->displayCredentials( $connection ) as $field => $info ) {
+			if ( ConnectionAuthTypes::OAUTH2 === $connection->authType() && in_array( $field, array( 'access_token', 'refresh_token', 'expires_at' ), true ) ) {
+				continue;
+			}
+
 			$this->renderFieldRow( $field, $info['label'], $info['secret'], $info['display'], $info['configured'] );
+		}
+
+		if ( ConnectionAuthTypes::OAUTH2 === $connection->authType() ) {
+			$this->renderOAuthCallbackRow();
+			$this->renderOAuthStatusRow( $connection );
+			$this->renderOAuthConnectButton( $connection );
 		}
 
 		echo '</tbody></table>';
@@ -331,5 +354,129 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</td></tr>';
+	}
+
+	/**
+	 * Google Cloud setup instructions shown when creating an OAuth connection.
+	 *
+	 * @return void
+	 */
+	private function renderOAuthSetupHelp(): void {
+		echo '<div class="notice notice-info inline"><p>';
+		echo wp_kses(
+			sprintf(
+				/* translators: %s: URL to Google Cloud Console credentials page */
+				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'workflow-automate' ),
+				esc_url( GoogleOAuthService::GOOGLE_CREDENTIALS_URL )
+			),
+			array(
+				'a' => array(
+					'href' => true,
+					'target' => true,
+					'rel' => true,
+				),
+			)
+		);
+		echo '</p></div>';
+	}
+
+	/**
+	 * Shows the callback URL the user must register in Google Cloud Console.
+	 *
+	 * @return void
+	 */
+	private function renderOAuthCallbackRow(): void {
+		$callback = $this->google_oauth->callbackUrl();
+
+		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'workflow-automate' ) . '</th><td>';
+		printf(
+			'<input type="text" class="large-text code" readonly="readonly" value="%s" onclick="this.select();" />',
+			esc_attr( $callback )
+		);
+		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'workflow-automate' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * @param Connection $connection Connection being edited.
+	 *
+	 * @return void
+	 */
+	private function renderOAuthStatusRow( Connection $connection ): void {
+		$connected = $this->google_oauth->isConnected( $connection );
+
+		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'workflow-automate' ) . '</th><td>';
+
+		if ( $connected ) {
+			echo '<p><span class="wfa-connection-status wfa-connection-status--verified">' . esc_html__( 'Connected', 'workflow-automate' ) . '</span></p>';
+		} else {
+			echo '<p><span class="wfa-connection-status wfa-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'workflow-automate' ) . '</span></p>';
+		}
+
+		echo '</td></tr>';
+	}
+
+	/**
+	 * @param Connection $connection Connection being edited.
+	 *
+	 * @return void
+	 */
+	private function renderOAuthConnectButton( Connection $connection ): void {
+		$url = wp_nonce_url(
+			add_query_arg(
+				array(
+					'action' => 'wfa_google_oauth_authorize',
+					'connection_id' => $connection->id(),
+				),
+				admin_url( 'admin-post.php' )
+			),
+			'wfa_google_oauth_authorize_' . $connection->id()
+		);
+
+		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'workflow-automate' ) . '</th><td>';
+		printf(
+			'<a href="%1$s" class="button button-primary">%2$s</a>',
+			esc_url( $url ),
+			esc_html__( 'Connect with Google', 'workflow-automate' )
+		);
+		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'workflow-automate' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * @return void
+	 */
+	private function renderNotice(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
+		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+
+		$notices = array(
+			'created_oauth' => array(
+				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'oauth_connected' => array(
+				'message' => __( 'Google account connected successfully.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'error' => array(
+				'message' => __( 'That connection action could not be completed.', 'workflow-automate' ),
+				'type' => 'error',
+			),
+		);
+
+		if ( ! isset( $notices[ $key ] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail.
+		$detail = isset( $_GET['wfa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['wfa_error'] ) ) : '';
+
+		printf(
+			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',
+			esc_attr( $notices[ $key ]['type'] ),
+			esc_html( $notices[ $key ]['message'] ),
+			'' !== $detail ? sprintf( '<p>%s</p>', esc_html( $detail ) ) : ''
+		);
 	}
 }

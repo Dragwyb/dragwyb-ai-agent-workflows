@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 use WorkflowAutomate\Plugin\Core\Container;
 use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
@@ -65,7 +66,8 @@ class RestApi {
 
 		$connections_controller = new ConnectionsController(
 			$this->container->get( ConnectionService::class ),
-			$this->container->get( AiModelsService::class )
+			$this->container->get( AiModelsService::class ),
+			$this->container->get( GoogleOAuthService::class )
 		);
 		$connections_controller->register_routes();
 
@@ -77,5 +79,11 @@ class RestApi {
 			$this->container->get( WorkflowTestListenerService::class )
 		);
 		$test_controller->register_routes();
+
+		$google_oauth_callback = new GoogleOAuthCallbackController(
+			$this->container->get( ConnectionService::class ),
+			$this->container->get( GoogleOAuthService::class )
+		);
+		$google_oauth_callback->register_routes();
 	}
 }

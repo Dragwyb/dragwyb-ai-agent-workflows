@@ -8,15 +8,35 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection, fetchConnectionModels } from '../api';
+import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, getBootstrap } from '../api';
 import CapturedResponse from './CapturedResponse';
 import TokenField, { fieldSupportsVariables } from './TokenField';
+
+const GOOGLE_SHEETS_OAUTH_SETTINGS = {
+	authType: 'oauth2',
+	hideAuthTypeSelect: true,
+	oauthConnection: true,
+};
+
+const GOOGLE_SHEETS_SLUG_ALIASES = [
+	'google_sheets',
+	'google_sheets_api',
+	'sheets',
+];
+
+/**
+ * @param {string} slug
+ * @return {boolean}
+ */
+function isGoogleSheetsAction(slug) {
+	return Boolean(slug && slug.startsWith('google_sheets_'));
+}
 
 /**
  * Per-integration defaults for the inline connection form so switching
  * nodes does not leak labels or auth types (e.g. Gemini → Telegram).
  *
- * @type {Record<string, {authType?: string, secretLabel?: string, secretFieldName?: string, hideAuthTypeSelect?: boolean}>}
+ * @type {Record<string, {authType?: string, secretLabel?: string, secretFieldName?: string, hideAuthTypeSelect?: boolean, oauthConnection?: boolean}>}
  */
 const INTEGRATION_CONNECTION_SETTINGS = {
 	telegram_send_message_action: {
@@ -61,11 +81,6 @@ const INTEGRATION_SLUG_ALIASES = {
 	claude_messages_action: ['claude', 'anthropic'],
 	telegram_send_message_action: ['telegram'],
 	whatsapp_cloud_send_message_action: ['whatsapp', 'whatsapp_cloud'],
-	google_sheets_append_row_action: [
-		'google_sheets',
-		'google_sheets_api',
-		'sheets',
-	],
 };
 
 /**
@@ -78,6 +93,10 @@ function connectionMatchesNodeType(connection, nodeTypeSlug) {
 
 	if (slug === nodeTypeSlug) {
 		return true;
+	}
+
+	if (isGoogleSheetsAction(nodeTypeSlug)) {
+		return GOOGLE_SHEETS_SLUG_ALIASES.includes(slug) || isGoogleSheetsAction(slug);
 	}
 
 	const aliases = INTEGRATION_SLUG_ALIASES[nodeTypeSlug] || [];
@@ -202,6 +221,7 @@ export default function ConfigPanel({
 						connections={connections}
 						nodeTypeSlug={nodeType.slug}
 						nodeTypeLabel={nodeType.label}
+						nodeId={node.id}
 						nodeCategory={node.category}
 						nodeConfig={node.config || {}}
 						capturedPayload={capturedPayload}
@@ -230,6 +250,7 @@ function ConfigField({
 	connections,
 	nodeTypeSlug,
 	nodeTypeLabel,
+	nodeId,
 	nodeCategory,
 	nodeConfig,
 	capturedPayload,
@@ -294,6 +315,7 @@ function ConfigField({
 				connections={connections || []}
 				nodeTypeSlug={nodeTypeSlug}
 				nodeTypeLabel={nodeTypeLabel}
+				nodeId={nodeId}
 				onConnectionsChange={onConnectionsChange}
 				onChange={onChange}
 			/>
@@ -500,12 +522,16 @@ function ConnectionField({
 	connections,
 	nodeTypeSlug,
 	nodeTypeLabel,
+	nodeId,
 	onConnectionsChange,
 	onChange,
 }) {
-	const integrationSettings =
-		INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] || {};
+	const bootstrap = getBootstrap();
+	const integrationSettings = isGoogleSheetsAction(nodeTypeSlug)
+		? GOOGLE_SHEETS_OAUTH_SETTINGS
+		: INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] || {};
 	const defaultAuthType = integrationSettings.authType || 'api_key';
+	const isGoogleOAuth = Boolean(integrationSettings.oauthConnection);
 
 	const selectedId = Number(value || 0);
 	const needsConnection = required && selectedId <= 0;
@@ -515,8 +541,12 @@ function ConnectionField({
 		[connections, nodeTypeSlug, selectedId]
 	);
 
+	const selectedConnection = matchingConnections.find(
+		(connection) => connection.id === selectedId
+	);
+
 	const [showAddForm, setShowAddForm] = useState(
-		needsConnection && matchingConnections.length === 0
+		isGoogleOAuth ? selectedId <= 0 : needsConnection && matchingConnections.length === 0
 	);
 	const [connectionLabel, setConnectionLabel] = useState(
 		nodeTypeLabel
@@ -525,8 +555,27 @@ function ConnectionField({
 	);
 	const [authType, setAuthType] = useState(defaultAuthType);
 	const [secret, setSecret] = useState('');
+	const [clientId, setClientId] = useState('');
+	const [clientSecret, setClientSecret] = useState('');
 	const [saving, setSaving] = useState(false);
+	const [connecting, setConnecting] = useState(false);
 	const [error, setError] = useState('');
+	const [oauthNotice, setOauthNotice] = useState('');
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const notice = params.get('wfa_notice') || '';
+
+		if ('oauth_connected' === notice) {
+			setOauthNotice(
+				__('Google account connected successfully.', 'workflow-automate')
+			);
+		} else if ('error' === notice && params.get('wfa_error')) {
+			setOauthNotice(String(params.get('wfa_error')));
+		} else {
+			setOauthNotice('');
+		}
+	}, [selectedId]);
 
 	useEffect(() => {
 		setConnectionLabel(
@@ -536,6 +585,8 @@ function ConnectionField({
 		);
 		setAuthType(defaultAuthType);
 		setSecret('');
+		setClientId('');
+		setClientSecret('');
 		setError('');
 
 		if (selectedId > 0) {
@@ -543,7 +594,9 @@ function ConnectionField({
 			return;
 		}
 
-		setShowAddForm(needsConnection && matchingConnections.length === 0);
+		setShowAddForm(
+			isGoogleOAuth ? true : needsConnection && matchingConnections.length === 0
+		);
 	}, [
 		nodeTypeSlug,
 		nodeTypeLabel,
@@ -551,6 +604,7 @@ function ConnectionField({
 		needsConnection,
 		selectedId,
 		matchingConnections.length,
+		isGoogleOAuth,
 	]);
 
 	// Auto-select when exactly one saved connection matches this node type.
@@ -580,13 +634,69 @@ function ConnectionField({
 			: __('API key', 'workflow-automate'));
 
 	const handleSaveConnection = async () => {
-		const trimmedSecret = secret.trim();
 		const trimmedLabel = connectionLabel.trim();
 
 		if (!trimmedLabel) {
 			setError(__('Enter a name for this connection.', 'workflow-automate'));
 			return;
 		}
+
+		if (isGoogleOAuth) {
+			const trimmedClientId = clientId.trim();
+			const trimmedClientSecret = clientSecret.trim();
+
+			if (!trimmedClientId || !trimmedClientSecret) {
+				setError(
+					__(
+						'Enter both Client ID and Client Secret.',
+						'workflow-automate'
+					)
+				);
+				return;
+			}
+
+			setSaving(true);
+			setError('');
+
+			try {
+				const created = await createConnection({
+					label: trimmedLabel,
+					integration_slug: 'google_sheets',
+					auth_type: 'oauth2',
+					credentials: {
+						client_id: trimmedClientId,
+						client_secret: trimmedClientSecret,
+					},
+				});
+
+				const nextList = Array.isArray(connections)
+					? [created, ...connections]
+					: [created];
+
+				if (typeof onConnectionsChange === 'function') {
+					onConnectionsChange(nextList);
+				}
+
+				onChange(created.id);
+				setClientSecret('');
+				setShowAddForm(false);
+			} catch (err) {
+				setError(
+					err && err.message
+						? err.message
+						: __(
+							'Could not save the connection. Check your permissions and try again.',
+							'workflow-automate'
+						)
+				);
+			} finally {
+				setSaving(false);
+			}
+
+			return;
+		}
+
+		const trimmedSecret = secret.trim();
 
 		if (!trimmedSecret) {
 			setError(__('Enter your API key or token.', 'workflow-automate'));
@@ -631,6 +741,67 @@ function ConnectionField({
 		}
 	};
 
+	const buildOAuthReturnUrl = () => {
+		const url = new URL(window.location.href);
+		url.searchParams.delete('wfa_notice');
+		url.searchParams.delete('wfa_error');
+
+		if (selectedId > 0) {
+			url.searchParams.set('wfa_connection', String(selectedId));
+		}
+
+		if (nodeId) {
+			url.searchParams.set('wfa_node', nodeId);
+		}
+
+		return url.toString();
+	};
+
+	const handleConnectGoogle = async (connectionId = selectedId) => {
+		if (connectionId <= 0) {
+			setError(
+				__(
+					'Save your Client ID and Client Secret first.',
+					'workflow-automate'
+				)
+			);
+			return;
+		}
+
+		setConnecting(true);
+		setError('');
+
+		try {
+			const result = await fetchGoogleOAuthAuthorizeUrl(connectionId, {
+				returnUrl: buildOAuthReturnUrl(),
+				nodeId: nodeId || '',
+			});
+
+			if (result && result.authorize_url) {
+				window.location.assign(result.authorize_url);
+				return;
+			}
+
+			setError(
+				__(
+					'Could not start Google authorization.',
+					'workflow-automate'
+				)
+			);
+		} catch (err) {
+			setError(
+				err && err.message
+					? err.message
+					: __(
+						'Could not start Google authorization.',
+						'workflow-automate'
+					)
+			);
+		} finally {
+			setConnecting(false);
+		}
+	};
+
 	return (
 		<div className="wfa-builder-config__connection">
 			<SelectControl
@@ -647,15 +818,65 @@ function ConnectionField({
 				}}
 				help={
 					needsConnection
-						? __(
-							'Required — add an API key below or pick an existing connection.',
-							'workflow-automate'
-						)
+						? isGoogleOAuth
+							? __(
+								'Required — add your Google OAuth credentials below, then connect your Google account.',
+								'workflow-automate'
+							)
+							: __(
+								'Required — add an API key below or pick an existing connection.',
+								'workflow-automate'
+							)
 						: undefined
 				}
 			/>
 
-			{!showAddForm && selectedId <= 0 && (
+			{oauthNotice && (
+				<p
+					className={
+						oauthNotice.includes('successfully')
+							? 'wfa-builder-config__connection-notice wfa-builder-config__connection-notice--success'
+							: 'wfa-builder-config__field-error'
+					}
+					role="status"
+				>
+					{oauthNotice}
+				</p>
+			)}
+
+			{selectedId > 0 &&
+				selectedConnection &&
+				isGoogleOAuth &&
+				!selectedConnection.oauth_connected && (
+					<div className="wfa-builder-config__connection-form">
+						<p className="wfa-builder-config__connection-form-help">
+							{__(
+								'Credentials saved. Connect your Google account to finish setup.',
+								'workflow-automate'
+							)}
+						</p>
+						<Button
+							isPrimary
+							onClick={() => handleConnectGoogle(selectedId)}
+							disabled={connecting}
+						>
+							{connecting
+								? __('Connecting…', 'workflow-automate')
+								: __('Connect with Google', 'workflow-automate')}
+						</Button>
+					</div>
+				)}
+
+			{selectedId > 0 &&
+				selectedConnection &&
+				isGoogleOAuth &&
+				selectedConnection.oauth_connected && (
+					<p className="wfa-builder-config__connection-notice wfa-builder-config__connection-notice--success">
+						{__('Google account connected.', 'workflow-automate')}
+					</p>
+				)}
+
+			{!showAddForm && selectedId <= 0 && !isGoogleOAuth && (
 				<Button
 					variant="secondary"
 					className="wfa-builder-config__add-connection"
@@ -670,7 +891,22 @@ function ConnectionField({
 				</Button>
 			)}
 
-			{!showAddForm && selectedId > 0 && (
+			{!showAddForm && selectedId <= 0 && isGoogleOAuth && (
+				<Button
+					variant="secondary"
+					className="wfa-builder-config__add-connection"
+					onClick={() => {
+						setClientId('');
+						setClientSecret('');
+						setError('');
+						setShowAddForm(true);
+					}}
+				>
+					{__('+ Add Google OAuth connection', 'workflow-automate')}
+				</Button>
+			)}
+
+			{!showAddForm && selectedId > 0 && !isGoogleOAuth && (
 				<Button
 					variant="link"
 					className="wfa-builder-config__add-connection"
@@ -685,7 +921,180 @@ function ConnectionField({
 				</Button>
 			)}
 
-			{showAddForm && (
+			{!showAddForm && selectedId > 0 && isGoogleOAuth && (
+				<Button
+					variant="link"
+					className="wfa-builder-config__add-connection"
+					onClick={() => {
+						onChange(0);
+						setClientId('');
+						setClientSecret('');
+						setError('');
+						setShowAddForm(true);
+					}}
+				>
+					{__('Use different Google credentials', 'workflow-automate')}
+				</Button>
+			)}
+
+			{showAddForm && isGoogleOAuth && (
+				<div className="wfa-builder-config__connection-form">
+					<p className="wfa-builder-config__connection-form-title">
+						{__('Google OAuth connection', 'workflow-automate')}
+					</p>
+					<p className="wfa-builder-config__connection-form-help">
+						<a
+							href={bootstrap.googleCredentialsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{__(
+								'Create credentials in Google Cloud Console',
+								'workflow-automate'
+							)}
+						</a>
+						{' · '}
+						{__(
+							'Enable Google Sheets API and Google Drive API.',
+							'workflow-automate'
+						)}
+					</p>
+					<TextControl
+						label={__('Connection name', 'workflow-automate')}
+						value={connectionLabel}
+						onChange={setConnectionLabel}
+					/>
+					<TextControl
+						label={__('Client ID', 'workflow-automate')}
+						value={clientId}
+						onChange={setClientId}
+						autoComplete="off"
+					/>
+					<TextControl
+						label={__('Client Secret', 'workflow-automate')}
+						type="password"
+						value={clientSecret}
+						onChange={setClientSecret}
+						autoComplete="off"
+						help={__(
+							'Saved encrypted. You will not see it again after saving.',
+							'workflow-automate'
+						)}
+					/>
+					<TextControl
+						label={__('Callback URL', 'workflow-automate')}
+						value={bootstrap.googleOAuthCallbackUrl || ''}
+						readOnly
+						help={__(
+							'Add this exact URL as an Authorized redirect URI in your Google OAuth client.',
+							'workflow-automate'
+						)}
+						onFocus={(event) => event.target.select()}
+					/>
+					{error && (
+						<p className="wfa-builder-config__field-error" role="alert">
+							{error}
+						</p>
+					)}
+					<div className="wfa-builder-config__connection-form-actions">
+						<Button
+							variant="secondary"
+							onClick={handleSaveConnection}
+							disabled={saving || connecting}
+						>
+							{saving
+								? __('Saving…', 'workflow-automate')
+								: __('Save credentials', 'workflow-automate')}
+						</Button>
+						<Button
+							isPrimary
+							onClick={async () => {
+								if (selectedId > 0) {
+									await handleConnectGoogle(selectedId);
+									return;
+								}
+
+								const trimmedLabel = connectionLabel.trim();
+								const trimmedClientId = clientId.trim();
+								const trimmedClientSecret = clientSecret.trim();
+
+								if (
+									!trimmedLabel ||
+									!trimmedClientId ||
+									!trimmedClientSecret
+								) {
+									setError(
+										__(
+											'Enter connection name, Client ID, and Client Secret first.',
+											'workflow-automate'
+										)
+									);
+									return;
+								}
+
+								setSaving(true);
+								setError('');
+
+								try {
+									const created = await createConnection({
+										label: trimmedLabel,
+										integration_slug: 'google_sheets',
+										auth_type: 'oauth2',
+										credentials: {
+											client_id: trimmedClientId,
+											client_secret: trimmedClientSecret,
+										},
+									});
+
+									const nextList = Array.isArray(connections)
+										? [created, ...connections]
+										: [created];
+
+									if (typeof onConnectionsChange === 'function') {
+										onConnectionsChange(nextList);
+									}
+
+									onChange(created.id);
+									setClientSecret('');
+									setShowAddForm(false);
+									await handleConnectGoogle(created.id);
+								} catch (err) {
+									setError(
+										err && err.message
+											? err.message
+											: __(
+												'Could not save the connection.',
+												'workflow-automate'
+											)
+									);
+								} finally {
+									setSaving(false);
+								}
+							}}
+							disabled={saving || connecting}
+						>
+							{connecting
+								? __('Connecting…', 'workflow-automate')
+								: __('Connect with Google', 'workflow-automate')}
+						</Button>
+						{!needsConnection && (
+							<Button
+								variant="tertiary"
+								onClick={() => {
+									setShowAddForm(false);
+									setError('');
+									setClientSecret('');
+								}}
+								disabled={saving || connecting}
+							>
+								{__('Cancel', 'workflow-automate')}
+							</Button>
+						)}
+					</div>
+				</div>
+			)}
+
+			{showAddForm && !isGoogleOAuth && (
 				<div className="wfa-builder-config__connection-form">
 					<p className="wfa-builder-config__connection-form-title">
 						{nodeTypeLabel

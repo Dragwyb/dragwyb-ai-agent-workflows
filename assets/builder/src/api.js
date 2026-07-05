@@ -74,12 +74,45 @@ export function createConnection(data) {
 }
 
 /**
+ * @param {number} connectionId
+ * @param {{returnUrl?: string, nodeId?: string}} [options]
+ * @return {Promise<{authorize_url: string, callback_url: string, credentials_url: string}>}
+ */
+export function fetchGoogleOAuthAuthorizeUrl(connectionId, options = {}) {
+	const params = new URLSearchParams();
+
+	if (options.returnUrl) {
+		params.set('return_url', options.returnUrl);
+	}
+
+	if (options.nodeId) {
+		params.set('node_id', options.nodeId);
+	}
+
+	const query = params.toString();
+
+	return apiFetch({
+		path: `/wfa/v1/connections/${connectionId}/oauth/authorize-url${
+			query ? `?${query}` : ''
+		}`,
+	});
+}
+
+/**
  * Bootstrap data localized by BuilderPage::enqueueAssets().
  *
  * @return {{workflowId: number, listUrl: string}} Bootstrap settings.
  */
 export function getBootstrap() {
-	return window.wfaBuilderSettings || { workflowId: 0, listUrl: '' };
+	return (
+		window.wfaBuilderSettings || {
+			workflowId: 0,
+			listUrl: '',
+			connectionsUrl: '',
+			googleCredentialsUrl: 'https://console.cloud.google.com/apis/credentials',
+			googleOAuthCallbackUrl: '',
+		}
+	);
 }
 
 /**

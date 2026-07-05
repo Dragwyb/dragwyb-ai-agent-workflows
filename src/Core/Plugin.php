@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Core;
 
 use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
+use WorkflowAutomate\Plugin\Admin\GoogleOAuthStartController;
 use WorkflowAutomate\Plugin\Admin\Menu;
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
@@ -39,6 +40,7 @@ use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
@@ -326,6 +328,13 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			GoogleOAuthService::class,
+			static function ( Container $container ): GoogleOAuthService {
+				return new GoogleOAuthService( $container->get( ConnectionService::class ) );
+			}
+		);
+
+		$this->container->singleton(
 			AiModelsService::class,
 			static function ( Container $container ): AiModelsService {
 				return new AiModelsService( $container->get( ConnectionService::class ) );
@@ -367,7 +376,10 @@ class Plugin {
 			}
 		);
 
-		$built_in_node_types = new BuiltInNodeTypes( $this->container->get( ConnectionService::class ) );
+		$built_in_node_types = new BuiltInNodeTypes(
+			$this->container->get( ConnectionService::class ),
+			$this->container->get( GoogleOAuthService::class )
+		);
 
 		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );
 
@@ -499,6 +511,7 @@ class Plugin {
 		$settings = $this->container->get( SettingsService::class );
 		$retention = $this->container->get( RunRetentionService::class );
 		$connections = $this->container->get( ConnectionService::class );
+		$google_oauth = $this->container->get( GoogleOAuthService::class );
 		$webhooks = $this->container->get( WebhookService::class );
 
 		$workflow_actions = new WorkflowActionsController( $workflows, WorkflowsPage::SLUG );
@@ -510,7 +523,7 @@ class Plugin {
 		$settings_page = new SettingsPage( $settings );
 		$connection_actions = new ConnectionActionsController( $connections );
 		$connections_page = new ConnectionsPage( $connections, $settings, $connection_actions );
-		$connection_form_page = new ConnectionFormPage( $connections );
+		$connection_form_page = new ConnectionFormPage( $connections, $google_oauth );
 		$webhook_actions = new WebhookActionsController( $webhooks );
 		$webhooks_page = new WebhooksPage( $webhooks, $workflows, $settings, $webhook_actions );
 		$webhook_form_page = new WebhookFormPage( $webhooks, $workflows, $settings );
@@ -532,6 +545,7 @@ class Plugin {
 		$run_actions->register();
 		( new SettingsController( $settings, $retention ) )->register();
 		$connection_actions->register();
+		( new GoogleOAuthStartController( $connections, $google_oauth ) )->register();
 		$webhook_actions->register();
 	}
 }

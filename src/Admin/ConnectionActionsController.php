@@ -11,8 +11,10 @@ namespace WorkflowAutomate\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
+use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
 use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
 use WorkflowAutomate\Plugin\Core\Capabilities;
+use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
@@ -129,11 +131,25 @@ class ConnectionActionsController {
 		$label = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : '';
 
 		try {
-			$this->connections->create( $integration_slug, $auth_type, $label, $this->extractCredentialValues() );
+			$connection = $this->connections->create( $integration_slug, $auth_type, $label, $this->extractCredentialValues() );
 		} catch ( InvalidArgumentException $exception ) {
 			$this->redirect( 'error', $exception->getMessage() );
 		} catch ( RuntimeException $e ) {
 			$this->redirect( 'error' );
+		}
+
+		if ( ConnectionAuthTypes::OAUTH2 === $auth_type ) {
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page' => ConnectionFormPage::SLUG,
+						'connection' => $connection->id(),
+						'wfa_notice' => 'created_oauth',
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+			exit;
 		}
 
 		$this->redirect( 'created' );

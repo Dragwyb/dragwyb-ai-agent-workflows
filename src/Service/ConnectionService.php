@@ -76,9 +76,14 @@ class ConnectionService {
 
 		foreach ( ConnectionAuthTypes::fields( $auth_type ) as $field => $meta ) {
 			$value = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
+			$required = ConnectionAuthTypes::isRequiredOnCreate( $auth_type, $field );
+
+			if ( $required && '' === $value ) {
+				throw new InvalidArgumentException( esc_html__( 'All fields are required to create a connection.', 'workflow-automate' ) );
+			}
 
 			if ( '' === $value ) {
-				throw new InvalidArgumentException( esc_html__( 'All fields are required to create a connection.', 'workflow-automate' ) );
+				continue;
 			}
 
 			$plaintext[ $field ]  = $value;
@@ -215,6 +220,49 @@ class ConnectionService {
 	}
 
 	/**
+	 * Persists OAuth tokens after authorization or refresh.
+	 *
+	 * @throws RuntimeException When the connection cannot be updated.
+	 */
+	public function storeOAuthTokens( int $id, string $access_token, string $refresh_token, int $expires_at ): Connection {
+		$connection = $this->connections->find( $id );
+
+		if ( null === $connection ) {
+			throw new RuntimeException( esc_html__( 'The specified connection does not exist.', 'workflow-automate' ) );
+		}
+
+		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
+			throw new RuntimeException( esc_html__( 'OAuth tokens can only be stored on OAuth connections.', 'workflow-automate' ) );
+		}
+
+		$encrypted = $connection->encryptedCredentials();
+		$encrypted['access_token']  = Encryption::encrypt( $access_token );
+		$encrypted['refresh_token'] = '' !== $refresh_token ? Encryption::encrypt( $refresh_token ) : ( $encrypted['refresh_token'] ?? '' );
+		$encrypted['expires_at']    = Encryption::encrypt( (string) $expires_at );
+
+		$verify_fields = $this->credentialsFromEncrypted( $encrypted );
+		$status        = $this->resolveStatusAfterVerification(
+			$connection->integrationSlug(),
+			$connection->authType(),
+			$verify_fields
+		);
+
+		$updated = $this->connections->update(
+			$id,
+			array(
+				'credentials' => $encrypted,
+				'status' => $status,
+			)
+		);
+
+		if ( null === $updated ) {
+			throw new RuntimeException( esc_html__( 'Failed to store OAuth tokens.', 'workflow-automate' ) );
+		}
+
+		return $updated;
+	}
+
+	/**
 	 * Decrypts every credential field for actual use (e.g. an action node
 	 * executing an authenticated outbound request in a future increment).
 	 * Never call this to render anything back to the browser — use
@@ -312,6 +360,10 @@ class ConnectionService {
 	 * @return int One of Connection::VALID_STATUSES.
 	 */
 	private function resolveStatusAfterVerification( string $integration_slug, string $auth_type, array $field_values ): int {
+		if ( ConnectionAuthTypes::OAUTH2 === $auth_type && '' === trim( (string) ( $field_values['access_token'] ?? '' ) ) ) {
+			return Connection::STATUS_PENDING;
+		}
+
 		$result = $this->verifier->verify( $integration_slug, $auth_type, $field_values );
 
 		if ( ! empty( $result['skipped'] ) ) {
@@ -327,5 +379,26 @@ class ConnectionService {
 		}
 
 		return Connection::STATUS_VERIFIED;
+	}
+
+	/**
+	 * @param array<string, string> $encrypted Encrypted credential map.
+	 *
+	 * @return array<string, string>
+	 */
+	private function credentialsFromEncrypted( array $encrypted ): array {
+		$plain = array();
+
+		foreach ( $encrypted as $field => $ciphertext ) {
+			if ( '' === (string) $ciphertext ) {
+				$plain[ $field ] = '';
+				continue;
+			}
+
+			$decrypted = Encryption::decrypt( (string) $ciphertext );
+			$plain[ $field ] = null === $decrypted ? '' : (string) $decrypted;
+		}
+
+		return $plain;
 	}
 }

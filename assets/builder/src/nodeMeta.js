@@ -13,6 +13,7 @@ const APP_META = {
 	anthropic: { icon: 'A', bg: '#d4a574', accent: '#1a1a1a' },
 	'google-ai': { icon: 'G', bg: '#4285f4', accent: '#fff' },
 	communication: { icon: '✉', bg: '#0ea5e9', accent: '#fff' },
+	'google-sheets': { icon: 'G', bg: '#34a853', accent: '#fff' },
 	integrations: { icon: '⚡', bg: '#6366f1', accent: '#fff' },
 };
 

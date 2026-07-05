@@ -95,6 +95,13 @@ class ConnectionVerifier {
 		$secret = $this->resolveSecret( $auth_type, $field_values );
 
 		if ( '' === $secret ) {
+			if ( ConnectionAuthTypes::OAUTH2 === $auth_type ) {
+				return array(
+					'success' => true,
+					'skipped' => true,
+				);
+			}
+
 			return array(
 				'success' => false,
 				'error' => __( 'Credentials are incomplete — cannot verify this connection.', 'workflow-automate' ),
@@ -157,6 +164,9 @@ class ConnectionVerifier {
 		switch ( $auth_type ) {
 			case ConnectionAuthTypes::BEARER_TOKEN:
 				return trim( (string) ( $field_values['token'] ?? '' ) );
+
+			case ConnectionAuthTypes::OAUTH2:
+				return trim( (string) ( $field_values['access_token'] ?? '' ) );
 
 			case ConnectionAuthTypes::BASIC:
 				return '';

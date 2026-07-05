@@ -1,6 +1,6 @@
 <?php
 /**
- * Google Sheets append row action.
+ * Google Sheets append row action (legacy slug).
  *
  * @package WorkflowAutomate\Plugin
  */
@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\ConnectionSecretResolver;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,154 +17,87 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Appends one row to a Google Sheet via the Sheets API v4 `values:append`.
- *
- * Requires an OAuth access token (or service-account access token) stored
- * as a Bearer Token / API Key connection. Spreadsheet must be shared with
- * the Google account that issued the token.
- *
- * `values` is a comma-separated list of cell values (tokens supported),
- * e.g. `{{trigger.fields.email}},{{trigger.fields.name}}`.
+ * Backward-compatible alias for append-row behavior. Prefer
+ * `google_sheets_add_row_action` for new workflows.
  */
-class GoogleSheetsAppendRowAction implements ActionInterface {
+class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 
-	private const TIMEOUT_SECONDS = 20;
-
-	private ConnectionSecretResolver $secrets;
-
-	public function __construct( ConnectionService $connections ) {
-		$this->secrets = new ConnectionSecretResolver( $connections );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public function slug(): string {
 		return 'google_sheets_append_row_action';
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function label(): string {
 		return __( 'Google Sheets Append Row', 'workflow-automate' );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function description(): string {
 		return __( 'Appends a row of values to a Google Sheet.', 'workflow-automate' );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function configSchema(): array {
 		return array(
-			'connection_id' => array(
-				'type' => 'connection',
-				'label' => __( 'Google access token connection', 'workflow-automate' ),
-				'required' => true,
-				'default' => 0,
-			),
-			'spreadsheet_id' => array(
-				'type' => 'string',
-				'label' => __( 'Spreadsheet ID (from the sheet URL)', 'workflow-automate' ),
-				'required' => true,
-			),
+			'connection_id' => $this->connectionField(),
+			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'range' => array(
 				'type' => 'string',
 				'label' => __( 'Range / tab (e.g. Sheet1!A1)', 'workflow-automate' ),
 				'default' => 'Sheet1!A1',
 			),
-			'values' => array(
-				'type' => 'string',
-				'label' => __( 'Row values, comma-separated (supports {{trigger.fields.*}})', 'workflow-automate' ),
-				'required' => true,
-			),
+			'values' => $this->valuesField(),
 		);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function execute( array $config, array $context ): array {
 		unset( $context );
 
-		$token = $this->secrets->resolveBearerSecret( isset( $config['connection_id'] ) ? (int) $config['connection_id'] : 0 );
+		$services = $this->resolveServices( $config );
 
-		if ( is_array( $token ) ) {
-			return $token;
+		if ( isset( $services['success'] ) && ! $services['success'] ) {
+			return $services;
 		}
 
-		$spreadsheet_id = isset( $config['spreadsheet_id'] ) ? trim( (string) $config['spreadsheet_id'] ) : '';
-		$range          = isset( $config['range'] ) ? trim( (string) $config['range'] ) : 'Sheet1!A1';
-		$values_raw     = isset( $config['values'] ) ? (string) $config['values'] : '';
+		$spreadsheet_id = $this->requireSpreadsheetId( $config );
 
-		if ( '' === $spreadsheet_id ) {
-			return array(
-				'success' => false,
-				'error' => __( 'No spreadsheet ID configured.', 'workflow-automate' ),
-			);
+		if ( is_array( $spreadsheet_id ) ) {
+			return $spreadsheet_id;
 		}
 
-		if ( '' === $range ) {
-			$range = 'Sheet1!A1';
-		}
+		$values_raw = $this->configString( $config, 'values' );
 
-		if ( '' === trim( $values_raw ) ) {
+		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
 				'error' => __( 'No row values configured.', 'workflow-automate' ),
 			);
 		}
 
-		$row = array_map( 'trim', explode( ',', $values_raw ) );
-
-		$url = sprintf(
-			'https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
-			rawurlencode( $spreadsheet_id ),
-			rawurlencode( $range )
+		$sheet_title = $this->sheetTitleFromRange( $this->configString( $config, 'range', 'Sheet1!A1' ) );
+		$result      = $services['rows']->addRow(
+			$spreadsheet_id,
+			$sheet_title,
+			$this->parseIndexedValues( $values_raw )
 		);
 
-		$body = wp_json_encode(
-			array(
-				'values' => array( $row ),
-			)
-		);
+		$formatted = $this->formatResult( $result );
 
-		if ( ! is_string( $body ) ) {
-			return array(
-				'success' => false,
-				'error' => __( 'Failed to encode the Google Sheets payload.', 'workflow-automate' ),
-			);
+		if ( ! empty( $formatted['success'] ) && isset( $result['response']['updates']['updatedRange'] ) ) {
+			$formatted['updated_range'] = (string) $result['response']['updates']['updatedRange'];
 		}
 
-		$response = wp_safe_remote_post(
-			$url,
-			array(
-				'timeout' => self::TIMEOUT_SECONDS,
-				'headers' => array(
-					'Content-Type' => 'application/json',
-					'Authorization' => 'Bearer ' . $token,
-				),
-				'body' => $body,
-			)
-		);
+		return $formatted;
+	}
 
-		$result = TelegramSendMessageAction::jsonApiResult( $response, 'Google Sheets' );
+	private function sheetTitleFromRange( string $range ): string {
+		$range = trim( $range );
 
-		if ( empty( $result['success'] ) ) {
-			return $result;
+		if ( '' === $range ) {
+			return 'Sheet1';
 		}
 
-		return array(
-			'success' => true,
-			'status_code' => $result['status_code'] ?? 200,
-			'updated_range' => is_array( $result['response'] ?? null ) && isset( $result['response']['updates']['updatedRange'] )
-				? (string) $result['response']['updates']['updatedRange']
-				: '',
-		);
+		if ( str_contains( $range, '!' ) ) {
+			return explode( '!', $range )[0];
+		}
+
+		return $range;
 	}
 }

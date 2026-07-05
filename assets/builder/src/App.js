@@ -163,6 +163,42 @@ export default function App() {
 					Array.isArray(fetchedConnections) ? fetchedConnections : []
 				);
 
+				const urlParams = new URLSearchParams(window.location.search);
+				const oauthConnectionId = Number(
+					urlParams.get('wfa_connection') || 0
+				);
+				const oauthNodeId = urlParams.get('wfa_node') || '';
+
+				if (oauthConnectionId > 0 && oauthNodeId) {
+					setGraph((previous) => ({
+						...previous,
+						nodes: previous.nodes.map((node) =>
+							node.id === oauthNodeId
+								? {
+									...node,
+									config: {
+										...(node.config || {}),
+										connection_id: oauthConnectionId,
+									},
+								}
+								: node
+						),
+					}));
+					setSelectedNodeId(oauthNodeId);
+
+					urlParams.delete('wfa_connection');
+					urlParams.delete('wfa_node');
+					urlParams.delete('wfa_notice');
+					urlParams.delete('wfa_error');
+
+					const cleaned = `${window.location.pathname}?${urlParams.toString()}`;
+					window.history.replaceState(
+						{},
+						'',
+						cleaned.endsWith('?') ? cleaned.slice(0, -1) : cleaned
+					);
+				}
+
 				const settings = workflow.settings || {};
 
 				if (settings.sample_payload) {

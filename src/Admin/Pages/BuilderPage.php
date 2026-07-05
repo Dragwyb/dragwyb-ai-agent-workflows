@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Core\Capabilities;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -127,7 +128,7 @@ class BuilderPage implements AdminPage {
 	}
 
 	/**
-	 * @return array{workflowId: int, listUrl: string}
+	 * @return array{workflowId: int, listUrl: string, connectionsUrl: string, googleCredentialsUrl: string, googleOAuthCallbackUrl: string}
 	 */
 	private function bootstrapSettings(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which workflow to load; the REST API this feeds still re-checks capability on every request.
@@ -137,6 +138,9 @@ class BuilderPage implements AdminPage {
 			'workflowId' => $workflow_id,
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+			'connectionsUrl' => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
+			'googleCredentialsUrl' => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
+			'googleOAuthCallbackUrl' => rest_url( 'wfa/v1/oauth/google/callback' ),
 		);
 	}
 

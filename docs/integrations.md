@@ -140,11 +140,31 @@ Use tokens in action fields, e.g. `{{trigger.fields.email}}` or `{{trigger.form_
 
 **Config:** `connection_id`, `model` (default `claude-3-5-haiku-latest`), `system_prompt`, `prompt`, `max_tokens`. Returns `content`.
 
-## Google Sheets Append Row — action (`google_sheets_append_row_action`)
+## Google Sheets — actions
 
-**Credentials:** Google OAuth **access token** (or service-account access token) in Connections as Bearer Token / API Key. The spreadsheet must be shared with that Google account. Full OAuth consent UI is not built yet — paste a valid access token into Connections.
+All Google Sheets actions require a **Google OAuth 2** connection (recommended) or a legacy Bearer Token. Create the connection under **Connections** with Client ID and Client Secret from [Google Cloud Console](https://console.cloud.google.com/apis/credentials), then click **Connect with Google**.
 
-**Config:** `connection_id`, `spreadsheet_id`, `range` (e.g. `Sheet1!A1`), `values` (comma-separated cells, tokens supported).
+| Action slug | Purpose |
+| --- | --- |
+| `google_sheets_create_spreadsheet_action` | Create a new spreadsheet |
+| `google_sheets_find_spreadsheets_action` | Search Drive for spreadsheets by name |
+| `google_sheets_delete_spreadsheet_action` | Delete a spreadsheet |
+| `google_sheets_create_sheet_action` | Add a worksheet tab |
+| `google_sheets_find_sheet_action` | Find worksheet tabs by title |
+| `google_sheets_copy_sheet_action` | Copy a tab to another spreadsheet |
+| `google_sheets_delete_sheet_action` | Delete a worksheet tab |
+| `google_sheets_clear_sheet_action` | Clear worksheet data |
+| `google_sheets_export_sheet_action` | Build CSV/PDF/XLSX export URL |
+| `google_sheets_add_row_action` | Append a row |
+| `google_sheets_append_row_action` | Legacy append row (uses `range` field) |
+| `google_sheets_update_row_action` | Update an existing row |
+| `google_sheets_append_or_update_row_action` | Upsert row by matching column |
+| `google_sheets_get_row_action` | Get one row by number |
+| `google_sheets_get_all_rows_action` | Get all rows |
+| `google_sheets_delete_row_action` | Clear a row |
+| `google_sheets_create_column_action` | Insert a column with header |
+
+Common config fields: `connection_id`, `spreadsheet_id`, `sheet_title` (tab name). Row actions also use `values` (comma-separated, tokens supported).
 
 ## Config tokens (`{{…}}`)
 
