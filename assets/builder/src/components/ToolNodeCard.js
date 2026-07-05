@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
+import { useNodeDrag } from '../hooks/useNodeDrag';
 import { getNodeMeta } from '../nodeMeta';
 
 /**
@@ -9,12 +10,19 @@ export default function ToolNodeCard({
 	node,
 	selected,
 	onSelect,
+	onMove,
 }) {
 	const meta = getNodeMeta(node.type, 'action');
+	const { handlePointerDown, handleKeyDown } = useNodeDrag({
+		nodeId: node.id,
+		x: node.x,
+		y: node.y,
+		onMove,
+		onSelect: () => onSelect(node.id),
+	});
 
 	return (
-		<button
-			type="button"
+		<div
 			className={[
 				'wfa-tool-node',
 				selected ? 'wfa-tool-node--selected' : '',
@@ -22,10 +30,10 @@ export default function ToolNodeCard({
 				.filter(Boolean)
 				.join(' ')}
 			data-node-id={node.id}
-			onClick={(event) => {
-				event.stopPropagation();
-				onSelect(node.id);
-			}}
+			role="button"
+			tabIndex={0}
+			onPointerDown={handlePointerDown}
+			onKeyDown={handleKeyDown}
 		>
 			<span className="wfa-tool-node__input-dot" aria-hidden="true" />
 			<span
@@ -44,6 +52,6 @@ export default function ToolNodeCard({
 					{__('Tool', 'workflow-automate')}
 				</span>
 			</span>
-		</button>
+		</div>
 	);
 }

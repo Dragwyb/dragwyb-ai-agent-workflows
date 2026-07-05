@@ -269,6 +269,51 @@ export function toolInputPortPosition(toolNode) {
 }
 
 /**
+ * Repositions an agent and every node attached via parent_agent_id.
+ *
+ * @param {Array<Object>} nodes   Full graph nodes.
+ * @param {string}        agentId Agent client node id.
+ * @param {number}        agentX  New agent x.
+ * @param {number}        agentY  New agent y.
+ * @return {Array<Object>}
+ */
+export function syncAgentGroupPositions(nodes, agentId, agentX, agentY) {
+	const agentPoint = { x: agentX, y: agentY };
+	const tools = toolsForAgent(nodes, agentId);
+
+	return nodes.map((node) => {
+		if (node.id === agentId) {
+			return { ...node, x: agentX, y: agentY };
+		}
+
+		if (node.parent_agent_id !== agentId) {
+			return node;
+		}
+
+		if (isChatModelAttachment(node)) {
+			const position = chatModelAttachmentPosition(agentPoint);
+			return { ...node, x: position.x, y: position.y };
+		}
+
+		if (isMemoryAttachment(node)) {
+			const position = memoryAttachmentPosition(agentPoint);
+			return { ...node, x: position.x, y: position.y };
+		}
+
+		if (isToolAttachment(node)) {
+			const index = tools.findIndex((tool) => tool.id === node.id);
+			const position = toolAttachmentPosition(
+				agentPoint,
+				index >= 0 ? index : 0
+			);
+			return { ...node, x: position.x, y: position.y };
+		}
+
+		return node;
+	});
+}
+
+/**
  * @param {Array<Object>} nodes
  * @param {string}        agentId
  * @return {Array<Object>}

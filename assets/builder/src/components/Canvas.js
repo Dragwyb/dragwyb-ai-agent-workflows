@@ -200,27 +200,17 @@ export default function Canvas({
 					return (
 						<AgentNodeCard
 							key={node.id}
-
 							node={node}
-
 							selected={node.id === selectedNodeId}
-
 							hasUnknownType={!knownTypeSlugs.includes(node.type)}
-
 							hasChatModel={Boolean(chatModel)}
-
 							hasMemory={Boolean(memory)}
-
 							chatModelId={chatModel?.id || null}
-
 							onSelect={onSelectNode}
-
+							onMove={onMoveNode}
 							onAddChatModel={onAddAgentChatModel}
-
 							onAddMemory={onAddAgentMemory}
-
 							onAddTool={onAddAgentTool}
-
 							registerRef={registerNodeRef}
 						/>
 					);
@@ -255,19 +245,16 @@ export default function Canvas({
 				.map((chatModel) => (
 					<div
 						key={chatModel.id}
-
 						className="wfa-chat-model-node-wrap"
-
 						style={{
 							transform: `translate(${chatModel.x}px, ${chatModel.y}px)`,
 						}}
 					>
 						<ChatModelSubNode
 							node={chatModel}
-
 							selected={chatModel.id === selectedNodeId}
-
 							onSelect={onSelectNode}
+							onMove={onMoveNode}
 						/>
 					</div>
 				))}
@@ -281,19 +268,16 @@ export default function Canvas({
 				.map((memory) => (
 					<div
 						key={memory.id}
-
 						className="wfa-memory-node-wrap"
-
 						style={{
 							transform: `translate(${memory.x}px, ${memory.y}px)`,
 						}}
 					>
 						<MemorySubNode
 							node={memory}
-
 							selected={memory.id === selectedNodeId}
-
 							onSelect={onSelectNode}
+							onMove={onMoveNode}
 						/>
 					</div>
 				))}
@@ -307,19 +291,16 @@ export default function Canvas({
 				.map((tool) => (
 					<div
 						key={tool.id}
-
 						className="wfa-tool-node-wrap"
-
 						style={{
 							transform: `translate(${tool.x}px, ${tool.y}px)`,
 						}}
 					>
 						<ToolNodeCard
 							node={tool}
-
 							selected={tool.id === selectedNodeId}
-
 							onSelect={onSelectNode}
+							onMove={onMoveNode}
 						/>
 					</div>
 				))}

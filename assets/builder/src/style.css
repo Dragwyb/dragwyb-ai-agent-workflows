@@ -323,7 +323,11 @@
 
 .wfa-builder-node--agent {
 	width: var(--wfa-node-width);
-	cursor: pointer;
+	align-items: stretch;
+}
+
+.wfa-builder-node--agent .wfa-builder-node__body {
+	border-radius: var(--wfa-node-radius) var(--wfa-node-radius) 0 0;
 }
 
 .wfa-agent-node__ports {
@@ -336,10 +340,6 @@
 	border-top: 1px dashed #e2e8f0;
 	background: #fafbfc;
 	border-radius: 0 0 var(--wfa-node-radius) var(--wfa-node-radius);
-}
-
-.wfa-builder-node--agent .wfa-builder-node__body {
-	border-radius: var(--wfa-node-radius) var(--wfa-node-radius) 0 0;
 }
 
 .wfa-agent-node__port {
@@ -425,7 +425,9 @@
 	padding: 0;
 	border: none;
 	background: transparent;
-	cursor: pointer;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
 	text-align: center;
 	position: relative;
 }
@@ -486,7 +488,9 @@
 	border: 1px dashed #cbd5e1;
 	border-radius: 999px;
 	box-shadow: var(--wfa-shadow-1);
-	cursor: pointer;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
 	text-align: left;
 	position: relative;
 }
@@ -551,7 +555,9 @@
 	border: 1px dashed #f97316;
 	border-radius: 10px;
 	box-shadow: var(--wfa-shadow-1);
-	cursor: pointer;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
 	text-align: left;
 }
 

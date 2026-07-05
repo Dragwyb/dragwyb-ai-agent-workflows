@@ -33,6 +33,7 @@ import {
 	syncAgentConfigFromChatModel,
 	providerFromChatModelSlug,
 	DEFAULT_MODEL_BY_PROVIDER,
+	AI_AGENT_SLUG,
 } from './utils/agentAttachments';
 import {
 	capturedSampleFromStatus,
@@ -727,12 +728,58 @@ export default function App() {
 	}, []);
 
 	const handleMoveNode = (nodeId, x, y) => {
-		setGraph((current) => ({
-			...current,
-			nodes: current.nodes.map((node) =>
-				node.id === nodeId ? { ...node, x, y } : node
-			),
-		}));
+		setGraph((current) => {
+			const movedNode = current.nodes.find((node) => node.id === nodeId);
+
+			if (!movedNode) {
+				return current;
+			}
+
+			const dx = x - movedNode.x;
+			const dy = y - movedNode.y;
+
+			// Drag an attachment on its own — keep the agent and siblings put.
+			if (
+				movedNode.parent_agent_id &&
+				movedNode.type !== AI_AGENT_SLUG
+			) {
+				return {
+					...current,
+					nodes: current.nodes.map((node) =>
+						node.id === nodeId ? { ...node, x, y } : node
+					),
+				};
+			}
+
+			// Drag the agent — move every attached sub-node by the same delta.
+			if (movedNode.type === AI_AGENT_SLUG) {
+				return {
+					...current,
+					nodes: current.nodes.map((node) => {
+						if (node.id === nodeId) {
+							return { ...node, x, y };
+						}
+
+						if (node.parent_agent_id === nodeId) {
+							return {
+								...node,
+								x: Math.max(0, node.x + dx),
+								y: Math.max(0, node.y + dy),
+							};
+						}
+
+						return node;
+					}),
+				};
+			}
+
+			return {
+				...current,
+				nodes: current.nodes.map((node) =>
+					node.id === nodeId ? { ...node, x, y } : node
+				),
+			};
+		});
 	};
 
 	const handleChangeLabel = (label) => {

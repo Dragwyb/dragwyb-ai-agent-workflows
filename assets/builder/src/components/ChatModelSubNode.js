@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
+import { useNodeDrag } from '../hooks/useNodeDrag';
 import { getNodeMeta } from '../nodeMeta';
 import {
 	CHAT_MODEL_APP_IDS,
@@ -13,13 +14,20 @@ export default function ChatModelSubNode({
 	node,
 	selected,
 	onSelect,
+	onMove,
 }) {
 	const appId = CHAT_MODEL_APP_IDS[node.type] || 'openai';
 	const meta = getNodeMeta(node.type, 'action', appId);
+	const { handlePointerDown, handleKeyDown } = useNodeDrag({
+		nodeId: node.id,
+		x: node.x,
+		y: node.y,
+		onMove,
+		onSelect: () => onSelect(node.id),
+	});
 
 	return (
-		<button
-			type="button"
+		<div
 			className={[
 				'wfa-chat-model-node',
 				selected ? 'wfa-chat-model-node--selected' : '',
@@ -28,10 +36,10 @@ export default function ChatModelSubNode({
 				.join(' ')}
 			style={{ width: CHAT_MODEL_NODE_SIZE, height: CHAT_MODEL_NODE_SIZE }}
 			data-node-id={node.id}
-			onClick={(event) => {
-				event.stopPropagation();
-				onSelect(node.id);
-			}}
+			role="button"
+			tabIndex={0}
+			onPointerDown={handlePointerDown}
+			onKeyDown={handleKeyDown}
 		>
 			<span className="wfa-chat-model-node__input-dot" aria-hidden="true" />
 			<span
@@ -48,6 +56,6 @@ export default function ChatModelSubNode({
 			<span className="wfa-chat-model-node__subtitle">
 				{__('Chat Model', 'workflow-automate')}
 			</span>
-		</button>
+		</div>
 	);
 }
