@@ -209,18 +209,32 @@ class NodeTypesController {
 	 * @return void
 	 */
 	private function applyElementorFormSchema( array &$data ): void {
-		if ( 'elementor_form_submitted_trigger' !== ( $data['slug'] ?? '' ) ) {
+		$slug = (string) ( $data['slug'] ?? '' );
+
+		if ( 'elementor_form_submitted_trigger' === $slug ) {
+			$this->applyFormSelectSchema( $data, $this->elementor_forms->listForms(), $this->elementor_forms->formSelectOptions() );
 			return;
 		}
 
+		if ( 'elementor_atomic_form_submitted_trigger' === $slug ) {
+			$this->applyFormSelectSchema( $data, $this->elementor_forms->listAtomicForms(), $this->elementor_forms->atomicFormSelectOptions() );
+		}
+	}
+
+	/**
+	 * @param array<string, mixed>                                              $data
+	 * @param array{options: array<int, array{value: string, label: string}>, error: string|null} $form_result
+	 * @param array<int, array{value: string, label: string}>                   $options
+	 *
+	 * @return void
+	 */
+	private function applyFormSelectSchema( array &$data, array $form_result, array $options ): void {
 		if ( ! isset( $data['config_schema']['form_id'] ) || ! is_array( $data['config_schema']['form_id'] ) ) {
 			return;
 		}
 
-		$form_result = $this->elementor_forms->listForms();
-
 		$data['config_schema']['form_id']['type']    = 'select';
-		$data['config_schema']['form_id']['options'] = $this->elementor_forms->formSelectOptions();
+		$data['config_schema']['form_id']['options'] = $options;
 
 		if ( null !== $form_result['error'] ) {
 			$data['config_schema']['form_id']['help'] = $form_result['error'];

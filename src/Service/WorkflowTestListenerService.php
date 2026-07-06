@@ -186,6 +186,10 @@ class WorkflowTestListenerService {
 			return 'elementor' === $source;
 		}
 
+		if ( 'elementor_atomic_form_submitted_trigger' === $trigger_type ) {
+			return 'elementor-atomic' === $source;
+		}
+
 		if ( 'woocommerce_order_completed_trigger' === $trigger_type ) {
 			return 'woocommerce' === $source;
 		}

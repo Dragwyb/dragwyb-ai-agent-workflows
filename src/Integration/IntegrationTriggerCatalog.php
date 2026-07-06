@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Integration;
 
 use WorkflowAutomate\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceOrderCompletedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
@@ -43,6 +44,13 @@ class IntegrationTriggerCatalog {
 				'requires_plugin' => 'Elementor Pro',
 				'class' => ElementorFormSubmittedTrigger::class,
 				'active' => self::isElementorProActive(),
+			),
+			array(
+				'slug' => 'elementor_atomic_form_submitted_trigger',
+				'app' => 'elementor',
+				'requires_plugin' => 'Elementor Pro',
+				'class' => ElementorAtomicFormSubmittedTrigger::class,
+				'active' => self::isElementorAtomicFormsActive(),
 			),
 			array(
 				'slug' => 'woocommerce_order_completed_trigger',
@@ -89,6 +97,14 @@ class IntegrationTriggerCatalog {
 	 */
 	public static function isElementorProActive(): bool {
 		return defined( 'ELEMENTOR_PRO_VERSION' ) || class_exists( '\ElementorPro\Plugin', false );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isElementorAtomicFormsActive(): bool {
+		return self::isElementorProActive()
+			&& class_exists( '\ElementorPro\Modules\AtomicForm\Atomic_Form_Controller', false );
 	}
 
 	/**

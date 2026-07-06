@@ -18,7 +18,7 @@ const PALETTE_HIDDEN_SLUGS = new Set([...TOOL_SLUGS]);
 
 /** @type {Array<{ id: string, label: string, slugs: string[] }>} */
 const INTEGRATION_TRIGGER_APPS = [
-	{ id: 'elementor', label: 'Elementor', slugs: ['elementor_form_submitted_trigger'] },
+	{ id: 'elementor', label: 'Elementor', slugs: ['elementor_form_submitted_trigger', 'elementor_atomic_form_submitted_trigger'] },
 	{ id: 'woocommerce', label: 'WooCommerce', slugs: ['woocommerce_order_completed_trigger'] },
 	{ id: 'contact-form-7', label: 'Contact Form 7', slugs: ['contact_form7_submitted_trigger'] },
 	{ id: 'wpforms', label: 'WPForms', slugs: ['wpforms_submitted_trigger'] },

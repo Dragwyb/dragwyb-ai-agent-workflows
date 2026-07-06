@@ -18,6 +18,10 @@ function legacyPayloadMatchesTrigger(triggerType, payload) {
 		return source === 'elementor';
 	}
 
+	if (triggerType === 'elementor_atomic_form_submitted_trigger') {
+		return source === 'elementor-atomic';
+	}
+
 	if (triggerType === 'woocommerce_order_completed_trigger') {
 		return source === 'woocommerce';
 	}
