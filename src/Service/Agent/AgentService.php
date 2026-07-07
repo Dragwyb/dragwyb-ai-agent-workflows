@@ -102,7 +102,7 @@ class AgentService {
 		);
 		$user_message    = $this->enrichUserMessage( $prompt, $context, $attachments );
 		$max_iterations  = $this->resolveMaxIterations( $config );
-		$tool_schemas    = $this->schema_builder->buildSchemas( $attachments['tools'] );
+		$tool_schemas    = $this->schema_builder->buildSchemas( $attachments['tools'], $graph_nodes );
 		$messages        = $this->buildMessages( $config, $context, $agent_node_id, $attachments, $system_prompt, $user_message );
 		$system_for_call = $this->extractSystemPrompt( $messages, $system_prompt );
 
@@ -144,6 +144,7 @@ class AgentService {
 		$loop['response'] = $response;
 		$loop['provider'] = $chat['provider'];
 		$loop['model']    = $model;
+		$loop['attached_tools'] = $this->summarizeAttachedTools( $attachments['tools'] );
 
 		if ( ! empty( $attachments['memory'] ) && is_array( $attachments['memory'] ) && isset( $loop['conversation_messages'] ) ) {
 			$memory_store = $this->memoryStore( $agent_node_id, $attachments['memory'], $config, $context );
@@ -374,6 +375,7 @@ class AgentService {
 					'iterations'    => $iteration,
 					'finish_reason' => (string) ( $completion['finish_reason'] ?? 'stop' ),
 					'tool_calls'    => $this->formatToolCalls( $all_tool_calls ),
+					'tools_called'  => $this->formatToolsCalled( $all_tool_calls ),
 					'conversation_messages' => $messages,
 				);
 			}
@@ -437,6 +439,7 @@ class AgentService {
 			'error'      => __( 'Max iterations reached.', 'workflow-automate' ),
 			'iterations' => $iteration,
 			'tool_calls' => $this->formatToolCalls( $all_tool_calls ),
+			'tools_called' => $this->formatToolsCalled( $all_tool_calls ),
 		);
 	}
 
@@ -462,6 +465,54 @@ class AgentService {
 		}
 
 		return $formatted;
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $tool_calls Raw tool calls.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function formatToolsCalled( array $tool_calls ): array {
+		$ordered = array();
+
+		foreach ( $tool_calls as $tool_call ) {
+			$name = (string) ( $tool_call['name'] ?? '' );
+
+			if ( '' === $name ) {
+				continue;
+			}
+
+			$ordered[] = array(
+				'name'   => $name,
+				'input'  => $tool_call['arguments'] ?? array(),
+				'output' => $tool_call['result'] ?? array(),
+			);
+		}
+
+		return $ordered;
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $tool_nodes Attached tool graph nodes.
+	 *
+	 * @return array<int, array<string, string>>
+	 */
+	private function summarizeAttachedTools( array $tool_nodes ): array {
+		$summary = array();
+
+		foreach ( $tool_nodes as $tool_node ) {
+			if ( ! is_array( $tool_node ) || empty( $tool_node['id'] ) ) {
+				continue;
+			}
+
+			$summary[] = array(
+				'id'    => (string) $tool_node['id'],
+				'type'  => (string) ( $tool_node['type'] ?? '' ),
+				'label' => isset( $tool_node['label'] ) ? (string) $tool_node['label'] : (string) ( $tool_node['type'] ?? '' ),
+			);
+		}
+
+		return $summary;
 	}
 
 	/**
@@ -523,6 +574,7 @@ class AgentService {
 
 		if ( ! empty( $attachments['tools'] ) ) {
 			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'workflow-automate' );
+			$parts[] = __( 'Condition and Router tools are pre-configured on their workflow nodes—call them with no arguments first, then call only the next tool named in their result.', 'workflow-automate' );
 		}
 
 		if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {

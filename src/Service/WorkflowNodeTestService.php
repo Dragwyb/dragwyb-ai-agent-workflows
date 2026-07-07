@@ -339,6 +339,34 @@ class WorkflowNodeTestService {
 			$input[ $key ] = $value;
 		}
 
+		if ( 'ai_agent_action' === (string) ( $graph_node['type'] ?? '' ) ) {
+			$graph_nodes = $context['graph']['nodes'] ?? array();
+
+			if ( is_array( $graph_nodes ) ) {
+				$attachments = AgentGraphHelper::resolveAttachments(
+					$graph_nodes,
+					(string) ( $graph_node['id'] ?? '' )
+				);
+				$tools       = array();
+
+				foreach ( $attachments['tools'] as $tool_node ) {
+					if ( ! is_array( $tool_node ) || empty( $tool_node['id'] ) ) {
+						continue;
+					}
+
+					$tools[] = array(
+						'id'    => (string) $tool_node['id'],
+						'type'  => (string) ( $tool_node['type'] ?? '' ),
+						'label' => isset( $tool_node['label'] ) ? (string) $tool_node['label'] : (string) ( $tool_node['type'] ?? '' ),
+					);
+				}
+
+				if ( array() !== $tools ) {
+					$input['attached_tools'] = $tools;
+				}
+			}
+		}
+
 		return $input;
 	}
 
@@ -372,6 +400,14 @@ class WorkflowNodeTestService {
 
 		if ( isset( $result['tool_calls'] ) && is_array( $result['tool_calls'] ) ) {
 			$output['tool_calls'] = $result['tool_calls'];
+		}
+
+		if ( isset( $result['tools_called'] ) && is_array( $result['tools_called'] ) ) {
+			$output['tools_called'] = $result['tools_called'];
+		}
+
+		if ( isset( $result['attached_tools'] ) && is_array( $result['attached_tools'] ) ) {
+			$output['attached_tools'] = $result['attached_tools'];
 		}
 
 		if ( isset( $result['provider'] ) && is_string( $result['provider'] ) ) {

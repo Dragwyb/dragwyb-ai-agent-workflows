@@ -54,15 +54,16 @@ class AgentToolSchemaBuilder {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>> $tool_nodes Attached tool graph nodes.
+	 * @param array<int, array<string, mixed>> $tool_nodes    Attached tool graph nodes.
+	 * @param array<int, mixed>                $graph_nodes   Full workflow graph nodes.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
-	public function buildSchemas( array $tool_nodes ): array {
+	public function buildSchemas( array $tool_nodes, array $graph_nodes = array() ): array {
 		$schemas = array();
 
 		foreach ( $tool_nodes as $tool_node ) {
-			$schema = $this->buildSchemaForNode( $tool_node );
+			$schema = $this->buildSchemaForNode( $tool_node, $graph_nodes );
 
 			if ( null !== $schema ) {
 				$schemas[] = $schema;
@@ -73,11 +74,12 @@ class AgentToolSchemaBuilder {
 	}
 
 	/**
-	 * @param array<string, mixed> $tool_node Graph tool node.
+	 * @param array<string, mixed> $tool_node   Graph tool node.
+	 * @param array<int, mixed>    $graph_nodes Full workflow graph nodes.
 	 *
 	 * @return array<string, mixed>|null
 	 */
-	private function buildSchemaForNode( array $tool_node ): ?array {
+	private function buildSchemaForNode( array $tool_node, array $graph_nodes ): ?array {
 		$node_type = (string) ( $tool_node['type'] ?? '' );
 		$node_id   = (string) ( $tool_node['id'] ?? '' );
 
@@ -98,6 +100,12 @@ class AgentToolSchemaBuilder {
 
 		if ( '' === $description ) {
 			$description = $action->label();
+		}
+
+		if ( 'condition_action' === $node_type ) {
+			$description = $this->conditionToolDescription( $description, $config, $graph_nodes );
+		} elseif ( 'router_action' === $node_type ) {
+			$description = $this->routerToolDescription( $description, $config, $graph_nodes );
 		}
 
 		return array(
@@ -228,6 +236,129 @@ class AgentToolSchemaBuilder {
 			'type' => $parts[0],
 			'id'   => $parts[1],
 		);
+	}
+
+	/**
+	 * @param string               $base        Action description.
+	 * @param array<string, mixed> $config      Saved node config.
+	 * @param array<int, mixed>    $graph_nodes Graph nodes.
+	 *
+	 * @return string
+	 */
+	private function conditionToolDescription( string $base, array $config, array $graph_nodes ): string {
+		$parts   = array( $base );
+		$parts[] = __( 'Pre-configured on this workflow node. Call with no arguments.', 'workflow-automate' );
+
+		$field    = isset( $config['field'] ) ? trim( (string) $config['field'] ) : '';
+		$operator = isset( $config['operator'] ) ? trim( (string) $config['operator'] ) : 'equals';
+		$value    = isset( $config['value'] ) ? trim( (string) $config['value'] ) : '';
+
+		if ( '' !== $field ) {
+			$parts[] = sprintf(
+				/* translators: 1: field path, 2: operator, 3: compare value */
+				__( 'Rule: %1$s %2$s "%3$s".', 'workflow-automate' ),
+				$field,
+				$operator,
+				$value
+			);
+		}
+
+		$true_id  = isset( $config['true_branch_node_id'] ) ? trim( (string) $config['true_branch_node_id'] ) : '';
+		$false_id = isset( $config['false_branch_node_id'] ) ? trim( (string) $config['false_branch_node_id'] ) : '';
+
+		if ( '' !== $true_id ) {
+			$parts[] = sprintf(
+				/* translators: %s: tool function name and label */
+				__( 'If yes, then call: %s.', 'workflow-automate' ),
+				$this->branchToolRef( $graph_nodes, $true_id )
+			);
+		}
+
+		if ( '' !== $false_id ) {
+			$parts[] = sprintf(
+				/* translators: %s: tool function name and label */
+				__( 'If no, then call: %s.', 'workflow-automate' ),
+				$this->branchToolRef( $graph_nodes, $false_id )
+			);
+		}
+
+		return implode( ' ', $parts );
+	}
+
+	/**
+	 * @param string               $base        Action description.
+	 * @param array<string, mixed> $config      Saved node config.
+	 * @param array<int, mixed>    $graph_nodes Graph nodes.
+	 *
+	 * @return string
+	 */
+	private function routerToolDescription( string $base, array $config, array $graph_nodes ): string {
+		$parts   = array( $base );
+		$parts[] = __( 'Pre-configured on this workflow node. Call with no arguments.', 'workflow-automate' );
+
+		$field = isset( $config['route_field'] ) ? trim( (string) $config['route_field'] ) : '';
+
+		if ( '' !== $field ) {
+			$parts[] = sprintf(
+				/* translators: %s: field path */
+				__( 'Route field: %s.', 'workflow-automate' ),
+				$field
+			);
+		}
+
+		$routes = isset( $config['routes'] ) && is_array( $config['routes'] ) ? $config['routes'] : array();
+
+		foreach ( $routes as $route ) {
+			if ( ! is_array( $route ) ) {
+				continue;
+			}
+
+			$match   = isset( $route['match'] ) ? trim( (string) $route['match'] ) : '';
+			$node_id = isset( $route['node_id'] ) ? trim( (string) $route['node_id'] ) : '';
+
+			if ( '' === $match || '' === $node_id ) {
+				continue;
+			}
+
+			$parts[] = sprintf(
+				/* translators: 1: match value, 2: tool function name and label */
+				__( 'When value is "%1$s", call: %2$s.', 'workflow-automate' ),
+				$match,
+				$this->branchToolRef( $graph_nodes, $node_id )
+			);
+		}
+
+		$default_id = isset( $config['default_branch_node_id'] ) ? trim( (string) $config['default_branch_node_id'] ) : '';
+
+		if ( '' !== $default_id ) {
+			$parts[] = sprintf(
+				/* translators: %s: tool function name and label */
+				__( 'Otherwise call: %s.', 'workflow-automate' ),
+				$this->branchToolRef( $graph_nodes, $default_id )
+			);
+		}
+
+		return implode( ' ', $parts );
+	}
+
+	/**
+	 * @param array<int, mixed> $graph_nodes Graph nodes.
+	 * @param string            $node_id     Branch target node id.
+	 *
+	 * @return string
+	 */
+	private function branchToolRef( array $graph_nodes, string $node_id ): string {
+		$node = AgentGraphHelper::findNode( $graph_nodes, $node_id );
+
+		if ( null === $node ) {
+			return $node_id;
+		}
+
+		$type  = (string) ( $node['type'] ?? '' );
+		$label = isset( $node['label'] ) ? (string) $node['label'] : $type;
+		$name  = self::toolName( $type, $node_id );
+
+		return $name . ' (' . $label . ')';
 	}
 
 	/**
