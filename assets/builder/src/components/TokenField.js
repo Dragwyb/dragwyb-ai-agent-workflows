@@ -188,8 +188,10 @@ export default function TokenField({
 		}
 
 		const current = value || '';
+		const inEditor = serializeEditor(editor);
 
-		if (current === lastSerializedRef.current) {
+		if (current === inEditor) {
+			lastSerializedRef.current = current;
 			return;
 		}
 
