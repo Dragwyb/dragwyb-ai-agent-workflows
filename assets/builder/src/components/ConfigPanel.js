@@ -566,7 +566,6 @@ function ConfigField({
 	) {
 		return (
 			<TokenField
-				key={`${nodeId}-${fieldName}`}
 				label={label}
 				value={
 					resolved === undefined || resolved === null
