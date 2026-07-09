@@ -34,9 +34,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class HttpRequestAction implements ActionInterface {
 
-	private const ALLOWED_METHODS = array( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' );
+	private const ALLOWED_METHODS = array( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS' );
 
 	private const DEFAULT_METHOD = 'GET';
+
+	private const DEFAULT_BODY_CONTENT_TYPE = 'json';
 
 	private const TIMEOUT_SECONDS = 15;
 
@@ -72,30 +74,93 @@ class HttpRequestAction implements ActionInterface {
 	 */
 	public function configSchema(): array {
 		return array(
+			'method' => array(
+				'type' => 'select',
+				'label' => __( 'Method', 'workflow-automate' ),
+				'default' => self::DEFAULT_METHOD,
+				'options' => array(
+					array( 'value' => 'GET', 'label' => 'GET' ),
+					array( 'value' => 'POST', 'label' => 'POST' ),
+					array( 'value' => 'PUT', 'label' => 'PUT' ),
+					array( 'value' => 'PATCH', 'label' => 'PATCH' ),
+					array( 'value' => 'DELETE', 'label' => 'DELETE' ),
+					array( 'value' => 'HEAD', 'label' => 'HEAD' ),
+					array( 'value' => 'OPTIONS', 'label' => 'OPTIONS' ),
+				),
+			),
 			'url' => array(
 				'type' => 'string',
-				'label' => __( 'Request URL', 'workflow-automate' ),
+				'label' => __( 'URL', 'workflow-automate' ),
 				'required' => true,
+				'supports_variables' => true,
 			),
-			'method' => array(
-				'type' => 'string',
-				'label' => __( 'HTTP method', 'workflow-automate' ),
-				'default' => self::DEFAULT_METHOD,
+			'connection_id' => array(
+				'type' => 'connection',
+				'label' => __( 'Authentication (optional)', 'workflow-automate' ),
+				'default' => 0,
 			),
 			'headers' => array(
 				'type' => 'object',
 				'label' => __( 'Headers', 'workflow-automate' ),
 				'default' => array(),
 			),
+			'allow_unsafe_urls' => array(
+				'type' => 'boolean',
+				'label' => __( 'Allow local/unsafe URLs', 'workflow-automate' ),
+				'default' => false,
+				'help' => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'workflow-automate' ),
+			),
+			'send_body' => array(
+				'type' => 'boolean',
+				'label' => __( 'Send Body', 'workflow-automate' ),
+				'default' => false,
+			),
+			'body_content_type' => array(
+				'type' => 'select',
+				'label' => __( 'Body Content Type', 'workflow-automate' ),
+				'default' => self::DEFAULT_BODY_CONTENT_TYPE,
+				'show_when' => array(
+					array( 'field' => 'send_body', 'equals' => true ),
+				),
+				'options' => array(
+					array( 'value' => 'json', 'label' => __( 'JSON', 'workflow-automate' ) ),
+					array( 'value' => 'form_urlencoded', 'label' => __( 'Form URL Encoded', 'workflow-automate' ) ),
+					array( 'value' => 'raw', 'label' => __( 'Raw', 'workflow-automate' ) ),
+				),
+			),
+			'body_specify' => array(
+				'type' => 'select',
+				'label' => __( 'Specify Body', 'workflow-automate' ),
+				'default' => 'json',
+				'show_when' => array(
+					array( 'field' => 'send_body', 'equals' => true ),
+				),
+				'options' => array(
+					array( 'value' => 'json', 'label' => __( 'Using JSON', 'workflow-automate' ) ),
+					array( 'value' => 'fields', 'label' => __( 'Using Fields Below', 'workflow-automate' ) ),
+				),
+			),
 			'body' => array(
 				'type' => 'string',
 				'label' => __( 'Body', 'workflow-automate' ),
 				'default' => '',
+				'supports_variables' => true,
+				'help' => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'workflow-automate' ),
+				'show_when' => array(
+					array( 'field' => 'send_body', 'equals' => true ),
+					array( 'field' => 'body_specify', 'equals' => 'json' ),
+				),
 			),
-			'connection_id' => array(
-				'type' => 'connection',
-				'label' => __( 'Authenticate with connection (optional)', 'workflow-automate' ),
-				'default' => 0,
+			'body_parameters' => array(
+				'type' => 'key_value',
+				'label' => __( 'Body Parameters', 'workflow-automate' ),
+				'default' => array(),
+				'button_label' => __( 'Add Body Field', 'workflow-automate' ),
+				'supports_variables' => true,
+				'show_when' => array(
+					array( 'field' => 'send_body', 'equals' => true ),
+					array( 'field' => 'body_specify', 'equals' => 'fields' ),
+				),
 			),
 		);
 	}
@@ -140,11 +205,19 @@ class HttpRequestAction implements ActionInterface {
 			'headers' => $headers,
 		);
 
-		if ( isset( $config['body'] ) && '' !== $config['body'] ) {
-			$args['body'] = $config['body'];
-		}
+		$this->applyBody( $config, $method, $args );
 
-		$response = wp_safe_remote_request( $url, $args );
+		$allow_unsafe_urls = ! empty( $config['allow_unsafe_urls'] );
+
+		// By default use `wp_safe_remote_request()` so WordPress's
+		// `reject_unsafe_urls` protection blocks requests to loopback and
+		// private/internal hosts (anti-SSRF). When the author explicitly
+		// opts in — typically to reach a local dev server such as
+		// `http://localhost:8002` — fall back to the regular client, which
+		// does not apply that restriction.
+		$response = $allow_unsafe_urls
+			? wp_remote_request( $url, $args )
+			: wp_safe_remote_request( $url, $args );
 
 		if ( is_wp_error( $response ) ) {
 			return array(
@@ -158,6 +231,152 @@ class HttpRequestAction implements ActionInterface {
 			'status_code' => wp_remote_retrieve_response_code( $response ),
 			'body' => wp_remote_retrieve_body( $response ),
 		);
+	}
+
+	/**
+	 * Builds the request body onto `$args` based on the configured
+	 * "Send Body" toggle, "Body Content Type" and "Specify Body" mode,
+	 * mirroring n8n's HTTP Request node.
+	 *
+	 * Two ways to specify the body:
+	 *  - "Using JSON" (`body_specify = json`): the author types a raw
+	 *    JSON/form/raw string in the Body field, sent verbatim.
+	 *  - "Using Fields Below" (`body_specify = fields`): the author adds
+	 *    Name/Value pairs in `body_parameters`, which are assembled into a
+	 *    JSON object or a URL-encoded query string per the content type.
+	 *
+	 * Values are already interpolated for `{{tokens}}` upstream.
+	 *
+	 * Backwards compatibility: older configs stored a plain `body` string
+	 * without a `send_body` toggle. When `send_body` is absent but a body
+	 * is present, we still send it so existing workflows keep working.
+	 *
+	 * @param array<string, mixed> $config Node configuration.
+	 * @param string               $method Resolved HTTP method.
+	 * @param array<string, mixed> $args   Request args, modified by reference.
+	 *
+	 * @return void
+	 */
+	private function applyBody( array $config, string $method, array &$args ): void {
+		$body = isset( $config['body'] ) ? (string) $config['body'] : '';
+
+		$send_body = array_key_exists( 'send_body', $config )
+			? (bool) $config['send_body']
+			: ( '' !== $body );
+
+		if ( ! $send_body || in_array( $method, array( 'GET', 'HEAD' ), true ) ) {
+			return;
+		}
+
+		$content_type = isset( $config['body_content_type'] )
+			? (string) $config['body_content_type']
+			: self::DEFAULT_BODY_CONTENT_TYPE;
+
+		$specify = isset( $config['body_specify'] ) ? (string) $config['body_specify'] : 'json';
+
+		if ( 'fields' === $specify ) {
+			$this->applyBodyFields( $config, $content_type, $args );
+			return;
+		}
+
+		if ( '' === $body ) {
+			return;
+		}
+
+		switch ( $content_type ) {
+			case 'form_urlencoded':
+				$decoded = json_decode( $body, true );
+
+				if ( is_array( $decoded ) ) {
+					$args['body'] = http_build_query( $decoded );
+				} else {
+					$args['body'] = $body;
+				}
+
+				$this->ensureContentType( $args, 'application/x-www-form-urlencoded' );
+				break;
+
+			case 'raw':
+				$args['body'] = $body;
+				break;
+
+			case 'json':
+			default:
+				$args['body'] = $body;
+				$this->ensureContentType( $args, 'application/json' );
+				break;
+		}
+	}
+
+	/**
+	 * Assembles the request body from the "Using Fields Below" Name/Value
+	 * pairs. Rows with an empty name are skipped. The pairs become a JSON
+	 * object (for `json`/`raw` content types) or a URL-encoded query string
+	 * (for `form_urlencoded`), with the matching default `Content-Type`.
+	 *
+	 * @param array<string, mixed> $config       Node configuration.
+	 * @param string               $content_type Resolved body content type.
+	 * @param array<string, mixed> $args         Request args, modified by reference.
+	 *
+	 * @return void
+	 */
+	private function applyBodyFields( array $config, string $content_type, array &$args ): void {
+		$rows = isset( $config['body_parameters'] ) && is_array( $config['body_parameters'] )
+			? $config['body_parameters']
+			: array();
+
+		$data = array();
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$name = isset( $row['name'] ) ? trim( (string) $row['name'] ) : '';
+
+			if ( '' === $name ) {
+				continue;
+			}
+
+			$data[ $name ] = isset( $row['value'] ) ? (string) $row['value'] : '';
+		}
+
+		if ( array() === $data ) {
+			return;
+		}
+
+		if ( 'form_urlencoded' === $content_type ) {
+			$args['body'] = http_build_query( $data );
+			$this->ensureContentType( $args, 'application/x-www-form-urlencoded' );
+			return;
+		}
+
+		$encoded      = wp_json_encode( $data );
+		$args['body'] = is_string( $encoded ) ? $encoded : '';
+		$this->ensureContentType( $args, 'application/json' );
+	}
+
+	/**
+	 * Adds a `Content-Type` header only when the author hasn't already
+	 * provided one (any capitalization), so an explicit header in the
+	 * Headers field always wins.
+	 *
+	 * @param array<string, mixed> $args         Request args, modified by reference.
+	 * @param string               $content_type Content type to default to.
+	 *
+	 * @return void
+	 */
+	private function ensureContentType( array &$args, string $content_type ): void {
+		$headers = isset( $args['headers'] ) && is_array( $args['headers'] ) ? $args['headers'] : array();
+
+		foreach ( array_keys( $headers ) as $name ) {
+			if ( 0 === strcasecmp( (string) $name, 'Content-Type' ) ) {
+				return;
+			}
+		}
+
+		$headers['Content-Type'] = $content_type;
+		$args['headers']         = $headers;
 	}
 
 	/**

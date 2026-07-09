@@ -472,6 +472,10 @@ function ConfigField({
 		return null;
 	}
 
+	if (!isFieldVisible(fieldSchema, nodeConfig)) {
+		return null;
+	}
+
 	const label = fieldSchema.label || fieldName;
 	const help = fieldSchema.help || '';
 	const resolved = value === undefined ? fieldSchema.default : value;
@@ -540,6 +544,18 @@ function ConfigField({
 
 	if (fieldSchema.type === 'object' || fieldSchema.type === 'array') {
 		return <JsonField label={label} value={resolved} onChange={onChange} />;
+	}
+
+	if (fieldSchema.type === 'key_value') {
+		return (
+			<KeyValueField
+				label={label}
+				value={resolved}
+				help={help || undefined}
+				addLabel={fieldSchema.button_label}
+				onChange={onChange}
+			/>
+		);
 	}
 
 	if (fieldSchema.type === 'connection') {
@@ -1422,6 +1438,117 @@ function ConnectionField({
 					</div>
 				</div>
 			)}
+		</div>
+	);
+}
+
+/**
+ * Evaluates a field's optional `show_when` conditions against the current
+ * node config. Conditions are ANDed together; each is `{ field, equals }`.
+ * Boolean `equals` compares truthiness so a toggle that is on/off matches
+ * regardless of how the value is stored.
+ *
+ * @param {Object} fieldSchema
+ * @param {Object} nodeConfig
+ * @return {boolean}
+ */
+function isFieldVisible(fieldSchema, nodeConfig = {}) {
+	const conditions = fieldSchema.show_when;
+
+	if (!conditions) {
+		return true;
+	}
+
+	const list = Array.isArray(conditions) ? conditions : [conditions];
+
+	return list.every((condition) => {
+		if (!condition || !('equals' in condition)) {
+			return true;
+		}
+
+		const actual = nodeConfig[condition.field];
+
+		if (typeof condition.equals === 'boolean') {
+			return Boolean(actual) === condition.equals;
+		}
+
+		return String(actual ?? '') === String(condition.equals);
+	});
+}
+
+/**
+ * Repeatable Name/Value editor (n8n "Using Fields Below" style). Stores an
+ * array of `{ name, value }` objects.
+ *
+ * @param {Object}   props
+ * @param {string}   props.label
+ * @param {*}        props.value
+ * @param {string}   [props.help]
+ * @param {string}   [props.addLabel]
+ * @param {Function} props.onChange
+ */
+function KeyValueField({ label, value, help, addLabel, onChange }) {
+	const rows = Array.isArray(value) ? value : [];
+
+	const updateRow = (index, key, nextValue) => {
+		onChange(
+			rows.map((row, i) =>
+				i === index ? { ...row, [key]: nextValue } : row
+			)
+		);
+	};
+
+	const addRow = () => {
+		onChange([...rows, { name: '', value: '' }]);
+	};
+
+	const removeRow = (index) => {
+		onChange(rows.filter((_, i) => i !== index));
+	};
+
+	return (
+		<div className="wfa-builder-config__key-value">
+			<span className="wfa-builder-config__key-value-label">{label}</span>
+			{help && (
+				<p className="wfa-builder-config__field-help">{help}</p>
+			)}
+			{rows.map((row, index) => (
+				<div
+					// eslint-disable-next-line react/no-array-index-key
+					key={index}
+					className="wfa-builder-config__key-value-row"
+				>
+					<TextControl
+						label={__('Name', 'workflow-automate')}
+						value={row.name || ''}
+						onChange={(nextValue) =>
+							updateRow(index, 'name', nextValue)
+						}
+					/>
+					<TextControl
+						label={__('Value', 'workflow-automate')}
+						value={row.value || ''}
+						onChange={(nextValue) =>
+							updateRow(index, 'value', nextValue)
+						}
+					/>
+					<Button
+						isDestructive
+						variant="tertiary"
+						className="wfa-builder-config__key-value-remove"
+						onClick={() => removeRow(index)}
+					>
+						{__('Remove', 'workflow-automate')}
+					</Button>
+				</div>
+			))}
+			<Button
+				variant="secondary"
+				className="wfa-builder-config__key-value-add"
+				onClick={addRow}
+			>
+				{addLabel || __('Add Field', 'workflow-automate')}
+			</Button>
 		</div>
 	);
 }

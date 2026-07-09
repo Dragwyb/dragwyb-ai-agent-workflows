@@ -843,6 +843,39 @@
 	margin-top: 8px;
 }
 
+.wfa-builder-config__key-value {
+	margin-bottom: 16px;
+}
+
+.wfa-builder-config__key-value-label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	color: #1e1e1e;
+}
+
+.wfa-builder-config__key-value-row {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px;
+	margin-bottom: 8px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background: #f6f7f7;
+}
+
+.wfa-builder-config__key-value-remove {
+	align-self: flex-end;
+}
+
+.wfa-builder-config__key-value-add {
+	width: 100%;
+	justify-content: center;
+}
+
 .wfa-builder-config__actions {
 	display: flex;
 	flex-direction: column;
