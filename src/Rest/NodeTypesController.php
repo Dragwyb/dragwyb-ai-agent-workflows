@@ -13,6 +13,7 @@ use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
 use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
+use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
 use WorkflowAutomate\Plugin\Service\ElementorFormsService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
@@ -105,8 +106,7 @@ class NodeTypesController {
 				continue;
 			}
 
-			$class    = $definition['class'];
-			$instance = new $class();
+			$instance = $this->instantiateTriggerDefinition( $definition );
 
 			$serialized_triggers[] = $this->serializeUnavailable(
 				$instance,
@@ -256,5 +256,24 @@ class NodeTypesController {
 		}
 
 		return $defaults;
+	}
+
+	/**
+	 * @param array<string, mixed> $definition Integration trigger catalog entry.
+	 *
+	 * @return NodeTypeInterface
+	 */
+	private function instantiateTriggerDefinition( array $definition ): NodeTypeInterface {
+		if (
+			WooCommerceCatalogTrigger::class === ( $definition['class'] ?? '' )
+			&& isset( $definition['definition'] )
+			&& is_array( $definition['definition'] )
+		) {
+			return new WooCommerceCatalogTrigger( $definition['definition'] );
+		}
+
+		$class = (string) ( $definition['class'] ?? '' );
+
+		return new $class();
 	}
 }

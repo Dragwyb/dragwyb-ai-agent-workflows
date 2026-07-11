@@ -212,6 +212,18 @@ class AgentService {
 			return 'gemini-2.0-flash';
 		}
 
+		if ( 'openrouter' === $provider ) {
+			return 'openai/gpt-4o-mini';
+		}
+
+		if ( 'groq' === $provider ) {
+			return 'llama-3.3-70b-versatile';
+		}
+
+		if ( 'deepseek' === $provider ) {
+			return 'deepseek-chat';
+		}
+
 		return 'gpt-4o-mini';
 	}
 
@@ -387,11 +399,7 @@ class AgentService {
 				$function     = is_array( $tool_call['function'] ?? null ) ? $tool_call['function'] : array();
 				$function_name = (string) ( $function['name'] ?? '' );
 				$raw_args      = $function['arguments'] ?? '{}';
-				$args          = is_string( $raw_args ) ? json_decode( $raw_args, true ) : $raw_args;
-
-				if ( ! is_array( $args ) ) {
-					$args = array();
-				}
+				$args          = $this->parseToolArguments( $raw_args );
 
 				$signature = md5( $function_name . wp_json_encode( $args ) );
 
@@ -438,6 +446,40 @@ class AgentService {
 			'iterations' => $iteration,
 			'tool_calls' => $this->formatToolCalls( $all_tool_calls ),
 		);
+	}
+
+	/**
+	 * @param mixed $raw_args Tool arguments from the LLM (JSON string or array).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function parseToolArguments( $raw_args ): array {
+		if ( is_array( $raw_args ) ) {
+			return $raw_args;
+		}
+
+		if ( ! is_string( $raw_args ) ) {
+			return array();
+		}
+
+		$trimmed = trim( $raw_args );
+
+		if ( '' === $trimmed ) {
+			return array();
+		}
+
+		$decoded = json_decode( $trimmed, true );
+
+		if ( is_array( $decoded ) ) {
+			return $decoded;
+		}
+
+		$repaired = preg_replace( '/,\s*([}\]])/', '$1', $trimmed );
+		$repaired = is_string( $repaired ) ? $repaired : $trimmed;
+
+		$decoded = json_decode( $repaired, true );
+
+		return is_array( $decoded ) ? $decoded : array();
 	}
 
 	/**
@@ -523,6 +565,7 @@ class AgentService {
 
 		if ( ! empty( $attachments['tools'] ) ) {
 			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'workflow-automate' );
+			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'workflow-automate' );
 		}
 
 		if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {

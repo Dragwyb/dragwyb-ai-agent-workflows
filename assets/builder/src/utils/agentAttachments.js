@@ -11,6 +11,9 @@ export const CHAT_MODEL_SLUGS = new Set([
 	'openai_chat_action',
 	'gemini_generate_content_action',
 	'claude_messages_action',
+	'openrouter_chat_action',
+	'groq_chat_action',
+	'deepseek_chat_action',
 ]);
 
 /** @type {Record<string, string>} */
@@ -18,6 +21,9 @@ export const PROVIDER_BY_CHAT_MODEL_SLUG = {
 	openai_chat_action: 'openai',
 	gemini_generate_content_action: 'gemini',
 	claude_messages_action: 'claude',
+	openrouter_chat_action: 'openrouter',
+	groq_chat_action: 'groq',
+	deepseek_chat_action: 'deepseek',
 };
 
 /** @type {Record<string, string>} */
@@ -25,6 +31,9 @@ export const CHAT_MODEL_APP_IDS = {
 	openai_chat_action: 'openai',
 	gemini_generate_content_action: 'google-ai',
 	claude_messages_action: 'anthropic',
+	openrouter_chat_action: 'openrouter',
+	groq_chat_action: 'groq',
+	deepseek_chat_action: 'deepseek',
 };
 
 /** @type {Record<string, string>} */
@@ -32,6 +41,9 @@ export const DEFAULT_MODEL_BY_PROVIDER = {
 	openai: 'gpt-4o-mini',
 	gemini: 'gemini-2.0-flash',
 	claude: 'claude-sonnet-4-20250514',
+	openrouter: 'openai/gpt-4o-mini',
+	groq: 'llama-3.3-70b-versatile',
+	deepseek: 'deepseek-chat',
 };
 
 export const AGENT_BODY_HEIGHT = 96;

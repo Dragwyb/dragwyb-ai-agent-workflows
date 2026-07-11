@@ -35,6 +35,9 @@ class AiModelsService {
 		'openai_chat_action' => true,
 		'claude_messages_action' => true,
 		'gemini_generate_content_action' => true,
+		'openrouter_chat_action' => true,
+		'groq_chat_action' => true,
+		'deepseek_chat_action' => true,
 	);
 
 	private ConnectionService $connections;
@@ -132,6 +135,9 @@ class AiModelsService {
 			'openai_chat_action' => array( 'openai', 'open_ai', 'chatgpt' ),
 			'claude_messages_action' => array( 'claude', 'anthropic' ),
 			'gemini_generate_content_action' => array( 'gemini', 'google_gemini', 'google_gemini_api', 'google_ai' ),
+			'openrouter_chat_action' => array( 'openrouter', 'open_router' ),
+			'groq_chat_action' => array( 'groq' ),
+			'deepseek_chat_action' => array( 'deepseek', 'deep_seek' ),
 		);
 
 		if ( ! isset( $aliases[ $node_type ] ) ) {
@@ -172,6 +178,15 @@ class AiModelsService {
 
 			case 'gemini_generate_content_action':
 				return $this->fetchGeminiModels( $secret );
+
+			case 'openrouter_chat_action':
+				return $this->fetchOpenRouterModels( $secret );
+
+			case 'groq_chat_action':
+				return $this->fetchGroqModels( $secret );
+
+			case 'deepseek_chat_action':
+				return $this->fetchDeepSeekModels( $secret );
 
 			default:
 				return array(
@@ -379,6 +394,138 @@ class AiModelsService {
 		return array(
 			'options' => $options,
 			'error' => array() === $options ? __( 'No generateContent models returned by Gemini for this API key.', 'workflow-automate' ) : null,
+		);
+	}
+
+	/**
+	 * @param string $api_key API key.
+	 *
+	 * @return array{options: array<int, array{value: string, label: string}>, error: string|null}
+	 */
+	private function fetchOpenRouterModels( string $api_key ): array {
+		return $this->fetchOpenAiCompatibleModels(
+			'https://openrouter.ai/api/v1/models',
+			$api_key,
+			'OpenRouter',
+			__( 'Could not load OpenRouter models.', 'workflow-automate' ),
+			__( 'No models returned by OpenRouter for this API key.', 'workflow-automate' ),
+			static function ( string $id ): bool {
+				return '' !== trim( $id );
+			}
+		);
+	}
+
+	/**
+	 * @param string $api_key API key.
+	 *
+	 * @return array{options: array<int, array{value: string, label: string}>, error: string|null}
+	 */
+	private function fetchGroqModels( string $api_key ): array {
+		return $this->fetchOpenAiCompatibleModels(
+			'https://api.groq.com/openai/v1/models',
+			$api_key,
+			'Groq',
+			__( 'Could not load Groq models.', 'workflow-automate' ),
+			__( 'No models returned by Groq for this API key.', 'workflow-automate' ),
+			static function ( string $id ): bool {
+				$lower = strtolower( $id );
+
+				return ! preg_match( '/(whisper|embed|tts|guard|vision-preview)/', $lower );
+			}
+		);
+	}
+
+	/**
+	 * @param string $api_key API key.
+	 *
+	 * @return array{options: array<int, array{value: string, label: string}>, error: string|null}
+	 */
+	private function fetchDeepSeekModels( string $api_key ): array {
+		return $this->fetchOpenAiCompatibleModels(
+			'https://api.deepseek.com/models',
+			$api_key,
+			'DeepSeek',
+			__( 'Could not load DeepSeek models.', 'workflow-automate' ),
+			__( 'No models returned by DeepSeek for this API key.', 'workflow-automate' ),
+			static function ( string $id ): bool {
+				return (bool) preg_match( '/^deepseek/i', $id );
+			}
+		);
+	}
+
+	/**
+	 * @param string               $url             Models list URL.
+	 * @param string               $api_key         API key.
+	 * @param string               $provider_label  Provider name for errors.
+	 * @param string               $fetch_error     Error when request fails.
+	 * @param string               $empty_error     Error when no models match.
+	 * @param callable(string):bool $include_model  Whether to include a model id.
+	 *
+	 * @return array{options: array<int, array{value: string, label: string}>, error: string|null}
+	 */
+	private function fetchOpenAiCompatibleModels(
+		string $url,
+		string $api_key,
+		string $provider_label,
+		string $fetch_error,
+		string $empty_error,
+		callable $include_model
+	): array {
+		$response = wp_safe_remote_get(
+			$url,
+			array(
+				'timeout' => self::TIMEOUT_SECONDS,
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $api_key,
+				),
+			)
+		);
+
+		$result = TelegramSendMessageAction::jsonApiResult( $response, $provider_label );
+
+		if ( empty( $result['success'] ) ) {
+			return array(
+				'options' => array(),
+				'error' => isset( $result['error'] ) ? (string) $result['error'] : $fetch_error,
+			);
+		}
+
+		$decoded = $result['response'] ?? array();
+		$options = array();
+
+		if ( is_array( $decoded ) && isset( $decoded['data'] ) && is_array( $decoded['data'] ) ) {
+			foreach ( $decoded['data'] as $model ) {
+				if ( ! is_array( $model ) || empty( $model['id'] ) ) {
+					continue;
+				}
+
+				$id = (string) $model['id'];
+
+				if ( ! $include_model( $id ) ) {
+					continue;
+				}
+
+				$label = isset( $model['name'] ) && '' !== trim( (string) $model['name'] )
+					? (string) $model['name']
+					: $id;
+
+				$options[] = array(
+					'value' => $id,
+					'label' => $label,
+				);
+			}
+		}
+
+		usort(
+			$options,
+			static function ( array $a, array $b ): int {
+				return strcmp( $a['label'], $b['label'] );
+			}
+		);
+
+		return array(
+			'options' => $options,
+			'error' => array() === $options ? $empty_error : null,
 		);
 	}
 }

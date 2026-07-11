@@ -25,6 +25,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ConfigInterpolator {
 
 	/**
+	 * Common LLM placeholder names mapped to trigger payload keys.
+	 *
+	 * @var array<string, string>
+	 */
+	private const TRIGGER_FIELD_ALIASES = array(
+		'customer_name' => 'billing_first_name',
+		'first_name' => 'billing_first_name',
+		'name' => 'billing_first_name',
+		'last_name' => 'billing_last_name',
+		'email' => 'billing_email',
+		'order_number' => 'order_id',
+		'amount' => 'total',
+		'order_total' => 'total',
+	);
+
+	/**
 	 * Recursively interpolates every string value in a config array.
 	 *
 	 * @param array<string, mixed> $config  Node configuration.
@@ -97,6 +113,43 @@ class ConfigInterpolator {
 	 * @return mixed|null
 	 */
 	private function resolvePath( array $context, string $path ) {
+		$value = $this->resolvePathSegments( $context, $path );
+
+		if ( null !== $value ) {
+			return $value;
+		}
+
+		if ( str_starts_with( $path, 'trigger.' ) ) {
+			return null;
+		}
+
+		$trigger_paths = array(
+			'trigger.' . $path,
+			'trigger.fields.' . $path,
+		);
+
+		foreach ( $trigger_paths as $trigger_path ) {
+			$value = $this->resolvePathSegments( $context, $trigger_path );
+
+			if ( null !== $value ) {
+				return $value;
+			}
+		}
+
+		if ( isset( self::TRIGGER_FIELD_ALIASES[ $path ] ) ) {
+			return $this->resolvePathSegments( $context, 'trigger.' . self::TRIGGER_FIELD_ALIASES[ $path ] );
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<string, mixed> $context Context root.
+	 * @param string               $path    Dot-separated path.
+	 *
+	 * @return mixed|null
+	 */
+	private function resolvePathSegments( array $context, string $path ) {
 		$segments = explode( '.', $path );
 		$current  = $context;
 

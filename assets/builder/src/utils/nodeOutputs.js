@@ -37,6 +37,21 @@ const NODE_OUTPUT_FIELDS = {
 		{ key: 'model', preview: 'gemini-2.5-flash' },
 		{ key: 'status_code', preview: '200' },
 	],
+	openrouter_chat_action: [
+		{ key: 'content', preview: 'Assistant reply' },
+		{ key: 'model', preview: 'openai/gpt-4o-mini' },
+		{ key: 'status_code', preview: '200' },
+	],
+	groq_chat_action: [
+		{ key: 'content', preview: 'Assistant reply' },
+		{ key: 'model', preview: 'llama-3.3-70b-versatile' },
+		{ key: 'status_code', preview: '200' },
+	],
+	deepseek_chat_action: [
+		{ key: 'content', preview: 'Assistant reply' },
+		{ key: 'model', preview: 'deepseek-chat' },
+		{ key: 'status_code', preview: '200' },
+	],
 	telegram_send_message_action: [
 		{ key: 'status_code', preview: '200' },
 	],

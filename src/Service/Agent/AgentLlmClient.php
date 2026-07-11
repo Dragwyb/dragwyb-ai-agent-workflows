@@ -25,7 +25,35 @@ class AgentLlmClient {
 	private const CLAUDE_API_VERSION = '2023-06-01';
 
 	/**
-	 * @param string               $provider    openai|claude|gemini.
+	 * OpenAI-compatible chat completion endpoints keyed by provider slug.
+	 *
+	 * @var array<string, array{url: string, label: string, extra_headers?: array<string, string>}>
+	 */
+	private const OPENAI_COMPATIBLE = array(
+		'openai' => array(
+			'url' => 'https://api.openai.com/v1/chat/completions',
+			'label' => 'OpenAI',
+		),
+		'openrouter' => array(
+			'url' => 'https://openrouter.ai/api/v1/chat/completions',
+			'label' => 'OpenRouter',
+			'extra_headers' => array(
+				'HTTP-Referer' => '',
+				'X-Title' => '',
+			),
+		),
+		'groq' => array(
+			'url' => 'https://api.groq.com/openai/v1/chat/completions',
+			'label' => 'Groq',
+		),
+		'deepseek' => array(
+			'url' => 'https://api.deepseek.com/chat/completions',
+			'label' => 'DeepSeek',
+		),
+	);
+
+	/**
+	 * @param string               $provider    openai|claude|gemini|openrouter|groq|deepseek.
 	 * @param string               $api_key     API key.
 	 * @param string               $model       Model id.
 	 * @param array<int, mixed>    $messages    OpenAI-style messages.
@@ -50,7 +78,9 @@ class AgentLlmClient {
 			return $this->completeGemini( $api_key, $model, $messages, $tools, $system_prompt );
 		}
 
-		return $this->completeOpenAi( $api_key, $model, $messages, $tools );
+		$config = self::OPENAI_COMPATIBLE[ $provider ] ?? self::OPENAI_COMPATIBLE['openai'];
+
+		return $this->completeOpenAiCompatible( $api_key, $model, $messages, $tools, $config );
 	}
 
 	/**
@@ -58,10 +88,20 @@ class AgentLlmClient {
 	 * @param string            $model    Model id.
 	 * @param array<int, mixed> $messages Messages.
 	 * @param array<int, mixed> $tools    Tool schemas.
+	 * @param array<string, mixed> $config Endpoint config from OPENAI_COMPATIBLE.
 	 *
 	 * @return array{success: bool, error?: string, message?: array<string, mixed>, finish_reason?: string}
 	 */
-	private function completeOpenAi( string $api_key, string $model, array $messages, array $tools ): array {
+	private function completeOpenAiCompatible(
+		string $api_key,
+		string $model,
+		array $messages,
+		array $tools,
+		array $config
+	): array {
+		$label = (string) ( $config['label'] ?? 'OpenAI' );
+		$url   = (string) ( $config['url'] ?? self::OPENAI_COMPATIBLE['openai']['url'] );
+
 		$payload = array(
 			'model'    => $model,
 			'messages' => $messages,
@@ -72,24 +112,48 @@ class AgentLlmClient {
 			$payload['tool_choice'] = 'auto';
 		}
 
+		$headers = array(
+			'Content-Type'  => 'application/json',
+			'Authorization' => 'Bearer ' . $api_key,
+		);
+
+		if ( isset( $config['extra_headers'] ) && is_array( $config['extra_headers'] ) ) {
+			foreach ( $config['extra_headers'] as $header_name => $header_value ) {
+				if ( 'HTTP-Referer' === $header_name && '' === $header_value ) {
+					$headers[ $header_name ] = home_url( '/' );
+					continue;
+				}
+
+				if ( 'X-Title' === $header_name && '' === $header_value ) {
+					$headers[ $header_name ] = get_bloginfo( 'name' ) ?: 'Workflow Automate';
+					continue;
+				}
+
+				if ( '' !== (string) $header_value ) {
+					$headers[ $header_name ] = (string) $header_value;
+				}
+			}
+		}
+
 		$response = wp_safe_remote_post(
-			'https://api.openai.com/v1/chat/completions',
+			$url,
 			array(
 				'timeout' => self::TIMEOUT_SECONDS,
-				'headers' => array(
-					'Content-Type'  => 'application/json',
-					'Authorization' => 'Bearer ' . $api_key,
-				),
+				'headers' => $headers,
 				'body'    => wp_json_encode( $payload ),
 			)
 		);
 
-		$result = TelegramSendMessageAction::jsonApiResult( $response, 'OpenAI' );
+		$result = TelegramSendMessageAction::jsonApiResult( $response, $label );
 
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'OpenAI request failed.', 'workflow-automate' ),
+				'error'   => isset( $result['error'] ) ? (string) $result['error'] : sprintf(
+					/* translators: %s: provider name */
+					__( '%s request failed.', 'workflow-automate' ),
+					$label
+				),
 			);
 		}
 
@@ -99,7 +163,11 @@ class AgentLlmClient {
 		if ( ! is_array( $choice ) || empty( $choice['message'] ) || ! is_array( $choice['message'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'OpenAI returned an empty response.', 'workflow-automate' ),
+				'error'   => sprintf(
+					/* translators: %s: provider name */
+					__( '%s returned an empty response.', 'workflow-automate' ),
+					$label
+				),
 			);
 		}
 

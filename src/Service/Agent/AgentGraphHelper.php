@@ -24,7 +24,25 @@ class AgentGraphHelper {
 
 	public const CHAT_MODEL_GEMINI = 'gemini_generate_content_action';
 
+	public const CHAT_MODEL_OPENROUTER = 'openrouter_chat_action';
+
+	public const CHAT_MODEL_GROQ = 'groq_chat_action';
+
+	public const CHAT_MODEL_DEEPSEEK = 'deepseek_chat_action';
+
 	public const MEMORY_TYPE = 'simple_memory';
+
+	/**
+	 * @var array<string, string>
+	 */
+	private const CHAT_MODEL_TYPES = array(
+		self::CHAT_MODEL_OPENAI => 'openai',
+		self::CHAT_MODEL_CLAUDE => 'claude',
+		self::CHAT_MODEL_GEMINI => 'gemini',
+		self::CHAT_MODEL_OPENROUTER => 'openrouter',
+		self::CHAT_MODEL_GROQ => 'groq',
+		self::CHAT_MODEL_DEEPSEEK => 'deepseek',
+	);
 
 	/**
 	 * @param array<int, mixed> $graph_nodes Raw graph node list.
@@ -131,24 +149,16 @@ class AgentGraphHelper {
 	 * @return bool
 	 */
 	public static function isChatModelType( string $node_type ): bool {
-		return in_array( $node_type, array( self::CHAT_MODEL_OPENAI, self::CHAT_MODEL_CLAUDE, self::CHAT_MODEL_GEMINI ), true );
+		return isset( self::CHAT_MODEL_TYPES[ $node_type ] );
 	}
 
 	/**
 	 * @param string $node_type Chat model node type.
 	 *
-	 * @return string openai|claude|gemini
+	 * @return string openai|claude|gemini|openrouter|groq|deepseek
 	 */
 	public static function providerFromNodeType( string $node_type ): string {
-		if ( self::CHAT_MODEL_CLAUDE === $node_type ) {
-			return 'claude';
-		}
-
-		if ( self::CHAT_MODEL_GEMINI === $node_type ) {
-			return 'gemini';
-		}
-
-		return 'openai';
+		return self::CHAT_MODEL_TYPES[ $node_type ] ?? 'openai';
 	}
 
 	/**
@@ -157,12 +167,12 @@ class AgentGraphHelper {
 	 * @return string
 	 */
 	public static function nodeTypeFromProvider( string $provider ): string {
-		if ( 'claude' === $provider ) {
-			return self::CHAT_MODEL_CLAUDE;
-		}
+		$provider = strtolower( $provider );
 
-		if ( 'gemini' === $provider ) {
-			return self::CHAT_MODEL_GEMINI;
+		foreach ( self::CHAT_MODEL_TYPES as $node_type => $mapped_provider ) {
+			if ( $mapped_provider === $provider ) {
+				return $node_type;
+			}
 		}
 
 		return self::CHAT_MODEL_OPENAI;

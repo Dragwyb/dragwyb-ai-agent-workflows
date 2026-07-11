@@ -145,6 +145,17 @@ export function buildPayloadTree(
 		return root;
 	}
 
+	if (!isScalar(payload)) {
+		root.children.push({
+			id: `${prefix}.__all__`,
+			label: 'All data (JSON)',
+			path: prefix,
+			token: `{{${prefix}}}`,
+			preview: '{…}',
+			isLeaf: true,
+		});
+	}
+
 	if (isScalar(payload)) {
 		root.children = [
 			{

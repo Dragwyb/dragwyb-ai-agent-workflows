@@ -1311,15 +1311,31 @@
 
 .wfa-variable-picker--popover {
 	background: #fff;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .wfa-variable-picker--popover .wfa-variable-picker__source {
 	padding-top: 10px;
+	flex: 0 0 auto;
+}
+
+.wfa-variable-picker--popover .wfa-variable-picker__search {
+	flex: 0 0 auto;
+}
+
+.wfa-variable-picker--popover .wfa-variable-picker__source-block {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .wfa-variable-picker--popover .wfa-variable-picker__tree {
 	max-height: none;
 	flex: 1 1 auto;
+	min-height: 0;
 	overflow-y: auto;
 }
 
@@ -1449,8 +1465,11 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	max-width: 120px;
+	max-width: 140px;
+	flex: 1 1 auto;
+	min-width: 0;
 	margin-left: auto;
+	text-align: right;
 }
 
 /* —— Token field (prompt / message only) —— */
@@ -1530,6 +1549,7 @@
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
+	min-height: 0;
 }
 
 .wfa-token-field__popover .wfa-variable-picker {
@@ -1540,10 +1560,12 @@
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
+	overflow: hidden;
 }
 
 .wfa-token-field__popover .wfa-variable-picker__tree {
 	flex: 1 1 auto;
+	min-height: 0;
 	overflow-y: auto;
 	max-height: none;
 }

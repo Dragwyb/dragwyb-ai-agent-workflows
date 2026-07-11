@@ -14,7 +14,10 @@ use WorkflowAutomate\Plugin\Integration\Actions\ClaudeMessagesAction;
 use WorkflowAutomate\Plugin\Integration\Actions\ConditionAction;
 use WorkflowAutomate\Plugin\Integration\Actions\GeminiGenerateContentAction;
 use WorkflowAutomate\Plugin\Integration\Actions\HttpRequestAction;
+use WorkflowAutomate\Plugin\Integration\Actions\DeepSeekChatAction;
+use WorkflowAutomate\Plugin\Integration\Actions\GroqChatAction;
 use WorkflowAutomate\Plugin\Integration\Actions\OpenAiChatAction;
+use WorkflowAutomate\Plugin\Integration\Actions\OpenRouterChatAction;
 use WorkflowAutomate\Plugin\Integration\Actions\RouterAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SendEmailAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
@@ -22,6 +25,7 @@ use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
 use WorkflowAutomate\Plugin\Service\Agent\AgentService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
@@ -75,6 +79,9 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new WhatsAppCloudSendMessageAction( $this->connections ) );
 		$registry->registerAction( new GeminiGenerateContentAction( $this->connections ) );
 		$registry->registerAction( new ClaudeMessagesAction( $this->connections ) );
+		$registry->registerAction( new OpenRouterChatAction( $this->connections ) );
+		$registry->registerAction( new GroqChatAction( $this->connections ) );
+		$registry->registerAction( new DeepSeekChatAction( $this->connections ) );
 		$registry->registerAction( new AiAgentAction( $this->agent ) );
 		$registry->registerAction( new RouterAction() );
 		$registry->registerAction( new ConditionAction() );
@@ -85,6 +92,15 @@ class BuiltInNodeTypes {
 
 		foreach ( IntegrationTriggerCatalog::definitions() as $definition ) {
 			if ( ! $definition['active'] ) {
+				continue;
+			}
+
+			if (
+				WooCommerceCatalogTrigger::class === $definition['class']
+				&& isset( $definition['definition'] )
+				&& is_array( $definition['definition'] )
+			) {
+				$registry->registerTrigger( new WooCommerceCatalogTrigger( $definition['definition'] ) );
 				continue;
 			}
 

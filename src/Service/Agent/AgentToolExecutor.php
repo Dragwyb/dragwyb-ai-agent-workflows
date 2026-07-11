@@ -108,12 +108,30 @@ class AgentToolExecutor {
 				continue;
 			}
 
+			if ( $this->isEmptyConfigValue( $value ) ) {
+				continue;
+			}
+
 			if ( ! array_key_exists( $key, $config ) || $this->isEmptyConfigValue( $config[ $key ] ) ) {
+				$config[ $key ] = $value;
+				continue;
+			}
+
+			if ( is_string( $value ) && is_string( $config[ $key ] ) && $this->containsUnresolvedTokens( $config[ $key ] ) ) {
 				$config[ $key ] = $value;
 			}
 		}
 
 		return $config;
+	}
+
+	/**
+	 * @param string $value Config or template string.
+	 *
+	 * @return bool
+	 */
+	private function containsUnresolvedTokens( string $value ): bool {
+		return (bool) preg_match( '/\{\{\s*[a-zA-Z0-9_.-]+\s*\}\}/', $value );
 	}
 
 	/**

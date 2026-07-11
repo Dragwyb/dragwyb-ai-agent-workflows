@@ -50,6 +50,9 @@ class AiAgentAction implements ActionInterface {
 					array( 'value' => 'openai', 'label' => 'OpenAI' ),
 					array( 'value' => 'gemini', 'label' => 'Google Gemini' ),
 					array( 'value' => 'claude', 'label' => 'Anthropic Claude' ),
+					array( 'value' => 'openrouter', 'label' => 'OpenRouter' ),
+					array( 'value' => 'groq', 'label' => 'Groq' ),
+					array( 'value' => 'deepseek', 'label' => 'DeepSeek' ),
 				),
 			),
 			'connection_id' => array(

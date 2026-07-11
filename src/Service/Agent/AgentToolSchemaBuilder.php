@@ -148,7 +148,7 @@ class AgentToolSchemaBuilder {
 
 			$properties[ $field_key ] = array(
 				'type'        => 'object' === $field_type ? 'string' : $field_type,
-				'description' => $description,
+				'description' => $this->parameterDescription( $field_key, $description ),
 			);
 
 			if ( ! empty( $field_def['required'] ) ) {
@@ -201,6 +201,21 @@ class AgentToolSchemaBuilder {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string $field_key   Config field key.
+	 * @param string $description Base field description.
+	 *
+	 * @return string
+	 */
+	private function parameterDescription( string $field_key, string $description ): string {
+		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
+			return $description . ' '
+				. __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'workflow-automate' );
+		}
+
+		return $description;
 	}
 
 	/**
