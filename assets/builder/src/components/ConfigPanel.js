@@ -418,23 +418,27 @@ export default function ConfigPanel({
 						return true;
 					})
 					.map((fieldName) => (
-					<ConfigField
+					<div
 						key={`${node.id}-${fieldName}`}
-						fieldName={fieldName}
-						fieldSchema={nodeType.config_schema[fieldName]}
-						value={node.config ? node.config[fieldName] : undefined}
-						connections={connections}
-						nodeTypeSlug={nodeType.slug}
-						nodeTypeLabel={nodeType.label}
-						nodeId={node.id}
-						nodeCategory={node.category}
-						nodeConfig={node.config || {}}
-						variableSources={variableSources}
-						nodeLabels={nodeLabels}
-						graphNodes={graphNodes}
-						onConnectionsChange={onConnectionsChange}
-						onChange={(value) => onChangeConfig(fieldName, value)}
-					/>
+						className="wfa-builder-config__field"
+					>
+						<ConfigField
+							fieldName={fieldName}
+							fieldSchema={nodeType.config_schema[fieldName]}
+							value={node.config ? node.config[fieldName] : undefined}
+							connections={connections}
+							nodeTypeSlug={nodeType.slug}
+							nodeTypeLabel={nodeType.label}
+							nodeId={node.id}
+							nodeCategory={node.category}
+							nodeConfig={node.config || {}}
+							variableSources={variableSources}
+							nodeLabels={nodeLabels}
+							graphNodes={graphNodes}
+							onConnectionsChange={onConnectionsChange}
+							onChange={(value) => onChangeConfig(fieldName, value)}
+						/>
+					</div>
 				))}
 
 			{testResult && (
@@ -554,6 +558,7 @@ function ConfigField({
 		return (
 			<ToggleControl
 				label={label}
+				help={help || undefined}
 				checked={Boolean(resolved)}
 				onChange={onChange}
 			/>
