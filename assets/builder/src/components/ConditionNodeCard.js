@@ -301,8 +301,12 @@ export default function ConditionNodeCard({
 							{renderBranchRow(row, index)}
 							{index < displayRows.length - 1 && (
 								<div className="wfa-condition-node__add-between">
-									<Button
-										variant="secondary"
+									<span
+										className="wfa-condition-node__add-line"
+										aria-hidden="true"
+									/>
+									<button
+										type="button"
 										className="wfa-condition-node__add-btn"
 										onPointerDown={stopPointer}
 										onClick={(event) => {
@@ -310,17 +314,29 @@ export default function ConditionNodeCard({
 											onAddCondition(node.id, index + 1);
 										}}
 										title={__('Add condition', 'workflow-automate')}
+										aria-label={__(
+											'Add condition',
+											'workflow-automate'
+										)}
 									>
 										+
-									</Button>
+									</button>
+									<span
+										className="wfa-condition-node__add-line"
+										aria-hidden="true"
+									/>
 								</div>
 							)}
 						</div>
 					))}
 
 					<div className="wfa-condition-node__add-between">
-						<Button
-							variant="secondary"
+						<span
+							className="wfa-condition-node__add-line"
+							aria-hidden="true"
+						/>
+						<button
+							type="button"
 							className="wfa-condition-node__add-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -328,9 +344,14 @@ export default function ConditionNodeCard({
 								onAddCondition(node.id, rows.length);
 							}}
 							title={__('Add condition', 'workflow-automate')}
+							aria-label={__('Add condition', 'workflow-automate')}
 						>
 							+
-						</Button>
+						</button>
+						<span
+							className="wfa-condition-node__add-line"
+							aria-hidden="true"
+						/>
 					</div>
 
 					<div className="wfa-condition-node__row wfa-condition-node__row--default">

@@ -2120,16 +2120,58 @@
 
 .wfa-condition-node__add-between {
 	display: flex;
+	align-items: center;
 	justify-content: center;
-	padding: 2px 0;
+	gap: 8px;
+	padding: 4px 12px;
+}
+
+.wfa-condition-node__add-line {
+	flex: 1 1 auto;
+	height: 1px;
+	background: #e2e8f0;
+	min-width: 24px;
 }
 
 .wfa-condition-node__add-btn {
-	min-width: 28px !important;
-	width: 28px !important;
-	height: 28px !important;
-	padding: 0 !important;
-	border-radius: 50% !important;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 22px;
+	width: 22px;
+	height: 22px;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #c4b5fd;
+	border-radius: 50%;
+	background: #f5f3ff;
+	color: #6d28d9;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1;
+	font-family: inherit;
+	cursor: pointer;
+	box-shadow: none;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease,
+		color 0.15s ease;
+}
+
+.wfa-condition-node__add-btn:hover,
+.wfa-condition-node__add-btn:focus {
+	background: #ede9fe;
+	border-color: #a78bfa;
+	color: #5b21b6;
+	outline: none;
+}
+
+.wfa-condition-node__add-btn:focus-visible {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #c4b5fd;
+}
+
+.wfa-condition-node__add-btn:active {
+	background: #ddd6fe;
 }
 
 .wfa-builder-config__condition-routes {
