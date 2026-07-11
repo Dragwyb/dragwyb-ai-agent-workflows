@@ -37,6 +37,9 @@ class ConnectionVerifier {
 		'openai_chat_action',
 		'claude_messages_action',
 		'gemini_generate_content_action',
+		'openrouter_chat_action',
+		'groq_chat_action',
+		'deepseek_chat_action',
 		'telegram_send_message_action',
 		'whatsapp_cloud_send_message_action',
 		'google_sheets_append_row_action',
@@ -55,6 +58,11 @@ class ConnectionVerifier {
 		'anthropic' => 'claude_messages_action',
 		'gemini' => 'gemini_generate_content_action',
 		'google_gemini' => 'gemini_generate_content_action',
+		'openrouter' => 'openrouter_chat_action',
+		'open_router' => 'openrouter_chat_action',
+		'groq' => 'groq_chat_action',
+		'deepseek' => 'deepseek_chat_action',
+		'deep_seek' => 'deepseek_chat_action',
 		'telegram' => 'telegram_send_message_action',
 		'whatsapp' => 'whatsapp_cloud_send_message_action',
 		'whatsapp_cloud' => 'whatsapp_cloud_send_message_action',
@@ -117,6 +125,15 @@ class ConnectionVerifier {
 
 			case 'gemini_generate_content_action':
 				return $this->verifyGemini( $secret );
+
+			case 'openrouter_chat_action':
+				return $this->verifyOpenRouter( $secret );
+
+			case 'groq_chat_action':
+				return $this->verifyGroq( $secret );
+
+			case 'deepseek_chat_action':
+				return $this->verifyDeepSeek( $secret );
 
 			case 'telegram_send_message_action':
 				return $this->verifyTelegram( $secret );
@@ -189,6 +206,51 @@ class ConnectionVerifier {
 				'Authorization' => 'Bearer ' . $api_key,
 			),
 			'OpenAI'
+		);
+	}
+
+	/**
+	 * @param string $api_key API key.
+	 *
+	 * @return array{success: bool, error?: string}
+	 */
+	private function verifyOpenRouter( string $api_key ): array {
+		return $this->remoteGet(
+			'https://openrouter.ai/api/v1/models',
+			array(
+				'Authorization' => 'Bearer ' . $api_key,
+			),
+			'OpenRouter'
+		);
+	}
+
+	/**
+	 * @param string $api_key API key.
+	 *
+	 * @return array{success: bool, error?: string}
+	 */
+	private function verifyGroq( string $api_key ): array {
+		return $this->remoteGet(
+			'https://api.groq.com/openai/v1/models',
+			array(
+				'Authorization' => 'Bearer ' . $api_key,
+			),
+			'Groq'
+		);
+	}
+
+	/**
+	 * @param string $api_key API key.
+	 *
+	 * @return array{success: bool, error?: string}
+	 */
+	private function verifyDeepSeek( string $api_key ): array {
+		return $this->remoteGet(
+			'https://api.deepseek.com/models',
+			array(
+				'Authorization' => 'Bearer ' . $api_key,
+			),
+			'DeepSeek'
 		);
 	}
 

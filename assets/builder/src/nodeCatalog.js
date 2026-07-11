@@ -8,6 +8,9 @@ const AGENT_SLUGS = new Set([
 	'openai_chat_action',
 	'claude_messages_action',
 	'gemini_generate_content_action',
+	'openrouter_chat_action',
+	'groq_chat_action',
+	'deepseek_chat_action',
 ]);
 
 /** @type {Set<string>} */
@@ -26,6 +29,7 @@ const INTEGRATION_TRIGGER_APPS = [
 		'woocommerce_create_product_trigger',
 		'woocommerce_update_product_trigger',
 		'woocommerce_product_status_updated_trigger',
+		'woocommerce_product_stock_status_updated_trigger',
 		'woocommerce_delete_product_trigger',
 		'woocommerce_restore_product_trigger',
 		'woocommerce_product_status_changed_trigger',
@@ -92,6 +96,21 @@ const AGENT_APPS = {
 		id: 'google-ai',
 		label: 'Google AI',
 		slugs: ['gemini_generate_content_action'],
+	},
+	openrouter: {
+		id: 'openrouter',
+		label: 'OpenRouter',
+		slugs: ['openrouter_chat_action'],
+	},
+	groq: {
+		id: 'groq',
+		label: 'Groq',
+		slugs: ['groq_chat_action'],
+	},
+	deepseek: {
+		id: 'deepseek',
+		label: 'DeepSeek',
+		slugs: ['deepseek_chat_action'],
 	},
 	'ai-agent': {
 		id: 'ai-agent',
@@ -344,6 +363,21 @@ const CHAT_MODEL_PICKER_ITEMS = [
 		slug: 'claude_messages_action',
 		label: 'Claude Chat Model',
 		appId: 'anthropic',
+	},
+	{
+		slug: 'openrouter_chat_action',
+		label: 'OpenRouter Chat Model',
+		appId: 'openrouter',
+	},
+	{
+		slug: 'groq_chat_action',
+		label: 'Groq Chat Model',
+		appId: 'groq',
+	},
+	{
+		slug: 'deepseek_chat_action',
+		label: 'DeepSeek Chat Model',
+		appId: 'deepseek',
 	},
 ];
 

@@ -65,6 +65,18 @@ const INTEGRATION_CONNECTION_SETTINGS = {
 		authType: 'api_key',
 		secretLabel: __('Google AI API key', 'workflow-automate'),
 	},
+	openrouter_chat_action: {
+		authType: 'api_key',
+		secretLabel: __('OpenRouter API key', 'workflow-automate'),
+	},
+	groq_chat_action: {
+		authType: 'api_key',
+		secretLabel: __('Groq API key', 'workflow-automate'),
+	},
+	deepseek_chat_action: {
+		authType: 'api_key',
+		secretLabel: __('DeepSeek API key', 'workflow-automate'),
+	},
 	whatsapp_cloud_send_message_action: {
 		authType: 'bearer_token',
 		secretLabel: __('Access token', 'workflow-automate'),
@@ -87,6 +99,9 @@ const INTEGRATION_SLUG_ALIASES = {
 	],
 	openai_chat_action: ['openai', 'open_ai'],
 	claude_messages_action: ['claude', 'anthropic'],
+	openrouter_chat_action: ['openrouter', 'open_router'],
+	groq_chat_action: ['groq'],
+	deepseek_chat_action: ['deepseek', 'deep_seek'],
 	telegram_send_message_action: ['telegram'],
 	whatsapp_cloud_send_message_action: ['whatsapp', 'whatsapp_cloud'],
 	google_sheets_append_row_action: [
@@ -102,6 +117,11 @@ const INTEGRATION_SLUG_ALIASES = {
 		'google_ai',
 		'claude',
 		'anthropic',
+		'openrouter',
+		'open_router',
+		'groq',
+		'deepseek',
+		'deep_seek',
 		'ai_agent',
 	],
 };
@@ -121,6 +141,9 @@ const AGENT_PROVIDER_NODE_SLUGS = {
 	openai: 'openai_chat_action',
 	gemini: 'gemini_generate_content_action',
 	claude: 'claude_messages_action',
+	openrouter: 'openrouter_chat_action',
+	groq: 'groq_chat_action',
+	deepseek: 'deepseek_chat_action',
 };
 
 /** @type {Record<string, { secretLabel: string }>} */
@@ -133,6 +156,15 @@ const AGENT_PROVIDER_CONNECTION_SETTINGS = {
 	},
 	claude: {
 		secretLabel: __('Anthropic API key', 'workflow-automate'),
+	},
+	openrouter: {
+		secretLabel: __('OpenRouter API key', 'workflow-automate'),
+	},
+	groq: {
+		secretLabel: __('Groq API key', 'workflow-automate'),
+	},
+	deepseek: {
+		secretLabel: __('DeepSeek API key', 'workflow-automate'),
 	},
 };
 

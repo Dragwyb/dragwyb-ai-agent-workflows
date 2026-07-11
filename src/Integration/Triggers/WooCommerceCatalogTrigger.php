@@ -25,6 +25,13 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 	/** @var array<string, mixed> */
 	private array $definition;
 
+	/**
+	 * Previous stock status loaded from the database before a product save.
+	 *
+	 * @var array<int, string>
+	 */
+	private static array $stock_status_before = array();
+
 	/** @param array<string, mixed> $definition */
 	public function __construct( array $definition ) {
 		$this->definition = $definition;
@@ -74,8 +81,11 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 			case 'product_updated':
 				$this->bindProductUpdated( $on_fire, $config );
 				break;
+			case 'product_post_status_updated':
+				$this->bindProductPostStatusTransition( $on_fire, $config, 'product_status_updated' );
+				break;
 			case 'product_stock_status_updated':
-				$this->bindProductStatusUpdated( $on_fire, $config );
+				$this->bindProductStockStatusTransition( $on_fire, $config, 'product_stock_status_updated' );
 				break;
 			case 'product_delete':
 				$this->bindProductDelete( $on_fire, $config );
@@ -84,7 +94,8 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 				$this->bindProductRestore( $on_fire, $config );
 				break;
 			case 'product_status_changed':
-				$this->bindProductStatusChanged( $on_fire, $config );
+				$this->bindProductPostStatusTransition( $on_fire, $config, 'product_status_changed' );
+				$this->bindProductStockStatusTransition( $on_fire, $config, 'product_status_changed' );
 				break;
 			case 'cart_item_added':
 				$this->bindCartItemAdded( $on_fire, $config );
@@ -374,33 +385,34 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 	}
 
 	/**
+	 * WordPress post status transition (publish, draft, pending, trash, etc.).
+	 *
 	 * @param callable             $on_fire
 	 * @param array<string, mixed> $config
+	 * @param string               $event
 	 *
 	 * @return void
 	 */
-	private function bindProductStatusUpdated( callable $on_fire, array $config ): void {
+	private function bindProductPostStatusTransition( callable $on_fire, array $config, string $event ): void {
 		add_action(
 			'transition_post_status',
-			static function ( $new_status, $old_status, $post ) use ( $on_fire, $config ): void {
+			static function ( $new_status, $old_status, $post ) use ( $on_fire, $config, $event ): void {
 				if (
 					! self::isWooCommerceActive()
 					|| ! self::isProductPost( $post )
 					|| (string) $new_status === (string) $old_status
-					|| ! is_object( $post )
-					|| ! isset( $post->post_status )
-					|| (string) $post->post_status !== (string) $new_status
 				) {
 					return;
 				}
 
-				$product_id = isset( $post->ID ) ? (int) $post->ID : 0;
+				$product_id = self::productIdFromPost( $post );
 
 				if ( $product_id <= 0 ) {
 					return;
 				}
 
-				$payload = WooCommercePayloadBuilder::product( 'product_status_updated', $product_id, null );
+				$payload = WooCommercePayloadBuilder::product( $event, $product_id, null );
+				$payload['status_kind'] = 'post';
 				$payload['old_status'] = (string) $old_status;
 				$payload['new_status'] = (string) $new_status;
 
@@ -409,6 +421,73 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 			10,
 			3
 		);
+	}
+
+	/**
+	 * WooCommerce inventory stock status (instock, outofstock, onbackorder).
+	 *
+	 * @param callable             $on_fire
+	 * @param array<string, mixed> $config
+	 * @param string               $event
+	 *
+	 * @return void
+	 */
+	private function bindProductStockStatusTransition( callable $on_fire, array $config, string $event ): void {
+		add_action(
+			'woocommerce_before_product_object_save',
+			static function ( $product ): void {
+				if ( ! self::isWooCommerceActive() || ! is_object( $product ) || ! method_exists( $product, 'get_id' ) ) {
+					return;
+				}
+
+				$product_id = (int) $product->get_id();
+
+				if ( $product_id <= 0 || ! function_exists( 'wc_get_product' ) ) {
+					return;
+				}
+
+				$existing = wc_get_product( $product_id );
+
+				if ( is_object( $existing ) && method_exists( $existing, 'get_stock_status' ) ) {
+					self::$stock_status_before[ $product_id ] = (string) $existing->get_stock_status();
+				}
+			},
+			5,
+			1
+		);
+
+		$fire = static function ( $product_id, $new_stock_status, $product = null ) use ( $on_fire, $config, $event ): void {
+			if ( ! self::isWooCommerceActive() ) {
+				return;
+			}
+
+			$product_id = (int) $product_id;
+
+			if ( $product_id <= 0 ) {
+				return;
+			}
+
+			$new_stock_status = (string) $new_stock_status;
+			$old_stock_status = self::$stock_status_before[ $product_id ] ?? '';
+
+			unset( self::$stock_status_before[ $product_id ] );
+
+			if ( '' !== $old_stock_status && $old_stock_status === $new_stock_status ) {
+				return;
+			}
+
+			$payload = WooCommercePayloadBuilder::product( $event, $product_id, $product );
+			$payload['status_kind'] = 'stock';
+			$payload['old_stock_status'] = $old_stock_status;
+			$payload['new_stock_status'] = $new_stock_status;
+			$payload['old_status'] = $old_stock_status;
+			$payload['new_status'] = $new_stock_status;
+
+			$on_fire( $payload, $config );
+		};
+
+		add_action( 'woocommerce_product_set_stock_status', $fire, 10, 3 );
+		add_action( 'woocommerce_variation_set_stock_status', $fire, 10, 3 );
 	}
 
 	/**
@@ -468,41 +547,6 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 				}
 
 				$on_fire( WooCommercePayloadBuilder::product( 'product_restored', $product_id, null ), $config );
-			},
-			10,
-			3
-		);
-	}
-
-	/**
-	 * @param callable             $on_fire
-	 * @param array<string, mixed> $config
-	 *
-	 * @return void
-	 */
-	private function bindProductStatusChanged( callable $on_fire, array $config ): void {
-		add_action(
-			'transition_post_status',
-			static function ( $new_status, $old_status, $post ) use ( $on_fire, $config ): void {
-				if (
-					! self::isWooCommerceActive()
-					|| ! self::isProductPost( $post )
-					|| (string) $new_status === (string) $old_status
-				) {
-					return;
-				}
-
-				$product_id = isset( $post->ID ) ? (int) $post->ID : 0;
-
-				if ( $product_id <= 0 ) {
-					return;
-				}
-
-				$payload = WooCommercePayloadBuilder::product( 'product_status_changed', $product_id, null );
-				$payload['old_status'] = (string) $old_status;
-				$payload['new_status'] = (string) $new_status;
-
-				$on_fire( $payload, $config );
 			},
 			10,
 			3
@@ -651,7 +695,24 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 	 * @return bool
 	 */
 	private static function isProductPost( $post ): bool {
-		return is_object( $post ) && isset( $post->post_type ) && 'product' === (string) $post->post_type;
+		if ( ! is_object( $post ) || ! isset( $post->post_type ) ) {
+			return false;
+		}
+
+		return in_array( (string) $post->post_type, array( 'product', 'product_variation' ), true );
+	}
+
+	/**
+	 * @param mixed $post
+	 *
+	 * @return int
+	 */
+	private static function productIdFromPost( $post ): int {
+		if ( ! is_object( $post ) || ! isset( $post->ID ) ) {
+			return 0;
+		}
+
+		return (int) $post->ID;
 	}
 
 	/**

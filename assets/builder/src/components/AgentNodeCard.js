@@ -127,7 +127,10 @@ export default function AgentNodeCard({
 								'Add chat model to agent',
 								'workflow-automate'
 							)}
-							title={__('Select OpenAI, Gemini, or Claude', 'workflow-automate')}
+							title={__(
+								'Select OpenAI, Gemini, Claude, OpenRouter, Groq, or DeepSeek',
+								'workflow-automate'
+							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();

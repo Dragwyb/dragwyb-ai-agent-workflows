@@ -327,9 +327,7 @@ class WooCommercePayloadBuilder {
 		}
 
 		if ( function_exists( 'WC' ) && WC()->cart ) {
-			$payload['cart_total'] = (string) WC()->cart->get_cart_contents_total();
-			$payload['cart_subtotal'] = (string) WC()->cart->get_subtotal();
-			$payload['cart_item_count'] = (int) WC()->cart->get_cart_contents_count();
+			$payload = self::enrichCartSnapshot( $payload );
 		}
 
 		unset( $variation_id );
@@ -364,8 +362,71 @@ class WooCommercePayloadBuilder {
 		}
 
 		if ( function_exists( 'WC' ) && WC()->cart ) {
-			$payload['cart_total'] = (string) WC()->cart->get_cart_contents_total();
-			$payload['cart_item_count'] = (int) WC()->cart->get_cart_contents_count();
+			$payload = self::enrichCartSnapshot( $payload );
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * Recalculates cart totals and attaches current cart summary fields.
+	 *
+	 * `woocommerce_add_to_cart` fires before WooCommerce runs calculate_totals(),
+	 * so subtotal/total would otherwise exclude the item just added.
+	 *
+	 * @param array<string, mixed> $payload
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function enrichCartSnapshot( array $payload ): array {
+		$cart = WC()->cart;
+
+		if ( ! is_object( $cart ) ) {
+			return $payload;
+		}
+
+		$cart->calculate_totals();
+
+		$payload['cart_total'] = (string) $cart->get_cart_contents_total();
+		$payload['cart_subtotal'] = (string) $cart->get_subtotal();
+		$payload['cart_tax'] = (string) $cart->get_cart_contents_tax();
+		$payload['cart_grand_total'] = (string) $cart->get_total( 'edit' );
+		$payload['cart_item_count'] = (int) $cart->get_cart_contents_count();
+		$payload['cart_line_count'] = count( $cart->get_cart() );
+
+		$line_items = array();
+
+		foreach ( $cart->get_cart() as $cart_item_key => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+
+			$data = isset( $item['data'] ) && is_object( $item['data'] ) ? $item['data'] : null;
+
+			$line_items[] = array(
+				'cart_item_key' => (string) $cart_item_key,
+				'product_id' => isset( $item['product_id'] ) ? (int) $item['product_id'] : 0,
+				'variation_id' => isset( $item['variation_id'] ) ? (int) $item['variation_id'] : 0,
+				'quantity' => isset( $item['quantity'] ) ? $item['quantity'] : 0,
+				'product_name' => is_object( $data ) && method_exists( $data, 'get_name' ) ? (string) $data->get_name() : '',
+				'product_unit_price' => is_object( $data ) && method_exists( $data, 'get_price' ) ? (string) $data->get_price() : '',
+				'line_subtotal' => isset( $item['line_subtotal'] ) ? (string) $item['line_subtotal'] : '',
+				'line_total' => isset( $item['line_total'] ) ? (string) $item['line_total'] : '',
+			);
+		}
+
+		$payload['cart_line_items'] = $line_items;
+
+		$added_key = isset( $payload['cart_item_key'] ) ? (string) $payload['cart_item_key'] : '';
+
+		if ( '' !== $added_key ) {
+			foreach ( $line_items as $line_item ) {
+				if ( $line_item['cart_item_key'] === $added_key ) {
+					$payload['added_line_subtotal'] = $line_item['line_subtotal'];
+					$payload['added_line_total'] = $line_item['line_total'];
+					break;
+				}
+			}
 		}
 
 		return $payload;
@@ -377,7 +438,7 @@ class WooCommercePayloadBuilder {
 	 *
 	 * @return object|null
 	 */
-	private static function resolveOrder( int $order_id, $order ) {
+	private static function resolveOrder( int $order_id, $order ): ?object {
 		if ( is_object( $order ) && method_exists( $order, 'get_id' ) ) {
 			return $order;
 		}

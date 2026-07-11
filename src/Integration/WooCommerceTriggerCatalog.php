@@ -145,6 +145,13 @@ class WooCommerceTriggerCatalog {
 					'label' => __( 'Product Status Updated', 'workflow-automate' ),
 					'description' => __( 'Starts the workflow when a WooCommerce product post status changes (publish, draft, pending, etc.).', 'workflow-automate' ),
 					'event' => 'product_status_updated',
+					'binder' => 'product_post_status_updated',
+				),
+				array(
+					'slug' => 'woocommerce_product_stock_status_updated_trigger',
+					'label' => __( 'Product Stock Status Updated', 'workflow-automate' ),
+					'description' => __( 'Starts the workflow when a WooCommerce product stock status changes (in stock, out of stock, on backorder).', 'workflow-automate' ),
+					'event' => 'product_stock_status_updated',
 					'binder' => 'product_stock_status_updated',
 				),
 				array(
@@ -164,7 +171,7 @@ class WooCommerceTriggerCatalog {
 				array(
 					'slug' => 'woocommerce_product_status_changed_trigger',
 					'label' => __( 'Product Status Changed', 'workflow-automate' ),
-					'description' => __( 'Starts the workflow when a WooCommerce product post status changes.', 'workflow-automate' ),
+					'description' => __( 'Starts the workflow when a WooCommerce product post status or stock status changes.', 'workflow-automate' ),
 					'event' => 'product_status_changed',
 					'binder' => 'product_status_changed',
 				),
