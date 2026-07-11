@@ -74,14 +74,18 @@ class AgentGraphHelper {
 	 *
 	 * @return array{
 	 *     chat_model: array<string, mixed>|null,
+	 *     fallback_chat_model: array<string, mixed>|null,
 	 *     memory: array<string, mixed>|null,
-	 *     tools: array<int, array<string, mixed>>
+	 *     tools: array<int, array<string, mixed>>,
+	 *     output_parser: array<string, mixed>|null
 	 * }
 	 */
 	public static function resolveAttachments( array $graph_nodes, string $agent_id ): array {
-		$chat_model = null;
-		$memory     = null;
-		$tools      = array();
+		$chat_model          = null;
+		$fallback_chat_model = null;
+		$memory              = null;
+		$output_parser       = null;
+		$tools               = array();
 
 		foreach ( $graph_nodes as $graph_node ) {
 			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) ) {
@@ -93,6 +97,16 @@ class AgentGraphHelper {
 			}
 
 			$attachment_type = (string) ( $graph_node['attachment_type'] ?? '' );
+
+			if ( 'fallback_chat_model' === $attachment_type ) {
+				$fallback_chat_model = $graph_node;
+				continue;
+			}
+
+			if ( 'output_parser' === $attachment_type || 'agent_output_parser' === (string) ( $graph_node['type'] ?? '' ) ) {
+				$output_parser = $graph_node;
+				continue;
+			}
 
 			if ( 'chat_model' === $attachment_type || self::isChatModelType( (string) ( $graph_node['type'] ?? '' ) ) ) {
 				$chat_model = $graph_node;
@@ -108,9 +122,11 @@ class AgentGraphHelper {
 		}
 
 		return array(
-			'chat_model' => $chat_model,
-			'memory'     => $memory,
-			'tools'      => $tools,
+			'chat_model'          => $chat_model,
+			'fallback_chat_model' => $fallback_chat_model,
+			'memory'              => $memory,
+			'tools'               => $tools,
+			'output_parser'       => $output_parser,
 		);
 	}
 

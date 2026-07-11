@@ -4,6 +4,16 @@ import {
 	canvasNodeWidth,
 	collectBranchTargetIds,
 } from './conditionBranches';
+import {
+	isAgentNode,
+	isChatModelAttachment,
+	isMemoryAttachment,
+	isToolAttachment,
+	isFallbackChatModelAttachment,
+	isOutputParserAttachment,
+	agentMainInputPortPosition,
+	agentMainOutputPortPosition,
+} from './agentAttachments';
 
 const BRANCHING_TYPES = new Set(['condition_action', 'router_action']);
 const NODE_GAP_X = 64;
@@ -15,6 +25,10 @@ const NODE_START_Y = 48;
  * @return {{ x: number, y: number }}
  */
 export function nodeOutputPortPosition(node) {
+	if (isAgentNode(node)) {
+		return agentMainOutputPortPosition(node);
+	}
+
 	return {
 		x: node.x + canvasNodeWidth(node) / 2,
 		y: node.y + canvasNodeHeight(node),
@@ -26,6 +40,10 @@ export function nodeOutputPortPosition(node) {
  * @return {{ x: number, y: number }}
  */
 export function nodeInputPortPosition(node) {
+	if (isAgentNode(node)) {
+		return agentMainInputPortPosition(node);
+	}
+
 	return {
 		x: node.x + canvasNodeWidth(node) / 2,
 		y: node.y,
@@ -55,6 +73,21 @@ export function canConnectFlowNodes(fromNode, toNode) {
 	}
 
 	if (fromNode.parent_agent_id || toNode.parent_agent_id) {
+		return false;
+	}
+
+	if (
+		isChatModelAttachment(fromNode) ||
+		isMemoryAttachment(fromNode) ||
+		isToolAttachment(fromNode) ||
+		isFallbackChatModelAttachment(fromNode) ||
+		isOutputParserAttachment(fromNode) ||
+		isChatModelAttachment(toNode) ||
+		isMemoryAttachment(toNode) ||
+		isToolAttachment(toNode) ||
+		isFallbackChatModelAttachment(toNode) ||
+		isOutputParserAttachment(toNode)
+	) {
 		return false;
 	}
 

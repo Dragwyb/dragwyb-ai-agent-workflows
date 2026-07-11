@@ -42,6 +42,15 @@ class AiAgentAction implements ActionInterface {
 
 	public function configSchema(): array {
 		return array(
+			'prompt_source' => array(
+				'type' => 'select',
+				'label' => __( 'Source for Prompt (User Message)', 'workflow-automate' ),
+				'default' => 'define_below',
+				'options' => array(
+					array( 'value' => 'connected_chat_trigger', 'label' => __( 'Connected Chat Trigger Node', 'workflow-automate' ) ),
+					array( 'value' => 'define_below', 'label' => __( 'Define below', 'workflow-automate' ) ),
+				),
+			),
 			'provider' => array(
 				'type' => 'select',
 				'label' => __( 'AI provider (fallback when no Chat Model is attached)', 'workflow-automate' ),
@@ -75,9 +84,19 @@ class AiAgentAction implements ActionInterface {
 			),
 			'prompt' => array(
 				'type' => 'string',
-				'label' => __( 'Message to send', 'workflow-automate' ),
+				'label' => __( 'Prompt (User Message)', 'workflow-automate' ),
 				'supports_variables' => true,
 				'required' => true,
+			),
+			'require_output_format' => array(
+				'type' => 'boolean',
+				'label' => __( 'Require Specific Output Format', 'workflow-automate' ),
+				'default' => false,
+			),
+			'fallback_enabled' => array(
+				'type' => 'boolean',
+				'label' => __( 'Enable Fallback Model', 'workflow-automate' ),
+				'default' => false,
 			),
 			'max_iterations' => array(
 				'type' => 'integer',
@@ -91,6 +110,25 @@ class AiAgentAction implements ActionInterface {
 				'options' => array(
 					array( 'value' => 'text', 'label' => __( 'Plain text', 'workflow-automate' ) ),
 					array( 'value' => 'json', 'label' => __( 'JSON', 'workflow-automate' ) ),
+				),
+			),
+			'options' => array(
+				'type' => 'array',
+				'label' => __( 'Options', 'workflow-automate' ),
+				'default' => array(),
+			),
+			'settings' => array(
+				'type' => 'object',
+				'label' => __( 'Settings', 'workflow-automate' ),
+				'default' => array(
+					'always_output_data' => false,
+					'execute_once' => false,
+					'retry_on_fail' => false,
+					'max_tries' => 3,
+					'wait_between_tries_ms' => 1000,
+					'on_error' => 'stop_workflow',
+					'notes' => '',
+					'display_note_in_flow' => false,
 				),
 			),
 		);

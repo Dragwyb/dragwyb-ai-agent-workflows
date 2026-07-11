@@ -69,8 +69,26 @@ export function isAgentNode(node) {
 export function isChatModelAttachment(node) {
 	return (
 		node?.attachment_type === 'chat_model' ||
-		(Boolean(node?.parent_agent_id) && CHAT_MODEL_SLUGS.has(node?.type))
+		(Boolean(node?.parent_agent_id) &&
+			CHAT_MODEL_SLUGS.has(node?.type) &&
+			node?.attachment_type !== 'fallback_chat_model')
 	);
+}
+
+/**
+ * @param {Object} node
+ * @return {boolean}
+ */
+export function isFallbackChatModelAttachment(node) {
+	return node?.attachment_type === 'fallback_chat_model';
+}
+
+/**
+ * @param {Object} node
+ * @return {boolean}
+ */
+export function isOutputParserAttachment(node) {
+	return node?.attachment_type === 'output_parser';
 }
 
 /**
@@ -90,7 +108,9 @@ export function isToolAttachment(node) {
 		node?.attachment_type === 'tool' ||
 		(Boolean(node?.parent_agent_id) &&
 			!isChatModelAttachment(node) &&
-			!isMemoryAttachment(node))
+			!isFallbackChatModelAttachment(node) &&
+			!isMemoryAttachment(node) &&
+			!isOutputParserAttachment(node))
 	);
 }
 
@@ -112,6 +132,36 @@ export function chatModelForAgent(nodes, agentId) {
 		nodes.find(
 			(node) =>
 				node.parent_agent_id === agentId && isChatModelAttachment(node)
+		) || null
+	);
+}
+
+/**
+ * @param {Array<Object>} nodes
+ * @param {string}        agentId
+ * @return {Object|null}
+ */
+export function fallbackChatModelForAgent(nodes, agentId) {
+	return (
+		nodes.find(
+			(node) =>
+				node.parent_agent_id === agentId &&
+				isFallbackChatModelAttachment(node)
+		) || null
+	);
+}
+
+/**
+ * @param {Array<Object>} nodes
+ * @param {string}        agentId
+ * @return {Object|null}
+ */
+export function outputParserForAgent(nodes, agentId) {
+	return (
+		nodes.find(
+			(node) =>
+				node.parent_agent_id === agentId &&
+				isOutputParserAttachment(node)
 		) || null
 	);
 }
@@ -177,6 +227,32 @@ export function syncAgentConfigFromChatModel(agentNode, chatModelNode) {
 }
 
 /**
+ * Main workflow input port (left edge, body center).
+ *
+ * @param {Object} agentNode
+ * @return {{ x: number, y: number }}
+ */
+export function agentMainInputPortPosition(agentNode) {
+	return {
+		x: agentNode.x,
+		y: agentNode.y + AGENT_BODY_HEIGHT / 2,
+	};
+}
+
+/**
+ * Main workflow output port (right edge, body center).
+ *
+ * @param {Object} agentNode
+ * @return {{ x: number, y: number }}
+ */
+export function agentMainOutputPortPosition(agentNode) {
+	return {
+		x: agentNode.x + NODE_WIDTH,
+		y: agentNode.y + AGENT_BODY_HEIGHT / 2,
+	};
+}
+
+/**
  * @param {Object} agentNode
  * @return {{ x: number, y: number }}
  */
@@ -206,6 +282,39 @@ export function agentToolPortPosition(agentNode) {
 	return {
 		x: agentNode.x + (NODE_WIDTH * 5) / 6,
 		y: agentNode.y + AGENT_BODY_HEIGHT + AGENT_PORTS_HEIGHT - 4,
+	};
+}
+
+/**
+ * @param {Object} agentNode
+ * @return {{ x: number, y: number }}
+ */
+export function agentFallbackModelPortPosition(agentNode) {
+	return {
+		x: agentNode.x + NODE_WIDTH / 4,
+		y: agentNode.y + AGENT_BODY_HEIGHT + AGENT_PORTS_HEIGHT - 4,
+	};
+}
+
+/**
+ * @param {Object} agentNode
+ * @return {{ x: number, y: number }}
+ */
+export function fallbackChatModelAttachmentPosition(agentNode) {
+	return {
+		x: agentNode.x + NODE_WIDTH / 4 - CHAT_MODEL_NODE_SIZE / 2,
+		y: agentNode.y + AGENT_TOTAL_HEIGHT + ATTACHMENT_GAP + CHAT_MODEL_NODE_SIZE + 24,
+	};
+}
+
+/**
+ * @param {Object} agentNode
+ * @return {{ x: number, y: number }}
+ */
+export function outputParserAttachmentPosition(agentNode) {
+	return {
+		x: agentNode.x + (NODE_WIDTH * 3) / 4 - 36,
+		y: agentNode.y + AGENT_TOTAL_HEIGHT + ATTACHMENT_GAP + CHAT_MODEL_NODE_SIZE + 24,
 	};
 }
 
@@ -304,6 +413,16 @@ export function syncAgentGroupPositions(nodes, agentId, agentX, agentY) {
 
 		if (isChatModelAttachment(node)) {
 			const position = chatModelAttachmentPosition(agentPoint);
+			return { ...node, x: position.x, y: position.y };
+		}
+
+		if (isFallbackChatModelAttachment(node)) {
+			const position = fallbackChatModelAttachmentPosition(agentPoint);
+			return { ...node, x: position.x, y: position.y };
+		}
+
+		if (isOutputParserAttachment(node)) {
+			const position = outputParserAttachmentPosition(agentPoint);
 			return { ...node, x: position.x, y: position.y };
 		}
 

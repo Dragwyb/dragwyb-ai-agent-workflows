@@ -55,6 +55,8 @@ import {
 	toolAttachmentPosition,
 	chatModelAttachmentPosition,
 	memoryAttachmentPosition,
+	fallbackChatModelAttachmentPosition,
+	outputParserAttachmentPosition,
 	toolsForAgent,
 	syncAgentConfigFromChatModel,
 	providerFromChatModelSlug,
@@ -1163,6 +1165,106 @@ export default function App() {
 		setSelectedNodeId(null);
 	};
 
+	const handleAddAgentFallbackModel = (agentId) => {
+		setPicker({
+			kind: 'agent-fallback-chat-model',
+			agentId,
+			appId: 'chat-models',
+		});
+		setSelectedNodeId(agentId);
+	};
+
+	const handleAddAgentOutputParser = (agentId) => {
+		const agent = latestRef.current.graph.nodes.find(
+			(node) => node.id === agentId
+		);
+
+		if (!agent) {
+			return;
+		}
+
+		const position = outputParserAttachmentPosition(agent);
+		const newParser = {
+			id: generateNodeId(),
+			type: 'agent_output_parser',
+			category: 'action',
+			label: __('Output Parser', 'workflow-automate'),
+			parent_agent_id: agentId,
+			attachment_type: 'output_parser',
+			x: position.x,
+			y: position.y,
+			config: {},
+		};
+
+		focusNodeIdRef.current = newParser.id;
+
+		setGraph((current) => ({
+			...current,
+			nodes: [
+				...current.nodes.filter(
+					(node) =>
+						!(
+							node.parent_agent_id === agentId &&
+							node.attachment_type === 'output_parser'
+						)
+				),
+				newParser,
+			],
+		}));
+
+		setSelectedNodeId(newParser.id);
+	};
+
+	const handleAttachAgentFallbackChatModel = (nodeTypeDefinition, agentId) => {
+		setPicker(null);
+
+		const agent = latestRef.current.graph.nodes.find(
+			(node) => node.id === agentId
+		);
+
+		if (!agent) {
+			return;
+		}
+
+		const provider = providerFromChatModelSlug(nodeTypeDefinition.slug);
+		const position = fallbackChatModelAttachmentPosition(agent);
+
+		const newFallbackModel = {
+			id: generateNodeId(),
+			type: nodeTypeDefinition.slug,
+			category: 'action',
+			label: `${nodeTypeDefinition.label} (${__('Fallback', 'workflow-automate')})`,
+			parent_agent_id: agentId,
+			attachment_type: 'fallback_chat_model',
+			x: position.x,
+			y: position.y,
+			config: {
+				...defaultConfigFor(nodeTypeDefinition),
+				model:
+					defaultConfigFor(nodeTypeDefinition).model ||
+					DEFAULT_MODEL_BY_PROVIDER[provider],
+			},
+		};
+
+		focusNodeIdRef.current = newFallbackModel.id;
+
+		setGraph((current) => ({
+			...current,
+			nodes: [
+				...current.nodes.filter(
+					(node) =>
+						!(
+							node.parent_agent_id === agentId &&
+							node.attachment_type === 'fallback_chat_model'
+						)
+				),
+				newFallbackModel,
+			],
+		}));
+
+		setSelectedNodeId(newFallbackModel.id);
+	};
+
 	const handleAddAgentTool = (agentId) => {
 		setPicker({ kind: 'agent-tool', agentId, appId: 'agent-tools' });
 		setSelectedNodeId(agentId);
@@ -1602,6 +1704,12 @@ export default function App() {
 												item,
 												picker.agentId
 											)
+									: picker.kind === 'agent-fallback-chat-model'
+										? (item) =>
+												handleAttachAgentFallbackChatModel(
+													item,
+													picker.agentId
+												)
 									: handleAddNode
 						}
 						onClose={() => setPicker(null)}
@@ -1623,6 +1731,12 @@ export default function App() {
 						workflowId={workflowId}
 						graph={graph}
 						onPersistBeforeTest={persistBeforeTest}
+						onAddAgentChatModel={handleAddAgentChatModel}
+						onAddAgentMemory={handleAddAgentMemory}
+						onAddAgentTool={handleAddAgentTool}
+						onAddAgentFallbackModel={handleAddAgentFallbackModel}
+						onAddAgentOutputParser={handleAddAgentOutputParser}
+						onSelectNode={setSelectedNodeId}
 					/>
 				)}
 			</div>

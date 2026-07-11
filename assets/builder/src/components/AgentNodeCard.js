@@ -66,31 +66,52 @@ export default function AgentNodeCard({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span
-				className="wfa-builder-node__handle wfa-builder-node__handle--input"
-				aria-hidden="true"
-			/>
-
 			<div
-				className="wfa-builder-node__body"
+				className="wfa-agent-node__main"
 				style={{ minHeight: `${AGENT_BODY_HEIGHT}px` }}
 			>
 				<span
-					className="wfa-builder-node__icon"
-					style={{
-						backgroundColor: meta.bg,
-						color: meta.accent,
-					}}
+					className="wfa-builder-node__handle wfa-builder-node__handle--input"
 					aria-hidden="true"
-				>
-					{meta.icon}
-				</span>
-				<div className="wfa-builder-node__text">
-					<span className="wfa-builder-node__label">{node.label}</span>
-					<span className="wfa-builder-node__subtitle">
-						{__('AI Agent', 'workflow-automate')}
+				/>
+
+				<div className="wfa-builder-node__body">
+					<span
+						className="wfa-builder-node__icon"
+						style={{
+							backgroundColor: meta.bg,
+							color: meta.accent,
+						}}
+						aria-hidden="true"
+					>
+						{meta.icon}
 					</span>
+					<div className="wfa-builder-node__text">
+						<span className="wfa-builder-node__label">{node.label}</span>
+						<span className="wfa-builder-node__subtitle">
+							{__('AI Agent', 'workflow-automate')}
+						</span>
+					</div>
 				</div>
+
+				{canStartFlowConnection && onStartFlowConnectionDrag && (
+					<button
+						type="button"
+						className="wfa-builder-node__output-port wfa-builder-node__output-port--side"
+						title={__(
+							'Drag to the next step to connect',
+							'workflow-automate'
+						)}
+						aria-label={__(
+							'Drag to the next step to connect',
+							'workflow-automate'
+						)}
+						onPointerDown={(event) => {
+							stopPointer(event);
+							onStartFlowConnectionDrag(node.id, event);
+						}}
+					/>
+				)}
 			</div>
 
 			<div
@@ -190,25 +211,6 @@ export default function AgentNodeCard({
 					</button>
 				</div>
 			</div>
-
-			{canStartFlowConnection && onStartFlowConnectionDrag && (
-				<button
-					type="button"
-					className="wfa-builder-node__output-port"
-					title={__(
-						'Drag to the next step to connect',
-						'workflow-automate'
-					)}
-					aria-label={__(
-						'Drag to the next step to connect',
-						'workflow-automate'
-					)}
-					onPointerDown={(event) => {
-						stopPointer(event);
-						onStartFlowConnectionDrag(node.id, event);
-					}}
-				/>
-			)}
 		</div>
 	);
 }

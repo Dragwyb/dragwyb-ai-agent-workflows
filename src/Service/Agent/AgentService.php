@@ -63,16 +63,58 @@ class AgentService {
 			);
 		}
 
+		$config = $this->normalizeAgentConfig( $config, $graph_nodes, $agent_node_id );
+
+		$validation = AgentValidator::validate( $config, $graph_nodes, $agent_node_id );
+
+		if ( empty( $validation['success'] ) ) {
+			return $validation;
+		}
+
+		$prompt_result = $this->resolvePrompt( $config, $context, $graph_nodes, $agent_node_id );
+
+		if ( empty( $prompt_result['success'] ) ) {
+			return $prompt_result;
+		}
+
+		$config['prompt'] = (string) ( $prompt_result['prompt'] ?? '' );
+
+		$settings     = $this->normalizeSettings( $config );
+		$max_attempts = ! empty( $settings['retry_on_fail'] ) ? max( 1, (int) $settings['max_tries'] ) : 1;
+		$wait_ms      = max( 0, (int) $settings['wait_between_tries_ms'] );
+		$last_result  = array(
+			'success' => false,
+			'error'   => __( 'AI Agent request failed.', 'workflow-automate' ),
+		);
+
+		for ( $attempt = 1; $attempt <= $max_attempts; ++$attempt ) {
+			$last_result = $this->executeOnce( $config, $context, $agent_node_id, $graph_nodes );
+
+			if ( ! empty( $last_result['success'] ) ) {
+				$last_result['attempt'] = $attempt;
+				return $this->finalizeAgentResult( $last_result, $config, $settings );
+			}
+
+			if ( $attempt < $max_attempts && $wait_ms > 0 ) {
+				usleep( $wait_ms * 1000 );
+			}
+		}
+
+		return $this->finalizeAgentResult( $last_result, $config, $settings );
+	}
+
+	/**
+	 * @param array<string, mixed> $config
+	 * @param array<string, mixed> $context
+	 * @param string               $agent_node_id
+	 * @param array<int, mixed>    $graph_nodes
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function executeOnce( array $config, array $context, string $agent_node_id, array $graph_nodes ): array {
 		$workflow_id = (int) ( $context['workflow_id'] ?? 0 );
 		$attachments = AgentGraphHelper::resolveAttachments( $graph_nodes, $agent_node_id );
 		$chat        = AgentGraphHelper::resolveChatModelConfig( $attachments['chat_model'], $config );
-
-		if ( $chat['connection_id'] <= 0 ) {
-			return array(
-				'success' => false,
-				'error'   => __( 'No chat model configured. Attach a Chat Model to the agent or set an API connection.', 'workflow-automate' ),
-			);
-		}
 
 		$api_key = $this->secrets->resolveBearerSecret( $chat['connection_id'] );
 
@@ -81,13 +123,6 @@ class AgentService {
 		}
 
 		$prompt = isset( $config['prompt'] ) ? trim( (string) $config['prompt'] ) : '';
-
-		if ( '' === $prompt ) {
-			return array(
-				'success' => false,
-				'error'   => __( 'No prompt configured for the AI Agent.', 'workflow-automate' ),
-			);
-		}
 
 		$model = trim( $chat['model'] );
 
@@ -119,6 +154,39 @@ class AgentService {
 			$context
 		);
 
+		if ( empty( $loop['success'] ) && ! empty( $config['fallback_enabled'] ) && is_array( $attachments['fallback_chat_model'] ) ) {
+			$fallback     = AgentGraphHelper::resolveChatModelConfig( $attachments['fallback_chat_model'], $config );
+			$fallback_key = $this->secrets->resolveBearerSecret( $fallback['connection_id'] );
+
+			if ( ! is_array( $fallback_key ) ) {
+				$fallback_model = trim( $fallback['model'] );
+
+				if ( '' === $fallback_model ) {
+					$fallback_model = $this->defaultModelForProvider( $fallback['provider'] );
+				}
+
+				$fallback_loop = $this->runAgentLoop(
+					$fallback['provider'],
+					$fallback_key,
+					$fallback_model,
+					$messages,
+					$tool_schemas,
+					$system_for_call,
+					$max_iterations,
+					$graph_nodes,
+					$workflow_id,
+					$context
+				);
+
+				if ( ! empty( $fallback_loop['success'] ) ) {
+					$fallback_loop['used_fallback_model'] = true;
+					$fallback_loop['provider']            = $fallback['provider'];
+					$fallback_loop['model']               = $fallback_model;
+					$loop                                 = $fallback_loop;
+				}
+			}
+		}
+
 		if ( empty( $loop['success'] ) ) {
 			return $loop;
 		}
@@ -142,8 +210,14 @@ class AgentService {
 		}
 
 		$loop['response'] = $response;
-		$loop['provider'] = $chat['provider'];
-		$loop['model']    = $model;
+
+		if ( empty( $loop['provider'] ) ) {
+			$loop['provider'] = $chat['provider'];
+		}
+
+		if ( empty( $loop['model'] ) ) {
+			$loop['model'] = $model;
+		}
 
 		if ( ! empty( $attachments['memory'] ) && is_array( $attachments['memory'] ) && isset( $loop['conversation_messages'] ) ) {
 			$memory_store = $this->memoryStore( $agent_node_id, $attachments['memory'], $config, $context );
@@ -152,6 +226,178 @@ class AgentService {
 		}
 
 		return $loop;
+	}
+
+	/**
+	 * @param array<string, mixed> $config
+	 * @param array<int, mixed>    $graph_nodes
+	 * @param string               $agent_node_id
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function normalizeAgentConfig( array $config, array $graph_nodes, string $agent_node_id ): array {
+		$attachments = AgentGraphHelper::resolveAttachments( $graph_nodes, $agent_node_id );
+
+		if ( ! empty( $config['require_output_format'] ) || null !== $attachments['output_parser'] ) {
+			$config['output_format'] = 'json';
+		}
+
+		return $config;
+	}
+
+	/**
+	 * @param array<string, mixed> $config
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function normalizeSettings( array $config ): array {
+		$settings = isset( $config['settings'] ) && is_array( $config['settings'] ) ? $config['settings'] : array();
+
+		return array(
+			'always_output_data'    => ! empty( $settings['always_output_data'] ),
+			'execute_once'          => ! empty( $settings['execute_once'] ),
+			'retry_on_fail'         => ! empty( $settings['retry_on_fail'] ),
+			'max_tries'             => max( 1, (int) ( $settings['max_tries'] ?? 3 ) ),
+			'wait_between_tries_ms' => max( 0, (int) ( $settings['wait_between_tries_ms'] ?? 1000 ) ),
+			'on_error'              => (string) ( $settings['on_error'] ?? 'stop_workflow' ),
+			'notes'                 => (string) ( $settings['notes'] ?? '' ),
+			'display_note_in_flow'  => ! empty( $settings['display_note_in_flow'] ),
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $config
+	 * @param array<string, mixed> $context
+	 * @param array<int, mixed>    $graph_nodes
+	 * @param string               $agent_node_id
+	 *
+	 * @return array{success: bool, prompt?: string, error?: string}
+	 */
+	private function resolvePrompt( array $config, array $context, array $graph_nodes, string $agent_node_id ): array {
+		$prompt_source = isset( $config['prompt_source'] ) ? (string) $config['prompt_source'] : AgentValidator::PROMPT_SOURCE_DEFINE;
+
+		if ( AgentValidator::PROMPT_SOURCE_DEFINE === $prompt_source ) {
+			$prompt = isset( $config['prompt'] ) ? trim( (string) $config['prompt'] ) : '';
+
+			if ( '' === $prompt ) {
+				return array(
+					'success' => false,
+					'error'   => __( 'No prompt configured for the AI Agent.', 'workflow-automate' ),
+				);
+			}
+
+			return array(
+				'success' => true,
+				'prompt'  => $prompt,
+			);
+		}
+
+		$prompt = $this->resolveChatTriggerPrompt( $context, $graph_nodes, $agent_node_id );
+
+		if ( '' === $prompt ) {
+			return array(
+				'success' => false,
+				'error'   => __( 'No chatInput value found from a connected Chat Trigger node.', 'workflow-automate' ),
+			);
+		}
+
+		return array(
+			'success' => true,
+			'prompt'  => $prompt,
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $context
+	 * @param array<int, mixed>    $graph_nodes
+	 * @param string               $agent_node_id
+	 *
+	 * @return string
+	 */
+	private function resolveChatTriggerPrompt( array $context, array $graph_nodes, string $agent_node_id ): string {
+		$trigger = $context['trigger'] ?? null;
+
+		if ( is_array( $trigger ) ) {
+			foreach ( array( 'chatInput', 'chat_input', 'message', 'prompt' ) as $key ) {
+				if ( isset( $trigger[ $key ] ) && is_scalar( $trigger[ $key ] ) ) {
+					$prompt = trim( (string) $trigger[ $key ] );
+
+					if ( '' !== $prompt ) {
+						return $prompt;
+					}
+				}
+			}
+		}
+
+		$graph       = isset( $context['graph'] ) && is_array( $context['graph'] ) ? $context['graph'] : array();
+		$connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
+
+		foreach ( $connections as $connection ) {
+			if ( ! is_array( $connection ) ) {
+				continue;
+			}
+
+			if ( (string) ( $connection['to'] ?? '' ) !== $agent_node_id ) {
+				continue;
+			}
+
+			$source_id = (string) ( $connection['from'] ?? '' );
+
+			if ( '' === $source_id ) {
+				continue;
+			}
+
+			$source_output = $context['nodes'][ $source_id ] ?? null;
+
+			if ( ! is_array( $source_output ) ) {
+				continue;
+			}
+
+			foreach ( array( 'chatInput', 'chat_input', 'response', 'message', 'prompt' ) as $key ) {
+				if ( isset( $source_output[ $key ] ) && is_scalar( $source_output[ $key ] ) ) {
+					$prompt = trim( (string) $source_output[ $key ] );
+
+					if ( '' !== $prompt ) {
+						return $prompt;
+					}
+				}
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * @param array<string, mixed> $result
+	 * @param array<string, mixed> $config
+	 * @param array<string, mixed> $settings
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function finalizeAgentResult( array $result, array $config, array $settings ): array {
+		if ( ! empty( $result['success'] ) ) {
+			return $result;
+		}
+
+		if ( 'continue' === $settings['on_error'] || 'continue_error_output' === $settings['on_error'] ) {
+			$output = array(
+				'success'  => true,
+				'response' => '',
+				'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ) ),
+			);
+
+			if ( 'continue_error_output' === $settings['on_error'] ) {
+				$output['error_output'] = $output['error'];
+			}
+
+			if ( ! empty( $settings['always_output_data'] ) ) {
+				$output['response'] = wp_json_encode( $output ) ?: '{}';
+			}
+
+			return $output;
+		}
+
+		return $result;
 	}
 
 	/**

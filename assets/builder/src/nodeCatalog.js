@@ -617,7 +617,7 @@ export function getItemsForPicker(
 		return actions.filter((action) => app.slugs.includes(action.slug));
 	}
 
-	if (kind === 'agent-chat-model') {
+	if (kind === 'agent-chat-model' || kind === 'agent-fallback-chat-model') {
 		return getChatModelPickerItems(actions);
 	}
 

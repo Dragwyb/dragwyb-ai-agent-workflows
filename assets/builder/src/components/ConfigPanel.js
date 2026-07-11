@@ -11,8 +11,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, getBootstrap, testWorkflowNode} from '../api';
 import CapturedResponse from './CapturedResponse';
 import NodeTestResult from './NodeTestResult';
+import AgentConfigPanel from './AgentConfigPanel';
 import TokenField, { fieldSupportsVariables } from './TokenField';
 import { buildVariableSources } from '../utils/variableSources';
+import { validateAgentConfig } from '../utils/agentConfig';
 import {
 	getConditionOperatorSelectOptions,
 	conditionOperatorNeedsValue,
@@ -131,6 +133,15 @@ const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
 	'provider',
 	'connection_id',
 	'model',
+	'prompt',
+	'system_prompt',
+	'max_iterations',
+	'output_format',
+	'prompt_source',
+	'require_output_format',
+	'fallback_enabled',
+	'options',
+	'settings',
 ]);
 
 /** @type {Set<string>} */
@@ -252,6 +263,12 @@ function filterMatchingConnections(connections, nodeTypeSlug, selectedId, nodeCo
  * @param {number}        [props.workflowId]
  * @param {Object}        [props.graph]
  * @param {Function}      [props.onPersistBeforeTest]
+ * @param {Function}      [props.onAddAgentChatModel]
+ * @param {Function}      [props.onAddAgentMemory]
+ * @param {Function}      [props.onAddAgentTool]
+ * @param {Function}      [props.onAddAgentFallbackModel]
+ * @param {Function}      [props.onAddAgentOutputParser]
+ * @param {Function}      [props.onSelectNode]
  */
 export default function ConfigPanel({
 	node,
@@ -269,6 +286,12 @@ export default function ConfigPanel({
 	workflowId = 0,
 	graph = { nodes: [], connections: [] },
 	onPersistBeforeTest,
+	onAddAgentChatModel,
+	onAddAgentMemory,
+	onAddAgentTool,
+	onAddAgentFallbackModel,
+	onAddAgentOutputParser,
+	onSelectNode,
 }) {
 	const [testing, setTesting] = useState(false);
 	const [testResult, setTestResult] = useState(null);
@@ -301,6 +324,23 @@ export default function ConfigPanel({
 	const handleTestNode = async () => {
 		if (!workflowId || !node?.id) {
 			return;
+		}
+
+		if (node.type === 'ai_agent_action') {
+			const agentErrors = validateAgentConfig(
+				node.config || {},
+				graphNodes,
+				node.id,
+				graph.connections || []
+			);
+
+			if (agentErrors.length > 0) {
+				setTestResult({
+					success: false,
+					error: agentErrors.map((entry) => entry.message).join(' '),
+				});
+				return;
+			}
 		}
 
 		setTesting(true);
@@ -348,7 +388,11 @@ export default function ConfigPanel({
 
 	return (
 		<aside
-			className="wfa-builder-config"
+			className={
+				node.type === 'ai_agent_action'
+					? 'wfa-builder-config wfa-builder-config--agent'
+					: 'wfa-builder-config'
+			}
 			aria-label={__('Node settings', 'workflow-automate')}
 		>
 			<div className="wfa-builder-config__header">
@@ -385,6 +429,24 @@ export default function ConfigPanel({
 				</p>
 			)}
 
+			{node.attachment_type === 'fallback_chat_model' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Fallback chat model used when the primary model fails.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
+			{node.attachment_type === 'output_parser' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Output parser attached to the agent. Required when “Require Specific Output Format” is enabled.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
 			{node.attachment_type === 'memory' && (
 				<p className="wfa-builder-config__field-help">
 					{__(
@@ -404,12 +466,22 @@ export default function ConfigPanel({
 			)}
 
 			{node.type === 'ai_agent_action' && (
-				<p className="wfa-builder-config__field-help">
-					{__(
-						'Use + on the canvas for Chat Model and Memory. Add Router and Condition from the Tools palette.',
-						'workflow-automate'
-					)}
-				</p>
+				<AgentConfigPanel
+					node={node}
+					graphNodes={graphNodes}
+					graphConnections={graph.connections || []}
+					variableSources={variableSources}
+					nodeLabels={nodeLabels}
+					onChangeConfig={onChangeConfig}
+					onAddChatModel={onAddAgentChatModel}
+					onAddMemory={onAddAgentMemory}
+					onAddTool={onAddAgentTool}
+					onAddFallbackModel={onAddAgentFallbackModel}
+					onAddOutputParser={onAddAgentOutputParser}
+					onSelectNode={onSelectNode}
+					onExecuteStep={handleTestNode}
+					testing={testing}
+				/>
 			)}
 
 			{node.category === 'trigger' && (
@@ -430,7 +502,9 @@ export default function ConfigPanel({
 			)}
 
 			{nodeType &&
+				node.type !== 'ai_agent_action' &&
 				node.attachment_type !== 'memory' &&
+				node.attachment_type !== 'output_parser' &&
 				Object.keys(nodeType.config_schema || {})
 					.filter((fieldName) => {
 						if (
@@ -441,10 +515,10 @@ export default function ConfigPanel({
 						}
 
 						if (
-							node.attachment_type === 'chat_model' &&
-							!CHAT_MODEL_ATTACHMENT_FIELDS.has(fieldName)
+							node.attachment_type === 'chat_model' ||
+							node.attachment_type === 'fallback_chat_model'
 						) {
-							return false;
+							return CHAT_MODEL_ATTACHMENT_FIELDS.has(fieldName);
 						}
 
 						return true;

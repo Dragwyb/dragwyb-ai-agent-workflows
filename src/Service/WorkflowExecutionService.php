@@ -371,7 +371,14 @@ class WorkflowExecutionService {
 			);
 
 			if ( ! $success && ! $this->settings->shouldContinueOnFailure() ) {
-				break;
+				$on_error = $this->resolveAgentOnError( $node, $graph_nodes );
+
+				if ( in_array( $on_error, array( 'continue', 'continue_error_output' ), true ) ) {
+					$context['nodes'][ $client_id ] = $this->buildAgentContinueOutput( $result, $on_error );
+					++$succeeded;
+				} else {
+					break;
+				}
 			}
 
 			$node_type = $node->nodeType();
@@ -467,6 +474,51 @@ class WorkflowExecutionService {
 	 */
 	public function logsFor( int $run_id ): array {
 		return $this->runLogs->findByRun( $run_id );
+	}
+
+	/**
+	 * @param WorkflowNode         $node
+	 * @param array<int, mixed>    $graph_nodes
+	 *
+	 * @return string
+	 */
+	private function resolveAgentOnError( WorkflowNode $node, array $graph_nodes ): string {
+		if ( 'ai_agent_action' !== $node->nodeType() ) {
+			return 'stop_workflow';
+		}
+
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || (string) ( $graph_node['id'] ?? '' ) !== $node->clientNodeId() ) {
+				continue;
+			}
+
+			$config   = isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : array();
+			$settings = isset( $config['settings'] ) && is_array( $config['settings'] ) ? $config['settings'] : array();
+
+			return (string) ( $settings['on_error'] ?? 'stop_workflow' );
+		}
+
+		return 'stop_workflow';
+	}
+
+	/**
+	 * @param array<string, mixed> $result
+	 * @param string               $on_error
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function buildAgentContinueOutput( array $result, string $on_error ): array {
+		$output = array(
+			'success'  => true,
+			'response' => '',
+			'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ) ),
+		);
+
+		if ( 'continue_error_output' === $on_error ) {
+			$output['error_output'] = $output['error'];
+		}
+
+		return $output;
 	}
 
 	/**

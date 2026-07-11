@@ -151,6 +151,37 @@ class NodeTypesController {
 			$data['role'] = $role;
 		}
 
+		if ( 'ai_agent_action' === $node_type->slug() ) {
+			$data['ports'] = array(
+				array(
+					'id'        => 'input',
+					'type'      => 'main',
+					'direction' => 'in',
+				),
+				array(
+					'id'        => 'output',
+					'type'      => 'main',
+					'direction' => 'out',
+				),
+				array(
+					'id'        => 'chatModel',
+					'type'      => 'ai',
+					'direction' => 'in',
+					'required'  => true,
+				),
+				array(
+					'id'        => 'memory',
+					'type'      => 'ai',
+					'direction' => 'in',
+				),
+				array(
+					'id'        => 'tool',
+					'type'      => 'ai',
+					'direction' => 'in',
+				),
+			);
+		}
+
 		$this->applyElementorFormSchema( $data );
 
 		return $data;
