@@ -22,8 +22,8 @@ function legacyPayloadMatchesTrigger(triggerType, payload) {
 		return source === 'elementor-atomic';
 	}
 
-	if (triggerType === 'woocommerce_order_completed_trigger') {
-		return source === 'woocommerce';
+	if (triggerType.startsWith('woocommerce_') && source === 'woocommerce') {
+		return true;
 	}
 
 	if (triggerType === 'contact_form7_submitted_trigger') {

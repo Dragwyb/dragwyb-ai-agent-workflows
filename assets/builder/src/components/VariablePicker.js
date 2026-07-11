@@ -167,10 +167,16 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 					className="wfa-variable-picker__leaf-btn"
 					style={{ paddingLeft: `${8 + depth * 14}px` }}
 					onClick={() => onSelect(node.token, node.path)}
-					title={node.token}
+					title={
+						node.preview
+							? `${node.token} — ${node.preview}`
+							: node.token
+					}
 				>
 					<span className="wfa-variable-picker__pill">
-						{pathToDisplayLabel(node.path, nodeLabels)}
+						{node.id.endsWith('.__all__')
+							? node.label
+							: pathToDisplayLabel(node.path, nodeLabels)}
 					</span>
 					{node.preview && (
 						<span className="wfa-variable-picker__preview">

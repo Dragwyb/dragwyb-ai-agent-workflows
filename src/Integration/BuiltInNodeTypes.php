@@ -22,6 +22,7 @@ use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
 use WorkflowAutomate\Plugin\Service\Agent\AgentService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
@@ -85,6 +86,15 @@ class BuiltInNodeTypes {
 
 		foreach ( IntegrationTriggerCatalog::definitions() as $definition ) {
 			if ( ! $definition['active'] ) {
+				continue;
+			}
+
+			if (
+				WooCommerceCatalogTrigger::class === $definition['class']
+				&& isset( $definition['definition'] )
+				&& is_array( $definition['definition'] )
+			) {
+				$registry->registerTrigger( new WooCommerceCatalogTrigger( $definition['definition'] ) );
 				continue;
 			}
 

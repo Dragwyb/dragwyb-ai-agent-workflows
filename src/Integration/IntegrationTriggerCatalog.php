@@ -12,7 +12,7 @@ namespace WorkflowAutomate\Plugin\Integration;
 use WorkflowAutomate\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceOrderCompletedTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 
 // Prevent direct file access.
@@ -53,13 +53,6 @@ class IntegrationTriggerCatalog {
 				'active' => self::isElementorAtomicFormsActive(),
 			),
 			array(
-				'slug' => 'woocommerce_order_completed_trigger',
-				'app' => 'woocommerce',
-				'requires_plugin' => 'WooCommerce',
-				'class' => WooCommerceOrderCompletedTrigger::class,
-				'active' => self::isWooCommerceActive(),
-			),
-			array(
 				'slug' => 'contact_form7_submitted_trigger',
 				'app' => 'contact-form-7',
 				'requires_plugin' => 'Contact Form 7',
@@ -74,6 +67,17 @@ class IntegrationTriggerCatalog {
 				'active' => self::isWpFormsActive(),
 			),
 		);
+
+		foreach ( WooCommerceTriggerCatalog::definitions() as $wc_definition ) {
+			$entries[] = array(
+				'slug' => (string) $wc_definition['slug'],
+				'app' => 'woocommerce',
+				'requires_plugin' => 'WooCommerce',
+				'class' => WooCommerceCatalogTrigger::class,
+				'definition' => $wc_definition,
+				'active' => self::isWooCommerceActive(),
+			);
+		}
 
 		return array_map(
 			static function ( array $entry ): array {

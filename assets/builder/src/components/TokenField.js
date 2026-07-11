@@ -17,7 +17,8 @@ function createPillElement(token, path, nodeLabels = {}) {
 	span.className = 'wfa-token-field__pill';
 	span.contentEditable = 'false';
 	span.dataset.token = token;
-	span.textContent = pathToDisplayLabel(path, nodeLabels);
+	const label = path === 'trigger' ? 'All data (JSON)' : pathToDisplayLabel(path, nodeLabels);
+	span.textContent = label || path;
 	return span;
 }
 
@@ -118,9 +119,9 @@ export default function TokenField({
 			return;
 		}
 
-		const popoverWidth = 260;
+		const popoverWidth = 300;
 		const gap = 8;
-		const maxHeight = Math.min(360, window.innerHeight - 24);
+		const maxHeight = Math.min(420, window.innerHeight - 24);
 		const rect = wrapperRef.current.getBoundingClientRect();
 
 		let left = rect.left - popoverWidth - gap;
@@ -276,6 +277,7 @@ export default function TokenField({
 						top: `${popoverPos.top}px`,
 						left: `${popoverPos.left}px`,
 						width: `${popoverPos.width}px`,
+						height: `${popoverPos.maxHeight}px`,
 						maxHeight: `${popoverPos.maxHeight}px`,
 					}}
 				>
@@ -286,6 +288,7 @@ export default function TokenField({
 						onClose={() => setPickerOpen(false)}
 						embedded
 						popover
+						showSearch
 					/>
 				</div>
 			)}

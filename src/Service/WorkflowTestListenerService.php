@@ -190,8 +190,8 @@ class WorkflowTestListenerService {
 			return 'elementor-atomic' === $source;
 		}
 
-		if ( 'woocommerce_order_completed_trigger' === $trigger_type ) {
-			return 'woocommerce' === $source;
+		if ( str_starts_with( $trigger_type, 'woocommerce_' ) && 'woocommerce' === $source ) {
+			return true;
 		}
 
 		if ( 'contact_form7_submitted_trigger' === $trigger_type ) {
