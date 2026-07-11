@@ -13,9 +13,6 @@ const AGENT_SLUGS = new Set([
 /** @type {Set<string>} */
 const TOOL_SLUGS = new Set(['condition_action', 'router_action']);
 
-/** @type {Set<string>} */
-const PALETTE_HIDDEN_SLUGS = new Set([...TOOL_SLUGS]);
-
 /** @type {Array<{ id: string, label: string, slugs: string[] }>} */
 const INTEGRATION_TRIGGER_APPS = [
 	{ id: 'elementor', label: 'Elementor', slugs: ['elementor_form_submitted_trigger', 'elementor_atomic_form_submitted_trigger'] },
@@ -357,12 +354,33 @@ export function getChatModelPickerItems(actions, query = '') {
 }
 
 /**
- * Logic tools that attach to an AI Agent (+ button), not the main palette.
+ * Flow tool nodes (Router, Condition) for the main canvas palette.
+ *
+ * @param {Array<Object>} actions
+ * @param {string}      query
+ * @return {Array<{ id: string, label: string, available: boolean }>}
+ */
+export function getToolApps(actions, query = '') {
+	const needle = query.trim().toLowerCase();
+
+	return getFlowToolTypes(actions)
+		.filter(
+			(tool) => !needle || tool.label.toLowerCase().includes(needle)
+		)
+		.map((tool) => ({
+			id: tool.slug,
+			label: tool.label,
+			available: tool.available !== false,
+		}));
+}
+
+/**
+ * Router, Condition, and other flow tool node types.
  *
  * @param {Array<Object>} actions
  * @return {Array<Object>}
  */
-export function getAgentToolTypes(actions) {
+export function getFlowToolTypes(actions) {
 	return actions.filter(
 		(action) =>
 			action.role === 'tool' || TOOL_SLUGS.has(action.slug)
@@ -379,7 +397,7 @@ export function getAgentActionToolTypes(actions) {
 	return actions.filter(
 		(action) =>
 			!AGENT_SLUGS.has(action.slug) &&
-			!PALETTE_HIDDEN_SLUGS.has(action.slug) &&
+			!TOOL_SLUGS.has(action.slug) &&
 			action.role !== 'agent' &&
 			action.role !== 'tool' &&
 			action.available !== false
@@ -394,11 +412,6 @@ export function getAgentActionToolTypes(actions) {
  */
 export function getAgentToolPickerSections(actions) {
 	const sections = [
-		{
-			id: 'logic',
-			label: 'Logic',
-			items: getAgentToolTypes(actions),
-		},
 		{
 			id: 'actions',
 			label: 'Actions',
@@ -419,7 +432,7 @@ export function getActionApps(actions, query = '') {
 	const available = actions.filter(
 		(action) =>
 			!AGENT_SLUGS.has(action.slug) &&
-			!PALETTE_HIDDEN_SLUGS.has(action.slug) &&
+			!TOOL_SLUGS.has(action.slug) &&
 			action.role !== 'agent' &&
 			action.role !== 'tool'
 	);
@@ -552,7 +565,13 @@ export function getItemsForPicker(
 	}
 
 	if (kind === 'agent-tool') {
-		return getAgentToolTypes(actions);
+		return getAgentActionToolTypes(actions);
+	}
+
+	if (kind === 'tool') {
+		const tool = actions.find((action) => action.slug === appId);
+
+		return tool ? [tool] : getFlowToolTypes(actions);
 	}
 
 	const app = getActionAppDef(appId, subAppId);
@@ -593,6 +612,10 @@ export function appUsesGroupedSections(kind, appId, subAppId = null) {
  * @return {string}
  */
 export function getAppLabel(kind, appId, subAppId = null) {
+	if (kind === 'tool') {
+		return 'Tools';
+	}
+
 	if (kind === 'agent') {
 		return AGENT_APPS[appId]?.label || appId;
 	}

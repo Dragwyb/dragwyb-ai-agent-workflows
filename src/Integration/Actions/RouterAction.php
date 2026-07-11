@@ -27,7 +27,7 @@ class RouterAction implements ActionInterface {
 	}
 
 	public function description(): string {
-		return __( 'Routes to different steps based on a value (attach to AI Agent).', 'workflow-automate' );
+		return __( 'Routes to different steps based on a value.', 'workflow-automate' );
 	}
 
 	public function configSchema(): array {

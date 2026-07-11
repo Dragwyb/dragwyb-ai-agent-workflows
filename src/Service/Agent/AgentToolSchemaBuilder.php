@@ -43,9 +43,10 @@ class AgentToolSchemaBuilder {
 	private const EXCLUDED_FIELDS = array(
 		'connection_id' => true,
 		'model' => true,
-		'default_branch_node_id' => true,
 		'true_branch_node_id' => true,
 		'false_branch_node_id' => true,
+		'conditions' => true,
+		'default_branch_node_id' => true,
 		'routes' => true,
 	);
 

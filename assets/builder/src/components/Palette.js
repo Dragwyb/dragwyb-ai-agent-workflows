@@ -5,6 +5,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	getTriggerApps,
 	getAgentApps,
+	getToolApps,
 	getActionApps,
 } from '../nodeCatalog';
 import { getNodeMeta } from '../nodeMeta';
@@ -26,6 +27,10 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 	);
 	const agentApps = useMemo(
 		() => getAgentApps(actions, query),
+		[actions, query]
+	);
+	const toolApps = useMemo(
+		() => getToolApps(actions, query),
 		[actions, query]
 	);
 	const actionApps = useMemo(
@@ -67,6 +72,17 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 					query
 						? __('No agents match your search.', 'workflow-automate')
 						: __('No agents are registered.', 'workflow-automate')
+				}
+			/>
+			<PaletteSection
+				title={__('Tools', 'workflow-automate')}
+				apps={toolApps}
+				kind="tool"
+				onOpenPicker={onOpenPicker}
+				emptyMessage={
+					query
+						? __('No tools match your search.', 'workflow-automate')
+						: __('No tools are registered.', 'workflow-automate')
 				}
 			/>
 			<PaletteSection

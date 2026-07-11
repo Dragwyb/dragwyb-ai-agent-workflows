@@ -20,13 +20,20 @@ const ARROW_DELTAS = {
  * @param {number}   options.y        Current y position.
  * @param {Function} options.onMove   (nodeId, x, y) => void
  * @param {Function} options.onSelect (nodeId) => void
+ * @param {boolean}  [options.linkConnectMode] Immediate select (branch linking).
  *
  * @return {{ handlePointerDown: Function, handleKeyDown: Function }}
  */
-export function useNodeDrag({ nodeId, x, y, onMove, onSelect }) {
+export function useNodeDrag({ nodeId, x, y, onMove, onSelect, linkConnectMode = false }) {
 	const draggingRef = useRef(null);
 
 	const handlePointerDown = (event) => {
+		if (linkConnectMode && onSelect) {
+			event.stopPropagation();
+			onSelect(nodeId);
+			return;
+		}
+
 		if (!onMove || (event.button !== undefined && event.button !== 0)) {
 			return;
 		}

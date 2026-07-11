@@ -1,20 +1,32 @@
 import { sortNodesForFlow } from '../utils';
+import { getPriorFlowNodes } from './flowConnections';
 import { buildPayloadTree } from './payloadVariables';
 import { getNodeOutputFields } from './nodeOutputs';
 
 /**
- * Action/agent nodes that run before the current node in canvas order.
+ * Action/agent nodes that run before the current node in flow order.
  *
  * @param {Array<Object>} graphNodes
  * @param {string|null}   currentNodeId
+ * @param {Array<Object>} [connections]
  * @return {Array<Object>}
  */
-export function getPriorActionNodes(graphNodes, currentNodeId) {
+export function getPriorActionNodes(
+	graphNodes,
+	currentNodeId,
+	connections = []
+) {
 	if (!currentNodeId) {
 		return [];
 	}
 
-	const flow = sortNodesForFlow(graphNodes);
+	const mainNodes = graphNodes.filter((node) => !node.parent_agent_id);
+
+	if (connections.length > 0) {
+		return getPriorFlowNodes(mainNodes, connections, currentNodeId);
+	}
+
+	const flow = sortNodesForFlow(mainNodes);
 	const index = flow.findIndex((node) => node.id === currentNodeId);
 
 	if (index <= 0) {
@@ -27,6 +39,7 @@ export function getPriorActionNodes(graphNodes, currentNodeId) {
 /**
  * @param {Object}        options
  * @param {Array<Object>} options.graphNodes
+ * @param {Array<Object>} [options.connections]
  * @param {string|null}   options.currentNodeId
  * @param {*}             options.triggerPayload
  * @param {string}        options.triggerLabel
@@ -34,6 +47,7 @@ export function getPriorActionNodes(graphNodes, currentNodeId) {
  */
 export function buildVariableSources({
 	graphNodes,
+	connections = [],
 	currentNodeId,
 	triggerPayload,
 	triggerLabel,
@@ -57,24 +71,26 @@ export function buildVariableSources({
 		badge += 1;
 	}
 
-	getPriorActionNodes(graphNodes, currentNodeId).forEach((node) => {
-		const fields = getNodeOutputFields(node.type);
-		const outputPayload = Object.fromEntries(
-			fields.map((field) => [field.key, field.preview || ''])
-		);
+	getPriorActionNodes(graphNodes, currentNodeId, connections).forEach(
+		(node) => {
+			const fields = getNodeOutputFields(node.type);
+			const outputPayload = Object.fromEntries(
+				fields.map((field) => [field.key, field.preview || ''])
+			);
 
-		sources.push({
-			id: node.id,
-			label: node.label || node.type,
-			badge,
-			tree: buildPayloadTree(
-				outputPayload,
-				`nodes.${node.id}`,
-				node.label || 'Step'
-			),
-		});
-		badge += 1;
-	});
+			sources.push({
+				id: node.id,
+				label: node.label || node.type,
+				badge,
+				tree: buildPayloadTree(
+					outputPayload,
+					`nodes.${node.id}`,
+					node.label || 'Step'
+				),
+			});
+			badge += 1;
+		}
+	);
 
 	return sources;
 }

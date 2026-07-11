@@ -13,15 +13,18 @@ import {
 export default function AgentNodeCard({
 	node,
 	selected,
+	isLinkTarget = false,
 	hasUnknownType,
 	hasChatModel,
 	hasMemory,
 	chatModelId,
+	canStartFlowConnection = false,
 	onSelect,
 	onMove,
 	onAddChatModel,
 	onAddMemory,
 	onAddTool,
+	onStartFlowConnectionDrag,
 	registerRef,
 }) {
 	const meta = getNodeMeta('ai-agent', 'action');
@@ -42,6 +45,7 @@ export default function AgentNodeCard({
 		'wfa-builder-node--agent',
 		selected ? 'wfa-builder-node--selected' : '',
 		hasUnknownType ? 'wfa-builder-node--unknown' : '',
+		isLinkTarget ? 'wfa-builder-node--link-target' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -170,7 +174,7 @@ export default function AgentNodeCard({
 						className="wfa-agent-node__add-port"
 						aria-label={__('Add tool to agent', 'workflow-automate')}
 						title={__(
-							'Add Router, Condition, or an action',
+							'Add an action as an agent tool',
 							'workflow-automate'
 						)}
 						onPointerDown={stopPointer}
@@ -183,6 +187,25 @@ export default function AgentNodeCard({
 					</button>
 				</div>
 			</div>
+
+			{canStartFlowConnection && onStartFlowConnectionDrag && (
+				<button
+					type="button"
+					className="wfa-builder-node__output-port"
+					title={__(
+						'Drag to the next step to connect',
+						'workflow-automate'
+					)}
+					aria-label={__(
+						'Drag to the next step to connect',
+						'workflow-automate'
+					)}
+					onPointerDown={(event) => {
+						stopPointer(event);
+						onStartFlowConnectionDrag(node.id, event);
+					}}
+				/>
+			)}
 		</div>
 	);
 }

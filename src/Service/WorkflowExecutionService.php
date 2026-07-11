@@ -290,6 +290,8 @@ class WorkflowExecutionService {
 		$workflow = $this->workflows->find( $workflow_id );
 		$graph    = null !== $workflow ? $workflow->graph() : array();
 		$graph_nodes = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
+		$graph_connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
+		$has_connections_key = array_key_exists( 'connections', $graph ) && is_array( $graph['connections'] );
 
 		$context = array(
 			'trigger' => $trigger_payload,
@@ -301,21 +303,47 @@ class WorkflowExecutionService {
 		$executed = 0;
 		$succeeded = 0;
 
+		$planner         = new GraphExecutionPlanner();
+		$main_path_ids   = $planner->getMainPathNodeIds( $graph_nodes, $graph_connections, $has_connections_key );
+		$branch_targets  = $planner->collectBranchTargetIds( $graph_nodes );
+		$pending_ids     = $main_path_ids;
+		$visited         = array();
+		$nodes_by_client = array();
+
 		foreach ( $nodes as $node ) {
-			if ( null !== $this->registry->trigger( $node->nodeType() ) ) {
+			$nodes_by_client[ $node->clientNodeId() ] = $node;
+		}
+
+		while ( array() !== $pending_ids ) {
+			$client_id = (string) array_shift( $pending_ids );
+
+			if ( '' === $client_id || isset( $visited[ $client_id ] ) ) {
 				continue;
 			}
 
-			if ( AgentGraphHelper::isAgentAttachment( $graph_nodes, $node->clientNodeId() ) ) {
+			if ( ! isset( $nodes_by_client[ $client_id ] ) ) {
+				continue;
+			}
+
+			$node = $nodes_by_client[ $client_id ];
+
+			if ( null !== $this->registry->trigger( $node->nodeType() ) ) {
+				$visited[ $client_id ] = true;
+				continue;
+			}
+
+			if ( AgentGraphHelper::isAgentAttachment( $graph_nodes, $client_id ) ) {
+				$visited[ $client_id ] = true;
 				continue;
 			}
 
 			++$executed;
+			$visited[ $client_id ] = true;
 
 			$started_at = microtime( true );
 			$node_context = array_merge(
 				$context,
-				array( 'current_node_id' => $node->clientNodeId() )
+				array( 'current_node_id' => $client_id )
 			);
 			$result = $this->nodeExecutor->execute( $node, $node_context );
 			$duration_ms = (int) round( ( microtime( true ) - $started_at ) * 1000 );
@@ -326,7 +354,7 @@ class WorkflowExecutionService {
 				++$succeeded;
 			}
 
-			$context['nodes'][ $node->clientNodeId() ] = $result;
+			$context['nodes'][ $client_id ] = $result;
 
 			$this->runLogs->insert(
 				array(
@@ -344,6 +372,29 @@ class WorkflowExecutionService {
 
 			if ( ! $success && ! $this->settings->shouldContinueOnFailure() ) {
 				break;
+			}
+
+			$node_type = $node->nodeType();
+
+			if ( in_array( $node_type, GraphExecutionPlanner::BRANCHING_TYPES, true ) ) {
+				$branch_ids = $planner->resolveBranchTargets( $result );
+				$pending_ids = $planner->stripMainPathAfterBranch( $pending_ids, $client_id, $main_path_ids );
+
+				foreach ( array_reverse( $branch_ids ) as $branch_id ) {
+					if ( ! isset( $visited[ $branch_id ] ) ) {
+						array_unshift( $pending_ids, $branch_id );
+					}
+				}
+
+				continue;
+			}
+
+			if ( isset( $branch_targets[ $client_id ] ) ) {
+				$next_branch = $planner->nextInBranchColumn( $client_id, $graph_nodes, $branch_targets );
+
+				if ( null !== $next_branch && ! isset( $visited[ $next_branch ] ) ) {
+					array_unshift( $pending_ids, $next_branch );
+				}
 			}
 		}
 

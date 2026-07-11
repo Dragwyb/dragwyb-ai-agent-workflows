@@ -13,6 +13,12 @@ import CapturedResponse from './CapturedResponse';
 import NodeTestResult from './NodeTestResult';
 import TokenField, { fieldSupportsVariables } from './TokenField';
 import { buildVariableSources } from '../utils/variableSources';
+import {
+	getConditionOperatorSelectOptions,
+	conditionOperatorNeedsValue,
+	createEmptyConditionRow,
+	getConnectableCanvasNodes,
+} from '../utils/conditionBranches';
 
 const GOOGLE_SHEETS_OAUTH_SETTINGS = {
 	authType: 'oauth2',
@@ -248,11 +254,12 @@ export default function ConfigPanel({
 		() =>
 			buildVariableSources({
 				graphNodes,
+				connections: graph.connections || [],
 				currentNodeId: node?.id || null,
 				triggerPayload: capturedPayload,
 				triggerLabel,
 			}),
-		[graphNodes, node?.id, capturedPayload, triggerLabel]
+		[graphNodes, graph.connections, node?.id, capturedPayload, triggerLabel]
 	);
 
 	useEffect(() => {
@@ -355,10 +362,19 @@ export default function ConfigPanel({
 				</p>
 			)}
 
+			{node.type === 'condition_action' && (
+				<p className="wfa-builder-config__field-help">
+					{__(
+						'Each condition has its own orange port on the right — drag each port to a different step (AI Agent, actions, etc.). Or pick targets under “Then run” for each condition below.',
+						'workflow-automate'
+					)}
+				</p>
+			)}
+
 			{node.type === 'ai_agent_action' && (
 				<p className="wfa-builder-config__field-help">
 					{__(
-						'Use + on the canvas for Chat Model, Memory, and Tools — not the left palette.',
+						'Use + on the canvas for Chat Model and Memory. Add Router and Condition from the Tools palette.',
 						'workflow-automate'
 					)}
 				</p>
@@ -415,6 +431,7 @@ export default function ConfigPanel({
 						nodeConfig={node.config || {}}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
+						graphNodes={graphNodes}
 						onConnectionsChange={onConnectionsChange}
 						onChange={(value) => onChangeConfig(fieldName, value)}
 					/>
@@ -465,6 +482,7 @@ function ConfigField({
 	nodeConfig,
 	variableSources,
 	nodeLabels,
+	graphNodes = [],
 	onConnectionsChange,
 	onChange,
 }) {
@@ -553,6 +571,34 @@ function ConfigField({
 				value={resolved}
 				help={help || undefined}
 				addLabel={fieldSchema.button_label}
+				onChange={onChange}
+			/>
+		);
+	}
+
+	if (fieldSchema.type === 'node_select') {
+		return (
+			<NodeSelectField
+				label={label}
+				value={resolved}
+				help={help || undefined}
+				nodeId={nodeId}
+				graphNodes={graphNodes}
+				onChange={onChange}
+			/>
+		);
+	}
+
+	if (fieldSchema.type === 'condition_routes') {
+		return (
+			<ConditionRoutesField
+				label={label}
+				value={resolved}
+				help={help || undefined}
+				nodeId={nodeId}
+				graphNodes={graphNodes}
+				variableSources={variableSources}
+				nodeLabels={nodeLabels}
 				onChange={onChange}
 			/>
 		);
@@ -1474,6 +1520,136 @@ function isFieldVisible(fieldSchema, nodeConfig = {}) {
 
 		return String(actual ?? '') === String(condition.equals);
 	});
+}
+
+/**
+ * Dropdown of canvas nodes for branch targets.
+ */
+function NodeSelectField({ label, value, help, nodeId, graphNodes, onChange }) {
+	const connectable = getConnectableCanvasNodes(graphNodes, nodeId);
+	const options = [
+		{ label: __('— None —', 'workflow-automate'), value: '' },
+		...connectable.map((graphNode) => ({
+			label: `${graphNode.label || graphNode.type}${
+				graphNode.type === 'ai_agent_action' ? ' (AI Agent)' : ''
+			}`,
+			value: graphNode.id,
+		})),
+	];
+
+	return (
+		<SelectControl
+			label={label}
+			help={help || undefined}
+			value={value ? String(value) : ''}
+			options={options}
+			onChange={onChange}
+		/>
+	);
+}
+
+/**
+ * Multi-condition editor for Condition nodes.
+ */
+function ConditionRoutesField({
+	label,
+	value,
+	help,
+	nodeId,
+	graphNodes,
+	variableSources,
+	nodeLabels,
+	onChange,
+}) {
+	const rows = Array.isArray(value) ? value : [];
+
+	const updateRow = (index, key, nextValue) => {
+		onChange(
+			rows.map((row, rowIndex) =>
+				rowIndex === index ? { ...row, [key]: nextValue } : row
+			)
+		);
+	};
+
+	const addRow = () => {
+		onChange([...rows, createEmptyConditionRow()]);
+	};
+
+	const removeRow = (index) => {
+		onChange(rows.filter((_, rowIndex) => rowIndex !== index));
+	};
+
+	return (
+		<div className="wfa-builder-config__condition-routes">
+			<span className="wfa-builder-config__key-value-label">{label}</span>
+			{help && (
+				<p className="wfa-builder-config__field-help">{help}</p>
+			)}
+			{rows.map((row, index) => (
+				<div
+					key={row.id || `condition-${index}`}
+					className="wfa-builder-config__condition-route"
+				>
+					<TextControl
+						label={__('Label', 'workflow-automate')}
+						value={row.label || ''}
+						onChange={(nextValue) =>
+							updateRow(index, 'label', nextValue)
+						}
+					/>
+					<TokenField
+						label={__('Value to check', 'workflow-automate')}
+						value={row.field || ''}
+						variableSources={variableSources}
+						nodeLabels={nodeLabels}
+						onChange={(nextValue) =>
+							updateRow(index, 'field', nextValue)
+						}
+					/>
+					<SelectControl
+						label={__('Comparison', 'workflow-automate')}
+						value={row.operator || 'equals'}
+						options={getConditionOperatorSelectOptions()}
+						onChange={(nextValue) => {
+							if (!nextValue) {
+								return;
+							}
+
+							updateRow(index, 'operator', nextValue);
+						}}
+					/>
+					{conditionOperatorNeedsValue(row.operator || 'equals') && (
+						<TextControl
+							label={__('Compare to', 'workflow-automate')}
+							value={row.value || ''}
+							onChange={(nextValue) =>
+								updateRow(index, 'value', nextValue)
+							}
+						/>
+					)}
+					<NodeSelectField
+						label={__('Then run', 'workflow-automate')}
+						value={row.node_id || ''}
+						nodeId={nodeId}
+						graphNodes={graphNodes}
+						onChange={(nextValue) =>
+							updateRow(index, 'node_id', nextValue)
+						}
+					/>
+					<Button
+						isDestructive
+						variant="tertiary"
+						onClick={() => removeRow(index)}
+					>
+						{__('Remove condition', 'workflow-automate')}
+					</Button>
+				</div>
+			))}
+			<Button variant="secondary" onClick={addRow}>
+				{__('Add condition', 'workflow-automate')}
+			</Button>
+		</div>
+	);
 }
 
 /**

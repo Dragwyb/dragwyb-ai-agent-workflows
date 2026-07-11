@@ -20,7 +20,7 @@ import { getNodeMeta } from '../nodeMeta';
  * Right sidebar for picking a trigger, agent, action, or agent attachment.
  *
  * @param {Object}        props
- * @param {'trigger'|'agent'|'action'|'agent-tool'|'agent-chat-model'} props.kind
+ * @param {'trigger'|'agent'|'action'|'agent-tool'|'agent-chat-model'|'branch-action'} props.kind
  * @param {string}        props.appId
  * @param {Array<Object>} props.triggers
  * @param {Array<Object>} props.actions
@@ -39,43 +39,54 @@ export default function PickerSidebar({
 }) {
 	const [groupId, setGroupId] = useState(null);
 	const [subAppId, setSubAppId] = useState(null);
-	const usesGroups = appUsesGroups(kind, appId);
-	const usesGroupedSections = appUsesGroupedSections(kind, appId, subAppId);
+	const pickerKind =
+		kind === 'branch-action' ||
+		kind === 'edge-insert' ||
+		kind === 'edge-branch-insert'
+			? 'action'
+			: kind;
+	const usesGroups = appUsesGroups(pickerKind, appId);
+	const usesGroupedSections = appUsesGroupedSections(pickerKind, appId, subAppId);
 	const groups = useMemo(
-		() => getGroupsForApp(kind, appId, triggers),
-		[kind, appId, triggers]
+		() => getGroupsForApp(pickerKind, appId, triggers),
+		[pickerKind, appId, triggers]
 	);
 	const subApps = useMemo(
-		() => getSubAppsForPicker(kind, appId, actions),
-		[kind, appId, actions]
+		() => getSubAppsForPicker(pickerKind, appId, actions),
+		[pickerKind, appId, actions]
 	);
 	const groupedItems = useMemo(
-		() => getGroupedItemsForPicker(kind, appId, subAppId, triggers, actions),
-		[kind, appId, subAppId, triggers, actions]
+		() => getGroupedItemsForPicker(pickerKind, appId, subAppId, triggers, actions),
+		[pickerKind, appId, subAppId, triggers, actions]
 	);
 	const items = useMemo(
-		() => getItemsForPicker(kind, appId, groupId, subAppId, triggers, actions),
-		[kind, appId, groupId, subAppId, triggers, actions]
+		() => getItemsForPicker(pickerKind, appId, groupId, subAppId, triggers, actions),
+		[pickerKind, appId, groupId, subAppId, triggers, actions]
 	);
 	const toolSections = useMemo(
 		() => (kind === 'agent-tool' ? getAgentToolPickerSections(actions) : []),
 		[kind, actions]
 	);
 	const showGroups = usesGroups && !groupId;
-	const showCommunicationList = kind === 'action' && appId === 'communication' && !subAppId;
-	const category = categoryForKind(kind);
-	const appLabel = getAppLabel(kind, appId, subAppId);
+	const showCommunicationList =
+		pickerKind === 'action' && appId === 'communication' && !subAppId;
+	const category = categoryForKind(pickerKind);
+	const appLabel = getAppLabel(pickerKind, appId, subAppId);
 	const metaAppId = subAppId || appId;
 	const title =
 		kind === 'agent-chat-model'
 			? __('Select chat model', 'workflow-automate')
 			: kind === 'agent-tool'
 				? __('Add tool to agent', 'workflow-automate')
-				: showGroups
-					? __('Choose a group', 'workflow-automate')
-					: usesGroupedSections
-						? appLabel
-						: __('Choose a node', 'workflow-automate');
+				: kind === 'branch-action'
+					? __('Add step to branch', 'workflow-automate')
+					: kind === 'edge-insert' || kind === 'edge-branch-insert'
+						? __('Add step between nodes', 'workflow-automate')
+						: showGroups
+						? __('Choose a group', 'workflow-automate')
+						: usesGroupedSections
+							? appLabel
+							: __('Choose a node', 'workflow-automate');
 	const replaceHint =
 		kind === 'trigger' && hasExistingTrigger && !showGroups
 			? __('Selecting a trigger replaces your current one.', 'workflow-automate')

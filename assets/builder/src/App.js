@@ -7,6 +7,13 @@ import Canvas from './components/Canvas';
 import ConfigPanel from './components/ConfigPanel';
 import PickerSidebar from './components/PickerSidebar';
 import useTestFlow from './hooks/useTestFlow';
+import {
+	useBranchConnectionDrag,
+	clientToCanvasPoint,
+	nodeIdFromPointer,
+	branchPortPosition,
+	portPositionFromElement,
+} from './hooks/useBranchConnectionDrag';
 import { defaultConfigFor } from './nodeCatalog';
 import {
 	fetchWorkflow,
@@ -22,8 +29,27 @@ import {
 	generateNodeId,
 	emptyGraph,
 	sortNodesForFlow,
-	insertNodeInFlow,
 } from './utils';
+import {
+	createEmptyConditionRow,
+	defaultBranchNodePosition,
+	getConditionRows,
+	setConditionBranchTarget,
+	clearConditionBranchTarget,
+	conditionOutputPortPosition,
+	CONDITION_NODE_WIDTH,
+} from './utils/conditionBranches';
+import {
+	canConnectFlowNodes,
+	inferLegacyFlowConnections,
+	placementForNewNode,
+	nodeOutputPortPosition,
+	removeConnectionsForNode,
+	removeFlowConnection,
+	insertNodeBetweenFlow,
+	positionBetweenNodes,
+	setFlowConnection,
+} from './utils/flowConnections';
 import {
 	removeAgentAttachments,
 	toolAttachmentPosition,
@@ -56,6 +82,15 @@ function normalizeGraph(graph) {
 	}
 
 	const nodes = Array.isArray(graph.nodes) ? [...graph.nodes] : [];
+	const mainNodes = nodes.filter((node) => !node.parent_agent_id);
+	let connections = Array.isArray(graph.connections)
+		? [...graph.connections]
+		: [];
+
+	if (connections.length === 0 && mainNodes.length > 1) {
+		connections = inferLegacyFlowConnections(mainNodes);
+	}
+
 	const triggerNodes = nodes.filter((node) => node.category === 'trigger');
 
 	// A workflow may only have one trigger — keep the topmost if legacy data has more.
@@ -66,15 +101,13 @@ function normalizeGraph(graph) {
 			nodes: nodes.filter(
 				(node) => node.category !== 'trigger' || node.id === keepId
 			),
-			connections: Array.isArray(graph.connections)
-				? graph.connections
-				: [],
+			connections,
 		};
 	}
 
 	return {
 		nodes,
-		connections: Array.isArray(graph.connections) ? graph.connections : [],
+		connections,
 	};
 }
 
@@ -94,6 +127,8 @@ export default function App() {
 	const [workflowStatus, setWorkflowStatus] = useState(0);
 	const [toggleActiveBusy, setToggleActiveBusy] = useState(false);
 	const [picker, setPicker] = useState(null);
+	const [connectionDrag, setConnectionDrag] = useState(null);
+	const [selectedConnection, setSelectedConnection] = useState(null);
 	const [capturedPayload, setCapturedPayload] = useState(null);
 	const [capturedAt, setCapturedAt] = useState(null);
 
@@ -111,6 +146,7 @@ export default function App() {
 	const autosaveTimeoutRef = useRef(null);
 	const nodeElementsRef = useRef({});
 	const focusNodeIdRef = useRef(null);
+	const canvasRef = useRef(null);
 
 	useEffect(() => {
 		latestRef.current = { title, graph, workflowId, selectedNodeId };
@@ -121,6 +157,16 @@ export default function App() {
 	useEffect(() => {
 		const onKeyDown = (event) => {
 			if (event.key === 'Escape') {
+				if (connectionDrag) {
+					setConnectionDrag(null);
+					return;
+				}
+
+				if (selectedConnection) {
+					setSelectedConnection(null);
+					return;
+				}
+
 				if (picker) {
 					setPicker(null);
 					return;
@@ -135,7 +181,7 @@ export default function App() {
 		return () => {
 			window.removeEventListener('keydown', onKeyDown);
 		};
-	}, [picker]);
+	}, [picker, connectionDrag, selectedConnection]);
 
 	// After adding a node, move focus to its card so keyboard users land
 	// on the new element without hunting for it.
@@ -521,6 +567,18 @@ export default function App() {
 			config: defaultConfigFor(nodeTypeDefinition),
 		};
 
+		if (nodeTypeDefinition.slug === 'condition_action') {
+			const conditions = newNode.config.conditions;
+
+			newNode.config = {
+				...newNode.config,
+				conditions:
+					Array.isArray(conditions) && conditions.length > 0
+						? conditions
+						: [createEmptyConditionRow()],
+			};
+		}
+
 		focusNodeIdRef.current = newNode.id;
 
 		const insertAfterId = latestRef.current.selectedNodeId;
@@ -529,44 +587,578 @@ export default function App() {
 			const mainNodes = current.nodes.filter(
 				(node) => !node.parent_agent_id
 			);
-			const { position, nodes: shiftedNodes } = insertNodeInFlow(
-				mainNodes,
-				insertAfterId
-			);
+			const position = placementForNewNode(mainNodes, insertAfterId);
 			const newNodeWithPosition = {
 				...newNode,
 				x: position.x,
 				y: position.y,
 			};
-			const ordered = sortNodesForFlow(shiftedNodes);
-			let insertIndex = ordered.length;
-
-			if (insertAfterId) {
-				const afterIndex = ordered.findIndex(
-					(node) => node.id === insertAfterId
-				);
-
-				if (afterIndex >= 0) {
-					insertIndex = afterIndex + 1;
-				}
-			}
-
-			ordered.splice(insertIndex, 0, newNodeWithPosition);
-
 			const attachmentNodes = current.nodes.filter(
 				(node) => node.parent_agent_id
 			);
 
 			return {
 				...current,
-				nodes: [...ordered, ...attachmentNodes],
+				nodes: [...mainNodes, newNodeWithPosition, ...attachmentNodes],
 			};
 		});
 
 		setSelectedNodeId(newNode.id);
 	};
 
+	const handleAddCondition = (conditionNodeId, insertIndex = null) => {
+		setGraph((current) => ({
+			...current,
+			nodes: current.nodes.map((node) => {
+				if (node.id !== conditionNodeId) {
+					return node;
+				}
+
+				const rows = [...getConditionRows(node.config || {})];
+				const nextRow = createEmptyConditionRow();
+				const index =
+					insertIndex === null ? rows.length : insertIndex;
+
+				rows.splice(index, 0, nextRow);
+
+				return {
+					...node,
+					config: {
+						...node.config,
+						conditions: rows,
+					},
+				};
+			}),
+		}));
+	};
+
+	const handleRemoveCondition = (conditionNodeId, conditionId) => {
+		setGraph((current) => ({
+			...current,
+			nodes: current.nodes.map((node) => {
+				if (node.id !== conditionNodeId) {
+					return node;
+				}
+
+				const rows = getConditionRows(node.config || {}).filter(
+					(row) => row.id !== conditionId
+				);
+
+				return {
+					...node,
+					config: {
+						...node.config,
+						conditions: rows,
+					},
+				};
+			}),
+		}));
+	};
+
+	const handleAddNodeOnBranch = (conditionNodeId, branchId) => {
+		setConnectionDrag(null);
+		setPicker({
+			kind: 'branch-action',
+			conditionNodeId,
+			branchId,
+			appId: 'communication',
+		});
+		setSelectedNodeId(conditionNodeId);
+	};
+
+	const isValidBranchDropTarget = (targetNodeId, conditionNodeId) => {
+		const targetNode = latestRef.current.graph.nodes.find(
+			(node) => node.id === targetNodeId
+		);
+
+		return Boolean(
+			targetNode &&
+				!targetNode.parent_agent_id &&
+				targetNode.category !== 'trigger' &&
+				targetNode.id !== conditionNodeId
+		);
+	};
+
+	const isValidFlowDropTarget = (targetNodeId, fromNodeId) => {
+		const nodes = latestRef.current.graph.nodes;
+		const fromNode = nodes.find((node) => node.id === fromNodeId);
+		const toNode = nodes.find((node) => node.id === targetNodeId);
+
+		return canConnectFlowNodes(fromNode, toNode);
+	};
+
+	const handleConnectFlowDirect = (fromNodeId, toNodeId) => {
+		const nodes = latestRef.current.graph.nodes;
+		const fromNode = nodes.find((node) => node.id === fromNodeId);
+		const toNode = nodes.find((node) => node.id === toNodeId);
+
+		if (!canConnectFlowNodes(fromNode, toNode)) {
+			return;
+		}
+
+		setGraph((current) => ({
+			...current,
+			connections: setFlowConnection(
+				current.connections,
+				fromNodeId,
+				toNodeId
+			),
+		}));
+		setPicker(null);
+		setConnectionDrag(null);
+	};
+
+	const handleConnectBranchDirect = (
+		conditionNodeId,
+		branchId,
+		targetNodeId
+	) => {
+		setGraph((current) => ({
+			...current,
+			nodes: current.nodes.map((node) =>
+				node.id === conditionNodeId
+					? {
+							...node,
+							config: setConditionBranchTarget(
+								node.config || {},
+								branchId,
+								targetNodeId
+							),
+						}
+					: node
+			),
+		}));
+		setPicker(null);
+		setConnectionDrag(null);
+		setSelectedNodeId(conditionNodeId);
+	};
+
+	const handleStartFlowConnectionDrag = (fromNodeId, event) => {
+		const fromNode = latestRef.current.graph.nodes.find(
+			(node) => node.id === fromNodeId
+		);
+
+		if (!fromNode) {
+			return;
+		}
+
+		const from = nodeOutputPortPosition(fromNode);
+		const pointer = clientToCanvasPoint(
+			canvasRef.current,
+			event.clientX,
+			event.clientY
+		);
+
+		setPicker(null);
+		setConnectionDrag({
+			kind: 'flow',
+			fromNodeId,
+			from,
+			pointer,
+			hoverTargetNodeId: null,
+		});
+	};
+
+	const handleStartBranchConnectionDrag = (
+		conditionNodeId,
+		branchId,
+		event
+	) => {
+		const portElement = event.currentTarget;
+		const from =
+			portPositionFromElement(portElement, canvasRef.current) ||
+			branchPortPosition(
+				latestRef.current.graph.nodes,
+				conditionNodeId,
+				branchId
+			);
+
+		if (!from) {
+			return;
+		}
+
+		const pointer = clientToCanvasPoint(
+			canvasRef.current,
+			event.clientX,
+			event.clientY
+		);
+
+		setPicker(null);
+		setConnectionDrag({
+			kind: 'branch',
+			conditionNodeId,
+			branchId,
+			from,
+			pointer,
+			hoverTargetNodeId: null,
+		});
+	};
+
+	const handleConnectionDragMove = useCallback((event) => {
+		const pointer = clientToCanvasPoint(
+			canvasRef.current,
+			event.clientX,
+			event.clientY
+		);
+
+		setConnectionDrag((current) => {
+			if (!current) {
+				return null;
+			}
+
+			const excludeNodeIds =
+				current.kind === 'branch'
+					? [current.conditionNodeId]
+					: current.kind === 'flow'
+						? [current.fromNodeId]
+						: [];
+			const hoverTargetNodeId = nodeIdFromPointer(
+				event.clientX,
+				event.clientY,
+				{ excludeNodeIds }
+			);
+
+			return {
+				...current,
+				pointer,
+				hoverTargetNodeId,
+			};
+		});
+	}, []);
+
+	const handleConnectionDragEnd = useCallback(
+		(event) => {
+			setConnectionDrag((current) => {
+				if (!current) {
+					return null;
+				}
+
+				const excludeNodeIds =
+					current.kind === 'branch'
+						? [current.conditionNodeId]
+						: current.kind === 'flow'
+							? [current.fromNodeId]
+							: [];
+				const targetNodeId = nodeIdFromPointer(
+					event.clientX,
+					event.clientY,
+					{ excludeNodeIds }
+				);
+
+				if (current.kind === 'branch') {
+					if (
+						targetNodeId &&
+						isValidBranchDropTarget(
+							targetNodeId,
+							current.conditionNodeId
+						)
+					) {
+						queueMicrotask(() =>
+							handleConnectBranchDirect(
+								current.conditionNodeId,
+								current.branchId,
+								targetNodeId
+							)
+						);
+					}
+				} else if (
+					targetNodeId &&
+					isValidFlowDropTarget(targetNodeId, current.fromNodeId)
+				) {
+					queueMicrotask(() =>
+						handleConnectFlowDirect(
+							current.fromNodeId,
+							targetNodeId
+						)
+					);
+				}
+
+				return null;
+			});
+		},
+		[handleConnectBranchDirect, handleConnectFlowDirect]
+	);
+
+	useBranchConnectionDrag(
+		connectionDrag,
+		handleConnectionDragMove,
+		handleConnectionDragEnd
+	);
+
+	const handleSelectConnection = (edge) => {
+		setPicker(null);
+		setConnectionDrag(null);
+		setSelectedNodeId(null);
+		setSelectedConnection({
+			id: edge.id,
+			kind: edge.kind,
+			fromNodeId: edge.fromNodeId,
+			toNodeId: edge.toNodeId,
+			conditionNodeId: edge.conditionNodeId,
+			branchId: edge.branchId,
+			targetNodeId: edge.targetNodeId,
+		});
+	};
+
+	const handleDeleteConnection = (edge) => {
+		if (edge.kind === 'branch') {
+			handleDisconnectBranch(edge.conditionNodeId, edge.branchId);
+		} else {
+			setGraph((current) => ({
+				...current,
+				connections: removeFlowConnection(current.connections, edge.id),
+			}));
+		}
+
+		setSelectedConnection(null);
+	};
+
+	const handleInsertOnConnection = (edge) => {
+		setSelectedConnection({
+			id: edge.id,
+			kind: edge.kind,
+			fromNodeId: edge.fromNodeId,
+			toNodeId: edge.toNodeId,
+			conditionNodeId: edge.conditionNodeId,
+			branchId: edge.branchId,
+			targetNodeId: edge.targetNodeId,
+		});
+		setSelectedNodeId(null);
+
+		if (edge.kind === 'branch') {
+			setPicker({
+				kind: 'edge-branch-insert',
+				conditionNodeId: edge.conditionNodeId,
+				branchId: edge.branchId,
+				targetNodeId: edge.targetNodeId,
+				appId: 'communication',
+			});
+			return;
+		}
+
+		setPicker({
+			kind: 'edge-insert',
+			fromNodeId: edge.fromNodeId,
+			toNodeId: edge.toNodeId,
+			appId: 'communication',
+		});
+	};
+
+	const buildActionNode = (nodeTypeDefinition) => {
+		const newNode = {
+			id: generateNodeId(),
+			type: nodeTypeDefinition.slug,
+			category: 'action',
+			label: nodeTypeDefinition.label,
+			x: 0,
+			y: 0,
+			config: defaultConfigFor(nodeTypeDefinition),
+		};
+
+		if (nodeTypeDefinition.slug === 'condition_action') {
+			const conditions = newNode.config.conditions;
+
+			newNode.config = {
+				...newNode.config,
+				conditions:
+					Array.isArray(conditions) && conditions.length > 0
+						? conditions
+						: [createEmptyConditionRow()],
+			};
+		}
+
+		return newNode;
+	};
+
+	const handleInsertNodeOnEdge = (
+		nodeTypeDefinition,
+		fromNodeId,
+		toNodeId
+	) => {
+		setPicker(null);
+		setSelectedConnection(null);
+
+		const nodes = latestRef.current.graph.nodes;
+		const fromNode = nodes.find((node) => node.id === fromNodeId);
+		const toNode = nodes.find((node) => node.id === toNodeId);
+
+		if (!fromNode || !toNode) {
+			return;
+		}
+
+		const newNode = {
+			...buildActionNode(nodeTypeDefinition),
+			...positionBetweenNodes(fromNode, toNode),
+		};
+
+		focusNodeIdRef.current = newNode.id;
+
+		setGraph((current) => {
+			const attachmentNodes = current.nodes.filter(
+				(node) => node.parent_agent_id
+			);
+			const mainNodes = current.nodes.filter(
+				(node) => !node.parent_agent_id
+			);
+
+			return {
+				...current,
+				nodes: [...mainNodes, newNode, ...attachmentNodes],
+				connections: insertNodeBetweenFlow(
+					current.connections,
+					fromNodeId,
+					toNodeId,
+					newNode.id
+				),
+			};
+		});
+
+		setSelectedNodeId(newNode.id);
+	};
+
+	const handleInsertNodeOnBranchEdge = (
+		nodeTypeDefinition,
+		conditionNodeId,
+		branchId,
+		targetNodeId
+	) => {
+		setPicker(null);
+		setSelectedConnection(null);
+
+		const nodes = latestRef.current.graph.nodes;
+		const conditionNode = nodes.find((node) => node.id === conditionNodeId);
+		const targetNode = nodes.find((node) => node.id === targetNodeId);
+
+		if (!conditionNode || !targetNode) {
+			return;
+		}
+
+		const rows = getConditionRows(conditionNode.config || {});
+		const port = conditionOutputPortPosition(conditionNode, branchId, rows);
+		const fromStub = {
+			x: conditionNode.x + CONDITION_NODE_WIDTH,
+			y: port.y - 48,
+		};
+		const position = positionBetweenNodes(fromStub, targetNode);
+		const newNode = {
+			...buildActionNode(nodeTypeDefinition),
+			...position,
+		};
+
+		focusNodeIdRef.current = newNode.id;
+
+		setGraph((current) => ({
+			...current,
+			nodes: current.nodes
+				.map((node) =>
+					node.id === conditionNodeId
+						? {
+								...node,
+								config: setConditionBranchTarget(
+									node.config || {},
+									branchId,
+									newNode.id
+								),
+							}
+						: node
+				)
+				.concat(newNode),
+			connections: setFlowConnection(
+				current.connections,
+				newNode.id,
+				targetNodeId
+			),
+		}));
+
+		setSelectedNodeId(newNode.id);
+	};
+
+	const handleDisconnectBranch = (conditionNodeId, branchId) => {
+		setGraph((current) => ({
+			...current,
+			nodes: current.nodes.map((node) =>
+				node.id === conditionNodeId
+					? {
+							...node,
+							config: clearConditionBranchTarget(
+								node.config || {},
+								branchId
+							),
+						}
+					: node
+			),
+		}));
+	};
+
+	const handleAttachBranchNode = (
+		nodeTypeDefinition,
+		conditionNodeId,
+		branchId
+	) => {
+		setPicker(null);
+
+		const conditionNode = latestRef.current.graph.nodes.find(
+			(node) => node.id === conditionNodeId
+		);
+
+		if (!conditionNode) {
+			return;
+		}
+
+		const branchTargets = getConditionRows(conditionNode.config || {})
+			.map((row) => row.node_id)
+			.filter(Boolean);
+		const position = defaultBranchNodePosition(
+			conditionNode,
+			branchId,
+			branchTargets.length
+		);
+
+		const newNode = {
+			id: generateNodeId(),
+			type: nodeTypeDefinition.slug,
+			category: 'action',
+			label: nodeTypeDefinition.label,
+			x: position.x,
+			y: position.y,
+			config: defaultConfigFor(nodeTypeDefinition),
+		};
+
+		focusNodeIdRef.current = newNode.id;
+
+		setGraph((current) => ({
+			...current,
+			nodes: current.nodes
+				.map((node) =>
+					node.id === conditionNodeId
+						? {
+								...node,
+								config: setConditionBranchTarget(
+									node.config || {},
+									branchId,
+									newNode.id
+								),
+							}
+						: node
+				)
+				.concat(newNode),
+		}));
+
+		setSelectedNodeId(newNode.id);
+	};
+
 	const handleOpenPicker = (kind, appId) => {
+		if (kind === 'tool') {
+			const toolDef = nodeTypes.actions.find(
+				(action) => action.slug === appId
+			);
+
+			if (toolDef) {
+				handleAddNode(toolDef, 'action');
+				return;
+			}
+		}
+
 		setPicker({ kind, appId });
 		setSelectedNodeId(null);
 	};
@@ -873,6 +1465,10 @@ export default function App() {
 			return {
 				...current,
 				nodes,
+				connections: removeConnectionsForNode(
+					current.connections,
+					deletingId
+				),
 			};
 		});
 		setSelectedNodeId(null);
@@ -928,20 +1524,39 @@ export default function App() {
 				/>
 				<Canvas
 					nodes={graph.nodes}
+					connections={graph.connections}
 					knownTypeSlugs={knownTypeSlugs}
 					selectedNodeId={selectedNodeId}
+					connectionDrag={connectionDrag}
+					isValidBranchDropTarget={isValidBranchDropTarget}
+					isValidFlowDropTarget={isValidFlowDropTarget}
+					onRegisterCanvas={(element) => {
+						canvasRef.current = element;
+					}}
 					onSelectNode={(nodeId) => {
 						setPicker(null);
+						setConnectionDrag(null);
+						setSelectedConnection(null);
 						setSelectedNodeId(nodeId);
 					}}
 					onMoveNode={handleMoveNode}
 					onAddAgentChatModel={handleAddAgentChatModel}
 					onAddAgentMemory={handleAddAgentMemory}
 					onAddAgentTool={handleAddAgentTool}
+					onAddCondition={handleAddCondition}
+					onRemoveCondition={handleRemoveCondition}
+					onStartBranchConnectionDrag={handleStartBranchConnectionDrag}
+					onStartFlowConnectionDrag={handleStartFlowConnectionDrag}
+					onDisconnectBranch={handleDisconnectBranch}
+					selectedConnection={selectedConnection}
+					onSelectConnection={handleSelectConnection}
+					onDeleteConnection={handleDeleteConnection}
+					onInsertOnConnection={handleInsertOnConnection}
 					registerNodeRef={registerNodeRef}
 					onCanvasClick={(event) => {
 						if (event.target === event.currentTarget) {
 							setSelectedNodeId(null);
+							setSelectedConnection(null);
 						}
 					}}
 				/>
@@ -953,7 +1568,29 @@ export default function App() {
 						actions={nodeTypes.actions}
 						hasExistingTrigger={hasExistingTrigger}
 						onSelect={
-							picker.kind === 'agent-tool'
+							picker.kind === 'branch-action'
+								? (item) =>
+										handleAttachBranchNode(
+											item,
+											picker.conditionNodeId,
+											picker.branchId
+										)
+								: picker.kind === 'edge-insert'
+									? (item) =>
+											handleInsertNodeOnEdge(
+												item,
+												picker.fromNodeId,
+												picker.toNodeId
+											)
+									: picker.kind === 'edge-branch-insert'
+										? (item) =>
+												handleInsertNodeOnBranchEdge(
+													item,
+													picker.conditionNodeId,
+													picker.branchId,
+													picker.targetNodeId
+												)
+								: picker.kind === 'agent-tool'
 								? (item) =>
 										handleAttachAgentTool(
 											item,
