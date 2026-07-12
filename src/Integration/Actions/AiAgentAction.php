@@ -93,6 +93,12 @@ class AiAgentAction implements ActionInterface {
 				'label' => __( 'Require Specific Output Format', 'workflow-automate' ),
 				'default' => false,
 			),
+			'clean_output' => array(
+				'type' => 'boolean',
+				'label' => __( 'Clean output (strip markdown code fences)', 'workflow-automate' ),
+				'default' => true,
+				'help' => __( 'When enabled, {{output}} is cleaned for HTTP Request and other nodes. Raw model text stays in {{response}}.', 'workflow-automate' ),
+			),
 			'fallback_enabled' => array(
 				'type' => 'boolean',
 				'label' => __( 'Enable Fallback Model', 'workflow-automate' ),

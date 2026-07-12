@@ -49,11 +49,21 @@ class ConfigInterpolator {
 	 * @return array<string, mixed>
 	 */
 	public function interpolateConfig( array $config, array $context ): array {
+		$json_escape_body = $this->shouldJsonEscapeHttpBody( $config );
+
 		foreach ( $config as $key => $value ) {
 			if ( is_string( $value ) ) {
-				$config[ $key ] = $this->interpolateString( $value, $context );
+				$force_json = ( 'body' === $key && $json_escape_body )
+					|| $this->looksLikeJsonTemplate( $value );
+
+				$config[ $key ] = $this->interpolateString( $value, $context, $force_json );
 			} elseif ( is_array( $value ) ) {
-				$config[ $key ] = $this->interpolateConfig( $value, $context );
+				// Key/value HTTP body rows still need JSON-safe string values.
+				if ( 'body_parameters' === $key && $json_escape_body ) {
+					$config[ $key ] = $this->interpolateBodyParameters( $value, $context );
+				} else {
+					$config[ $key ] = $this->interpolateConfig( $value, $context );
+				}
 			}
 		}
 
@@ -61,49 +71,184 @@ class ConfigInterpolator {
 	}
 
 	/**
-	 * @param string               $template Config string that may contain `{{tokens}}`.
-	 * @param array<string, mixed> $context  Runtime context.
+	 * @param array<string, mixed> $config Node configuration.
+	 *
+	 * @return bool
+	 */
+	private function shouldJsonEscapeHttpBody( array $config ): bool {
+		$content_type = isset( $config['body_content_type'] )
+			? (string) $config['body_content_type']
+			: 'json';
+
+		if ( 'json' !== $content_type ) {
+			return false;
+		}
+
+		if ( array_key_exists( 'send_body', $config ) && ! $config['send_body'] ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param string $template Config string.
+	 *
+	 * @return bool
+	 */
+	private function looksLikeJsonTemplate( string $template ): bool {
+		$trimmed = ltrim( $template );
+
+		return str_starts_with( $trimmed, '{' ) || str_starts_with( $trimmed, '[' );
+	}
+
+	/**
+	 * @param array<int, mixed>    $rows    Body parameter rows.
+	 * @param array<string, mixed> $context Runtime context.
+	 *
+	 * @return array<int, mixed>
+	 */
+	private function interpolateBodyParameters( array $rows, array $context ): array {
+		foreach ( $rows as $index => $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			if ( isset( $row['name'] ) && is_string( $row['name'] ) ) {
+				$rows[ $index ]['name'] = $this->interpolateString( $row['name'], $context, false );
+			}
+
+			if ( isset( $row['value'] ) && is_string( $row['value'] ) ) {
+				// Values are later passed through wp_json_encode — keep raw text here.
+				$rows[ $index ]['value'] = $this->interpolateString( $row['value'], $context, false );
+			}
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * @param string               $template   Config string that may contain `{{tokens}}`.
+	 * @param array<string, mixed> $context    Runtime context.
+	 * @param bool                 $force_json Escape scalars for JSON string contexts.
 	 *
 	 * @return string
 	 */
-	public function interpolateString( string $template, array $context ): string {
+	public function interpolateString( string $template, array $context, bool $force_json = false ): string {
 		if ( false === strpos( $template, '{{' ) ) {
 			return $template;
 		}
 
-		return (string) preg_replace_callback(
-			'/\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/',
-			function ( array $matches ) use ( $context ): string {
-				$value = $this->resolvePath( $context, $matches[1] );
+		// Auto-detect JSON templates even when the caller did not opt in.
+		if ( ! $force_json && $this->looksLikeJsonTemplate( $template ) ) {
+			$force_json = true;
+		}
 
-				if ( null === $value ) {
-					return '';
+		$pattern = '/\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/';
+
+		if ( ! preg_match_all( $pattern, $template, $matches, PREG_OFFSET_CAPTURE ) ) {
+			return $template;
+		}
+
+		$result = '';
+		$cursor = 0;
+
+		foreach ( $matches[0] as $index => $match ) {
+			$token = $match[0];
+			$pos   = (int) $match[1];
+			$path  = (string) $matches[1][ $index ][0];
+
+			$result .= substr( $template, $cursor, $pos - $cursor );
+
+			$value = $this->resolvePath( $context, $path );
+
+			if ( null === $value ) {
+				$result .= $this->formatInterpolatedValue( '', $template, $pos, $force_json );
+			} elseif ( is_bool( $value ) ) {
+				$inside_json = $force_json && $this->isInsideJsonString( $template, $pos );
+				$result     .= $inside_json
+					? $this->formatInterpolatedValue( $value ? 'true' : 'false', $template, $pos, true )
+					: ( $value ? '1' : '0' );
+			} elseif ( is_scalar( $value ) ) {
+				$resolved = (string) $value;
+
+				if ( str_contains( $resolved, '<!-- wp:' ) ) {
+					$resolved = TriggerPayloadNormalizer::plainTextFromPostContent( $resolved );
 				}
 
-				if ( is_bool( $value ) ) {
-					return $value ? '1' : '0';
-				}
+				$result .= $this->formatInterpolatedValue( $resolved, $template, $pos, $force_json );
+			} elseif ( is_array( $value ) ) {
+				$encoded = wp_json_encode( $value );
+				$result .= is_string( $encoded ) ? $encoded : '';
+			}
 
-				if ( is_scalar( $value ) ) {
-					$resolved = (string) $value;
+			$cursor = $pos + strlen( $token );
+		}
 
-					if ( str_contains( $resolved, '<!-- wp:' ) ) {
-						return TriggerPayloadNormalizer::plainTextFromPostContent( $resolved );
-					}
+		$result .= substr( $template, $cursor );
 
-					return $resolved;
-				}
+		return $result;
+	}
 
-				if ( is_array( $value ) ) {
-					$encoded = wp_json_encode( $value );
+	/**
+	 * Formats a resolved token for insertion. When the token sits inside a
+	 * JSON string, control characters and quotes are escaped so the resulting
+	 * body remains valid JSON — matching how n8n injects expression results.
+	 *
+	 * @param string $value      Resolved scalar text.
+	 * @param string $template   Full template string.
+	 * @param int    $offset     Byte offset of the token in $template.
+	 * @param bool   $force_json Whether this template should use JSON escaping.
+	 *
+	 * @return string
+	 */
+	private function formatInterpolatedValue(
+		string $value,
+		string $template,
+		int $offset,
+		bool $force_json
+	): string {
+		if ( $force_json && $this->isInsideJsonString( $template, $offset ) ) {
+			$encoded = wp_json_encode( $value );
 
-					return is_string( $encoded ) ? $encoded : '';
-				}
-
+			if ( ! is_string( $encoded ) || strlen( $encoded ) < 2 ) {
 				return '';
-			},
-			$template
-		);
+			}
+
+			// Strip surrounding quotes — the template already provides them.
+			return substr( $encoded, 1, -1 );
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Returns true when $offset is inside a JSON double-quoted string,
+	 * including when whitespace surrounds the token (TokenField pills).
+	 *
+	 * @param string $template Full template.
+	 * @param int    $offset   Token start offset.
+	 *
+	 * @return bool
+	 */
+	private function isInsideJsonString( string $template, int $offset ): bool {
+		$in_string = false;
+		$length    = strlen( $template );
+
+		for ( $i = 0; $i < $offset && $i < $length; $i++ ) {
+			$char = $template[ $i ];
+
+			if ( '\\' === $char && $in_string ) {
+				++$i;
+				continue;
+			}
+
+			if ( '"' === $char ) {
+				$in_string = ! $in_string;
+			}
+		}
+
+		return $in_string;
 	}
 
 	/**

@@ -113,20 +113,24 @@ class WorkflowNodeTestService {
 			);
 		}
 
-		if ( array() === $trigger_payload ) {
-			return array(
-				'success' => false,
-				'kind' => 'action',
-				'error' => __( 'No captured trigger data yet. Listen for a trigger response before testing action nodes.', 'workflow-automate' ),
-			);
-		}
-
 		$context = array(
-			'trigger' => $trigger_payload,
-			'nodes' => array(),
+			'trigger'     => $trigger_payload,
+			'nodes'       => array(),
 			'workflow_id' => $workflow_id,
-			'graph' => $graph,
+			'graph'       => $graph,
 		);
+
+		// Static configs (no {{tokens}}) can be tested without trigger sample
+		// or prior-node outputs — matches "Test node" with a fixed HTTP body.
+		if ( ! $this->configUsesTokens( $target ) ) {
+			$node_context = array_merge(
+				$context,
+				array( 'current_node_id' => (string) $target['id'] )
+			);
+			$raw = $this->runActionNode( $workflow_id, $target, $node_context );
+
+			return $this->formatActionTestResponse( $target, $node_context, $raw );
+		}
 
 		foreach ( $sorted as $graph_node ) {
 			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) || empty( $graph_node['type'] ) ) {
@@ -198,6 +202,27 @@ class WorkflowNodeTestService {
 			$this->workflowNodeFromGraph( $workflow_id, $graph_node ),
 			$context
 		);
+	}
+
+	/**
+	 * Whether the node config references runtime tokens (trigger / prior nodes).
+	 *
+	 * @param array<string, mixed> $graph_node Graph node entry.
+	 *
+	 * @return bool
+	 */
+	private function configUsesTokens( array $graph_node ): bool {
+		$config = isset( $graph_node['config'] ) && is_array( $graph_node['config'] )
+			? $graph_node['config']
+			: array();
+
+		$encoded = wp_json_encode( $config );
+
+		if ( ! is_string( $encoded ) || '' === $encoded ) {
+			return false;
+		}
+
+		return false !== strpos( $encoded, '{{' );
 	}
 
 	/**

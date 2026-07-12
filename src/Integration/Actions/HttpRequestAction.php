@@ -302,10 +302,36 @@ class HttpRequestAction implements ActionInterface {
 
 			case 'json':
 			default:
-				$args['body'] = $body;
+				$args['body'] = $this->sanitizeJsonBody( $body );
 				$this->ensureContentType( $args, 'application/json' );
 				break;
 		}
+	}
+
+	/**
+	 * Ensures the JSON body is valid. If interpolation left raw control
+	 * characters inside strings, re-encode via json_decode/encode when possible.
+	 *
+	 * @param string $body Request body.
+	 *
+	 * @return string
+	 */
+	private function sanitizeJsonBody( string $body ): string {
+		$trimmed = trim( $body );
+
+		if ( '' === $trimmed ) {
+			return $body;
+		}
+
+		$decoded = json_decode( $trimmed, true );
+
+		if ( JSON_ERROR_NONE === json_last_error() && ( is_array( $decoded ) || is_object( $decoded ) ) ) {
+			$encoded = wp_json_encode( $decoded );
+
+			return is_string( $encoded ) ? $encoded : $trimmed;
+		}
+
+		return $body;
 	}
 
 	/**

@@ -210,6 +210,13 @@ class AgentService {
 		}
 
 		$loop['response'] = $response;
+		// n8n-compatible fields for downstream nodes (HTTP Request, etc.).
+		$clean_output     = $this->buildCleanOutput( $response, $config );
+		$loop['output']   = $clean_output;
+		// Structured payload: {{nodes.X.json}} encodes as {"output":"..."}.
+		$loop['json']     = array(
+			'output' => $clean_output,
+		);
 
 		if ( empty( $loop['provider'] ) ) {
 			$loop['provider'] = $chat['provider'];
@@ -383,6 +390,8 @@ class AgentService {
 			$output = array(
 				'success'  => true,
 				'response' => '',
+				'output'   => '',
+				'json'     => array( 'output' => '' ),
 				'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ) ),
 			);
 
@@ -391,7 +400,10 @@ class AgentService {
 			}
 
 			if ( ! empty( $settings['always_output_data'] ) ) {
-				$output['response'] = wp_json_encode( $output ) ?: '{}';
+				$encoded            = wp_json_encode( $output ) ?: '{}';
+				$output['response'] = $encoded;
+				$output['output']   = $encoded;
+				$output['json']     = array( 'output' => $encoded );
 			}
 
 			return $output;
@@ -816,6 +828,8 @@ class AgentService {
 
 		if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {
 			$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'workflow-automate' );
+		} elseif ( empty( $attachments['tools'] ) ) {
+			$parts[] = __( 'Reply with the final answer as plain text only — a single short string. Never return Python, JavaScript, curl, HTTP examples, markdown code fences, or wrappers. If the user asks for a joke, return only the joke words.', 'workflow-automate' );
 		}
 
 		return implode( "\n\n", $parts );
@@ -850,6 +864,232 @@ class AgentService {
 			. "\n```json\n"
 			. $trigger_json
 			. "\n```";
+	}
+
+	/**
+	 * Builds the downstream `output` value from the raw model response.
+	 *
+	 * @param string               $response Raw model text.
+	 * @param array<string, mixed> $config   Agent config.
+	 *
+	 * @return string
+	 */
+	private function buildCleanOutput( string $response, array $config ): string {
+		$clean_enabled = ! array_key_exists( 'clean_output', $config ) || ! empty( $config['clean_output'] );
+
+		if ( ! $clean_enabled ) {
+			return $this->normalizeOutputForTransport( $response );
+		}
+
+		$stripped  = $this->stripMarkdownFences( $response );
+		$extracted = $this->extractUsefulText( $stripped );
+		$text      = '' !== $extracted ? $extracted : $stripped;
+
+		return $this->normalizeOutputForTransport( $text );
+	}
+
+	/**
+	 * Makes agent text safe to embed in JSON / HTTP bodies: collapses control
+	 * characters and trims whitespace so downstream nodes receive a single-line string.
+	 *
+	 * @param string $text Cleaned model text.
+	 *
+	 * @return string
+	 */
+	private function normalizeOutputForTransport( string $text ): string {
+		$text = str_replace( array( "\r\n", "\r", "\n", "\t" ), ' ', $text );
+		$stripped = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text );
+		$text     = is_string( $stripped ) ? $stripped : $text;
+		$collapsed = preg_replace( '/\s+/', ' ', $text );
+		$text      = is_string( $collapsed ) ? $collapsed : $text;
+
+		return trim( $text );
+	}
+
+	/**
+	 * Removes surrounding markdown code fences so HTTP Request / Set nodes
+	 * receive plain usable text instead of ```python ... ``` wrappers.
+	 *
+	 * @param string $text Raw model text.
+	 *
+	 * @return string
+	 */
+	private function stripMarkdownFences( string $text ): string {
+		$trimmed = trim( $text );
+
+		if ( '' === $trimmed ) {
+			return '';
+		}
+
+		// Whole reply is a single fenced block.
+		if ( preg_match( '/^```[a-zA-Z0-9_-]*\s*\r?\n([\s\S]*?)\r?\n```$/', $trimmed, $matches ) ) {
+			return trim( (string) $matches[1] );
+		}
+
+		// One or more fenced blocks inside other text — prefer first fence body
+		// when it is the dominant content.
+		if ( preg_match( '/```[a-zA-Z0-9_-]*\s*\r?\n([\s\S]*?)\r?\n```/', $trimmed, $matches ) ) {
+			$inner = trim( (string) $matches[1] );
+			$without_fences = trim(
+				(string) preg_replace( '/```[a-zA-Z0-9_-]*\s*\r?\n[\s\S]*?\r?\n```/', '', $trimmed )
+			);
+
+			if ( '' === $without_fences || strlen( $inner ) >= strlen( $without_fences ) ) {
+				return $inner;
+			}
+		}
+
+		// Strip leftover fence markers if the model omitted closing fences.
+		$trimmed = (string) preg_replace( '/^```[a-zA-Z0-9_-]*\s*\r?\n?/', '', $trimmed );
+		$trimmed = (string) preg_replace( '/\r?\n?```$/', '', $trimmed );
+
+		return trim( $trimmed );
+	}
+
+	/**
+	 * Pulls the useful human answer out of code-shaped model replies.
+	 *
+	 * Example input:
+	 *   import requests
+	 *   requests.get("...", params={"joke": "Parallel lines have so much in common. Shame."})
+	 *
+	 * Example output:
+	 *   Parallel lines have so much in common. Shame.
+	 *
+	 * @param string $text Fence-stripped model text.
+	 *
+	 * @return string Empty string when no better value was found.
+	 */
+	private function extractUsefulText( string $text ): string {
+		$trimmed = trim( $text );
+
+		if ( '' === $trimmed ) {
+			return '';
+		}
+
+		// Already plain text — keep as-is.
+		if ( ! $this->looksLikeCodeOrWrappedPayload( $trimmed ) ) {
+			return $trimmed;
+		}
+
+		// Prefer explicit answer keys (joke, output, message, …).
+		foreach ( array( 'joke', 'output', 'message', 'text', 'content', 'answer', 'result', 'name' ) as $key ) {
+			$value = $this->extractKeyedString( $trimmed, $key );
+
+			if ( '' !== $value ) {
+				return $value;
+			}
+		}
+
+		// JSON object with a single useful string field.
+		$json = json_decode( $trimmed, true );
+
+		if ( is_array( $json ) ) {
+			foreach ( array( 'joke', 'output', 'message', 'text', 'content', 'answer', 'result', 'name' ) as $key ) {
+				if ( isset( $json[ $key ] ) && is_scalar( $json[ $key ] ) ) {
+					$value = trim( (string) $json[ $key ] );
+
+					if ( '' !== $value ) {
+						return $value;
+					}
+				}
+			}
+		}
+
+		// Fallback: best non-URL quoted string inside the code.
+		$quoted = $this->extractBestQuotedString( $trimmed );
+
+		return $quoted;
+	}
+
+	/**
+	 * @param string $text Candidate text.
+	 *
+	 * @return bool
+	 */
+	private function looksLikeCodeOrWrappedPayload( string $text ): bool {
+		if ( preg_match( '/^\s*[{[]/', $text ) ) {
+			$decoded = json_decode( $text, true );
+
+			if ( is_array( $decoded ) ) {
+				return true;
+			}
+		}
+
+		return (bool) preg_match(
+			'/\b(import\s+\w+|from\s+\w+\s+import|requests\.|fetch\(|curl\s|def\s+\w+\s*\(|console\.log|params\s*=)/i',
+			$text
+		);
+	}
+
+	/**
+	 * @param string $text Source text.
+	 * @param string $key  Field name to extract.
+	 *
+	 * @return string
+	 */
+	private function extractKeyedString( string $text, string $key ): string {
+		$pattern = '/["\']?' . preg_quote( $key, '/' ) . '["\']?\s*[:=]\s*(["\'])(.*?)\1/s';
+
+		if ( ! preg_match( $pattern, $text, $matches ) ) {
+			return '';
+		}
+
+		$value = trim( (string) ( $matches[2] ?? '' ) );
+
+		if ( '' === $value || $this->looksLikeUrl( $value ) ) {
+			return '';
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param string $text Source text.
+	 *
+	 * @return string
+	 */
+	private function extractBestQuotedString( string $text ): string {
+		if ( ! preg_match_all( '/(["\'])([^"\']{8,400})\1/', $text, $matches ) ) {
+			return '';
+		}
+
+		$best       = '';
+		$best_score = -1;
+
+		foreach ( $matches[2] as $candidate ) {
+			$candidate = trim( (string) $candidate );
+
+			if ( '' === $candidate || $this->looksLikeUrl( $candidate ) ) {
+				continue;
+			}
+
+			$score = strlen( $candidate );
+
+			if ( preg_match( '/\s/', $candidate ) ) {
+				$score += 50;
+			}
+
+			if ( preg_match( '/[.!?]$/', $candidate ) ) {
+				$score += 20;
+			}
+
+			if ( $score > $best_score ) {
+				$best_score = $score;
+				$best       = $candidate;
+			}
+		}
+
+		return $best;
+	}
+
+	/**
+	 * @param string $value Candidate string.
+	 *
+	 * @return bool
+	 */
+	private function looksLikeUrl( string $value ): bool {
+		return (bool) preg_match( '#^https?://#i', $value );
 	}
 
 	/**

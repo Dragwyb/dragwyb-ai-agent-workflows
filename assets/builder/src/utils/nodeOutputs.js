@@ -6,7 +6,9 @@
 /** @type {Record<string, Array<{ key: string, preview?: string }>>} */
 const NODE_OUTPUT_FIELDS = {
 	ai_agent_action: [
-		{ key: 'response', preview: 'Agent reply' },
+		{ key: 'output', preview: 'Agent reply' },
+		{ key: 'json', preview: '{ "output": "Agent reply" }' },
+		{ key: 'response', preview: 'Agent reply (raw)' },
 		{ key: 'parsed', preview: '{ "key": "value" }' },
 		{ key: 'iterations', preview: '1' },
 		{ key: 'finish_reason', preview: 'stop' },

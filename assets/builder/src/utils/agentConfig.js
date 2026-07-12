@@ -49,6 +49,7 @@ export function normalizeAgentConfig(config = {}) {
 		prompt_source: config.prompt_source || PROMPT_SOURCE_DEFINE,
 		prompt: config.prompt ?? '',
 		require_output_format: Boolean(config.require_output_format),
+		clean_output: config.clean_output === undefined ? true : Boolean(config.clean_output),
 		fallback_enabled: Boolean(config.fallback_enabled),
 		system_prompt: config.system_prompt ?? '',
 		max_iterations: Number(config.max_iterations ?? 5),

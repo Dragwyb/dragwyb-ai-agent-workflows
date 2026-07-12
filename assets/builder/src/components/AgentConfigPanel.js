@@ -279,6 +279,21 @@ export default function AgentConfigPanel({
 					)}
 
 					<ToggleControl
+						label={__(
+							'Clean output (strip markdown)',
+							'workflow-automate'
+						)}
+						help={__(
+							'Removes ``` code fences from {{output}} so HTTP Request gets plain text. Raw reply stays in {{response}}.',
+							'workflow-automate'
+						)}
+						checked={config.clean_output}
+						onChange={(checked) =>
+							onChangeConfig('clean_output', checked)
+						}
+					/>
+
+					<ToggleControl
 						label={__('Enable Fallback Model', 'workflow-automate')}
 						checked={config.fallback_enabled}
 						onChange={(checked) =>

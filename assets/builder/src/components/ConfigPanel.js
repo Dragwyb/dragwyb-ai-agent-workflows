@@ -139,6 +139,7 @@ const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
 	'output_format',
 	'prompt_source',
 	'require_output_format',
+	'clean_output',
 	'fallback_enabled',
 	'options',
 	'settings',
