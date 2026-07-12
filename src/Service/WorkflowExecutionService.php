@@ -306,7 +306,12 @@ class WorkflowExecutionService {
 		$planner         = new GraphExecutionPlanner();
 		$main_path_ids   = $planner->getMainPathNodeIds( $graph_nodes, $graph_connections, $has_connections_key );
 		$branch_targets  = $planner->collectBranchTargetIds( $graph_nodes );
-		$pending_ids     = $main_path_ids;
+		$outgoing_map    = $has_connections_key ? $planner->buildOutgoingMap( $graph_connections ) : array();
+		$use_fan_out     = $has_connections_key && array() !== $graph_connections;
+		$trigger_id      = $planner->findTriggerId( $graph_nodes );
+		$pending_ids     = $use_fan_out && null !== $trigger_id && '' !== $trigger_id
+			? array( $trigger_id )
+			: $main_path_ids;
 		$visited         = array();
 		$nodes_by_client = array();
 
@@ -329,6 +334,15 @@ class WorkflowExecutionService {
 
 			if ( null !== $this->registry->trigger( $node->nodeType() ) ) {
 				$visited[ $client_id ] = true;
+
+				if ( $use_fan_out ) {
+					foreach ( array_reverse( $planner->getOutgoingTargets( $outgoing_map, $client_id ) ) as $next_id ) {
+						if ( ! isset( $visited[ $next_id ] ) ) {
+							array_unshift( $pending_ids, $next_id );
+						}
+					}
+				}
+
 				continue;
 			}
 
@@ -390,6 +404,17 @@ class WorkflowExecutionService {
 				foreach ( array_reverse( $branch_ids ) as $branch_id ) {
 					if ( ! isset( $visited[ $branch_id ] ) ) {
 						array_unshift( $pending_ids, $branch_id );
+					}
+				}
+
+				continue;
+			}
+
+			if ( $use_fan_out ) {
+				// n8n-style: enqueue every node connected from this node's output.
+				foreach ( array_reverse( $planner->getOutgoingTargets( $outgoing_map, $client_id ) ) as $next_id ) {
+					if ( ! isset( $visited[ $next_id ] ) ) {
+						array_unshift( $pending_ids, $next_id );
 					}
 				}
 

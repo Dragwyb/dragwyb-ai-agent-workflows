@@ -142,12 +142,19 @@ export function inferLegacyFlowConnections(mainNodes) {
  * @return {Array<Object>}
  */
 export function setFlowConnection(connections, fromNodeId, toNodeId) {
-	const withoutSource = (connections || []).filter(
-		(connection) => connection.from !== fromNodeId
+	const list = connections || [];
+	const exists = list.some(
+		(connection) =>
+			connection.from === fromNodeId && connection.to === toNodeId
 	);
 
+	if (exists) {
+		return list;
+	}
+
+	// Allow multiple outgoing edges from the same source (n8n-style fan-out).
 	return [
-		...withoutSource,
+		...list,
 		{
 			id: generateNodeId(),
 			from: fromNodeId,

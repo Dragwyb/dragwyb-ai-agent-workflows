@@ -96,9 +96,50 @@ class GraphExecutionPlanner {
 	 * @return string[]
 	 */
 	private function getMainPathNodeIdsByConnections( array $graph_nodes, array $connections ): array {
-		$main_nodes     = $this->mainCanvasNodes( $graph_nodes );
+		$outgoing   = $this->buildOutgoingMap( $connections );
+		$trigger_id = $this->findTriggerId( $graph_nodes );
+
+		if ( null === $trigger_id || '' === $trigger_id ) {
+			return $this->getMainPathNodeIdsByPosition( $graph_nodes );
+		}
+
 		$branch_targets = $this->collectBranchTargetIds( $graph_nodes );
-		$outgoing       = array();
+		$path           = array();
+		$queue          = array( $trigger_id );
+		$visited        = array();
+
+		while ( array() !== $queue ) {
+			$current = (string) array_shift( $queue );
+
+			if ( '' === $current || isset( $visited[ $current ] ) ) {
+				continue;
+			}
+
+			$visited[ $current ] = true;
+
+			if ( ! isset( $branch_targets[ $current ] ) ) {
+				$path[] = $current;
+			}
+
+			foreach ( $outgoing[ $current ] ?? array() as $next ) {
+				if ( ! isset( $visited[ $next ] ) ) {
+					$queue[] = $next;
+				}
+			}
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Builds from → [to, to, …] adjacency for fan-out execution.
+	 *
+	 * @param array<int, mixed> $connections Explicit connections.
+	 *
+	 * @return array<string, string[]>
+	 */
+	public function buildOutgoingMap( array $connections ): array {
+		$outgoing = array();
 
 		foreach ( $connections as $connection ) {
 			if ( ! is_array( $connection ) ) {
@@ -108,39 +149,49 @@ class GraphExecutionPlanner {
 			$from = isset( $connection['from'] ) ? trim( (string) $connection['from'] ) : '';
 			$to   = isset( $connection['to'] ) ? trim( (string) $connection['to'] ) : '';
 
-			if ( '' !== $from && '' !== $to ) {
-				$outgoing[ $from ] = $to;
+			if ( '' === $from || '' === $to ) {
+				continue;
+			}
+
+			if ( ! isset( $outgoing[ $from ] ) ) {
+				$outgoing[ $from ] = array();
+			}
+
+			if ( ! in_array( $to, $outgoing[ $from ], true ) ) {
+				$outgoing[ $from ][] = $to;
 			}
 		}
 
-		$trigger_id = null;
+		return $outgoing;
+	}
 
-		foreach ( $main_nodes as $graph_node ) {
+	/**
+	 * @param array<int, mixed> $graph_nodes Raw graph nodes.
+	 *
+	 * @return string|null
+	 */
+	public function findTriggerId( array $graph_nodes ): ?string {
+		foreach ( $this->mainCanvasNodes( $graph_nodes ) as $graph_node ) {
 			if ( ( $graph_node['category'] ?? '' ) === 'trigger' ) {
-				$trigger_id = (string) ( $graph_node['id'] ?? '' );
-				break;
+				$id = (string) ( $graph_node['id'] ?? '' );
+
+				if ( '' !== $id ) {
+					return $id;
+				}
 			}
 		}
 
-		if ( null === $trigger_id || '' === $trigger_id ) {
-			return $this->getMainPathNodeIdsByPosition( $graph_nodes );
-		}
+		return null;
+	}
 
-		$path     = array();
-		$current  = $trigger_id;
-		$visited  = array();
-
-		while ( '' !== $current && ! isset( $visited[ $current ] ) ) {
-			$visited[ $current ] = true;
-
-			if ( ! isset( $branch_targets[ $current ] ) ) {
-				$path[] = $current;
-			}
-
-			$current = $outgoing[ $current ] ?? '';
-		}
-
-		return $path;
+	/**
+	 * @param array<string, string[]> $outgoing Outgoing map.
+	 * @param string                  $from_id  Source node id.
+	 *
+	 * @return string[]
+	 */
+	public function getOutgoingTargets( array $outgoing, string $from_id ): array {
+		return $outgoing[ $from_id ] ?? array();
 	}
 
 	/**
