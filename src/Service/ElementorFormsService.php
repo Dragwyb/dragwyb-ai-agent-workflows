@@ -113,6 +113,359 @@ final class ElementorFormsService {
 	}
 
 	/**
+	 * Builds a sample trigger payload (field keys with empty values) for the
+	 * variable picker — no Listen / form submit required.
+	 *
+	 * @param string $form_id Elementor form element id (empty = first form found).
+	 * @param bool   $atomic  True for atomic e-form elements.
+	 *
+	 * @return array{success: bool, payload?: array<string, mixed>, error?: string}
+	 */
+	public function samplePayloadForForm( string $form_id = '', bool $atomic = false ): array {
+		$form = $this->findForm( $form_id, $atomic );
+
+		if ( null === $form ) {
+			return array(
+				'success' => false,
+				'error'   => $atomic
+					? __( 'No Elementor atomic form was found for the variable picker.', 'workflow-automate' )
+					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'workflow-automate' ),
+			);
+		}
+
+		$fields = array();
+
+		foreach ( $form['field_ids'] as $field_id ) {
+			$fields[ $field_id ] = '';
+		}
+
+		$source = $atomic ? 'elementor-atomic' : 'elementor';
+
+		$payload = array(
+			'source'       => $source,
+			'event'        => 'form_submitted',
+			'form_name'    => $form['form_name'],
+			'form_id'      => $form['form_id'],
+			'form_post_id' => (string) $form['post_id'],
+			'fields'       => $fields,
+		);
+
+		if ( $atomic ) {
+			$payload['fields_by_label'] = array();
+
+			foreach ( $form['field_labels'] as $label => $field_id ) {
+				$payload['fields_by_label'][ $label ] = '';
+			}
+		}
+
+		return array(
+			'success' => true,
+			'payload' => $payload,
+		);
+	}
+
+	/**
+	 * @param string $form_id Preferred form id (empty = first match).
+	 * @param bool   $atomic  Atomic form mode.
+	 *
+	 * @return array{form_id: string, form_name: string, post_id: int, field_ids: array<int, string>, field_labels: array<string, string>}|null
+	 */
+	private function findForm( string $form_id, bool $atomic ): ?array {
+		$matches_element = $atomic
+			? array( $this, 'isAtomicFormElement' )
+			: static function ( array $element ): bool {
+				return 'widget' === ( $element['elType'] ?? '' )
+					&& 'form' === ( $element['widgetType'] ?? '' );
+			};
+
+		$resolve_form_name = $atomic
+			? array( $this, 'resolveAtomicFormName' )
+			: static function ( array $settings ): string {
+				return trim( (string) ( $settings['form_name'] ?? '' ) );
+			};
+
+		$found = null;
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$post_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT DISTINCT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value <> '' AND meta_value <> %s",
+				'_elementor_data',
+				'[]'
+			)
+		);
+
+		if ( ! is_array( $post_ids ) ) {
+			$post_ids = array();
+		}
+
+		foreach ( $post_ids as $post_id ) {
+			$post_id = (int) $post_id;
+
+			if ( $post_id <= 0 ) {
+				continue;
+			}
+
+			$post = get_post( $post_id );
+
+			if ( ! $post instanceof \WP_Post ) {
+				continue;
+			}
+
+			if ( in_array( $post->post_status, array( 'trash', 'auto-draft', 'inherit' ), true ) ) {
+				continue;
+			}
+
+			$elements = $this->readElementsForPost( $post_id );
+
+			if ( null === $elements ) {
+				continue;
+			}
+
+			$match = $this->findFormInElements(
+				$elements,
+				$post_id,
+				$form_id,
+				$matches_element,
+				$resolve_form_name,
+				$atomic
+			);
+
+			if ( null === $match ) {
+				continue;
+			}
+
+			if ( '' !== $form_id ) {
+				if ( $match['form_id'] === $form_id ) {
+					return $match;
+				}
+
+				continue;
+			}
+
+			return $match;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<int|string, mixed>             $elements
+	 * @param int                                  $post_id
+	 * @param string                               $preferred_form_id
+	 * @param callable(array<string, mixed>): bool $matches_element
+	 * @param callable(array<string, mixed>): string $resolve_form_name
+	 * @param bool                                 $atomic
+	 *
+	 * @return array{form_id: string, form_name: string, post_id: int, field_ids: array<int, string>, field_labels: array<string, string>}|null
+	 */
+	private function findFormInElements(
+		array $elements,
+		int $post_id,
+		string $preferred_form_id,
+		callable $matches_element,
+		callable $resolve_form_name,
+		bool $atomic
+	): ?array {
+		$fallback = null;
+
+		foreach ( $elements as $element ) {
+			if ( ! is_array( $element ) ) {
+				continue;
+			}
+
+			if ( $matches_element( $element ) ) {
+				$element_id = trim( (string) ( $element['id'] ?? '' ) );
+
+				if ( '' === $element_id ) {
+					continue;
+				}
+
+				$settings  = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
+				$form_name = $resolve_form_name( $settings );
+
+				if ( '' === $form_name ) {
+					$form_name = __( 'Untitled Form', 'workflow-automate' );
+				}
+
+				$parsed = $atomic
+					? $this->extractAtomicFieldIds( $element )
+					: $this->extractClassicFieldIds( $settings );
+
+				$candidate = array(
+					'form_id'      => $element_id,
+					'form_name'    => $form_name,
+					'post_id'      => $post_id,
+					'field_ids'    => $parsed['ids'],
+					'field_labels' => $parsed['labels'],
+				);
+
+				if ( '' !== $preferred_form_id && $element_id === $preferred_form_id ) {
+					return $candidate;
+				}
+
+				if ( null === $fallback ) {
+					$fallback = $candidate;
+				}
+			}
+
+			$children = $this->elementChildrenForScan( $element );
+
+			if ( array() !== $children ) {
+				$nested = $this->findFormInElements(
+					$children,
+					$post_id,
+					$preferred_form_id,
+					$matches_element,
+					$resolve_form_name,
+					$atomic
+				);
+
+				if ( null !== $nested ) {
+					if ( '' !== $preferred_form_id ) {
+						return $nested;
+					}
+
+					if ( null === $fallback ) {
+						$fallback = $nested;
+					}
+				}
+			}
+		}
+
+		if ( '' !== $preferred_form_id ) {
+			return null;
+		}
+
+		return $fallback;
+	}
+
+	/**
+	 * @param array<string, mixed> $settings Classic form widget settings.
+	 *
+	 * @return array{ids: array<int, string>, labels: array<string, string>}
+	 */
+	private function extractClassicFieldIds( array $settings ): array {
+		$ids    = array();
+		$labels = array();
+		$raw    = $settings['form_fields'] ?? array();
+
+		if ( ! is_array( $raw ) ) {
+			return array(
+				'ids'    => $ids,
+				'labels' => $labels,
+			);
+		}
+
+		foreach ( $raw as $field ) {
+			if ( ! is_array( $field ) ) {
+				continue;
+			}
+
+			$type = (string) ( $field['field_type'] ?? 'text' );
+
+			if ( in_array( $type, array( 'html', 'step', 'honeypot', 'recaptcha', 'recaptcha_v3' ), true ) ) {
+				continue;
+			}
+
+			$custom_id = trim( (string) ( $field['custom_id'] ?? '' ) );
+
+			if ( '' === $custom_id ) {
+				$custom_id = trim( (string) ( $field['_id'] ?? '' ) );
+			}
+
+			if ( '' === $custom_id ) {
+				continue;
+			}
+
+			$ids[] = $custom_id;
+
+			$label = trim( (string) ( $field['field_label'] ?? '' ) );
+
+			if ( '' !== $label ) {
+				$labels[ $label ] = $custom_id;
+			}
+		}
+
+		return array(
+			'ids'    => array_values( array_unique( $ids ) ),
+			'labels' => $labels,
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $form_element Atomic form element.
+	 *
+	 * @return array{ids: array<int, string>, labels: array<string, string>}
+	 */
+	private function extractAtomicFieldIds( array $form_element ): array {
+		$ids    = array();
+		$labels = array();
+		$stack  = $this->elementChildrenForScan( $form_element );
+
+		while ( array() !== $stack ) {
+			$element = array_shift( $stack );
+
+			if ( ! is_array( $element ) ) {
+				continue;
+			}
+
+			$children = $this->elementChildrenForScan( $element );
+
+			if ( array() !== $children ) {
+				foreach ( $children as $child ) {
+					$stack[] = $child;
+				}
+			}
+
+			$widget_type = (string) ( $element['widgetType'] ?? '' );
+			$el_type     = (string) ( $element['elType'] ?? '' );
+
+			if ( 'widget' !== $el_type && '' === $widget_type ) {
+				continue;
+			}
+
+			if ( ! preg_match( '/field|input|textarea|select|checkbox|radio|email|tel|url|number|date/i', $widget_type . ' ' . $el_type ) ) {
+				continue;
+			}
+
+			$settings = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
+			$field_id = $this->resolveSettingValue( $settings, 'custom_id' );
+
+			if ( '' === $field_id ) {
+				$field_id = $this->resolveSettingValue( $settings, 'field_name' );
+			}
+
+			if ( '' === $field_id ) {
+				$field_id = trim( (string) ( $element['id'] ?? '' ) );
+			}
+
+			if ( '' === $field_id ) {
+				continue;
+			}
+
+			$ids[] = $field_id;
+
+			$label = $this->resolveSettingValue( $settings, 'label' );
+
+			if ( '' === $label ) {
+				$label = $this->resolveSettingValue( $settings, 'field_label' );
+			}
+
+			if ( '' !== $label ) {
+				$labels[ $label ] = $field_id;
+			}
+		}
+
+		return array(
+			'ids'    => array_values( array_unique( $ids ) ),
+			'labels' => $labels,
+		);
+	}
+
+	/**
 	 * @param callable(array<string, mixed>): bool $matches_element
 	 * @param callable(array<string, mixed>): string $resolve_form_name
 	 *

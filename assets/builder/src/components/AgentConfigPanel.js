@@ -265,10 +265,15 @@ export default function AgentConfigPanel({
 
 					{config.require_output_format && (
 						<div className="wfa-agent-config__notice wfa-agent-config__notice--warning">
-							{__(
-								'Connect an Output Parser node on the canvas to specify the output format you require.',
-								'workflow-automate'
-							)}
+							{attachments.outputParser
+								? __(
+										'Output Parser connected. Click it on the canvas to edit the JSON example or schema.',
+										'workflow-automate'
+								  )
+								: __(
+										'Connect an Output Parser node on the canvas to specify the output format you require.',
+										'workflow-automate'
+								  )}
 						</div>
 					)}
 

@@ -48,6 +48,27 @@ export function fetchNodeTypes() {
 }
 
 /**
+ * Sample trigger payload (field keys) for the variable picker.
+ *
+ * @param {string} triggerType Trigger node slug.
+ * @param {string} [formId]    Optional Elementor form id.
+ * @return {Promise<{ success: boolean, payload: Object }>}
+ */
+export function fetchTriggerSampleSchema(triggerType, formId = '') {
+	const params = new URLSearchParams({
+		trigger_type: triggerType || '',
+	});
+
+	if (formId) {
+		params.set('form_id', formId);
+	}
+
+	return apiFetch({
+		path: `/wfa/v1/trigger-sample-schema?${params.toString()}`,
+	});
+}
+
+/**
  * Credential-free connection summaries, used to populate a "connection"
  * config field (see ConfigPanel) with a picker rather than a raw id input.
  *

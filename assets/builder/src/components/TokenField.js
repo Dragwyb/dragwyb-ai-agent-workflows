@@ -1,4 +1,10 @@
-import { useRef, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useEffect,
+	useCallback,
+	createPortal,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import VariablePicker from './VariablePicker';
@@ -17,7 +23,10 @@ function createPillElement(token, path, nodeLabels = {}) {
 	span.className = 'wfa-token-field__pill';
 	span.contentEditable = 'false';
 	span.dataset.token = token;
-	const label = path === 'trigger' ? 'All data (JSON)' : pathToDisplayLabel(path, nodeLabels);
+	const label =
+		path === 'trigger'
+			? 'All data (JSON)'
+			: pathToDisplayLabel(path, nodeLabels);
 	span.textContent = label || path;
 	return span;
 }
@@ -124,11 +133,16 @@ export default function TokenField({
 		const maxHeight = Math.min(420, window.innerHeight - 24);
 		const rect = wrapperRef.current.getBoundingClientRect();
 
+		// Prefer left of the field. Fall back below — never open off-screen right.
 		let left = rect.left - popoverWidth - gap;
 		let top = rect.top;
 
 		if (left < 12) {
-			left = rect.right + gap;
+			left = Math.max(
+				12,
+				Math.min(rect.left, window.innerWidth - popoverWidth - 12)
+			);
+			top = rect.bottom + gap;
 		}
 
 		if (top + maxHeight > window.innerHeight - 12) {
@@ -241,20 +255,63 @@ export default function TokenField({
 		};
 	}, [pickerOpen]);
 
+	const popover =
+		pickerOpen && hasVariables && popoverPos
+			? createPortal(
+					<div
+						ref={popoverRef}
+						className="wfa-token-field__popover"
+						style={{
+							position: 'fixed',
+							top: `${popoverPos.top}px`,
+							left: `${popoverPos.left}px`,
+							width: `${popoverPos.width}px`,
+							height: `${popoverPos.maxHeight}px`,
+							maxHeight: `${popoverPos.maxHeight}px`,
+						}}
+					>
+						<VariablePicker
+							sources={variableSources}
+							nodeLabels={nodeLabels}
+							onSelect={insertToken}
+							onClose={() => setPickerOpen(false)}
+							embedded
+							popover
+							showSearch
+						/>
+					</div>,
+					document.body
+			  )
+			: null;
+
 	return (
 		<div
 			ref={wrapperRef}
 			className={`wfa-token-field${pickerOpen ? ' wfa-token-field--picker-open' : ''}`}
 		>
-			<label className="wfa-token-field__label">
-				{label}
-				{required && (
-					<span className="wfa-token-field__required" aria-hidden="true">
-						{' '}
-						*
-					</span>
+			<div className="wfa-token-field__header">
+				<label className="wfa-token-field__label">
+					{label}
+					{required && (
+						<span
+							className="wfa-token-field__required"
+							aria-hidden="true"
+						>
+							{' '}
+							*
+						</span>
+					)}
+				</label>
+				{hasVariables && (
+					<button
+						type="button"
+						className="wfa-token-field__insert"
+						onClick={openPicker}
+					>
+						{__('Insert variable', 'workflow-automate')}
+					</button>
 				)}
-			</label>
+			</div>
 
 			<div
 				ref={editorRef}
@@ -268,30 +325,7 @@ export default function TokenField({
 				onClick={openPicker}
 			/>
 
-			{pickerOpen && hasVariables && popoverPos && (
-				<div
-					ref={popoverRef}
-					className="wfa-token-field__popover"
-					style={{
-						position: 'fixed',
-						top: `${popoverPos.top}px`,
-						left: `${popoverPos.left}px`,
-						width: `${popoverPos.width}px`,
-						height: `${popoverPos.maxHeight}px`,
-						maxHeight: `${popoverPos.maxHeight}px`,
-					}}
-				>
-					<VariablePicker
-						sources={variableSources}
-						nodeLabels={nodeLabels}
-						onSelect={insertToken}
-						onClose={() => setPickerOpen(false)}
-						embedded
-						popover
-						showSearch
-					/>
-				</div>
-			)}
+			{popover}
 
 			{!hasVariables && (
 				<p className="wfa-token-field__hint">

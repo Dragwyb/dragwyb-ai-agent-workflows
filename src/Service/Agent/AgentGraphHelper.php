@@ -160,6 +160,38 @@ class AgentGraphHelper {
 	}
 
 	/**
+	 * Chat model attached under a Structured Output Parser (Auto-Fix Model*).
+	 *
+	 * @param array<int, mixed> $graph_nodes Graph nodes.
+	 * @param string            $parser_id   Output parser node id.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	public static function findParserChatModel( array $graph_nodes, string $parser_id ): ?array {
+		if ( '' === $parser_id ) {
+			return null;
+		}
+
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) ) {
+				continue;
+			}
+
+			if ( (string) ( $graph_node['parent_agent_id'] ?? '' ) !== $parser_id ) {
+				continue;
+			}
+
+			$attachment_type = (string) ( $graph_node['attachment_type'] ?? '' );
+
+			if ( 'parser_chat_model' === $attachment_type || self::isChatModelType( (string) ( $graph_node['type'] ?? '' ) ) ) {
+				return $graph_node;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * @param string $node_type Action node type slug.
 	 *
 	 * @return bool

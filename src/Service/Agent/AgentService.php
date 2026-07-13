@@ -34,16 +34,19 @@ class AgentService {
 
 	private AgentLlmClient $llm_client;
 
+	private AgentStructuredOutputParser $structured_parser;
+
 	public function __construct(
 		ConnectionService $connections,
 		AgentToolSchemaBuilder $schema_builder,
 		AgentToolExecutor $tool_executor,
 		AgentLlmClient $llm_client
 	) {
-		$this->secrets         = new ConnectionSecretResolver( $connections );
-		$this->schema_builder  = $schema_builder;
-		$this->tool_executor   = $tool_executor;
-		$this->llm_client      = $llm_client;
+		$this->secrets            = new ConnectionSecretResolver( $connections );
+		$this->schema_builder     = $schema_builder;
+		$this->tool_executor      = $tool_executor;
+		$this->llm_client         = $llm_client;
+		$this->structured_parser  = new AgentStructuredOutputParser();
 	}
 
 	/**
@@ -193,30 +196,77 @@ class AgentService {
 
 		$response = (string) ( $loop['response'] ?? '' );
 
-		if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] ) {
-			$parsed = $this->parseJsonResponse( $response );
+		if ( is_array( $attachments['output_parser'] ) ) {
+			$fix_provider = $chat['provider'];
+			$fix_api_key  = $api_key;
+			$fix_model    = $model;
 
-			if ( is_array( $parsed ) ) {
-				$loop['parsed'] = $parsed;
-			} elseif ( ! empty( $attachments['tools'] ) || ! empty( $loop['tool_calls'] ) ) {
-				$loop['json_parse_warning'] = __( 'Reply was plain text, not JSON (expected when the agent uses tools).', 'workflow-automate' );
-			} else {
-				return array(
-					'success'  => false,
-					'error'    => __( 'The agent did not return valid JSON.', 'workflow-automate' ),
-					'response' => $response,
-				);
+			$parser_id    = (string) ( $attachments['output_parser']['id'] ?? '' );
+			$parser_model = AgentGraphHelper::findParserChatModel( $graph_nodes, $parser_id );
+
+			if ( is_array( $parser_model ) ) {
+				$parser_chat = AgentGraphHelper::resolveChatModelConfig( $parser_model, array() );
+				$parser_key  = $this->secrets->resolveBearerSecret( $parser_chat['connection_id'] );
+
+				if ( ! is_array( $parser_key ) ) {
+					$fix_provider = $parser_chat['provider'];
+					$fix_api_key  = $parser_key;
+					$fix_model    = trim( $parser_chat['model'] );
+
+					if ( '' === $fix_model ) {
+						$fix_model = $this->defaultModelForProvider( $fix_provider );
+					}
+				}
 			}
-		}
 
-		$loop['response'] = $response;
-		// n8n-compatible fields for downstream nodes (HTTP Request, etc.).
-		$clean_output     = $this->buildCleanOutput( $response, $config );
-		$loop['output']   = $clean_output;
-		// Structured payload: {{nodes.X.json}} encodes as {"output":"..."}.
-		$loop['json']     = array(
-			'output' => $clean_output,
-		);
+			$structured = $this->applyStructuredOutputParser(
+				$response,
+				$attachments['output_parser'],
+				$fix_provider,
+				$fix_api_key,
+				$fix_model
+			);
+
+			if ( empty( $structured['success'] ) ) {
+				return $structured;
+			}
+
+			$data             = $structured['data'];
+			$encoded          = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
+			$loop['response'] = is_string( $encoded ) ? $encoded : '';
+			$loop['parsed']   = $data;
+			$loop['output']   = $data;
+			$loop['json']     = is_array( $data ) ? $data : array( 'output' => $data );
+
+			if ( ! empty( $structured['auto_fixed'] ) ) {
+				$loop['structured_output_auto_fixed'] = true;
+			}
+		} else {
+			if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] ) {
+				$parsed = $this->parseJsonResponse( $response );
+
+				if ( is_array( $parsed ) ) {
+					$loop['parsed'] = $parsed;
+				} elseif ( ! empty( $attachments['tools'] ) || ! empty( $loop['tool_calls'] ) ) {
+					$loop['json_parse_warning'] = __( 'Reply was plain text, not JSON (expected when the agent uses tools).', 'workflow-automate' );
+				} else {
+					return array(
+						'success'  => false,
+						'error'    => __( 'The agent did not return valid JSON.', 'workflow-automate' ),
+						'response' => $response,
+					);
+				}
+			}
+
+			$loop['response'] = $response;
+			// n8n-compatible fields for downstream nodes (HTTP Request, etc.).
+			$clean_output   = $this->buildCleanOutput( $response, $config );
+			$loop['output'] = $clean_output;
+			// Structured payload: {{nodes.X.json}} encodes as {"output":"..."}.
+			$loop['json'] = array(
+				'output' => $clean_output,
+			);
+		}
 
 		if ( empty( $loop['provider'] ) ) {
 			$loop['provider'] = $chat['provider'];
@@ -826,13 +876,122 @@ class AgentService {
 			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'workflow-automate' );
 		}
 
-		if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {
+		$parser_resolved = null;
+
+		if ( is_array( $attachments['output_parser'] ?? null ) ) {
+			$parser_resolved = $this->structured_parser->resolve( $attachments['output_parser'] );
+
+			if ( isset( $parser_resolved['success'] ) && false === $parser_resolved['success'] ) {
+				// Invalid schema is reported at parse time; still prefer JSON-only guidance.
+				$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'workflow-automate' );
+			} elseif ( ! empty( $parser_resolved['instructions'] ) ) {
+				$parts[] = (string) $parser_resolved['instructions'];
+			}
+		} elseif ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {
 			$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'workflow-automate' );
 		} elseif ( empty( $attachments['tools'] ) ) {
 			$parts[] = __( 'Reply with the final answer as plain text only — a single short string. Never return Python, JavaScript, curl, HTTP examples, markdown code fences, or wrappers. If the user asks for a joke, return only the joke words.', 'workflow-automate' );
 		}
 
 		return implode( "\n\n", $parts );
+	}
+
+	/**
+	 * Validates agent text against the attached Structured Output Parser schema.
+	 *
+	 * @param string               $response    Raw model reply.
+	 * @param array<string, mixed> $parser_node Output parser attachment.
+	 * @param string               $provider    Chat provider.
+	 * @param string               $api_key     API key.
+	 * @param string               $model       Model id.
+	 *
+	 * @return array{success: true, data: mixed, auto_fixed?: bool}|array{success: false, error: string, response?: string}
+	 */
+	private function applyStructuredOutputParser(
+		string $response,
+		array $parser_node,
+		string $provider,
+		string $api_key,
+		string $model
+	): array {
+		$resolved = $this->structured_parser->resolve( $parser_node );
+
+		if ( isset( $resolved['success'] ) && false === $resolved['success'] ) {
+			return $resolved;
+		}
+
+		/** @var array{schema: array<string, mixed>, auto_fix: bool, retry_prompt: string, instructions: string} $resolved */
+		$parsed = $this->structured_parser->parseAndValidate( $response, $resolved['schema'] );
+
+		if ( ! empty( $parsed['success'] ) ) {
+			return array(
+				'success' => true,
+				'data'    => $parsed['data'],
+			);
+		}
+
+		if ( empty( $resolved['auto_fix'] ) ) {
+			return array(
+				'success'  => false,
+				'error'    => sprintf(
+					/* translators: %s: validation error */
+					__( 'Structured output validation failed: %s', 'workflow-automate' ),
+					(string) ( $parsed['error'] ?? '' )
+				),
+				'response' => $response,
+			);
+		}
+
+		$retry_user = $this->structured_parser->buildRetryUserMessage(
+			$resolved['retry_prompt'],
+			$resolved['instructions'],
+			$response,
+			(string) ( $parsed['error'] ?? '' )
+		);
+
+		$completion = $this->llm_client->complete(
+			$provider,
+			$api_key,
+			$model,
+			array(
+				array(
+					'role'    => 'user',
+					'content' => $retry_user,
+				),
+			),
+			array(),
+			$resolved['instructions']
+		);
+
+		if ( empty( $completion['success'] ) ) {
+			return array(
+				'success'  => false,
+				'error'    => $completion['error'] ?? __( 'Structured output auto-fix request failed.', 'workflow-automate' ),
+				'response' => $response,
+			);
+		}
+
+		$message      = is_array( $completion['message'] ?? null ) ? $completion['message'] : array();
+		$fixed_reply  = (string) ( $message['content'] ?? '' );
+		$fixed_parsed = $this->structured_parser->parseAndValidate( $fixed_reply, $resolved['schema'] );
+
+		if ( empty( $fixed_parsed['success'] ) ) {
+			return array(
+				'success'  => false,
+				'error'    => sprintf(
+					/* translators: %s: validation error */
+					__( 'Structured output still invalid after auto-fix: %s', 'workflow-automate' ),
+					(string) ( $fixed_parsed['error'] ?? '' )
+				),
+				'response' => $fixed_reply,
+			);
+		}
+
+		return array(
+			'success'    => true,
+			'data'       => $fixed_parsed['data'],
+			'auto_fixed' => true,
+		);
 	}
 
 	/**

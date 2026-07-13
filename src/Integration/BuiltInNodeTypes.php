@@ -21,6 +21,7 @@ use WorkflowAutomate\Plugin\Integration\Actions\OpenRouterChatAction;
 use WorkflowAutomate\Plugin\Integration\Actions\RouterAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SendEmailAction;
 use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
+use WorkflowAutomate\Plugin\Integration\Actions\StructuredOutputParserAction;
 use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
@@ -83,6 +84,7 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new GroqChatAction( $this->connections ) );
 		$registry->registerAction( new DeepSeekChatAction( $this->connections ) );
 		$registry->registerAction( new AiAgentAction( $this->agent ) );
+		$registry->registerAction( new StructuredOutputParserAction() );
 		$registry->registerAction( new RouterAction() );
 		$registry->registerAction( new ConditionAction() );
 

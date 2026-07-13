@@ -64,6 +64,27 @@ class NodeTypesController {
 				'args' => array(),
 			)
 		);
+
+		register_rest_route(
+			self::API_NAMESPACE,
+			'/trigger-sample-schema',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'getTriggerSampleSchema' ),
+				'permission_callback' => array( $this, 'permissionsCheck' ),
+				'args' => array(
+					'trigger_type' => array(
+						'type' => 'string',
+						'required' => true,
+					),
+					'form_id' => array(
+						'type' => 'string',
+						'required' => false,
+						'default' => '',
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -120,6 +141,62 @@ class NodeTypesController {
 				'triggers' => $serialized_triggers,
 				'actions' => array_map( array( $this, 'serialize' ), $this->registry->actions() ),
 			)
+		);
+	}
+
+	/**
+	 * Sample trigger payload for the variable picker (form fields without Listen).
+	 *
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function getTriggerSampleSchema( $request ) {
+		$trigger_type = sanitize_key( (string) $request->get_param( 'trigger_type' ) );
+		$form_id      = sanitize_text_field( (string) $request->get_param( 'form_id' ) );
+
+		if ( 'elementor_form_submitted_trigger' === $trigger_type ) {
+			$result = $this->elementor_forms->samplePayloadForForm( $form_id, false );
+
+			if ( empty( $result['success'] ) ) {
+				return new WP_Error(
+					'wfa_trigger_sample_unavailable',
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
+					array( 'status' => 404 )
+				);
+			}
+
+			return rest_ensure_response(
+				array(
+					'success' => true,
+					'payload' => $result['payload'],
+				)
+			);
+		}
+
+		if ( 'elementor_atomic_form_submitted_trigger' === $trigger_type ) {
+			$result = $this->elementor_forms->samplePayloadForForm( $form_id, true );
+
+			if ( empty( $result['success'] ) ) {
+				return new WP_Error(
+					'wfa_trigger_sample_unavailable',
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
+					array( 'status' => 404 )
+				);
+			}
+
+			return rest_ensure_response(
+				array(
+					'success' => true,
+					'payload' => $result['payload'],
+				)
+			);
+		}
+
+		return new WP_Error(
+			'wfa_trigger_sample_unsupported',
+			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'workflow-automate' ),
+			array( 'status' => 400 )
 		);
 	}
 

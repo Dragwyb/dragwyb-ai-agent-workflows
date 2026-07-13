@@ -57,6 +57,7 @@ import {
 	memoryAttachmentPosition,
 	fallbackChatModelAttachmentPosition,
 	outputParserAttachmentPosition,
+	parserChatModelAttachmentPosition,
 	toolsForAgent,
 	syncAgentConfigFromChatModel,
 	providerFromChatModelSlug,
@@ -491,7 +492,8 @@ export default function App() {
 		},
 	});
 
-	// Refresh captured data when a trigger node is selected.
+	// Refresh captured trigger sample whenever a main canvas node is selected
+	// so AI Agent / action Prompt fields still get form-field suggestions.
 	useEffect(() => {
 		if (!workflowId || !selectedNodeId) {
 			return;
@@ -499,7 +501,15 @@ export default function App() {
 
 		const node = graph.nodes.find((item) => item.id === selectedNodeId);
 
-		if (!node || node.category !== 'trigger') {
+		if (!node || node.parent_agent_id) {
+			return;
+		}
+
+		const triggerNode = graph.nodes.find(
+			(item) => item.category === 'trigger'
+		);
+
+		if (!triggerNode) {
 			return;
 		}
 
@@ -511,9 +521,15 @@ export default function App() {
 					return;
 				}
 
-				const sample = capturedSampleFromStatus(status, node.type);
-				setCapturedPayload(sample.payload);
-				setCapturedAt(sample.capturedAt);
+				const sample = capturedSampleFromStatus(
+					status,
+					triggerNode.type
+				);
+
+				if (sample.payload) {
+					setCapturedPayload(sample.payload);
+					setCapturedAt(sample.capturedAt);
+				}
 			})
 			.catch(() => {});
 
@@ -1188,12 +1204,21 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'agent_output_parser',
 			category: 'action',
-			label: __('Output Parser', 'workflow-automate'),
+			label: __('Structured Output Parser', 'workflow-automate'),
 			parent_agent_id: agentId,
 			attachment_type: 'output_parser',
 			x: position.x,
 			y: position.y,
-			config: {},
+			config: {
+				schema_type: 'from_json',
+				json_example:
+					'{\n  "state": "California",\n  "cities": ["Los Angeles", "San Francisco", "San Diego"]\n}',
+				json_schema:
+					'{\n  "type": "object",\n  "properties": {\n    "state": {\n      "type": "string"\n    },\n    "cities": {\n      "type": "array",\n      "items": {\n        "type": "string"\n      }\n    }\n  }\n}',
+				auto_fix: true,
+				customize_retry_prompt: false,
+				retry_prompt: '',
+			},
 		};
 
 		focusNodeIdRef.current = newParser.id;
@@ -1273,6 +1298,15 @@ export default function App() {
 	const handleAddAgentChatModel = (agentId) => {
 		setPicker({ kind: 'agent-chat-model', agentId, appId: 'chat-models' });
 		setSelectedNodeId(agentId);
+	};
+
+	const handleAddParserChatModel = (parserId) => {
+		setPicker({
+			kind: 'parser-chat-model',
+			parserId,
+			appId: 'chat-models',
+		});
+		setSelectedNodeId(parserId);
 	};
 
 	const handleAddAgentMemory = (agentId) => {
@@ -1370,6 +1404,55 @@ export default function App() {
 					.concat(newChatModel),
 			};
 		});
+
+		setSelectedNodeId(newChatModel.id);
+	};
+
+	const handleAttachParserChatModel = (nodeTypeDefinition, parserId) => {
+		setPicker(null);
+
+		const parser = latestRef.current.graph.nodes.find(
+			(node) => node.id === parserId
+		);
+
+		if (!parser) {
+			return;
+		}
+
+		const provider = providerFromChatModelSlug(nodeTypeDefinition.slug);
+		const position = parserChatModelAttachmentPosition(parser);
+		const defaults = defaultConfigFor(nodeTypeDefinition);
+
+		const newChatModel = {
+			id: generateNodeId(),
+			type: nodeTypeDefinition.slug,
+			category: 'action',
+			label: `${nodeTypeDefinition.label} (${__('Auto-Fix', 'workflow-automate')})`,
+			parent_agent_id: parserId,
+			attachment_type: 'parser_chat_model',
+			x: position.x,
+			y: position.y,
+			config: {
+				...defaults,
+				model: defaults.model || DEFAULT_MODEL_BY_PROVIDER[provider] || '',
+			},
+		};
+
+		focusNodeIdRef.current = newChatModel.id;
+
+		setGraph((current) => ({
+			...current,
+			nodes: [
+				...current.nodes.filter(
+					(node) =>
+						!(
+							node.parent_agent_id === parserId &&
+							node.attachment_type === 'parser_chat_model'
+						)
+				),
+				newChatModel,
+			],
+		}));
 
 		setSelectedNodeId(newChatModel.id);
 	};
@@ -1645,6 +1728,7 @@ export default function App() {
 					onAddAgentChatModel={handleAddAgentChatModel}
 					onAddAgentMemory={handleAddAgentMemory}
 					onAddAgentTool={handleAddAgentTool}
+					onAddParserChatModel={handleAddParserChatModel}
 					onAddCondition={handleAddCondition}
 					onRemoveCondition={handleRemoveCondition}
 					onStartBranchConnectionDrag={handleStartBranchConnectionDrag}
@@ -1704,6 +1788,12 @@ export default function App() {
 												item,
 												picker.agentId
 											)
+									: picker.kind === 'parser-chat-model'
+										? (item) =>
+												handleAttachParserChatModel(
+													item,
+													picker.parserId
+												)
 									: picker.kind === 'agent-fallback-chat-model'
 										? (item) =>
 												handleAttachAgentFallbackChatModel(
@@ -1736,6 +1826,7 @@ export default function App() {
 						onAddAgentTool={handleAddAgentTool}
 						onAddAgentFallbackModel={handleAddAgentFallbackModel}
 						onAddAgentOutputParser={handleAddAgentOutputParser}
+						onAddParserChatModel={handleAddParserChatModel}
 						onSelectNode={setSelectedNodeId}
 					/>
 				)}

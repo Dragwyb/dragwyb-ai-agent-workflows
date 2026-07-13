@@ -8,12 +8,16 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, getBootstrap, testWorkflowNode} from '../api';
+import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, fetchTriggerSampleSchema, getBootstrap, testWorkflowNode} from '../api';
 import CapturedResponse from './CapturedResponse';
 import NodeTestResult from './NodeTestResult';
 import AgentConfigPanel from './AgentConfigPanel';
 import TokenField, { fieldSupportsVariables } from './TokenField';
-import { buildVariableSources } from '../utils/variableSources';
+import {
+	buildVariableSources,
+	elementorTriggerStubPayload,
+	getTriggerNode,
+} from '../utils/variableSources';
 import { validateAgentConfig } from '../utils/agentConfig';
 import {
 	getConditionOperatorSelectOptions,
@@ -269,6 +273,7 @@ function filterMatchingConnections(connections, nodeTypeSlug, selectedId, nodeCo
  * @param {Function}      [props.onAddAgentTool]
  * @param {Function}      [props.onAddAgentFallbackModel]
  * @param {Function}      [props.onAddAgentOutputParser]
+ * @param {Function}      [props.onAddParserChatModel]
  * @param {Function}      [props.onSelectNode]
  */
 export default function ConfigPanel({
@@ -292,10 +297,12 @@ export default function ConfigPanel({
 	onAddAgentTool,
 	onAddAgentFallbackModel,
 	onAddAgentOutputParser,
+	onAddParserChatModel,
 	onSelectNode,
 }) {
 	const [testing, setTesting] = useState(false);
 	const [testResult, setTestResult] = useState(null);
+	const [schemaPayload, setSchemaPayload] = useState(null);
 	const nodeLabels = useMemo(() => {
 		const labels = {};
 
@@ -306,16 +313,84 @@ export default function ConfigPanel({
 		return labels;
 	}, [graphNodes]);
 
+	const triggerNode = useMemo(
+		() => getTriggerNode(graphNodes),
+		[graphNodes]
+	);
+
+	const hasCapturedTrigger =
+		capturedPayload !== null &&
+		capturedPayload !== undefined &&
+		typeof capturedPayload === 'object' &&
+		Object.keys(capturedPayload).length > 0;
+
+	useEffect(() => {
+		if (hasCapturedTrigger || !triggerNode) {
+			setSchemaPayload(null);
+			return undefined;
+		}
+
+		const triggerType = triggerNode.type || '';
+		const formId = String(triggerNode.config?.form_id || '');
+		let cancelled = false;
+
+		if (
+			triggerType !== 'elementor_form_submitted_trigger' &&
+			triggerType !== 'elementor_atomic_form_submitted_trigger'
+		) {
+			setSchemaPayload(null);
+			return undefined;
+		}
+
+		fetchTriggerSampleSchema(triggerType, formId)
+			.then((result) => {
+				if (cancelled) {
+					return;
+				}
+
+				if (result?.payload && typeof result.payload === 'object') {
+					setSchemaPayload(result.payload);
+					return;
+				}
+
+				setSchemaPayload(elementorTriggerStubPayload());
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setSchemaPayload(elementorTriggerStubPayload());
+				}
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [
+		hasCapturedTrigger,
+		triggerNode?.id,
+		triggerNode?.type,
+		triggerNode?.config?.form_id,
+	]);
+
+	const effectiveTriggerPayload = hasCapturedTrigger
+		? capturedPayload
+		: schemaPayload;
+
 	const variableSources = useMemo(
 		() =>
 			buildVariableSources({
 				graphNodes,
 				connections: graph.connections || [],
 				currentNodeId: node?.id || null,
-				triggerPayload: capturedPayload,
+				triggerPayload: effectiveTriggerPayload,
 				triggerLabel,
 			}),
-		[graphNodes, graph.connections, node?.id, capturedPayload, triggerLabel]
+		[
+			graphNodes,
+			graph.connections,
+			node?.id,
+			effectiveTriggerPayload,
+			triggerLabel,
+		]
 	);
 
 	useEffect(() => {
@@ -440,12 +515,41 @@ export default function ConfigPanel({
 			)}
 
 			{node.attachment_type === 'output_parser' && (
-				<p className="wfa-builder-config__field-help">
-					{__(
-						'Output parser attached to the agent. Required when “Require Specific Output Format” is enabled.',
-						'workflow-automate'
+				<div className="wfa-builder-config__parser-model">
+					<p className="wfa-builder-config__field-help">
+						{__(
+							'Define the JSON structure the AI Agent must return. Paste an example or a JSON Schema, then enable Auto-Fix if the model should retry on mismatch.',
+							'workflow-automate'
+						)}
+					</p>
+					<p className="wfa-builder-config__field-help">
+						{__(
+							'Connect a chat model under this node (Model*) for Auto-Fix.',
+							'workflow-automate'
+						)}
+					</p>
+					{graphNodes.some(
+						(entry) =>
+							entry.parent_agent_id === node.id &&
+							entry.attachment_type === 'parser_chat_model'
+					) ? (
+						<p className="wfa-agent-config__notice wfa-agent-config__notice--info">
+							{__(
+								'Auto-Fix model connected. Open it on the canvas to set the API key and model.',
+								'workflow-automate'
+							)}
+						</p>
+					) : (
+						onAddParserChatModel && (
+							<Button
+								variant="secondary"
+								onClick={() => onAddParserChatModel(node.id)}
+							>
+								{__('Connect Auto-Fix model', 'workflow-automate')}
+							</Button>
+						)
 					)}
-				</p>
+				</div>
 			)}
 
 			{node.attachment_type === 'memory' && (
@@ -505,7 +609,6 @@ export default function ConfigPanel({
 			{nodeType &&
 				node.type !== 'ai_agent_action' &&
 				node.attachment_type !== 'memory' &&
-				node.attachment_type !== 'output_parser' &&
 				Object.keys(nodeType.config_schema || {})
 					.filter((fieldName) => {
 						if (
@@ -517,7 +620,8 @@ export default function ConfigPanel({
 
 						if (
 							node.attachment_type === 'chat_model' ||
-							node.attachment_type === 'fallback_chat_model'
+							node.attachment_type === 'fallback_chat_model' ||
+							node.attachment_type === 'parser_chat_model'
 						) {
 							return CHAT_MODEL_ATTACHMENT_FIELDS.has(fieldName);
 						}
@@ -750,6 +854,22 @@ function ConfigField({
 				required={Boolean(fieldSchema.required)}
 				variableSources={variableSources}
 				nodeLabels={nodeLabels}
+				onChange={onChange}
+			/>
+		);
+	}
+
+	if (fieldSchema.type === 'string' && fieldSchema.multiline) {
+		return (
+			<TextareaControl
+				label={label}
+				help={help || undefined}
+				value={
+					resolved === undefined || resolved === null
+						? ''
+						: String(resolved)
+				}
+				rows={Number(fieldSchema.rows) || 8}
 				onChange={onChange}
 			/>
 		);

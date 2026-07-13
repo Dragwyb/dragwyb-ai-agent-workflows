@@ -10,6 +10,8 @@ import ChatModelSubNode from './ChatModelSubNode';
 
 import MemorySubNode from './MemorySubNode';
 
+import OutputParserSubNode from './OutputParserSubNode';
+
 import ConditionNodeCard from './ConditionNodeCard';
 
 import FlowEdgeControls from './FlowEdgeControls';
@@ -32,16 +34,24 @@ import {
 	toolsForAgent,
 	chatModelForAgent,
 	memoryForAgent,
+	outputParserForAgent,
+	chatModelForOutputParser,
 	agentToolPortPosition,
 	agentChatModelPortPosition,
 	agentMemoryPortPosition,
+	agentOutputParserPortPosition,
 	toolInputPortPosition,
 	chatModelInputPortPosition,
 	memoryInputPortPosition,
+	outputParserInputPortPosition,
+	outputParserModelPortPosition,
 	AGENT_TOTAL_HEIGHT,
 	isToolAttachment,
 	isChatModelAttachment,
 	isMemoryAttachment,
+	isOutputParserAttachment,
+	isParserChatModelAttachment,
+	isFallbackChatModelAttachment,
 } from '../utils/agentAttachments';
 
 /**
@@ -98,6 +108,8 @@ export default function Canvas({
 	onAddAgentMemory,
 
 	onAddAgentTool,
+
+	onAddParserChatModel,
 
 	onAddCondition,
 
@@ -270,6 +282,30 @@ export default function Canvas({
 
 				to: memoryInputPortPosition(memory),
 			});
+		}
+
+		const outputParser = outputParserForAgent(nodes, node.id);
+
+		if (outputParser) {
+			attachmentEdges.push({
+				id: `attach-parser-${node.id}-${outputParser.id}`,
+
+				from: agentOutputParserPortPosition(node),
+
+				to: outputParserInputPortPosition(outputParser),
+			});
+
+			const parserModel = chatModelForOutputParser(nodes, outputParser.id);
+
+			if (parserModel) {
+				attachmentEdges.push({
+					id: `attach-parser-model-${outputParser.id}-${parserModel.id}`,
+
+					from: outputParserModelPortPosition(outputParser),
+
+					to: chatModelInputPortPosition(parserModel),
+				});
+			}
 		}
 
 		const tools = toolsForAgent(nodes, node.id);
@@ -482,7 +518,10 @@ export default function Canvas({
 
 				.filter(
 					(node) =>
-						isChatModelAttachment(node) && node.parent_agent_id
+						(isChatModelAttachment(node) ||
+							isFallbackChatModelAttachment(node) ||
+							isParserChatModelAttachment(node)) &&
+						node.parent_agent_id
 				)
 
 				.map((chatModel) => (
@@ -521,6 +560,34 @@ export default function Canvas({
 							selected={memory.id === selectedNodeId}
 							onSelect={onSelectNode}
 							onMove={onMoveNode}
+						/>
+					</div>
+				))}
+
+			{nodes
+
+				.filter(
+					(node) =>
+						isOutputParserAttachment(node) && node.parent_agent_id
+				)
+
+				.map((parser) => (
+					<div
+						key={parser.id}
+						className="wfa-output-parser-node-wrap"
+						style={{
+							transform: `translate(${parser.x}px, ${parser.y}px)`,
+						}}
+					>
+						<OutputParserSubNode
+							node={parser}
+							selected={parser.id === selectedNodeId}
+							hasChatModel={Boolean(
+								chatModelForOutputParser(nodes, parser.id)
+							)}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+							onAddChatModel={onAddParserChatModel}
 						/>
 					</div>
 				))}

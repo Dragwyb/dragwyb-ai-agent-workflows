@@ -5,6 +5,7 @@
 /** @type {Set<string>} */
 const AGENT_SLUGS = new Set([
 	'ai_agent_action',
+	'agent_output_parser',
 	'openai_chat_action',
 	'claude_messages_action',
 	'gemini_generate_content_action',
@@ -617,7 +618,7 @@ export function getItemsForPicker(
 		return actions.filter((action) => app.slugs.includes(action.slug));
 	}
 
-	if (kind === 'agent-chat-model' || kind === 'agent-fallback-chat-model') {
+	if (kind === 'agent-chat-model' || kind === 'agent-fallback-chat-model' || kind === 'parser-chat-model') {
 		return getChatModelPickerItems(actions);
 	}
 

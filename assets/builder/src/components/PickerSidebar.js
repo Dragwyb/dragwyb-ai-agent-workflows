@@ -74,10 +74,14 @@ export default function PickerSidebar({
 	const appLabel = getAppLabel(pickerKind, appId, subAppId);
 	const metaAppId = subAppId || appId;
 	const title =
-		kind === 'agent-chat-model' || kind === 'agent-fallback-chat-model'
+		kind === 'agent-chat-model' ||
+		kind === 'agent-fallback-chat-model' ||
+		kind === 'parser-chat-model'
 			? kind === 'agent-fallback-chat-model'
 				? __('Select fallback chat model', 'workflow-automate')
-				: __('Select chat model', 'workflow-automate')
+				: kind === 'parser-chat-model'
+					? __('Select Auto-Fix chat model', 'workflow-automate')
+					: __('Select chat model', 'workflow-automate')
 			: kind === 'agent-tool'
 				? __('Add tool to agent', 'workflow-automate')
 				: kind === 'branch-action'

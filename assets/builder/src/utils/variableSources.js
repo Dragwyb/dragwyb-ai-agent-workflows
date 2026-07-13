@@ -94,3 +94,35 @@ export function buildVariableSources({
 
 	return sources;
 }
+
+/**
+ * @param {Array<Object>} graphNodes
+ * @return {Object|null}
+ */
+export function getTriggerNode(graphNodes = []) {
+	return (
+		graphNodes.find(
+			(node) => node.category === 'trigger' && !node.parent_agent_id
+		) || null
+	);
+}
+
+/**
+ * Minimal Elementor-shaped stub when the schema API is unavailable.
+ *
+ * @return {Object}
+ */
+export function elementorTriggerStubPayload() {
+	return {
+		source: 'elementor',
+		event: 'form_submitted',
+		form_name: '',
+		form_id: '',
+		form_post_id: '',
+		fields: {
+			name: '',
+			email: '',
+			message: '',
+		},
+	};
+}

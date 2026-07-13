@@ -53,6 +53,8 @@ export const ATTACHMENT_GAP = 56;
 export const TOOL_NODE_HEIGHT = 52;
 export const CHAT_MODEL_NODE_SIZE = 72;
 export const MEMORY_NODE_HEIGHT = 40;
+export const OUTPUT_PARSER_NODE_WIDTH = 180;
+export const OUTPUT_PARSER_NODE_HEIGHT = 72;
 
 /**
  * @param {Object} node
@@ -67,6 +69,10 @@ export function isAgentNode(node) {
  * @return {boolean}
  */
 export function isChatModelAttachment(node) {
+	if (node?.attachment_type === 'parser_chat_model') {
+		return false;
+	}
+
 	return (
 		node?.attachment_type === 'chat_model' ||
 		(Boolean(node?.parent_agent_id) &&
@@ -95,6 +101,14 @@ export function isOutputParserAttachment(node) {
  * @param {Object} node
  * @return {boolean}
  */
+export function isParserChatModelAttachment(node) {
+	return node?.attachment_type === 'parser_chat_model';
+}
+
+/**
+ * @param {Object} node
+ * @return {boolean}
+ */
 export function isMemoryAttachment(node) {
 	return node?.attachment_type === 'memory';
 }
@@ -110,7 +124,8 @@ export function isToolAttachment(node) {
 			!isChatModelAttachment(node) &&
 			!isFallbackChatModelAttachment(node) &&
 			!isMemoryAttachment(node) &&
-			!isOutputParserAttachment(node))
+			!isOutputParserAttachment(node) &&
+			!isParserChatModelAttachment(node))
 	);
 }
 
@@ -162,6 +177,21 @@ export function outputParserForAgent(nodes, agentId) {
 			(node) =>
 				node.parent_agent_id === agentId &&
 				isOutputParserAttachment(node)
+		) || null
+	);
+}
+
+/**
+ * @param {Array<Object>} nodes
+ * @param {string}        parserId
+ * @return {Object|null}
+ */
+export function chatModelForOutputParser(nodes, parserId) {
+	return (
+		nodes.find(
+			(node) =>
+				node.parent_agent_id === parserId &&
+				isParserChatModelAttachment(node)
 		) || null
 	);
 }
@@ -313,8 +343,58 @@ export function fallbackChatModelAttachmentPosition(agentNode) {
  */
 export function outputParserAttachmentPosition(agentNode) {
 	return {
-		x: agentNode.x + (NODE_WIDTH * 3) / 4 - 36,
+		x: agentNode.x + (NODE_WIDTH * 3) / 4 - OUTPUT_PARSER_NODE_WIDTH / 2,
 		y: agentNode.y + AGENT_TOTAL_HEIGHT + ATTACHMENT_GAP + CHAT_MODEL_NODE_SIZE + 24,
+	};
+}
+
+/**
+ * Chat model attached under a Structured Output Parser (Auto-Fix model).
+ *
+ * @param {Object} parserNode
+ * @return {{ x: number, y: number }}
+ */
+export function parserChatModelAttachmentPosition(parserNode) {
+	return {
+		x: parserNode.x + OUTPUT_PARSER_NODE_WIDTH / 2 - CHAT_MODEL_NODE_SIZE / 2,
+		y: parserNode.y + OUTPUT_PARSER_NODE_HEIGHT + ATTACHMENT_GAP,
+	};
+}
+
+/**
+ * @param {Object} parserNode
+ * @return {{ x: number, y: number }}
+ */
+export function outputParserInputPortPosition(parserNode) {
+	return {
+		x: parserNode.x + OUTPUT_PARSER_NODE_WIDTH / 2,
+		y: parserNode.y,
+	};
+}
+
+/**
+ * Model* port on the bottom of the output parser card.
+ *
+ * @param {Object} parserNode
+ * @return {{ x: number, y: number }}
+ */
+export function outputParserModelPortPosition(parserNode) {
+	return {
+		x: parserNode.x + OUTPUT_PARSER_NODE_WIDTH / 2,
+		y: parserNode.y + OUTPUT_PARSER_NODE_HEIGHT,
+	};
+}
+
+/**
+ * Port on the agent body for the output-parser attachment edge.
+ *
+ * @param {Object} agentNode
+ * @return {{ x: number, y: number }}
+ */
+export function agentOutputParserPortPosition(agentNode) {
+	return {
+		x: agentNode.x + (NODE_WIDTH * 3) / 4,
+		y: agentNode.y + AGENT_TOTAL_HEIGHT,
 	};
 }
 
@@ -402,7 +482,7 @@ export function syncAgentGroupPositions(nodes, agentId, agentX, agentY) {
 	const agentPoint = { x: agentX, y: agentY };
 	const tools = toolsForAgent(nodes, agentId);
 
-	return nodes.map((node) => {
+	const next = nodes.map((node) => {
 		if (node.id === agentId) {
 			return { ...node, x: agentX, y: agentY };
 		}
@@ -442,6 +522,25 @@ export function syncAgentGroupPositions(nodes, agentId, agentX, agentY) {
 
 		return node;
 	});
+
+	return next.map((node) => {
+		if (!isParserChatModelAttachment(node)) {
+			return node;
+		}
+
+		const parser = next.find(
+			(entry) =>
+				entry.id === node.parent_agent_id &&
+				isOutputParserAttachment(entry)
+		);
+
+		if (!parser || parser.parent_agent_id !== agentId) {
+			return node;
+		}
+
+		const position = parserChatModelAttachmentPosition(parser);
+		return { ...node, x: position.x, y: position.y };
+	});
 }
 
 /**
@@ -450,5 +549,19 @@ export function syncAgentGroupPositions(nodes, agentId, agentX, agentY) {
  * @return {Array<Object>}
  */
 export function removeAgentAttachments(nodes, agentId) {
-	return nodes.filter((node) => node.parent_agent_id !== agentId);
+	const parserIds = new Set(
+		nodes
+			.filter(
+				(node) =>
+					node.parent_agent_id === agentId &&
+					isOutputParserAttachment(node)
+			)
+			.map((node) => node.id)
+	);
+
+	return nodes.filter(
+		(node) =>
+			node.parent_agent_id !== agentId &&
+			!parserIds.has(node.parent_agent_id)
+	);
 }
