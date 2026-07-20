@@ -51,10 +51,10 @@ export const AGENT_PORTS_HEIGHT = 36;
 export const AGENT_TOTAL_HEIGHT = AGENT_BODY_HEIGHT + AGENT_PORTS_HEIGHT;
 export const ATTACHMENT_GAP = 56;
 export const TOOL_NODE_HEIGHT = 52;
-export const CHAT_MODEL_NODE_SIZE = 72;
+export const CHAT_MODEL_NODE_SIZE = 104;
 export const MEMORY_NODE_HEIGHT = 40;
-export const OUTPUT_PARSER_NODE_WIDTH = 180;
-export const OUTPUT_PARSER_NODE_HEIGHT = 72;
+export const OUTPUT_PARSER_NODE_WIDTH = 200;
+export const OUTPUT_PARSER_NODE_HEIGHT = 78;
 
 /**
  * @param {Object} node
@@ -349,8 +349,6 @@ export function outputParserAttachmentPosition(agentNode) {
 }
 
 /**
- * Chat model attached under a Structured Output Parser (Auto-Fix model).
- *
  * @param {Object} parserNode
  * @return {{ x: number, y: number }}
  */

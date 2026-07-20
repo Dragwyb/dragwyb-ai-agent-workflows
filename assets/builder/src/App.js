@@ -1427,7 +1427,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: nodeTypeDefinition.slug,
 			category: 'action',
-			label: `${nodeTypeDefinition.label} (${__('Auto-Fix', 'workflow-automate')})`,
+			label: nodeTypeDefinition.label,
 			parent_agent_id: parserId,
 			attachment_type: 'parser_chat_model',
 			x: position.x,

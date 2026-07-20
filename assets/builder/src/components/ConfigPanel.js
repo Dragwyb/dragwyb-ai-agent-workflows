@@ -515,41 +515,27 @@ export default function ConfigPanel({
 			)}
 
 			{node.attachment_type === 'output_parser' && (
-				<div className="wfa-builder-config__parser-model">
+				<>
 					<p className="wfa-builder-config__field-help">
 						{__(
-							'Define the JSON structure the AI Agent must return. Paste an example or a JSON Schema, then enable Auto-Fix if the model should retry on mismatch.',
+							'JSON structure for the AI Agent reply. Connect a Model* on the canvas for Auto-Fix.',
 							'workflow-automate'
 						)}
 					</p>
-					<p className="wfa-builder-config__field-help">
-						{__(
-							'Connect a chat model under this node (Model*) for Auto-Fix.',
-							'workflow-automate'
-						)}
-					</p>
-					{graphNodes.some(
-						(entry) =>
-							entry.parent_agent_id === node.id &&
-							entry.attachment_type === 'parser_chat_model'
-					) ? (
-						<p className="wfa-agent-config__notice wfa-agent-config__notice--info">
-							{__(
-								'Auto-Fix model connected. Open it on the canvas to set the API key and model.',
-								'workflow-automate'
-							)}
-						</p>
-					) : (
-						onAddParserChatModel && (
+					{onAddParserChatModel &&
+						!graphNodes.some(
+							(entry) =>
+								entry.parent_agent_id === node.id &&
+								entry.attachment_type === 'parser_chat_model'
+						) && (
 							<Button
 								variant="secondary"
 								onClick={() => onAddParserChatModel(node.id)}
 							>
-								{__('Connect Auto-Fix model', 'workflow-automate')}
+								{__('Connect model', 'workflow-automate')}
 							</Button>
-						)
-					)}
-				</div>
+						)}
+				</>
 			)}
 
 			{node.attachment_type === 'memory' && (

@@ -8,7 +8,7 @@ import {
 } from '../utils/agentAttachments';
 
 /**
- * Circular chat model card attached below an AI Agent.
+ * Circular chat model card (logo + label below).
  */
 export default function ChatModelSubNode({
 	node,
@@ -34,25 +34,24 @@ export default function ChatModelSubNode({
 			]
 				.filter(Boolean)
 				.join(' ')}
-			style={{ width: CHAT_MODEL_NODE_SIZE, height: CHAT_MODEL_NODE_SIZE }}
+			style={{ width: CHAT_MODEL_NODE_SIZE }}
 			data-node-id={node.id}
 			role="button"
 			tabIndex={0}
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-chat-model-node__input-dot" aria-hidden="true" />
+			<span className="wfa-chat-model-node__port" aria-hidden="true" />
 			<span
 				className="wfa-chat-model-node__ring"
-				style={{
-					backgroundColor: meta.bg,
-					color: meta.accent,
-				}}
+				style={{ backgroundColor: meta.bg, color: meta.accent }}
 				aria-hidden="true"
 			>
 				<span className="wfa-chat-model-node__icon">{meta.icon}</span>
 			</span>
-			<span className="wfa-chat-model-node__label">{node.label}</span>
+			<span className="wfa-chat-model-node__label">
+				{node.label || __('Chat Model', 'workflow-automate')}
+			</span>
 			<span className="wfa-chat-model-node__subtitle">
 				{__('Chat Model', 'workflow-automate')}
 			</span>

@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import NodeCard from './NodeCard';
@@ -82,6 +83,34 @@ function flowPath(from, to) {
 	return `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`;
 }
 
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 1.5;
+const ZOOM_STEP = 0.1;
+
+/**
+ * @param {number} zoom
+ * @return {number}
+ */
+function clampZoom(zoom) {
+	return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(zoom * 10) / 10));
+}
+
+/**
+ * @param {Array<Object>} nodes
+ * @return {{ w: number, h: number }}
+ */
+function contentBounds(nodes) {
+	let maxX = 1200;
+	let maxY = 800;
+
+	for (const node of nodes) {
+		maxX = Math.max(maxX, (node.x || 0) + 320);
+		maxY = Math.max(maxY, (node.y || 0) + 220);
+	}
+
+	return { w: maxX, h: maxY };
+}
+
 export default function Canvas({
 	nodes,
 
@@ -133,7 +162,44 @@ export default function Canvas({
 
 	registerNodeRef,
 }) {
+	const [zoom, setZoom] = useState(1);
+	const canvasElRef = useRef(null);
 	const canvasNodes = mainCanvasNodes(nodes);
+	const bounds = contentBounds(nodes);
+
+	const setCanvasRef = useCallback(
+		(element) => {
+			canvasElRef.current = element;
+			if (onRegisterCanvas) {
+				onRegisterCanvas(element);
+			}
+		},
+		[onRegisterCanvas]
+	);
+
+	const bumpZoom = useCallback((delta) => {
+		setZoom((current) => clampZoom(current + delta));
+	}, []);
+
+	useEffect(() => {
+		const element = canvasElRef.current;
+		if (!element) {
+			return undefined;
+		}
+
+		const onWheel = (event) => {
+			if (!event.ctrlKey && !event.metaKey) {
+				return;
+			}
+
+			event.preventDefault();
+			const direction = event.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+			setZoom((current) => clampZoom(current + direction));
+		};
+
+		element.addEventListener('wheel', onWheel, { passive: false });
+		return () => element.removeEventListener('wheel', onWheel);
+	}, []);
 
 	const nodesById = Object.fromEntries(canvasNodes.map((node) => [node.id, node]));
 
@@ -324,20 +390,34 @@ export default function Canvas({
 	});
 
 	return (
+		<div className="wfa-builder-canvas-host">
 		<div
-			ref={onRegisterCanvas}
+			ref={setCanvasRef}
 			className={
 				connectionDrag
 					? 'wfa-builder-canvas wfa-builder-canvas--connecting'
 					: 'wfa-builder-canvas'
 			}
-
+			style={{ '--wfa-canvas-zoom': String(zoom) }}
 			role="region"
-
 			aria-label={__('Workflow canvas', 'workflow-automate')}
-
 			onClick={onCanvasClick}
 		>
+			<div
+				className="wfa-builder-canvas__scaler"
+				style={{
+					width: bounds.w * zoom,
+					height: bounds.h * zoom,
+				}}
+			>
+				<div
+					className="wfa-builder-canvas__world"
+					style={{
+						width: bounds.w,
+						height: bounds.h,
+						transform: `scale(${zoom})`,
+					}}
+				>
 			{(flowEdges.length > 0 ||
 				attachmentEdges.length > 0 ||
 				branchEdges.length > 0 ||
@@ -614,6 +694,38 @@ export default function Canvas({
 						/>
 					</div>
 				))}
+				</div>
+			</div>
+		</div>
+			<div className="wfa-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'workflow-automate')}>
+				<button
+					type="button"
+					className="wfa-builder-canvas__zoom-btn"
+					aria-label={__('Zoom out', 'workflow-automate')}
+					disabled={zoom <= ZOOM_MIN}
+					onClick={(event) => {
+						event.stopPropagation();
+						bumpZoom(-ZOOM_STEP);
+					}}
+				>
+					−
+				</button>
+				<span className="wfa-builder-canvas__zoom-label">
+					{Math.round(zoom * 100)}%
+				</span>
+				<button
+					type="button"
+					className="wfa-builder-canvas__zoom-btn"
+					aria-label={__('Zoom in', 'workflow-automate')}
+					disabled={zoom >= ZOOM_MAX}
+					onClick={(event) => {
+						event.stopPropagation();
+						bumpZoom(ZOOM_STEP);
+					}}
+				>
+					+
+				</button>
+			</div>
 		</div>
 	);
 }

@@ -1,5 +1,7 @@
 import { useRef } from '@wordpress/element';
 
+import { getCanvasZoom } from './useBranchConnectionDrag';
+
 const DRAG_THRESHOLD_PX = 3;
 const NUDGE_STEP = 10;
 const NUDGE_STEP_LARGE = 40;
@@ -47,6 +49,7 @@ export function useNodeDrag({ nodeId, x, y, onMove, onSelect, linkConnectMode = 
 			originX: x,
 			originY: y,
 			moved: false,
+			zoom: getCanvasZoom(target.closest('.wfa-builder-canvas')),
 		};
 
 		const handlePointerMove = (moveEvent) => {
@@ -55,12 +58,13 @@ export function useNodeDrag({ nodeId, x, y, onMove, onSelect, linkConnectMode = 
 				return;
 			}
 
-			const dx = moveEvent.clientX - drag.startX;
-			const dy = moveEvent.clientY - drag.startY;
+			const zoom = drag.zoom || 1;
+			const dx = (moveEvent.clientX - drag.startX) / zoom;
+			const dy = (moveEvent.clientY - drag.startY) / zoom;
 
 			if (
-				Math.abs(dx) > DRAG_THRESHOLD_PX ||
-				Math.abs(dy) > DRAG_THRESHOLD_PX
+				Math.abs(moveEvent.clientX - drag.startX) > DRAG_THRESHOLD_PX ||
+				Math.abs(moveEvent.clientY - drag.startY) > DRAG_THRESHOLD_PX
 			) {
 				drag.moved = true;
 			}

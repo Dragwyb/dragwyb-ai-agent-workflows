@@ -3,8 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useNodeDrag } from '../hooks/useNodeDrag';
 
 /**
- * Compact Structured Output Parser card attached below an AI Agent.
- * n8n-style: Output Parser port on top, Model* on the bottom for Auto-Fix.
+ * Structured Output Parser card with Model* port for Auto-Fix.
  */
 export default function OutputParserSubNode({
 	node,
@@ -27,7 +26,6 @@ export default function OutputParserSubNode({
 			className={[
 				'wfa-output-parser-node',
 				selected ? 'wfa-output-parser-node--selected' : '',
-				!hasChatModel ? 'wfa-output-parser-node--needs-model' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -37,9 +35,6 @@ export default function OutputParserSubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-output-parser-node__output-port" aria-hidden="true">
-				{__('Output Parser', 'workflow-automate')}
-			</span>
 			<span className="wfa-output-parser-node__input-dot" aria-hidden="true" />
 			<span className="wfa-output-parser-node__icon" aria-hidden="true">
 				{'{✓}'}
@@ -49,20 +44,11 @@ export default function OutputParserSubNode({
 					__('Structured Output Parser', 'workflow-automate')}
 			</span>
 			<div className="wfa-output-parser-node__model-row">
-				<span
-					className={[
-						'wfa-output-parser-node__model-label',
-						!hasChatModel
-							? 'wfa-output-parser-node__model-label--required'
-							: '',
-					]
-						.filter(Boolean)
-						.join(' ')}
-				>
+				<span className="wfa-output-parser-node__model-label">
 					{__('Model', 'workflow-automate')}
 					{!hasChatModel ? '*' : ''}
 				</span>
-				{!hasChatModel && typeof onAddChatModel === 'function' ? (
+				{!hasChatModel && onAddChatModel ? (
 					<button
 						type="button"
 						className="wfa-output-parser-node__model-add"
@@ -70,10 +56,7 @@ export default function OutputParserSubNode({
 							event.stopPropagation();
 							onAddChatModel(node.id);
 						}}
-						aria-label={__(
-							'Connect chat model for Auto-Fix',
-							'workflow-automate'
-						)}
+						aria-label={__('Connect model', 'workflow-automate')}
 					>
 						+
 					</button>

@@ -4,6 +4,23 @@ import { conditionOutputPortPosition, getConditionRows } from '../utils/conditio
 
 /**
  * @param {HTMLElement|null} canvasElement
+ * @return {number}
+ */
+export function getCanvasZoom(canvasElement) {
+	if (!canvasElement) {
+		return 1;
+	}
+
+	const raw =
+		canvasElement.style.getPropertyValue('--wfa-canvas-zoom') ||
+		getComputedStyle(canvasElement).getPropertyValue('--wfa-canvas-zoom');
+	const zoom = parseFloat(raw);
+
+	return zoom > 0 ? zoom : 1;
+}
+
+/**
+ * @param {HTMLElement|null} canvasElement
  * @param {number}           clientX
  * @param {number}           clientY
  * @return {{ x: number, y: number }}
@@ -14,10 +31,11 @@ export function clientToCanvasPoint(canvasElement, clientX, clientY) {
 	}
 
 	const rect = canvasElement.getBoundingClientRect();
+	const zoom = getCanvasZoom(canvasElement);
 
 	return {
-		x: clientX - rect.left + canvasElement.scrollLeft,
-		y: clientY - rect.top + canvasElement.scrollTop,
+		x: (clientX - rect.left + canvasElement.scrollLeft) / zoom,
+		y: (clientY - rect.top + canvasElement.scrollTop) / zoom,
 	};
 }
 
@@ -66,18 +84,21 @@ export function portPositionFromElement(portElement, canvasElement) {
 
 	const portRect = portElement.getBoundingClientRect();
 	const canvasRect = canvasElement.getBoundingClientRect();
+	const zoom = getCanvasZoom(canvasElement);
 
 	return {
 		x:
-			portRect.left +
-			portRect.width / 2 -
-			canvasRect.left +
-			canvasElement.scrollLeft,
+			(portRect.left +
+				portRect.width / 2 -
+				canvasRect.left +
+				canvasElement.scrollLeft) /
+			zoom,
 		y:
-			portRect.top +
-			portRect.height / 2 -
-			canvasRect.top +
-			canvasElement.scrollTop,
+			(portRect.top +
+				portRect.height / 2 -
+				canvasRect.top +
+				canvasElement.scrollTop) /
+			zoom,
 	};
 }
 
