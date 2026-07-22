@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
+use WorkflowAutomate\Plugin\Domain\WorkflowNode;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;

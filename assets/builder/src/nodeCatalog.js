@@ -153,6 +153,43 @@ const GOOGLE_SHEETS_GROUPS = [
 	},
 ];
 
+/** @type {Array<{ id: string, label: string }>} */
+const WORDPRESS_ACTION_GROUP_ORDER = [
+	{ id: 'user', label: 'User Management' },
+	{ id: 'user_retrieval', label: 'User Retrieval' },
+	{ id: 'user_metadata', label: 'User Metadata' },
+	{ id: 'role', label: 'Role Management' },
+	{ id: 'capabilities', label: 'Capabilities Management' },
+	{ id: 'post', label: 'Post Management' },
+	{ id: 'comment', label: 'Comment Management' },
+	{ id: 'post_type', label: 'Post Type Management' },
+	{ id: 'post_tag', label: 'Post Tag Management' },
+	{ id: 'media', label: 'Media Management' },
+	{ id: 'term', label: 'Term Management' },
+	{ id: 'taxonomy', label: 'Taxonomy Management' },
+	{ id: 'category', label: 'Category Management' },
+	{ id: 'product_tag', label: 'Product Tag Management' },
+	{ id: 'product_category', label: 'Product Category Management' },
+	{ id: 'product_type', label: 'Product Type Management' },
+	{ id: 'plugin', label: 'Plugin Management' },
+];
+
+/**
+ * @param {Object} action
+ * @return {boolean}
+ */
+function isWordPressAction(action) {
+	return action?.app === 'wordpress' || String(action?.slug || '').startsWith('wp_');
+}
+
+/**
+ * @param {Array<Object>} actions
+ * @return {Array<Object>}
+ */
+function getWordPressActions(actions) {
+	return actions.filter(isWordPressAction);
+}
+
 /** @type {Record<string, { id: string, label: string, parentId: string, slugs: string[] }>} */
 const NESTED_ACTION_APPS = {
 	'google-sheets': {
@@ -163,8 +200,14 @@ const NESTED_ACTION_APPS = {
 	},
 };
 
-/** @type {Record<string, { id: string, label: string, slugs: string[], subApps?: string[] }>} */
+/** @type {Record<string, { id: string, label: string, slugs: string[], subApps?: string[], matchActions?: (action: Object) => boolean }>} */
 const ACTION_APPS = {
+	wordpress: {
+		id: 'wordpress',
+		label: 'WordPress',
+		slugs: [],
+		matchActions: isWordPressAction,
+	},
 	communication: {
 		id: 'communication',
 		label: 'Communication',
@@ -207,10 +250,14 @@ function getActionAppDef(appId, subAppId = null) {
 
 /**
  * @param {Array<Object>} actions
- * @param {{ slugs: string[], subApps?: string[] }} app
+ * @param {{ slugs: string[], subApps?: string[], matchActions?: (action: Object) => boolean }} app
  * @return {boolean}
  */
 function actionAppHasItems(actions, app) {
+	if (typeof app.matchActions === 'function' && actions.some((action) => app.matchActions(action))) {
+		return true;
+	}
+
 	if (app.slugs.some((slug) => actions.some((action) => action.slug === slug))) {
 		return true;
 	}
@@ -229,13 +276,25 @@ function actionAppHasItems(actions, app) {
 
 /**
  * @param {Array<Object>} actions
- * @param {{ slugs: string[], subApps?: string[] }} app
+ * @param {{ label: string, slugs: string[], subApps?: string[], matchActions?: (action: Object) => boolean }} app
  * @param {string}        needle
  * @return {boolean}
  */
 function actionAppMatchesSearch(actions, app, needle) {
 	if (app.label.toLowerCase().includes(needle)) {
 		return true;
+	}
+
+	if (typeof app.matchActions === 'function') {
+		if (
+			actions.some(
+				(action) =>
+					app.matchActions(action) &&
+					(action.label || '').toLowerCase().includes(needle)
+			)
+		) {
+			return true;
+		}
 	}
 
 	if (
@@ -638,6 +697,10 @@ export function getItemsForPicker(
 		return [];
 	}
 
+	if (typeof app.matchActions === 'function') {
+		return actions.filter((action) => app.matchActions(action));
+	}
+
 	return actions.filter((action) => app.slugs.includes(action.slug));
 }
 
@@ -657,9 +720,11 @@ export function appUsesGroups(kind, appId) {
  * @return {boolean}
  */
 export function appUsesGroupedSections(kind, appId, subAppId = null) {
+	const effectiveId = getEffectiveActionAppId(appId, subAppId);
+
 	return (
 		kind === 'action' &&
-		getEffectiveActionAppId(appId, subAppId) === 'google-sheets'
+		(effectiveId === 'google-sheets' || effectiveId === 'wordpress')
 	);
 }
 
@@ -727,6 +792,40 @@ export function getGroupedItemsForPicker(
 		return null;
 	}
 
+	const effectiveId = getEffectiveActionAppId(appId, subAppId);
+
+	if (effectiveId === 'wordpress') {
+		const appActions = getWordPressActions(actions);
+		const byGroup = new Map();
+
+		appActions.forEach((action) => {
+			const groupId = action.group || 'other';
+			if (!byGroup.has(groupId)) {
+				byGroup.set(groupId, []);
+			}
+			byGroup.get(groupId).push(action);
+		});
+
+		const ordered = WORDPRESS_ACTION_GROUP_ORDER.map((group) => ({
+			id: group.id,
+			label: group.label,
+			items: byGroup.get(group.id) || [],
+			metaAppId: 'wordpress',
+		})).filter((group) => group.items.length > 0);
+
+		const knownIds = new Set(WORDPRESS_ACTION_GROUP_ORDER.map((group) => group.id));
+		const extras = [...byGroup.entries()]
+			.filter(([groupId]) => !knownIds.has(groupId))
+			.map(([groupId, items]) => ({
+				id: groupId,
+				label: items[0]?.group_label || groupId,
+				items,
+				metaAppId: 'wordpress',
+			}));
+
+		return [...ordered, ...extras];
+	}
+
 	const app = getActionAppDef(appId, subAppId);
 
 	if (!app) {
@@ -734,7 +833,7 @@ export function getGroupedItemsForPicker(
 	}
 
 	const appActions = actions.filter((action) => app.slugs.includes(action.slug));
-	const metaAppId = getEffectiveActionAppId(appId, subAppId);
+	const metaAppId = effectiveId;
 
 	return GOOGLE_SHEETS_GROUPS.map((group) => ({
 		id: group.id,

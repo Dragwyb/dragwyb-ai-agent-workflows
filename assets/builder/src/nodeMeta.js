@@ -46,5 +46,13 @@ export function getNodeMeta(slugOrAppId, category, appId) {
 		return APP_META[slugOrAppId];
 	}
 
+	if (typeof slugOrAppId === 'string' && slugOrAppId.startsWith('wp_')) {
+		return APP_META.wordpress;
+	}
+
+	if (typeof slugOrAppId === 'string' && slugOrAppId.startsWith('google_sheets_')) {
+		return APP_META['google-sheets'];
+	}
+
 	return NODE_META[category] || NODE_META.action;
 }

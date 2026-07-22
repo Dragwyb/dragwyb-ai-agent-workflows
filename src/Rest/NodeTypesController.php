@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Capabilities;
+use WorkflowAutomate\Plugin\Domain\Contracts\ActionGroupInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
 use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
@@ -216,7 +217,7 @@ class NodeTypesController {
 			'available' => true,
 		);
 
-		if ( $node_type instanceof TriggerGroupInterface ) {
+		if ( $node_type instanceof TriggerGroupInterface || $node_type instanceof ActionGroupInterface ) {
 			$data['app'] = $node_type->app();
 			$data['group'] = $node_type->group();
 			$data['group_label'] = $node_type->groupLabel();

@@ -26,6 +26,7 @@ use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
+use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
 use WorkflowAutomate\Plugin\Service\Agent\AgentService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
@@ -89,6 +90,10 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new ConditionAction() );
 
 		foreach ( GoogleSheetsActionRegistrar::all( $this->connections, $this->google_oauth ) as $action ) {
+			$registry->registerAction( $action );
+		}
+
+		foreach ( WordPressActionRegistrar::all() as $action ) {
 			$registry->registerAction( $action );
 		}
 
