@@ -304,9 +304,16 @@ class Plugin {
 		$this->container->singleton(
 			TriggerReentrancyGuard::class,
 			static function (): TriggerReentrancyGuard {
-				return new TriggerReentrancyGuard();
+				$guard = new TriggerReentrancyGuard();
+				TriggerReentrancyGuard::bindInstance( $guard );
+
+				return $guard;
 			}
 		);
+
+		// Resolve immediately so WordPress action writes can suppress triggers
+		// even before the execution engine is first pulled from the container.
+		$this->container->get( TriggerReentrancyGuard::class );
 
 		$this->container->singleton(
 			WorkflowTestListenerService::class,

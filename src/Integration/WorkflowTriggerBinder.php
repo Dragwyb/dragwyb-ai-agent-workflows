@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Integration;
 
 use WorkflowAutomate\Plugin\Domain\Workflow;
+use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\SettingsService;
 use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
@@ -175,7 +176,19 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
+					// Mid-write: any WFA create/update/delete is still on the stack.
+					if ( $this->trigger_guard->isWriting() ) {
+						return;
+					}
+
+					// Same workflow already executing this request.
 					if ( $this->trigger_guard->isActive( $workflow_id ) ) {
+						return;
+					}
+
+					// Entity was created by a previous WFA action (translated post,
+					// auto-user, auto-comment, etc.) — do not start another loop.
+					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
 						return;
 					}
 
@@ -207,14 +220,16 @@ class WorkflowTriggerBinder {
 	 * @return string Empty when no useful key exists.
 	 */
 	private function triggerDedupeKey( array $payload ): string {
-		$post_id = isset( $payload['post_id'] ) ? (int) $payload['post_id'] : 0;
+		foreach ( array( 'post_id', 'product_id', 'user_id', 'customer_id', 'comment_id', 'term_id', 'order_id', 'ID' ) as $field ) {
+			if ( ! isset( $payload[ $field ] ) ) {
+				continue;
+			}
 
-		if ( $post_id <= 0 && isset( $payload['ID'] ) ) {
-			$post_id = (int) $payload['ID'];
-		}
+			$id = (int) $payload[ $field ];
 
-		if ( $post_id > 0 ) {
-			return '"post_id":' . $post_id;
+			if ( $id > 0 ) {
+				return '"' . $field . '":' . $id;
+			}
 		}
 
 		return '';

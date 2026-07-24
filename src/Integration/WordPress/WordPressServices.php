@@ -178,11 +178,20 @@ final class WordPressServices {
 		$userData['user_pass'] = $password;
 		$userData['role'] = $userRole;
 
+		$marker = static function ( int $id ): void {
+			WordPressActionHelper::markAutomatedUser( $id );
+		};
+		add_action( 'user_register', $marker, 0, 1 );
+
 		$userId = wp_insert_user( $userData );
+
+		remove_action( 'user_register', $marker, 0 );
 
 		if ( is_wp_error( $userId ) ) {
 			return WordPressActionHelper::fail( $userId->get_error_message() );
 		}
+
+		WordPressActionHelper::markAutomatedUser( (int) $userId );
 
 		foreach ( $this->keyValue( $config, 'metadata' ) as $metaKey => $metaValue ) {
 			update_user_meta( $userId, $metaKey, $metaValue );
@@ -1078,6 +1087,8 @@ final class WordPressServices {
 			return WordPressActionHelper::fail( $commentId->get_error_message() );
 		}
 
+		WordPressActionHelper::markAutomatedComment( (int) $commentId );
+
 		return WordPressActionHelper::ok( array( 'comment_id' => $commentId ) );
 	}
 
@@ -1108,6 +1119,8 @@ final class WordPressServices {
 		if ( is_wp_error( $commentId ) ) {
 			return WordPressActionHelper::fail( $commentId->get_error_message() );
 		}
+
+		WordPressActionHelper::markAutomatedComment( (int) $commentId );
 
 		return WordPressActionHelper::ok( array( 'comment_id' => $commentId ) );
 	}
@@ -1381,6 +1394,7 @@ final class WordPressServices {
 		}
 
 		$imageId = (int) $imageId;
+		WordPressActionHelper::markAutomatedPost( $imageId );
 		$attachmentUrl = wp_get_attachment_url( $imageId );
 
 		if ( empty( $attachmentUrl ) ) {

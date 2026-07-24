@@ -145,6 +145,9 @@ final class WordPressActionHelper {
 			return self::fail( $term->get_error_message() );
 		}
 
+		$term_id = isset( $term['term_id'] ) ? (int) $term['term_id'] : 0;
+		self::markAutomatedTerm( $term_id );
+
 		return self::ok( (array) $term );
 	}
 
@@ -500,6 +503,133 @@ final class WordPressActionHelper {
 		}
 
 		return '' !== (string) get_post_meta( $post_id, self::AUTOMATED_META_KEY, true );
+	}
+
+	/**
+	 * @param int $user_id User id.
+	 *
+	 * @return void
+	 */
+	public static function markAutomatedUser( int $user_id ): void {
+		if ( $user_id <= 0 ) {
+			return;
+		}
+
+		update_user_meta( $user_id, self::AUTOMATED_META_KEY, '1' );
+	}
+
+	/**
+	 * @param int $user_id User id.
+	 *
+	 * @return bool
+	 */
+	public static function isAutomatedUser( int $user_id ): bool {
+		if ( $user_id <= 0 ) {
+			return false;
+		}
+
+		return '' !== (string) get_user_meta( $user_id, self::AUTOMATED_META_KEY, true );
+	}
+
+	/**
+	 * @param int $comment_id Comment id.
+	 *
+	 * @return void
+	 */
+	public static function markAutomatedComment( int $comment_id ): void {
+		if ( $comment_id <= 0 ) {
+			return;
+		}
+
+		add_comment_meta( $comment_id, self::AUTOMATED_META_KEY, '1', true );
+	}
+
+	/**
+	 * @param int $comment_id Comment id.
+	 *
+	 * @return bool
+	 */
+	public static function isAutomatedComment( int $comment_id ): bool {
+		if ( $comment_id <= 0 ) {
+			return false;
+		}
+
+		return '' !== (string) get_comment_meta( $comment_id, self::AUTOMATED_META_KEY, true );
+	}
+
+	/**
+	 * @param int $term_id Term id.
+	 *
+	 * @return void
+	 */
+	public static function markAutomatedTerm( int $term_id ): void {
+		if ( $term_id <= 0 || ! function_exists( 'update_term_meta' ) ) {
+			return;
+		}
+
+		update_term_meta( $term_id, self::AUTOMATED_META_KEY, '1' );
+	}
+
+	/**
+	 * @param int $term_id Term id.
+	 *
+	 * @return bool
+	 */
+	public static function isAutomatedTerm( int $term_id ): bool {
+		if ( $term_id <= 0 || ! function_exists( 'get_term_meta' ) ) {
+			return false;
+		}
+
+		return '' !== (string) get_term_meta( $term_id, self::AUTOMATED_META_KEY, true );
+	}
+
+	/**
+	 * True when a trigger payload refers to an entity this plugin created.
+	 *
+	 * @param array<string, mixed> $payload Trigger payload.
+	 *
+	 * @return bool
+	 */
+	public static function isAutomatedPayload( array $payload ): bool {
+		$post_id = 0;
+
+		foreach ( array( 'post_id', 'product_id', 'image_id', 'media_id', 'ID' ) as $key ) {
+			if ( isset( $payload[ $key ] ) && (int) $payload[ $key ] > 0 ) {
+				$post_id = (int) $payload[ $key ];
+				break;
+			}
+		}
+
+		if ( $post_id > 0 && self::isAutomatedPost( $post_id ) ) {
+			return true;
+		}
+
+		$user_id = 0;
+
+		foreach ( array( 'user_id', 'customer_id' ) as $key ) {
+			if ( isset( $payload[ $key ] ) && (int) $payload[ $key ] > 0 ) {
+				$user_id = (int) $payload[ $key ];
+				break;
+			}
+		}
+
+		if ( $user_id > 0 && self::isAutomatedUser( $user_id ) ) {
+			return true;
+		}
+
+		$comment_id = isset( $payload['comment_id'] ) ? (int) $payload['comment_id'] : 0;
+
+		if ( $comment_id > 0 && self::isAutomatedComment( $comment_id ) ) {
+			return true;
+		}
+
+		$term_id = isset( $payload['term_id'] ) ? (int) $payload['term_id'] : 0;
+
+		if ( $term_id > 0 && self::isAutomatedTerm( $term_id ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

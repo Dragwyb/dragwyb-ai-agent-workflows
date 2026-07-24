@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Integration\WordPress;
 
 use WorkflowAutomate\Plugin\Domain\Contracts\ActionGroupInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
+use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -80,6 +81,18 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 		$method = $this->definition['method'];
 		$args = $this->definition['method_args'] ?? array();
 
-		return $this->services->$method( $config, ...$args );
+		$guard = TriggerReentrancyGuard::instance();
+
+		if ( null !== $guard ) {
+			$guard->beginWrite();
+		}
+
+		try {
+			return $this->services->$method( $config, ...$args );
+		} finally {
+			if ( null !== $guard ) {
+				$guard->endWrite();
+			}
+		}
 	}
 }
