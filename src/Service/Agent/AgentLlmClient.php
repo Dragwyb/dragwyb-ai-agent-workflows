@@ -502,6 +502,16 @@ class AgentLlmClient {
 			}
 
 			if ( 'assistant' === $role && ! empty( $message['tool_calls'] ) && is_array( $message['tool_calls'] ) ) {
+				// Prefer the original Gemini parts so thoughtSignature (required for
+				// tool-calling models) is returned exactly as received.
+				if ( ! empty( $message['gemini_parts'] ) && is_array( $message['gemini_parts'] ) ) {
+					$contents[] = array(
+						'role'  => 'model',
+						'parts' => $message['gemini_parts'],
+					);
+					continue;
+				}
+
 				$parts = array();
 
 				if ( ! empty( $message['content'] ) ) {
@@ -520,12 +530,20 @@ class AgentLlmClient {
 						$args   = is_array( $parsed ) ? $parsed : array();
 					}
 
-					$parts[] = array(
+					$part = array(
 						'functionCall' => array(
 							'name' => (string) ( $tool_call['function']['name'] ?? '' ),
 							'args' => $this->toGeminiStruct( is_array( $args ) ? $args : array() ),
 						),
 					);
+
+					$thought_signature = $tool_call['thought_signature'] ?? $tool_call['thoughtSignature'] ?? null;
+
+					if ( is_string( $thought_signature ) && '' !== $thought_signature ) {
+						$part['thoughtSignature'] = $thought_signature;
+					}
+
+					$parts[] = $part;
 				}
 
 				$contents[] = array(
@@ -689,8 +707,8 @@ class AgentLlmClient {
 			}
 
 			if ( isset( $part['functionCall'] ) && is_array( $part['functionCall'] ) ) {
-				$call = $part['functionCall'];
-				$tool_calls[] = array(
+				$call      = $part['functionCall'];
+				$tool_call = array(
 					'id'       => wp_generate_uuid4(),
 					'type'     => 'function',
 					'function' => array(
@@ -698,6 +716,14 @@ class AgentLlmClient {
 						'arguments' => wp_json_encode( is_array( $call['args'] ?? null ) ? $call['args'] : array() ),
 					),
 				);
+
+				$thought_signature = $part['thoughtSignature'] ?? $part['thought_signature'] ?? null;
+
+				if ( is_string( $thought_signature ) && '' !== $thought_signature ) {
+					$tool_call['thought_signature'] = $thought_signature;
+				}
+
+				$tool_calls[] = $tool_call;
 			}
 		}
 
@@ -707,7 +733,9 @@ class AgentLlmClient {
 		);
 
 		if ( array() !== $tool_calls ) {
-			$message['tool_calls'] = $tool_calls;
+			$message['tool_calls']   = $tool_calls;
+			// Keep original parts for the next Gemini request (thought signatures).
+			$message['gemini_parts'] = $parts;
 		}
 
 		return array(

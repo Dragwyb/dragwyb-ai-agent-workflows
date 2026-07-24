@@ -21,6 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class WordPressActionHelper {
 
 	/**
+	 * Post meta key stamped on posts this plugin creates, so save_post
+	 * triggers do not re-fire on the automation's own output (e.g. a
+	 * translated post created by an agent).
+	 */
+	public const AUTOMATED_META_KEY = '_wfa_automated';
+
+	/**
 	 * Builds a successful action result.
 	 *
 	 * @param mixed                $data  Primary result payload.
@@ -464,6 +471,35 @@ final class WordPressActionHelper {
 			'permalink' => (string) get_permalink( $post ),
 			'featured_image_id' => (int) get_post_thumbnail_id( $post ),
 		);
+	}
+
+	/**
+	 * Marks a post as created by Workflow Automate so later save_post events
+	 * for that post do not start another run of the same kind of workflow.
+	 *
+	 * @param int $post_id Post id.
+	 *
+	 * @return void
+	 */
+	public static function markAutomatedPost( int $post_id ): void {
+		if ( $post_id <= 0 ) {
+			return;
+		}
+
+		update_post_meta( $post_id, self::AUTOMATED_META_KEY, '1' );
+	}
+
+	/**
+	 * @param int $post_id Post id.
+	 *
+	 * @return bool
+	 */
+	public static function isAutomatedPost( int $post_id ): bool {
+		if ( $post_id <= 0 ) {
+			return false;
+		}
+
+		return '' !== (string) get_post_meta( $post_id, self::AUTOMATED_META_KEY, true );
 	}
 
 	/**

@@ -50,6 +50,7 @@ use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
+use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
@@ -301,6 +302,13 @@ class Plugin {
 		);
 
 		$this->container->singleton(
+			TriggerReentrancyGuard::class,
+			static function (): TriggerReentrancyGuard {
+				return new TriggerReentrancyGuard();
+			}
+		);
+
+		$this->container->singleton(
 			WorkflowTestListenerService::class,
 			static function ( Container $container ): WorkflowTestListenerService {
 				return new WorkflowTestListenerService( $container->get( WorkflowService::class ) );
@@ -328,7 +336,8 @@ class Plugin {
 					$container->get( NodeExecutionService::class ),
 					$container->get( WorkflowRunRepository::class ),
 					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( SettingsService::class )
+					$container->get( SettingsService::class ),
+					$container->get( TriggerReentrancyGuard::class )
 				);
 			}
 		);
@@ -478,7 +487,8 @@ class Plugin {
 					$this->container->get( NodeTypeRegistry::class ),
 					$this->container->get( WorkflowExecutionService::class ),
 					$this->container->get( SettingsService::class ),
-					$this->container->get( WorkflowTestListenerService::class )
+					$this->container->get( WorkflowTestListenerService::class ),
+					$this->container->get( TriggerReentrancyGuard::class )
 				);
 
 				$binder->bindActiveWorkflows();

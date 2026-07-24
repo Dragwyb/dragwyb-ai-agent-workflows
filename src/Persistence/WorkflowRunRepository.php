@@ -91,6 +91,48 @@ class WorkflowRunRepository {
 	}
 
 	/**
+	 * Reports whether this workflow already has a `queued` or `running` run
+	 * whose trigger payload contains the given JSON fragment. Lets callers
+	 * collapse duplicate firings of one real-world event (WordPress emits
+	 * `save_post` more than once for a single editor "Update") into one run
+	 * instead of a pile-up that repeats every third-party API call.
+	 *
+	 * @param int    $workflow_id    Workflow id.
+	 * @param string $payload_needle Raw JSON fragment to match, e.g. `"post_id":70`.
+	 *
+	 * @return bool
+	 */
+	public function hasPendingRunMatchingPayload( int $workflow_id, string $payload_needle ): bool {
+		global $wpdb;
+
+		if ( '' === $payload_needle ) {
+			return false;
+		}
+
+		$table = $this->table();
+		$like = '%' . $wpdb->esc_like( $payload_needle ) . '%';
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; all values are passed through wpdb->prepare().
+		$sql = "SELECT id FROM {$table}
+			WHERE workflow_id = %d
+				AND status IN ( %s, %s )
+				AND trigger_payload_json LIKE %s
+			LIMIT 1";
+
+		$found = $wpdb->get_var(
+			$wpdb->prepare(
+				$sql,
+				$workflow_id,
+				WorkflowRun::STATUS_QUEUED,
+				WorkflowRun::STATUS_RUNNING,
+				$like
+			)
+		);
+
+		return null !== $found;
+	}
+
+	/**
 	 * Atomically claims up to `$limit` runs that are ready to execute, and
 	 * returns them. "Ready" means either a fresh `queued` row whose
 	 * `next_attempt_at` (if any) has passed, or a `running` row that has

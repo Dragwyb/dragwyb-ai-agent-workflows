@@ -12,6 +12,7 @@ namespace WorkflowAutomate\Plugin\Integration;
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\SettingsService;
+use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
@@ -79,12 +80,15 @@ class WorkflowTriggerBinder {
 
 	private WorkflowTestListenerService $test_listener;
 
-	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings, WorkflowTestListenerService $test_listener ) {
+	private TriggerReentrancyGuard $trigger_guard;
+
+	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings, WorkflowTestListenerService $test_listener, TriggerReentrancyGuard $trigger_guard ) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
 		$this->executor = $executor;
 		$this->settings = $settings;
 		$this->test_listener = $test_listener;
+		$this->trigger_guard = $trigger_guard;
 	}
 
 	/**
@@ -171,13 +175,48 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
+					if ( $this->trigger_guard->isActive( $workflow_id ) ) {
+						return;
+					}
+
+					$dedupe_key = $this->triggerDedupeKey( $payload );
+
+					if ( '' !== $dedupe_key && ! $this->trigger_guard->claim( $workflow_id, $dedupe_key ) ) {
+						return;
+					}
+
 					if ( $this->settings->backgroundExecutionEnabled() ) {
-						$this->executor->queue( $workflow_id, $payload );
+						$this->executor->queueUnlessPending( $workflow_id, $payload, $dedupe_key );
 					} else {
 						$this->executor->run( $workflow_id, $payload );
 					}
 				}
 			);
 		}
+	}
+
+	/**
+	 * Builds a dedupe key identifying the event behind a trigger payload.
+	 *
+	 * Formatted as the JSON fragment the payload is persisted with, so the same
+	 * key works both for the in-request claim and for matching already-queued
+	 * runs in `WorkflowExecutionService::queueUnlessPending()`.
+	 *
+	 * @param array<string, mixed> $payload Trigger payload.
+	 *
+	 * @return string Empty when no useful key exists.
+	 */
+	private function triggerDedupeKey( array $payload ): string {
+		$post_id = isset( $payload['post_id'] ) ? (int) $payload['post_id'] : 0;
+
+		if ( $post_id <= 0 && isset( $payload['ID'] ) ) {
+			$post_id = (int) $payload['ID'];
+		}
+
+		if ( $post_id > 0 ) {
+			return '"post_id":' . $post_id;
+		}
+
+		return '';
 	}
 }

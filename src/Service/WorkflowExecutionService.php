@@ -71,10 +71,12 @@ class WorkflowExecutionService {
 
 	/**
 	 * A background run is retried up to this many times in total (i.e. up
-	 * to 4 retries after the original attempt) before being left in its
-	 * final failed/partial state.
+	 * to 2 retries after the original attempt) before being left in its
+	 * final failed/partial state. Kept low because a retry re-executes every
+	 * node from the start, repeating any paid third-party call the earlier
+	 * attempt already made.
 	 */
-	private const MAX_ATTEMPTS = 5;
+	private const MAX_ATTEMPTS = 3;
 
 	/**
 	 * Backoff base, in seconds: attempt 2 waits ~1 minute, attempt 3 ~2
@@ -97,13 +99,16 @@ class WorkflowExecutionService {
 
 	private SettingsService $settings;
 
+	private TriggerReentrancyGuard $trigger_guard;
+
 	public function __construct(
 		WorkflowService $workflows,
 		NodeTypeRegistry $registry,
 		NodeExecutionService $nodeExecutor,
 		WorkflowRunRepository $runs,
 		WorkflowRunLogRepository $runLogs,
-		SettingsService $settings
+		SettingsService $settings,
+		TriggerReentrancyGuard $trigger_guard
 	) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
@@ -111,6 +116,7 @@ class WorkflowExecutionService {
 		$this->runs = $runs;
 		$this->runLogs = $runLogs;
 		$this->settings = $settings;
+		$this->trigger_guard = $trigger_guard;
 	}
 
 	/**
@@ -226,6 +232,30 @@ class WorkflowExecutionService {
 	}
 
 	/**
+	 * Queues a run unless an equivalent one is already waiting or in flight.
+	 *
+	 * A single real-world event can reach the trigger binder several times
+	 * (WordPress fires `save_post` more than once per editor "Update"), and
+	 * each queued twin would repeat every node — including paid API calls.
+	 *
+	 * @param int                  $workflow_id     Workflow id.
+	 * @param array<string, mixed> $trigger_payload Data the triggering event provided.
+	 * @param string               $dedupe_key      JSON fragment identifying the event, e.g. `"post_id":70`.
+	 *
+	 * @throws InvalidArgumentException When the workflow does not exist.
+	 * @throws RuntimeException         When the run could not be recorded.
+	 *
+	 * @return WorkflowRun|null Null when an equivalent run is already pending.
+	 */
+	public function queueUnlessPending( int $workflow_id, array $trigger_payload, string $dedupe_key ): ?WorkflowRun {
+		if ( '' !== $dedupe_key && $this->runs->hasPendingRunMatchingPayload( $workflow_id, $dedupe_key ) ) {
+			return null;
+		}
+
+		return $this->queue( $workflow_id, $trigger_payload );
+	}
+
+	/**
 	 * Executes a run that BackgroundRunner has already claimed (its status
 	 * is `running` and it owns a `claim_token` — see
 	 * WorkflowRunRepository::claimBatch()). Not meant to be called with any
@@ -271,6 +301,27 @@ class WorkflowExecutionService {
 	 * @return WorkflowRun The finished run.
 	 */
 	private function executeNodes( WorkflowRun $run ): WorkflowRun {
+		$workflow_id = $run->workflowId();
+
+		$this->trigger_guard->enter( $workflow_id );
+
+		try {
+			return $this->executeNodesGuarded( $run );
+		} finally {
+			$this->trigger_guard->leave( $workflow_id );
+		}
+	}
+
+	/**
+	 * Executes nodes while the workflow is marked active by the trigger guard.
+	 *
+	 * @param WorkflowRun $run A running workflow run.
+	 *
+	 * @throws RuntimeException When the run could not be finalized.
+	 *
+	 * @return WorkflowRun The finished run.
+	 */
+	private function executeNodesGuarded( WorkflowRun $run ): WorkflowRun {
 		$workflow_id = $run->workflowId();
 		$trigger_payload = $run->triggerPayload();
 
@@ -477,6 +528,10 @@ class WorkflowExecutionService {
 			return;
 		}
 
+		if ( ! $this->isTransientFailure( $run ) ) {
+			return;
+		}
+
 		$delay = min( self::MAX_BACKOFF_SECONDS, self::BASE_BACKOFF_SECONDS * ( 2 ** ( $run->attempts() - 1 ) ) );
 
 		$this->runs->insert(
@@ -489,6 +544,57 @@ class WorkflowExecutionService {
 				'next_attempt_at' => gmdate( 'Y-m-d H:i:s', time() + $delay ),
 			)
 		);
+	}
+
+	/**
+	 * Decides whether a failed run is worth attempting again.
+	 *
+	 * Only failures that plausibly resolve on their own — timeouts, rate
+	 * limits, upstream 5xx, dropped connections — qualify. A rejected request
+	 * or a misconfigured node fails identically every attempt, so retrying it
+	 * only multiplies third-party API usage without ever succeeding.
+	 *
+	 * @param WorkflowRun $run The just-finished run.
+	 *
+	 * @return bool
+	 */
+	private function isTransientFailure( WorkflowRun $run ): bool {
+		static $signals = array(
+			'timed out',
+			'timeout',
+			'rate limit',
+			'too many requests',
+			'429',
+			'500',
+			'502',
+			'503',
+			'504',
+			'temporarily unavailable',
+			'try again',
+			'overloaded',
+			'connection',
+			'could not resolve host',
+		);
+
+		foreach ( $this->runLogs->findByRun( $run->id() ) as $log ) {
+			if ( WorkflowRunLog::STATUS_ERROR !== $log->status() ) {
+				continue;
+			}
+
+			$message = strtolower( (string) $log->message() );
+
+			if ( '' === $message ) {
+				continue;
+			}
+
+			foreach ( $signals as $signal ) {
+				if ( false !== strpos( $message, $signal ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

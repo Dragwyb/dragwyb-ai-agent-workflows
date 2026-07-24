@@ -861,11 +861,30 @@ final class WordPressServices {
 			$postData['meta_input'] = $customFields;
 		}
 
+		$existing_meta = isset( $postData['meta_input'] ) && is_array( $postData['meta_input'] )
+			? $postData['meta_input']
+			: array();
+		$postData['meta_input'] = array_merge(
+			$existing_meta,
+			array( WordPressActionHelper::AUTOMATED_META_KEY => '1' )
+		);
+
+		// Stamp meta before CatalogHookTrigger (priority 10) sees this save_post,
+		// so the newly created post never queues another run of the same workflow.
+		$marker = static function ( int $id ): void {
+			WordPressActionHelper::markAutomatedPost( $id );
+		};
+		add_action( 'save_post', $marker, 0, 1 );
+
 		$postId = wp_insert_post( $postData, true );
+
+		remove_action( 'save_post', $marker, 0 );
 
 		if ( is_wp_error( $postId ) ) {
 			return WordPressActionHelper::fail( $postId->get_error_message() );
 		}
+
+		WordPressActionHelper::markAutomatedPost( (int) $postId );
 
 		$this->applyPostTaxonomies( $postId, $config, false );
 

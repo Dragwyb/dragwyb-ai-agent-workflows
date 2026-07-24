@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Integration\Triggers;
 
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
 use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
 use WorkflowAutomate\Plugin\Service\TriggerPayloadNormalizer;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -84,11 +85,76 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		add_action(
 			$hook_name,
 			static function ( ...$args ) use ( $on_fire, $config, $hook_name ) {
+				if ( self::shouldIgnorePostEvent( $hook_name, $args ) ) {
+					return;
+				}
+
 				$payload = TriggerPayloadNormalizer::normalize( $hook_name, $args );
 				$on_fire( $payload, $config );
 			},
 			$priority,
 			$accepted_args
 		);
+	}
+
+	/**
+	 * Skips autosaves, revisions, trash, auto-drafts, and posts this plugin
+	 * already created — otherwise one editor "Update" (or trashing the
+	 * translated post the agent just made) starts another run.
+	 *
+	 * @param string            $hook_name Hook name.
+	 * @param array<int, mixed> $args      Hook arguments.
+	 *
+	 * @return bool
+	 */
+	private static function shouldIgnorePostEvent( string $hook_name, array $args ): bool {
+		static $post_hooks = array(
+			'save_post'            => true,
+			'wp_insert_post'       => true,
+			'wp_after_insert_post' => true,
+			'post_updated'         => true,
+		);
+
+		if ( ! isset( $post_hooks[ $hook_name ] ) ) {
+			return false;
+		}
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return true;
+		}
+
+		$post_id = isset( $args[0] ) ? (int) $args[0] : 0;
+
+		if ( $post_id <= 0 ) {
+			return false;
+		}
+
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return true;
+		}
+
+		if ( WordPressActionHelper::isAutomatedPost( $post_id ) ) {
+			return true;
+		}
+
+		$post = $args[1] ?? null;
+
+		if ( ! $post instanceof \WP_Post ) {
+			$post = get_post( $post_id );
+		}
+
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		if ( 'revision' === $post->post_type ) {
+			return true;
+		}
+
+		if ( in_array( (string) $post->post_status, array( 'auto-draft', 'inherit', 'trash' ), true ) ) {
+			return true;
+		}
+
+		return false;
 	}
 }
