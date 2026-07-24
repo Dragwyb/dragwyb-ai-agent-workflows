@@ -884,6 +884,7 @@ export function getPickerItemLabel(item, appId) {
  * @param {string|null}                subAppId
  * @param {Array<Object>}              triggers
  * @param {Array<Object>}              actions
+ * @param {string}                     [query]
  * @return {Array<{ id: string, label: string, items: Array<Object> }>|null}
  */
 export function getGroupedItemsForPicker(
@@ -891,13 +892,50 @@ export function getGroupedItemsForPicker(
 	appId,
 	subAppId,
 	triggers,
-	actions
+	actions,
+	query = ''
 ) {
 	if (!appUsesGroupedSections(kind, appId, subAppId)) {
 		return null;
 	}
 
 	const effectiveId = getEffectiveActionAppId(appId, subAppId);
+	const needle = query.trim().toLowerCase();
+
+	/**
+	 * @param {Array<{ id: string, label: string, items: Array<Object>, metaAppId?: string }>} sections
+	 * @return {Array<{ id: string, label: string, items: Array<Object>, metaAppId?: string }>}
+	 */
+	const filterSections = (sections) => {
+		if (!needle) {
+			return sections;
+		}
+
+		return sections
+			.map((section) => {
+				const sectionMatches = section.label.toLowerCase().includes(needle);
+
+				if (sectionMatches) {
+					return section;
+				}
+
+				return {
+					...section,
+					items: section.items.filter((item) => {
+						const label = (item.label || '').toLowerCase();
+						const description = (item.description || '').toLowerCase();
+						const slug = (item.slug || '').toLowerCase();
+
+						return (
+							label.includes(needle) ||
+							description.includes(needle) ||
+							slug.includes(needle)
+						);
+					}),
+				};
+			})
+			.filter((section) => section.items.length > 0);
+	};
 
 	if (effectiveId === 'wordpress') {
 		const appActions = getWordPressActions(actions);
@@ -928,7 +966,7 @@ export function getGroupedItemsForPicker(
 				metaAppId: 'wordpress',
 			}));
 
-		return [...ordered, ...extras];
+		return filterSections([...ordered, ...extras]);
 	}
 
 	const app = getActionAppDef(appId, subAppId);
@@ -940,14 +978,16 @@ export function getGroupedItemsForPicker(
 	const appActions = actions.filter((action) => app.slugs.includes(action.slug));
 	const metaAppId = effectiveId;
 
-	return GOOGLE_SHEETS_GROUPS.map((group) => ({
-		id: group.id,
-		label: group.label,
-		items: group.slugs
-			.map((slug) => appActions.find((action) => action.slug === slug))
-			.filter(Boolean),
-		metaAppId,
-	})).filter((group) => group.items.length > 0);
+	return filterSections(
+		GOOGLE_SHEETS_GROUPS.map((group) => ({
+			id: group.id,
+			label: group.label,
+			items: group.slugs
+				.map((slug) => appActions.find((action) => action.slug === slug))
+				.filter(Boolean),
+			metaAppId,
+		})).filter((group) => group.items.length > 0)
+	);
 }
 
 /**

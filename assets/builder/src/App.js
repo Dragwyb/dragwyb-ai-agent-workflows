@@ -134,6 +134,7 @@ export default function App() {
 	const [selectedConnection, setSelectedConnection] = useState(null);
 	const [capturedPayload, setCapturedPayload] = useState(null);
 	const [capturedAt, setCapturedAt] = useState(null);
+	const [nodeOutputSamples, setNodeOutputSamples] = useState({});
 
 	// Autosave fires from a setTimeout created by a stable useCallback, so it
 	// needs a way to read state as of when it actually runs rather than as
@@ -1656,6 +1657,11 @@ export default function App() {
 				),
 			};
 		});
+		setNodeOutputSamples((current) => {
+			const next = { ...current };
+			delete next[deletingId];
+			return next;
+		});
 		setSelectedNodeId(null);
 	};
 
@@ -1828,6 +1834,13 @@ export default function App() {
 						onAddAgentOutputParser={handleAddAgentOutputParser}
 						onAddParserChatModel={handleAddParserChatModel}
 						onSelectNode={setSelectedNodeId}
+						nodeOutputSamples={nodeOutputSamples}
+						onNodeTestResult={(nodeId, output) =>
+							setNodeOutputSamples((current) => ({
+								...current,
+								[nodeId]: output,
+							}))
+						}
 					/>
 				)}
 			</div>

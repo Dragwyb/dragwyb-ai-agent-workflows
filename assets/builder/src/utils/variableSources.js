@@ -4,6 +4,42 @@ import { buildPayloadTree } from './payloadVariables';
 import { getNodeOutputFields } from './nodeOutputs';
 
 /**
+ * Parse JSON returned as an AI Agent response and expose its fields using the
+ * same `json` / `parsed` paths available at runtime.
+ *
+ * @param {*} sample
+ * @return {*}
+ */
+function normalizeNodeOutputSample(sample) {
+	if (!sample || typeof sample !== 'object' || Array.isArray(sample)) {
+		return sample;
+	}
+
+	const normalized = { ...sample };
+	const response =
+		typeof normalized.response === 'string'
+			? normalized.response
+			: typeof normalized.output === 'string'
+				? normalized.output
+				: '';
+
+	if (response) {
+		try {
+			const parsed = JSON.parse(response);
+
+			if (parsed && typeof parsed === 'object') {
+				normalized.parsed = parsed;
+				normalized.json = parsed;
+			}
+		} catch (error) {
+			// Plain-text agent responses keep their normal static fields.
+		}
+	}
+
+	return normalized;
+}
+
+/**
  * Action/agent nodes that run before the current node in flow order.
  *
  * @param {Array<Object>} graphNodes
@@ -43,6 +79,7 @@ export function getPriorActionNodes(
  * @param {string|null}   options.currentNodeId
  * @param {*}             options.triggerPayload
  * @param {string}        options.triggerLabel
+ * @param {Object}        [options.nodeOutputSamples]
  * @return {Array<{ id: string, label: string, badge: number, tree: Object }>}
  */
 export function buildVariableSources({
@@ -51,6 +88,7 @@ export function buildVariableSources({
 	currentNodeId,
 	triggerPayload,
 	triggerLabel,
+	nodeOutputSamples = {},
 }) {
 	const sources = [];
 	let badge = 1;
@@ -74,9 +112,14 @@ export function buildVariableSources({
 	getPriorActionNodes(graphNodes, currentNodeId, connections).forEach(
 		(node) => {
 			const fields = getNodeOutputFields(node.type);
-			const outputPayload = Object.fromEntries(
+			const fallbackPayload = Object.fromEntries(
 				fields.map((field) => [field.key, field.preview || ''])
 			);
+			const sample = normalizeNodeOutputSample(nodeOutputSamples[node.id]);
+			const outputPayload =
+				sample && typeof sample === 'object'
+					? { ...fallbackPayload, ...sample }
+					: fallbackPayload;
 
 			sources.push({
 				id: node.id,

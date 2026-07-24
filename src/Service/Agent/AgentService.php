@@ -242,9 +242,9 @@ class AgentService {
 				$loop['structured_output_auto_fixed'] = true;
 			}
 		} else {
-			if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] ) {
-				$parsed = $this->parseJsonResponse( $response );
+			$parsed = $this->parseJsonResponse( $response );
 
+			if ( isset( $config['output_format'] ) && 'json' === $config['output_format'] ) {
 				if ( is_array( $parsed ) ) {
 					$loop['parsed'] = $parsed;
 				} elseif ( ! empty( $attachments['tools'] ) || ! empty( $loop['tool_calls'] ) ) {
@@ -262,10 +262,18 @@ class AgentService {
 			// n8n-compatible fields for downstream nodes (HTTP Request, etc.).
 			$clean_output   = $this->buildCleanOutput( $response, $config );
 			$loop['output'] = $clean_output;
-			// Structured payload: {{nodes.X.json}} encodes as {"output":"..."}.
-			$loop['json'] = array(
-				'output' => $clean_output,
-			);
+
+			if ( is_array( $parsed ) ) {
+				// Valid JSON replies are directly addressable downstream:
+				// {{nodes.X.json.title}} / {{nodes.X.parsed.title}}.
+				$loop['parsed'] = $parsed;
+				$loop['json']   = $parsed;
+			} else {
+				// Plain text remains available through the n8n-style wrapper.
+				$loop['json'] = array(
+					'output' => $clean_output,
+				);
+			}
 		}
 
 		if ( empty( $loop['provider'] ) ) {

@@ -275,6 +275,8 @@ function filterMatchingConnections(connections, nodeTypeSlug, selectedId, nodeCo
  * @param {Function}      [props.onAddAgentOutputParser]
  * @param {Function}      [props.onAddParserChatModel]
  * @param {Function}      [props.onSelectNode]
+ * @param {Object}        [props.nodeOutputSamples]
+ * @param {Function}      [props.onNodeTestResult]
  */
 export default function ConfigPanel({
 	node,
@@ -299,6 +301,8 @@ export default function ConfigPanel({
 	onAddAgentOutputParser,
 	onAddParserChatModel,
 	onSelectNode,
+	nodeOutputSamples = {},
+	onNodeTestResult,
 }) {
 	const [testing, setTesting] = useState(false);
 	const [testResult, setTestResult] = useState(null);
@@ -383,6 +387,7 @@ export default function ConfigPanel({
 				currentNodeId: node?.id || null,
 				triggerPayload: effectiveTriggerPayload,
 				triggerLabel,
+				nodeOutputSamples,
 			}),
 		[
 			graphNodes,
@@ -390,6 +395,7 @@ export default function ConfigPanel({
 			node?.id,
 			effectiveTriggerPayload,
 			triggerLabel,
+			nodeOutputSamples,
 		]
 	);
 
@@ -433,6 +439,13 @@ export default function ConfigPanel({
 			});
 
 			setTestResult(result);
+			if (
+				result?.success &&
+				result.output &&
+				typeof onNodeTestResult === 'function'
+			) {
+				onNodeTestResult(node.id, result.output);
+			}
 		} catch (error) {
 			setTestResult({
 				success: false,
@@ -820,7 +833,35 @@ function ConfigField({
 		);
 	}
 
-	if (fieldSchema.type === 'object' || fieldSchema.type === 'array') {
+	if (fieldSchema.type === 'object') {
+		return <JsonField label={label} value={resolved} onChange={onChange} />;
+	}
+
+	if (
+		fieldSchema.type === 'array' &&
+		nodeCategory === 'action' &&
+		fieldSupportsVariables(fieldName, fieldSchema)
+	) {
+		const displayValue = Array.isArray(resolved)
+			? resolved.join(', ')
+			: resolved === undefined || resolved === null
+				? ''
+				: String(resolved);
+
+		return (
+			<TokenField
+				key={`${nodeId}-${fieldName}`}
+				label={label}
+				value={displayValue}
+				required={Boolean(fieldSchema.required)}
+				variableSources={variableSources}
+				nodeLabels={nodeLabels}
+				onChange={onChange}
+			/>
+		);
+	}
+
+	if (fieldSchema.type === 'array') {
 		return <JsonField label={label} value={resolved} onChange={onChange} />;
 	}
 
@@ -831,6 +872,8 @@ function ConfigField({
 				value={resolved}
 				help={help || undefined}
 				addLabel={fieldSchema.button_label}
+				variableSources={variableSources}
+				nodeLabels={nodeLabels}
 				onChange={onChange}
 			/>
 		);
@@ -1937,9 +1980,19 @@ function ConditionRoutesField({
  * @param {*}        props.value
  * @param {string}   [props.help]
  * @param {string}   [props.addLabel]
+ * @param {Array}    [props.variableSources]
+ * @param {Object}   [props.nodeLabels]
  * @param {Function} props.onChange
  */
-function KeyValueField({ label, value, help, addLabel, onChange }) {
+function KeyValueField({
+	label,
+	value,
+	help,
+	addLabel,
+	variableSources = [],
+	nodeLabels = {},
+	onChange,
+}) {
 	const rows = Array.isArray(value) ? value : [];
 
 	const updateRow = (index, key, nextValue) => {
@@ -1970,16 +2023,20 @@ function KeyValueField({ label, value, help, addLabel, onChange }) {
 					key={index}
 					className="wfa-builder-config__key-value-row"
 				>
-					<TextControl
+					<TokenField
 						label={__('Name', 'workflow-automate')}
 						value={row.name || ''}
+						variableSources={variableSources}
+						nodeLabels={nodeLabels}
 						onChange={(nextValue) =>
 							updateRow(index, 'name', nextValue)
 						}
 					/>
-					<TextControl
+					<TokenField
 						label={__('Value', 'workflow-automate')}
 						value={row.value || ''}
+						variableSources={variableSources}
+						nodeLabels={nodeLabels}
 						onChange={(nextValue) =>
 							updateRow(index, 'value', nextValue)
 						}

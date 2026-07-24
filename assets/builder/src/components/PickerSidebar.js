@@ -40,6 +40,7 @@ export default function PickerSidebar({
 	const [groupId, setGroupId] = useState(null);
 	const [subAppId, setSubAppId] = useState(null);
 	const [toolQuery, setToolQuery] = useState('');
+	const [groupedQuery, setGroupedQuery] = useState('');
 	const pickerKind =
 		kind === 'branch-action' ||
 		kind === 'edge-insert' ||
@@ -57,8 +58,16 @@ export default function PickerSidebar({
 		[pickerKind, appId, actions]
 	);
 	const groupedItems = useMemo(
-		() => getGroupedItemsForPicker(pickerKind, appId, subAppId, triggers, actions),
-		[pickerKind, appId, subAppId, triggers, actions]
+		() =>
+			getGroupedItemsForPicker(
+				pickerKind,
+				appId,
+				subAppId,
+				triggers,
+				actions,
+				groupedQuery
+			),
+		[pickerKind, appId, subAppId, triggers, actions, groupedQuery]
 	);
 	const items = useMemo(
 		() => getItemsForPicker(pickerKind, appId, groupId, subAppId, triggers, actions),
@@ -264,16 +273,41 @@ export default function PickerSidebar({
 					)}
 				</>
 			) : usesGroupedSections && groupedItems ? (
-				groupedItems.map((group) => (
-					<div key={group.id} className="wfa-builder-picker__section">
-						<h3 className="wfa-builder-picker__section-heading">
-							{group.label}
-						</h3>
-						<ul className="wfa-builder-picker__list">
-							{group.items.map((item) => renderItem(item, metaAppId))}
-						</ul>
+				<>
+					<div className="wfa-builder-picker__search">
+						<TextControl
+							label={__('Search actions', 'workflow-automate')}
+							hideLabelFromVision
+							placeholder={__('Search actions…', 'workflow-automate')}
+							value={groupedQuery}
+							onChange={setGroupedQuery}
+						/>
 					</div>
-				))
+					{groupedItems.length === 0 ? (
+						<p className="wfa-builder-picker__empty">
+							{__(
+								'No actions match your search.',
+								'workflow-automate'
+							)}
+						</p>
+					) : (
+						groupedItems.map((group) => (
+							<div
+								key={group.id}
+								className="wfa-builder-picker__section"
+							>
+								<h3 className="wfa-builder-picker__section-heading">
+									{group.label}
+								</h3>
+								<ul className="wfa-builder-picker__list">
+									{group.items.map((item) =>
+										renderItem(item, metaAppId)
+									)}
+								</ul>
+							</div>
+						))
+					)}
+				</>
 			) : (
 				<ul className="wfa-builder-picker__list">
 					{showCommunicationList &&

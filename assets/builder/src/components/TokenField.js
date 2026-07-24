@@ -340,14 +340,31 @@ export default function TokenField({
 }
 
 /**
+ * Whether an action string field should offer the variable picker.
+ *
+ * Defaults to true so WordPress / integration actions can map trigger fields.
+ * Opt out with `supports_variables: false`, or via the sensitive-name blocklist.
+ *
  * @param {string} fieldName
  * @param {Object} fieldSchema
  * @return {boolean}
  */
 export function fieldSupportsVariables(fieldName, fieldSchema) {
-	if (fieldSchema.supports_variables) {
+	if (fieldSchema.supports_variables === false) {
+		return false;
+	}
+
+	if (fieldSchema.supports_variables === true) {
 		return true;
 	}
 
-	return /^(prompt|message|system_prompt|user_prompt)$/i.test(fieldName);
+	if (
+		/^(password|secret|api_key|api_secret|access_token|refresh_token|client_secret|private_key)$/i.test(
+			fieldName
+		)
+	) {
+		return false;
+	}
+
+	return true;
 }
