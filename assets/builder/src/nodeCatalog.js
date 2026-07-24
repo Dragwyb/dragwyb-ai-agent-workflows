@@ -522,21 +522,126 @@ export function getAgentActionToolTypes(actions) {
 }
 
 /**
- * Grouped picker sections for agent tools.
+ * Ordered app sections for the agent tool picker.
+ *
+ * @type {Array<{ id: string, label: string, pickerAppId: string, slugs?: string[], match?: (action: Object) => boolean }>}
+ */
+const AGENT_TOOL_SECTION_DEFS = [
+	{
+		id: 'wordpress',
+		label: 'WordPress',
+		pickerAppId: 'wordpress',
+		match: isWordPressAction,
+	},
+	{
+		id: 'email',
+		label: 'Email',
+		pickerAppId: 'send_email_action',
+		slugs: ['send_email_action'],
+	},
+	{
+		id: 'slack',
+		label: 'Slack',
+		pickerAppId: 'integrations',
+		slugs: ['slack_incoming_webhook_action'],
+	},
+	{
+		id: 'telegram',
+		label: 'Telegram',
+		pickerAppId: 'telegram_send_message_action',
+		slugs: ['telegram_send_message_action'],
+	},
+	{
+		id: 'whatsapp',
+		label: 'WhatsApp',
+		pickerAppId: 'integrations',
+		slugs: ['whatsapp_cloud_send_message_action'],
+	},
+	{
+		id: 'google-sheets',
+		label: 'Google Sheets',
+		pickerAppId: 'google-sheets',
+		slugs: NESTED_ACTION_APPS['google-sheets'].slugs,
+	},
+	{
+		id: 'integrations',
+		label: 'Integrations',
+		pickerAppId: 'integrations',
+		slugs: ['http_request_action'],
+	},
+];
+
+/**
+ * @param {Object} action
+ * @param {string} needle
+ * @return {boolean}
+ */
+function agentToolMatchesSearch(action, needle) {
+	if (!needle) {
+		return true;
+	}
+
+	return (
+		(action.label || '').toLowerCase().includes(needle) ||
+		(action.description || '').toLowerCase().includes(needle) ||
+		(action.slug || '').toLowerCase().includes(needle)
+	);
+}
+
+/**
+ * Grouped picker sections for agent tools (by integration type).
  *
  * @param {Array<Object>} actions
+ * @param {string}        [query]
  * @return {Array<{ id: string, label: string, items: Array<Object> }>}
  */
-export function getAgentToolPickerSections(actions) {
-	const sections = [
-		{
-			id: 'actions',
-			label: 'Actions',
-			items: getAgentActionToolTypes(actions),
-		},
-	];
+export function getAgentToolPickerSections(actions, query = '') {
+	const tools = getAgentActionToolTypes(actions);
+	const needle = query.trim().toLowerCase();
+	const claimed = new Set();
 
-	return sections.filter((section) => section.items.length > 0);
+	const sections = AGENT_TOOL_SECTION_DEFS.map((def) => {
+		let items = tools
+			.filter((action) =>
+				typeof def.match === 'function'
+					? def.match(action)
+					: (def.slugs || []).includes(action.slug)
+			)
+			.map((action) => {
+				claimed.add(action.slug);
+
+				return {
+					...action,
+					pickerAppId: def.pickerAppId,
+				};
+			});
+
+		const sectionMatches = needle && def.label.toLowerCase().includes(needle);
+
+		if (needle && !sectionMatches) {
+			items = items.filter((action) => agentToolMatchesSearch(action, needle));
+		}
+
+		return {
+			id: def.id,
+			label: def.label,
+			items,
+		};
+	}).filter((section) => section.items.length > 0);
+
+	let other = tools
+		.filter((action) => !claimed.has(action.slug))
+		.filter((action) => agentToolMatchesSearch(action, needle));
+
+	if (other.length > 0) {
+		sections.push({
+			id: 'other',
+			label: 'Other',
+			items: other,
+		});
+	}
+
+	return sections;
 }
 
 /**

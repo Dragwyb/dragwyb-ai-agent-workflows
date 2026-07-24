@@ -1035,6 +1035,38 @@
 	font-size: 12px;
 }
 
+.wfa-builder-config__form-page-link {
+	margin: -4px 0 12px;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.wfa-builder-config__form-page-link a {
+	color: #2271b1;
+	text-decoration: none;
+}
+
+.wfa-builder-config__form-page-link a:hover,
+.wfa-builder-config__form-page-link a:focus {
+	color: #135e96;
+	text-decoration: underline;
+}
+
+.wfa-builder-config__form-page-link-label {
+	display: block;
+	margin-bottom: 4px;
+	color: #646970;
+}
+
+.wfa-builder-config__form-page-link-list {
+	margin: 0;
+	padding-left: 1.1em;
+}
+
+.wfa-builder-config__form-page-link-list li {
+	margin: 0 0 2px;
+}
+
 .wfa-builder-config__field .wfa-token-field,
 .wfa-builder-config__field .wfa-builder-config__key-value,
 .wfa-builder-config__field .wfa-builder-config__connection,

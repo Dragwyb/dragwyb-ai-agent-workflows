@@ -704,23 +704,81 @@ function ConfigField({
 	);
 
 	if (fieldSchema.type === 'select') {
-		const options = (fieldSchema.options || []).map((option) => ({
+		const rawOptions = fieldSchema.options || [];
+		const options = rawOptions.map((option) => ({
 			label: option.label || option.value,
 			value: String(option.value ?? ''),
 		}));
+		const selectedValue =
+			resolved === undefined || resolved === null
+				? ''
+				: String(resolved);
+		const selectedOption = rawOptions.find(
+			(option) => String(option.value ?? '') === selectedValue
+		);
+		const pageLinks = Array.isArray(selectedOption?.pages)
+			? selectedOption.pages.filter((page) => page?.url)
+			: selectedOption?.url
+				? [
+						{
+							label: selectedOption.label || '',
+							url: selectedOption.url,
+						},
+					]
+				: [];
 
 		return (
-			<SelectControl
-				label={label}
-				help={help || undefined}
-				value={
-					resolved === undefined || resolved === null
-						? ''
-						: String(resolved)
-				}
-				options={options}
-				onChange={onChange}
-			/>
+			<>
+				<SelectControl
+					label={label}
+					help={help || undefined}
+					value={selectedValue}
+					options={options}
+					onChange={onChange}
+				/>
+				{pageLinks.length > 0 && (
+					<div className="wfa-builder-config__form-page-link">
+						{pageLinks.length === 1 ? (
+							<a
+								href={pageLinks[0].url}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{__(
+									'Open form page',
+									'workflow-automate'
+								)}
+								{pageLinks[0].label
+									? ` — ${pageLinks[0].label}`
+									: ''}
+							</a>
+						) : (
+							<>
+								<span className="wfa-builder-config__form-page-link-label">
+									{__('Form pages:', 'workflow-automate')}
+								</span>
+								<ul className="wfa-builder-config__form-page-link-list">
+									{pageLinks.map((page) => (
+										<li key={page.url}>
+											<a
+												href={page.url}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{page.label ||
+													__(
+														'Open form page',
+														'workflow-automate'
+													)}
+											</a>
+										</li>
+									))}
+								</ul>
+							</>
+						)}
+					</div>
+				)}
+			</>
 		);
 	}
 

@@ -24,7 +24,7 @@ final class ElementorFormsService {
 	private const ATOMIC_FORM_EL_TYPE = 'e-form';
 
 	/**
-	 * @return array<int, array{value: string, label: string}>
+	 * @return array<int, array{value: string, label: string, url?: string, pages?: array<int, array{label: string, url: string}>}>
 	 */
 	public function formSelectOptions(): array {
 		$result  = $this->listForms();
@@ -43,7 +43,7 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @return array<int, array{value: string, label: string}>
+	 * @return array<int, array{value: string, label: string, url?: string, pages?: array<int, array{label: string, url: string}>}>
 	 */
 	public function atomicFormSelectOptions(): array {
 		$result  = $this->listAtomicForms();
@@ -469,7 +469,7 @@ final class ElementorFormsService {
 	 * @param callable(array<string, mixed>): bool $matches_element
 	 * @param callable(array<string, mixed>): string $resolve_form_name
 	 *
-	 * @return array{options: array<int, array{value: string, label: string}>, error: string|null}
+	 * @return array{options: array<int, array{value: string, label: string, url?: string, pages?: array<int, array{label: string, url: string}>}>, error: string|null}
 	 */
 	private function scanForms( callable $matches_element, callable $resolve_form_name ): array {
 		global $wpdb;
@@ -487,7 +487,7 @@ final class ElementorFormsService {
 			$post_ids = array();
 		}
 
-		/** @var array<string, array{form_name: string, label: string, pages: array<int, string>}> $forms_by_id */
+		/** @var array<string, array{form_name: string, label: string, pages: array<int, array{title: string, url: string, post_id: int}>}> $forms_by_id */
 		$forms_by_id = array();
 
 		foreach ( $post_ids as $post_id ) {
@@ -516,34 +516,71 @@ final class ElementorFormsService {
 				continue;
 			}
 
-			$this->collectFormsFromElements( $elements, $post_title, $forms_by_id, $matches_element, $resolve_form_name );
+			$this->collectFormsFromElements(
+				$elements,
+				$post_id,
+				$post_title,
+				$forms_by_id,
+				$matches_element,
+				$resolve_form_name
+			);
 		}
 
 		$options = array();
 
 		foreach ( $forms_by_id as $form_id => $entry ) {
+			$page_titles = array_map(
+				static function ( array $page ): string {
+					return (string) ( $page['title'] ?? '' );
+				},
+				$entry['pages']
+			);
+			$page_titles = array_values( array_filter( $page_titles ) );
+
 			$label = $entry['form_name'];
 
-			if ( count( $entry['pages'] ) > 1 ) {
+			if ( count( $page_titles ) > 1 ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: comma-separated page titles */
 					__( '%1$s (%2$s)', 'workflow-automate' ),
 					$entry['form_name'],
-					implode( ', ', $entry['pages'] )
+					implode( ', ', $page_titles )
 				);
-			} elseif ( 1 === count( $entry['pages'] ) && '' !== $entry['pages'][0] ) {
+			} elseif ( 1 === count( $page_titles ) ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: page title */
 					__( '%1$s — %2$s', 'workflow-automate' ),
 					$entry['form_name'],
-					$entry['pages'][0]
+					$page_titles[0]
 				);
 			}
 
-			$options[] = array(
+			$page_links = array();
+
+			foreach ( $entry['pages'] as $page ) {
+				$url = (string) ( $page['url'] ?? '' );
+
+				if ( '' === $url ) {
+					continue;
+				}
+
+				$page_links[] = array(
+					'label' => (string) ( $page['title'] ?? '' ),
+					'url'   => $url,
+				);
+			}
+
+			$option = array(
 				'value' => $form_id,
 				'label' => $label,
 			);
+
+			if ( array() !== $page_links ) {
+				$option['url']  = $page_links[0]['url'];
+				$option['pages'] = $page_links;
+			}
+
+			$options[] = $option;
 		}
 
 		usort(
@@ -753,16 +790,18 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param array<int|string, mixed>                                                         $elements
-	 * @param string                                                                           $post_title
-	 * @param array<string, array{form_name: string, label: string, pages: array<int, string>}> $forms_by_id
-	 * @param callable(array<string, mixed>): bool                                             $matches_element
-	 * @param callable(array<string, mixed>): string                                           $resolve_form_name
+	 * @param array<int|string, mixed> $elements
+	 * @param int                      $post_id
+	 * @param string                   $post_title
+	 * @param array<string, array{form_name: string, label: string, pages: array<int, array{title: string, url: string, post_id: int}>}> $forms_by_id
+	 * @param callable(array<string, mixed>): bool   $matches_element
+	 * @param callable(array<string, mixed>): string $resolve_form_name
 	 *
 	 * @return void
 	 */
 	private function collectFormsFromElements(
 		array $elements,
+		int $post_id,
 		string $post_title,
 		array &$forms_by_id,
 		callable $matches_element,
@@ -795,15 +834,36 @@ final class ElementorFormsService {
 					);
 				}
 
-				if ( '' !== $post_title && ! in_array( $post_title, $forms_by_id[ $form_id ]['pages'], true ) ) {
-					$forms_by_id[ $form_id ]['pages'][] = $post_title;
+				$already_listed = false;
+
+				foreach ( $forms_by_id[ $form_id ]['pages'] as $page ) {
+					if ( (int) ( $page['post_id'] ?? 0 ) === $post_id ) {
+						$already_listed = true;
+						break;
+					}
+				}
+
+				if ( ! $already_listed ) {
+					$page_url = get_permalink( $post_id );
+					$forms_by_id[ $form_id ]['pages'][] = array(
+						'title'   => $post_title,
+						'url'     => is_string( $page_url ) ? $page_url : '',
+						'post_id' => $post_id,
+					);
 				}
 			}
 
 			$children = $this->elementChildrenForScan( $element );
 
 			if ( array() !== $children ) {
-				$this->collectFormsFromElements( $children, $post_title, $forms_by_id, $matches_element, $resolve_form_name );
+				$this->collectFormsFromElements(
+					$children,
+					$post_id,
+					$post_title,
+					$forms_by_id,
+					$matches_element,
+					$resolve_form_name
+				);
 			}
 		}
 	}

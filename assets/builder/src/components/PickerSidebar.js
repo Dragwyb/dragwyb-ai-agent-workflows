@@ -1,5 +1,5 @@
 import { useState, useMemo } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 import {
@@ -39,6 +39,7 @@ export default function PickerSidebar({
 }) {
 	const [groupId, setGroupId] = useState(null);
 	const [subAppId, setSubAppId] = useState(null);
+	const [toolQuery, setToolQuery] = useState('');
 	const pickerKind =
 		kind === 'branch-action' ||
 		kind === 'edge-insert' ||
@@ -64,8 +65,11 @@ export default function PickerSidebar({
 		[pickerKind, appId, groupId, subAppId, triggers, actions]
 	);
 	const toolSections = useMemo(
-		() => (kind === 'agent-tool' ? getAgentToolPickerSections(actions) : []),
-		[kind, actions]
+		() =>
+			kind === 'agent-tool'
+				? getAgentToolPickerSections(actions, toolQuery)
+				: [],
+		[kind, actions, toolQuery]
 	);
 	const showGroups = usesGroups && !groupId;
 	const showCommunicationList =
@@ -224,16 +228,41 @@ export default function PickerSidebar({
 					))}
 				</ul>
 			) : kind === 'agent-tool' ? (
-				toolSections.map((section) => (
-					<div key={section.id} className="wfa-builder-picker__section">
-						<h3 className="wfa-builder-picker__section-title">
-							{section.label}
-						</h3>
-						<ul className="wfa-builder-picker__list">
-							{section.items.map((item) => renderItem(item))}
-						</ul>
+				<>
+					<div className="wfa-builder-picker__search">
+						<TextControl
+							label={__('Search tools', 'workflow-automate')}
+							hideLabelFromVision
+							placeholder={__('Search tools…', 'workflow-automate')}
+							value={toolQuery}
+							onChange={setToolQuery}
+						/>
 					</div>
-				))
+					{toolSections.length === 0 ? (
+						<p className="wfa-builder-picker__empty">
+							{__(
+								'No tools match your search.',
+								'workflow-automate'
+							)}
+						</p>
+					) : (
+						toolSections.map((section) => (
+							<div
+								key={section.id}
+								className="wfa-builder-picker__section"
+							>
+								<h3 className="wfa-builder-picker__section-heading">
+									{section.label}
+								</h3>
+								<ul className="wfa-builder-picker__list">
+									{section.items.map((item) =>
+										renderItem(item, item.pickerAppId)
+									)}
+								</ul>
+							</div>
+						))
+					)}
+				</>
 			) : usesGroupedSections && groupedItems ? (
 				groupedItems.map((group) => (
 					<div key={group.id} className="wfa-builder-picker__section">
