@@ -588,6 +588,16 @@ export default function ConfigPanel({
 				/>
 			)}
 
+			{node.category === 'trigger' &&
+				node.type === 'chat_message_received_trigger' && (
+					<p className="wfa-builder-config__field-help">
+						{__(
+							'Click Chat in the header to open the chat panel and send messages (same idea as n8n). Save the workflow first if you just added this trigger.',
+							'workflow-automate'
+						)}
+					</p>
+				)}
+
 			{node.category === 'trigger' && (
 				<CapturedResponse
 					payload={capturedPayload}

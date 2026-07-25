@@ -213,3 +213,18 @@ export function runWorkflow(id, data = {}) {
 		data,
 	});
 }
+
+/**
+ * Builder Chat panel — runs the workflow with a chatInput payload.
+ *
+ * @param {number} id Workflow id.
+ * @param {{ chatInput: string, sessionId?: string }} data
+ * @return {Promise<{ output: string, sessionId: string, run_id: number, status: number }>}
+ */
+export function sendWorkflowChat(id, data) {
+	return apiFetch({
+		path: `/wfa/v1/workflows/${id}/chat`,
+		method: 'POST',
+		data,
+	});
+}

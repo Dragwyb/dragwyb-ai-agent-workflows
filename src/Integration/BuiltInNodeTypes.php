@@ -26,6 +26,7 @@ use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
 use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
+use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
 use WorkflowAutomate\Plugin\Service\Agent\AgentService;
@@ -72,6 +73,8 @@ class BuiltInNodeTypes {
 		foreach ( WordPressHookCatalog::definitions() as $definition ) {
 			$registry->registerTrigger( new CatalogHookTrigger( $definition ) );
 		}
+
+		$registry->registerTrigger( new ChatMessageReceivedTrigger() );
 
 		$registry->registerAction( new HttpRequestAction( $this->connections ) );
 		$registry->registerAction( new SendEmailAction() );

@@ -6,6 +6,7 @@ import Palette from './components/Palette';
 import Canvas from './components/Canvas';
 import ConfigPanel from './components/ConfigPanel';
 import PickerSidebar from './components/PickerSidebar';
+import ChatPanel from './components/ChatPanel';
 import useTestFlow from './hooks/useTestFlow';
 import {
 	useBranchConnectionDrag,
@@ -24,6 +25,7 @@ import {
 	getBootstrap,
 	fetchTestStatus,
 	clearTestSample,
+	sendWorkflowChat,
 } from './api';
 import {
 	generateNodeId,
@@ -135,6 +137,11 @@ export default function App() {
 	const [capturedPayload, setCapturedPayload] = useState(null);
 	const [capturedAt, setCapturedAt] = useState(null);
 	const [nodeOutputSamples, setNodeOutputSamples] = useState({});
+	const [chatOpen, setChatOpen] = useState(false);
+	const [chatMessages, setChatMessages] = useState([]);
+	const [chatSessionId, setChatSessionId] = useState('');
+	const [chatSending, setChatSending] = useState(false);
+	const [chatError, setChatError] = useState('');
 
 	// Autosave fires from a setTimeout created by a stable useCallback, so it
 	// needs a way to read state as of when it actually runs rather than as
@@ -453,6 +460,93 @@ export default function App() {
 		});
 		setSaveStatus('saved');
 	}, []);
+
+	const handleToggleChat = useCallback(() => {
+		setChatOpen((open) => {
+			const next = !open;
+
+			if (next && !chatSessionId) {
+				const id =
+					typeof crypto !== 'undefined' &&
+					typeof crypto.randomUUID === 'function'
+						? crypto.randomUUID()
+						: `session-${Date.now()}`;
+				setChatSessionId(id);
+			}
+
+			if (next) {
+				setChatError('');
+			}
+
+			return next;
+		});
+	}, [chatSessionId]);
+
+	const handleSendChat = useCallback(
+		async (text) => {
+			const current = latestRef.current;
+
+			if (!current.workflowId || !text.trim()) {
+				return;
+			}
+
+			const sessionId =
+				chatSessionId ||
+				(typeof crypto !== 'undefined' &&
+				typeof crypto.randomUUID === 'function'
+					? crypto.randomUUID()
+					: `session-${Date.now()}`);
+
+			if (!chatSessionId) {
+				setChatSessionId(sessionId);
+			}
+
+			const userMessage = {
+				id: `user-${Date.now()}`,
+				role: 'user',
+				content: text.trim(),
+			};
+
+			setChatMessages((previous) => [...previous, userMessage]);
+			setChatSending(true);
+			setChatError('');
+
+			try {
+				await persistBeforeTest();
+				const result = await sendWorkflowChat(current.workflowId, {
+					chatInput: text.trim(),
+					sessionId,
+				});
+				const reply = (result?.output || '').trim();
+
+				setChatMessages((previous) => [
+					...previous,
+					{
+						id: `assistant-${result?.run_id || Date.now()}`,
+						role: 'assistant',
+						content:
+							reply ||
+							__(
+								'(Workflow finished with no chat reply. Check the AI Agent output.)',
+								'workflow-automate'
+							),
+					},
+				]);
+
+				if (result?.sessionId) {
+					setChatSessionId(result.sessionId);
+				}
+			} catch (error) {
+				const message =
+					error?.message ||
+					__('Chat request failed.', 'workflow-automate');
+				setChatError(message);
+			} finally {
+				setChatSending(false);
+			}
+		},
+		[chatSessionId, persistBeforeTest]
+	);
 
 	const testFlow = useTestFlow(workflowId, {
 		persistBeforeTest,
@@ -1692,9 +1786,17 @@ export default function App() {
 	const triggerLabel =
 		triggerNode?.label || __('Trigger', 'workflow-automate');
 	const hasExistingTrigger = Boolean(triggerNode);
+	const hasChatTrigger =
+		triggerNode?.type === 'chat_message_received_trigger';
+	const chatInitialMessages = String(
+		triggerNode?.config?.initial_messages || ''
+	)
+		.split(/\r\n|\r|\n/)
+		.map((line) => line.trim())
+		.filter(Boolean);
 
 	return (
-		<div className="wfa-builder">
+		<div className={`wfa-builder${chatOpen ? ' wfa-builder--chat-open' : ''}`}>
 			<Header
 				title={title}
 				onTitleChange={setTitle}
@@ -1706,6 +1808,9 @@ export default function App() {
 				listUrl={bootstrap.listUrl}
 				saveDisabled={saveStatus === 'saving' || toggleActiveBusy}
 				testFlow={testFlow}
+				showChat={hasChatTrigger}
+				chatOpen={chatOpen}
+				onToggleChat={handleToggleChat}
 			/>
 			<div className="wfa-builder__body">
 				<Palette
@@ -1713,6 +1818,7 @@ export default function App() {
 					actions={nodeTypes.actions}
 					onOpenPicker={handleOpenPicker}
 				/>
+				<div className="wfa-builder__canvas-wrap">
 				<Canvas
 					nodes={graph.nodes}
 					connections={graph.connections}
@@ -1752,6 +1858,17 @@ export default function App() {
 						}
 					}}
 				/>
+				<ChatPanel
+					open={chatOpen}
+					onClose={() => setChatOpen(false)}
+					messages={chatMessages}
+					sending={chatSending}
+					error={chatError}
+					onSend={handleSendChat}
+					title={triggerNode?.config?.title || __('Chat', 'workflow-automate')}
+					initialMessages={chatInitialMessages}
+				/>
+				</div>
 				{picker ? (
 					<PickerSidebar
 						kind={picker.kind}

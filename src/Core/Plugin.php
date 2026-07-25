@@ -42,6 +42,7 @@ use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
 use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
 use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
+use WorkflowAutomate\Plugin\Service\ChatMessageService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
 use WorkflowAutomate\Plugin\Service\ElementorFormsService;
@@ -423,6 +424,16 @@ class Plugin {
 					$container->get( WorkflowService::class ),
 					$container->get( WorkflowExecutionService::class ),
 					$container->get( SettingsService::class )
+				);
+			}
+		);
+
+		$this->container->singleton(
+			ChatMessageService::class,
+			static function ( Container $container ): ChatMessageService {
+				return new ChatMessageService(
+					$container->get( WorkflowService::class ),
+					$container->get( WorkflowRunLogRepository::class )
 				);
 			}
 		);

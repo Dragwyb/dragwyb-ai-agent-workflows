@@ -19,6 +19,7 @@ const TOOL_SLUGS = new Set(['condition_action', 'router_action']);
 
 /** @type {Array<{ id: string, label: string, slugs: string[] }>} */
 const INTEGRATION_TRIGGER_APPS = [
+	{ id: 'chat', label: 'Chat', slugs: ['chat_message_received_trigger'] },
 	{ id: 'elementor', label: 'Elementor', slugs: ['elementor_form_submitted_trigger', 'elementor_atomic_form_submitted_trigger'] },
 	{ id: 'woocommerce', label: 'WooCommerce', slugs: [
 		'woocommerce_new_order_trigger',
@@ -339,10 +340,23 @@ export function defaultConfigFor(nodeType) {
 		}
 	});
 
-	return {
+	const config = {
 		...fromSchema,
 		...(nodeType.default_config || {}),
 	};
+
+	if (
+		nodeType?.slug === 'chat_message_received_trigger' &&
+		!String(config.endpoint_id || '').trim()
+	) {
+		config.endpoint_id =
+			typeof crypto !== 'undefined' &&
+			typeof crypto.randomUUID === 'function'
+				? crypto.randomUUID()
+				: `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+	}
+
+	return config;
 }
 
 /**
@@ -369,7 +383,9 @@ export function getTriggerApps(triggers, query = '') {
 			id: appDef.id,
 			label: appDef.label,
 			available: status.available,
-			requiresPlugin: status.requiresPlugin || appDef.label,
+			requiresPlugin: status.available
+				? null
+				: status.requiresPlugin || appDef.label,
 		});
 	});
 

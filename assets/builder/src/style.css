@@ -2788,3 +2788,118 @@
 	color: #b32d2e;
 	text-align: center;
 }
+.wfa-builder__canvas-wrap {
+	position: relative;
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.wfa-builder-chat {
+	position: absolute;
+	right: 16px;
+	bottom: 16px;
+	width: min(380px, calc(100% - 32px));
+	max-height: min(520px, calc(100% - 32px));
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 12px;
+	box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+	z-index: 30;
+	overflow: hidden;
+}
+
+.wfa-builder-chat__header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 14px;
+	border-bottom: 1px solid #e2e8f0;
+	background: #111827;
+	color: #fff;
+}
+
+.wfa-builder-chat__header strong {
+	display: block;
+	font-size: 14px;
+}
+
+.wfa-builder-chat__subtitle {
+	margin: 4px 0 0;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #cbd5e1;
+}
+
+.wfa-builder-chat__messages {
+	flex: 1;
+	overflow: auto;
+	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background: #f8fafc;
+	min-height: 220px;
+}
+
+.wfa-builder-chat__bubble {
+	max-width: 88%;
+	padding: 10px 12px;
+	border-radius: 12px;
+	font-size: 13px;
+	line-height: 1.45;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.wfa-builder-chat__bubble--user {
+	align-self: flex-end;
+	background: #2563eb;
+	color: #fff;
+	border-bottom-right-radius: 4px;
+}
+
+.wfa-builder-chat__bubble--assistant,
+.wfa-builder-chat__bubble--system {
+	align-self: flex-start;
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	color: #0f172a;
+	border-bottom-left-radius: 4px;
+}
+
+.wfa-builder-chat__bubble--pending {
+	opacity: 0.7;
+	font-style: italic;
+}
+
+.wfa-builder-chat__error {
+	margin: 0;
+	padding: 8px 14px;
+	color: #b32d2e;
+	font-size: 12px;
+	background: #fcf0f1;
+}
+
+.wfa-builder-chat__composer {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 8px;
+	align-items: end;
+	padding: 12px 14px;
+	border-top: 1px solid #e2e8f0;
+	background: #fff;
+}
+
+.wfa-builder-chat__composer .components-base-control {
+	margin-bottom: 0;
+}
+
+.wfa-builder-chat__composer textarea {
+	min-height: 56px;
+}

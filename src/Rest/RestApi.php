@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Container;
 use WorkflowAutomate\Plugin\Service\AiModelsService;
+use WorkflowAutomate\Plugin\Service\ChatMessageService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\ElementorFormsService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
@@ -60,7 +61,7 @@ class RestApi {
 		$workflows_controller = new WorkflowsController(
 			$this->container->get( WorkflowService::class ),
 			$this->container->get( WorkflowExecutionService::class ),
-			$this->container->get( WorkflowTestListenerService::class )
+			$this->container->get( ChatMessageService::class )
 		);
 		$workflows_controller->register_routes();
 
@@ -79,6 +80,13 @@ class RestApi {
 
 		$webhook_ingress_controller = new WebhookIngressController( $this->container->get( WebhookService::class ) );
 		$webhook_ingress_controller->register_routes();
+
+		$chat_ingress_controller = new ChatMessageIngressController(
+			$this->container->get( ChatMessageService::class ),
+			$this->container->get( WorkflowExecutionService::class ),
+			$this->container->get( WorkflowTestListenerService::class )
+		);
+		$chat_ingress_controller->register_routes();
 
 		$test_controller = new WorkflowTestController(
 			$this->container->get( WorkflowService::class ),

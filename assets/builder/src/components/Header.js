@@ -34,6 +34,9 @@ export default function Header({
 	listUrl,
 	saveDisabled,
 	testFlow,
+	showChat,
+	chatOpen,
+	onToggleChat,
 }) {
 	const isActive = workflowStatus === 1;
 	const statusLabel =
@@ -146,6 +149,16 @@ export default function Header({
 							</div>
 						)}
 					</div>
+				)}
+				{showChat && (
+					<Button
+						isSecondary={chatOpen}
+						isPrimary={!chatOpen}
+						onClick={onToggleChat}
+						aria-pressed={chatOpen}
+					>
+						{__('Chat', 'workflow-automate')}
+					</Button>
 				)}
 				<Button
 					isPrimary={!isActive}

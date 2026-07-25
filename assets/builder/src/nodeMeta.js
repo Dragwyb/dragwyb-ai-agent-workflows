@@ -5,6 +5,7 @@
 /** @type {Record<string, { icon: string, bg: string, accent: string }>} */
 const APP_META = {
 	wordpress: { icon: 'W', bg: '#21759b', accent: '#fff' },
+	chat: { icon: '💬', bg: '#0f766e', accent: '#fff' },
 	elementor: { icon: 'E', bg: '#92003b', accent: '#fff' },
 	'contact-form-7': { icon: '7', bg: '#0073aa', accent: '#fff' },
 	wpforms: { icon: 'F', bg: '#e27730', accent: '#fff' },
