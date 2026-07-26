@@ -1,0 +1,19 @@
+{
+    "name": "workflow-automate/ai-providers",
+    "description": "Vendored AI provider packages for Workflow Automate",
+    "type": "library",
+    "require": {
+        "wordpress/ai-provider-for-openai": "^1.0.2",
+        "wordpress/ai-provider-for-anthropic": "^1.0.0",
+        "wordpress/ai-provider-for-google": "^1.0.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "WorkflowAutomate\\AiProviders\\": "src/"
+        }
+    },
+    "config": {
+        "vendor-dir": "vendor",
+        "optimize-autoloader": true
+    }
+}

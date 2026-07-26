@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Service\Agent;
 
+use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -41,10 +43,10 @@ class AgentValidator {
 
 		$chat = AgentGraphHelper::resolveChatModelConfig( $attachments['chat_model'], $config );
 
-		if ( $chat['connection_id'] <= 0 ) {
+		if ( ! AiClientBootstrap::isProviderConfigured( $chat['provider'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No chat model configured. Attach a Chat Model to the agent or set an API connection.', 'workflow-automate' ),
+				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'workflow-automate' ),
 			);
 		}
 
@@ -78,10 +80,10 @@ class AgentValidator {
 
 			$fallback = AgentGraphHelper::resolveChatModelConfig( $attachments['fallback_chat_model'], $config );
 
-			if ( $fallback['connection_id'] <= 0 ) {
+			if ( ! AiClientBootstrap::isProviderConfigured( $fallback['provider'] ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The fallback chat model needs a valid API connection.', 'workflow-automate' ),
+					'error'   => __( 'The fallback chat model needs a configured AI connector.', 'workflow-automate' ),
 				);
 			}
 		}

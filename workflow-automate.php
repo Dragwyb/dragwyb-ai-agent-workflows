@@ -77,10 +77,42 @@ define( 'WFA_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
  * the plugin remains fully functional without requiring a Composer install
  * step. See README.md for details on this trade-off.
  */
-if ( file_exists( WFA_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+/*
+ * Detect WordPress 7+ core AI Client.
+ *
+ * Core defines wp_ai_client_prompt() (in wp-includes/ai-client.php) before
+ * plugins load, and ships its own bundled `WordPress\AiClient\*` library. At
+ * this point our vendored SDK has NOT been loaded yet, so this check reliably
+ * reflects core capabilities and cannot be tripped by our own polyfills.
+ */
+$wfa_has_core_ai_client = function_exists( 'wp_ai_client_prompt' )
+	|| ( function_exists( 'wp_get_wp_version' ) && version_compare( wp_get_wp_version(), '7.0-alpha', '>=' ) );
+
+if ( $wfa_has_core_ai_client ) {
+	/*
+	 * WordPress 7+: rely entirely on the core `WordPress\AiClient\*` library.
+	 *
+	 * We deliberately do NOT load the plugin's root Composer autoloader here,
+	 * because it maps the `WordPress\AiClient\` prefix (and its HTTP/PSR
+	 * dependencies) to our own vendored copy. Composer prepends its autoloader,
+	 * so loading it would shadow core's bundled SDK with a different version and
+	 * a different (unscoped) dependency set, breaking the HTTP transporter and
+	 * authentication binding used to verify provider credentials.
+	 *
+	 * Instead we register only the plugin's own classes and the vendored AI
+	 * provider packages, all of which extend core's `WordPress\AiClient\*`.
+	 */
+	require_once WFA_PLUGIN_DIR . 'src/autoload.php';
+} elseif ( file_exists( WFA_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	// Pre-WP 7: load the full vendored SDK (php-ai-client + HTTP/PSR deps).
 	require_once WFA_PLUGIN_DIR . 'vendor/autoload.php';
 } else {
 	require_once WFA_PLUGIN_DIR . 'src/autoload.php';
+}
+
+// AI provider packages (official + custom) extend core's SDK; load them either way.
+if ( file_exists( WFA_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php' ) ) {
+	require_once WFA_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
 }
 
 register_activation_hook( WFA_PLUGIN_FILE, array( 'WorkflowAutomate\\Plugin\\Core\\Activator', 'activate' ) );

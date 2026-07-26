@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection, fetchConnectionModels, fetchGoogleOAuthAuthorizeUrl, fetchTriggerSampleSchema, getBootstrap, testWorkflowNode} from '../api';
+import { createConnection, fetchAiProviderModels, fetchAiProviderStatus, saveAiProviderCredentials, clearAiProviderCredentials, fetchGoogleOAuthAuthorizeUrl, fetchTriggerSampleSchema, getBootstrap, testWorkflowNode} from '../api';
 import CapturedResponse from './CapturedResponse';
 import NodeTestResult from './NodeTestResult';
 import AgentConfigPanel from './AgentConfigPanel';
@@ -58,30 +58,6 @@ const INTEGRATION_CONNECTION_SETTINGS = {
 		secretLabel: __('Bot token', 'workflow-automate'),
 		secretFieldName: 'api_key',
 		hideAuthTypeSelect: true,
-	},
-	openai_chat_action: {
-		authType: 'api_key',
-		secretLabel: __('OpenAI API key', 'workflow-automate'),
-	},
-	claude_messages_action: {
-		authType: 'api_key',
-		secretLabel: __('Anthropic API key', 'workflow-automate'),
-	},
-	gemini_generate_content_action: {
-		authType: 'api_key',
-		secretLabel: __('Google AI API key', 'workflow-automate'),
-	},
-	openrouter_chat_action: {
-		authType: 'api_key',
-		secretLabel: __('OpenRouter API key', 'workflow-automate'),
-	},
-	groq_chat_action: {
-		authType: 'api_key',
-		secretLabel: __('Groq API key', 'workflow-automate'),
-	},
-	deepseek_chat_action: {
-		authType: 'api_key',
-		secretLabel: __('DeepSeek API key', 'workflow-automate'),
 	},
 	whatsapp_cloud_send_message_action: {
 		authType: 'bearer_token',
@@ -136,6 +112,7 @@ const INTEGRATION_SLUG_ALIASES = {
 const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
 	'provider',
 	'connection_id',
+	'api_credentials',
 	'model',
 	'prompt',
 	'system_prompt',
@@ -150,7 +127,7 @@ const AGENT_SIDEBAR_HIDDEN_FIELDS = new Set([
 ]);
 
 /** @type {Set<string>} */
-const CHAT_MODEL_ATTACHMENT_FIELDS = new Set(['connection_id', 'model']);
+const CHAT_MODEL_ATTACHMENT_FIELDS = new Set(['api_credentials', 'model']);
 
 /** @type {Record<string, string>} */
 const AGENT_PROVIDER_NODE_SLUGS = {
@@ -805,12 +782,48 @@ function ConfigField({
 		);
 	}
 
+	if (fieldSchema.type === 'info') {
+		const text =
+			resolved === undefined || resolved === null || resolved === ''
+				? String(fieldSchema.default || '')
+				: String(resolved);
+		return (
+			<div className="wfa-field wfa-field--info">
+				<strong>{label}</strong>
+				<p style={{ marginTop: 4 }}>{text}</p>
+			</div>
+		);
+	}
+
+	if (fieldSchema.type === 'ai_credentials') {
+		const providerField = fieldSchema.provider_field || 'provider';
+		const provider =
+			fieldSchema.provider ||
+			nodeConfig[providerField] ||
+			connectionNodeSlug ||
+			'openai';
+
+		return (
+			<AiCredentialsField
+				label={label}
+				provider={String(provider)}
+				onCredentialsChange={() => {
+					/* model field refetches via shared status key bump */
+				}}
+			/>
+		);
+	}
+
 	if (
 		fieldSchema.type === 'dynamic_select' &&
 		fieldSchema.options_source === 'ai_models'
 	) {
-		const connectionField = fieldSchema.connection_field || 'connection_id';
-		const connectionId = Number(nodeConfig[connectionField] || 0);
+		const providerField = fieldSchema.provider_field || 'provider';
+		const provider =
+			fieldSchema.provider ||
+			nodeConfig[providerField] ||
+			connectionNodeSlug ||
+			'openai';
 
 		return (
 			<AiModelField
@@ -825,7 +838,7 @@ function ConfigField({
 						? ''
 						: String(fieldSchema.default)
 				}
-				connectionId={connectionId}
+				provider={String(provider)}
 				nodeTypeSlug={connectionNodeSlug}
 				onChange={onChange}
 			/>
@@ -987,13 +1000,243 @@ function ConfigField({
 }
 
 /**
- * Model picker loaded from the provider API for the selected connection.
+ * In-builder site-wide AI API key field (no redirect to Connectors).
+ *
+ * @param {Object}   props
+ * @param {string}   props.label
+ * @param {string}   props.provider
+ * @param {Function} [props.onCredentialsChange]
+ */
+function AiCredentialsField({ label, provider, onCredentialsChange }) {
+	const [configured, setConfigured] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [replacing, setReplacing] = useState(false);
+	const [apiKey, setApiKey] = useState('');
+	const [saving, setSaving] = useState(false);
+	const [clearing, setClearing] = useState(false);
+	const [error, setError] = useState('');
+	const [notice, setNotice] = useState('');
+
+	useEffect(() => {
+		if (!provider) {
+			setConfigured(false);
+			setLoading(false);
+			return undefined;
+		}
+
+		let cancelled = false;
+		setLoading(true);
+		setError('');
+
+		fetchAiProviderStatus()
+			.then((result) => {
+				if (cancelled) {
+					return;
+				}
+				const providers = result?.providers || {};
+				const providerId = String(provider).toLowerCase();
+				const mapped =
+					providers[providerId] ??
+					providers[
+						providerId === 'claude'
+							? 'anthropic'
+							: providerId === 'gemini'
+								? 'google'
+								: providerId
+					];
+				setConfigured(Boolean(mapped));
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setConfigured(false);
+				}
+			})
+			.finally(() => {
+				if (!cancelled) {
+					setLoading(false);
+				}
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [provider]);
+
+	const notifyModels = () => {
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(
+				new CustomEvent('wfa-ai-credentials-changed', {
+					detail: { provider },
+				})
+			);
+		}
+		if (typeof onCredentialsChange === 'function') {
+			onCredentialsChange();
+		}
+	};
+
+	const handleSave = async () => {
+		if (!apiKey.trim()) {
+			setError(__('Enter an API key.', 'workflow-automate'));
+			return;
+		}
+
+		setSaving(true);
+		setError('');
+		setNotice('');
+
+		try {
+			await saveAiProviderCredentials(provider, apiKey.trim());
+			setApiKey('');
+			setReplacing(false);
+			setConfigured(true);
+			setNotice(__('API key saved.', 'workflow-automate'));
+			notifyModels();
+		} catch (err) {
+			setError(
+				err && err.message
+					? err.message
+					: __(
+							'Could not save API key. Check that the key is valid.',
+							'workflow-automate'
+						)
+			);
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const handleClear = async () => {
+		setClearing(true);
+		setError('');
+		setNotice('');
+
+		try {
+			await clearAiProviderCredentials(provider);
+			setConfigured(false);
+			setReplacing(true);
+			setNotice(__('API key removed.', 'workflow-automate'));
+			notifyModels();
+		} catch (err) {
+			setError(
+				err && err.message
+					? err.message
+					: __('Could not remove API key.', 'workflow-automate')
+			);
+		} finally {
+			setClearing(false);
+		}
+	};
+
+	if (loading) {
+		return (
+			<div className="wfa-field wfa-field--ai-credentials">
+				<p className="wfa-builder-config__field-help">
+					{__('Checking API key…', 'workflow-automate')}
+				</p>
+			</div>
+		);
+	}
+
+	if (configured && !replacing) {
+		return (
+			<div className="wfa-field wfa-field--ai-credentials">
+				<strong>{label}</strong>
+				<p className="wfa-builder-config__connection-notice wfa-builder-config__connection-notice--success">
+					{__('API key saved for this site.', 'workflow-automate')}
+				</p>
+				{notice ? (
+					<p className="wfa-builder-config__connection-notice wfa-builder-config__connection-notice--success">
+						{notice}
+					</p>
+				) : null}
+				{error ? (
+					<p className="wfa-builder-config__field-error" role="alert">
+						{error}
+					</p>
+				) : null}
+				<div className="wfa-builder-config__connection-actions">
+					<Button
+						variant="secondary"
+						onClick={() => {
+							setReplacing(true);
+							setApiKey('');
+							setError('');
+							setNotice('');
+						}}
+					>
+						{__('Replace API key', 'workflow-automate')}
+					</Button>
+					<Button
+						variant="link"
+						isDestructive
+						onClick={handleClear}
+						disabled={clearing}
+					>
+						{clearing
+							? __('Removing…', 'workflow-automate')
+							: __('Remove', 'workflow-automate')}
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className="wfa-field wfa-field--ai-credentials">
+			<TextControl
+				label={label}
+				type="password"
+				value={apiKey}
+				onChange={setApiKey}
+				autoComplete="off"
+				help={__(
+					'Saved for this WordPress site and used by all workflows.',
+					'workflow-automate'
+				)}
+			/>
+			{error ? (
+				<p className="wfa-builder-config__field-error" role="alert">
+					{error}
+				</p>
+			) : null}
+			{notice ? (
+				<p className="wfa-builder-config__connection-notice wfa-builder-config__connection-notice--success">
+					{notice}
+				</p>
+			) : null}
+			<div className="wfa-builder-config__connection-actions">
+				<Button isPrimary onClick={handleSave} disabled={saving}>
+					{saving
+						? __('Saving…', 'workflow-automate')
+						: __('Save API key', 'workflow-automate')}
+				</Button>
+				{configured || replacing ? (
+					<Button
+						variant="link"
+						onClick={() => {
+							setReplacing(false);
+							setApiKey('');
+							setError('');
+						}}
+						disabled={saving}
+					>
+						{__('Cancel', 'workflow-automate')}
+					</Button>
+				) : null}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Model picker loaded from the WordPress AI Client provider registry.
  *
  * @param {Object}   props
  * @param {string}   props.label
  * @param {string}   props.value
  * @param {string}   props.defaultValue
- * @param {number}   props.connectionId
+ * @param {string}   props.provider
  * @param {string}   props.nodeTypeSlug
  * @param {Function} props.onChange
  */
@@ -1001,16 +1244,34 @@ function AiModelField({
 	label,
 	value,
 	defaultValue,
-	connectionId,
+	provider,
 	nodeTypeSlug,
 	onChange,
 }) {
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
+	const [reloadToken, setReloadToken] = useState(0);
 
 	useEffect(() => {
-		if (!connectionId || connectionId <= 0) {
+		const onCredentialsChanged = () => {
+			setReloadToken((token) => token + 1);
+		};
+
+		window.addEventListener(
+			'wfa-ai-credentials-changed',
+			onCredentialsChanged
+		);
+		return () => {
+			window.removeEventListener(
+				'wfa-ai-credentials-changed',
+				onCredentialsChanged
+			);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!provider) {
 			setOptions([]);
 			setError('');
 			setLoading(false);
@@ -1022,7 +1283,7 @@ function AiModelField({
 		setLoading(true);
 		setError('');
 
-		fetchConnectionModels(connectionId, nodeTypeSlug)
+		fetchAiProviderModels(provider, nodeTypeSlug)
 			.then((result) => {
 				if (cancelled) {
 					return;
@@ -1052,18 +1313,15 @@ function AiModelField({
 		return () => {
 			cancelled = true;
 		};
-	}, [connectionId, nodeTypeSlug]);
+	}, [provider, nodeTypeSlug, reloadToken]);
 
-	if (!connectionId || connectionId <= 0) {
+	if (error && options.length === 0) {
 		return (
 			<TextControl
 				label={label}
 				value={value || defaultValue}
 				onChange={onChange}
-				help={__(
-					'Select a connection above to load available models from the API.',
-					'workflow-automate'
-				)}
+				help={error}
 			/>
 		);
 	}
@@ -1094,7 +1352,7 @@ function AiModelField({
 				help={
 					error ||
 					__(
-						'No models returned. Enter a model id manually.',
+						'No models listed. Enter a model id manually or save an API key above.',
 						'workflow-automate'
 					)
 				}
@@ -1132,7 +1390,7 @@ function AiModelField({
 
 /**
  * Connection picker with inline "add API key" form so authors configure
- * credentials on the node without leaving the builder.
+ * Telegram / WhatsApp / Google (etc.) without leaving the builder.
  *
  * @param {Object}        props
  * @param {string}        props.label

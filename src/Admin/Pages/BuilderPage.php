@@ -91,6 +91,12 @@ class BuilderPage implements AdminPage {
 		}
 
 		$asset = require $asset_file;
+		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
+		// Bust browser caches when the built bundle changes on disk.
+		$built_js = WFA_PLUGIN_DIR . 'assets/builder/build/index.js';
+		if ( file_exists( $built_js ) ) {
+			$version = (string) filemtime( $built_js );
+		}
 
 		wp_enqueue_style(
 			'wfa-builder-font',
@@ -103,7 +109,7 @@ class BuilderPage implements AdminPage {
 			'wfa-builder',
 			WFA_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
-			$asset['version'],
+			$version,
 			true
 		);
 
@@ -115,7 +121,7 @@ class BuilderPage implements AdminPage {
 				'wfa-builder',
 				WFA_PLUGIN_URL . 'assets/builder/build/style-index.css',
 				array( 'wp-components', 'wfa-builder-font' ),
-				$asset['version']
+				$version
 			);
 			wp_style_add_data( 'wfa-builder', 'rtl', 'replace' );
 		}
@@ -128,7 +134,7 @@ class BuilderPage implements AdminPage {
 	}
 
 	/**
-	 * @return array{workflowId: int, listUrl: string, connectionsUrl: string, googleCredentialsUrl: string, googleOAuthCallbackUrl: string}
+	 * @return array{workflowId: int, listUrl: string, connectionsUrl: string, aiCredentialsUrl: string, googleCredentialsUrl: string, googleOAuthCallbackUrl: string}
 	 */
 	private function bootstrapSettings(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which workflow to load; the REST API this feeds still re-checks capability on every request.
@@ -139,6 +145,7 @@ class BuilderPage implements AdminPage {
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
 			'connectionsUrl' => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
+			'aiCredentialsUrl' => \WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl' => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
 			'googleOAuthCallbackUrl' => rest_url( 'wfa/v1/oauth/google/callback' ),
 		);

@@ -18,15 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Calls each integration's real API with the submitted credentials before a
- * connection is saved. Unknown or generic integrations (e.g. HTTP Request)
- * are skipped — those stay `pending` because there is no single endpoint to
- * probe without extra configuration.
+ * connection is saved. AI providers use in-builder API keys (Connectors on WP 7+,
+ * AI Client credentials option below WP 7) instead of WFA Connections, so they
+ * are not verified here.
  */
 class ConnectionVerifier {
 
 	private const TIMEOUT_SECONDS = 15;
-
-	private const ANTHROPIC_API_VERSION = '2023-06-01';
 
 	/**
 	 * Built-in action slugs that have a lightweight auth-check endpoint.
@@ -34,12 +32,6 @@ class ConnectionVerifier {
 	 * @var string[]
 	 */
 	private const VERIFIABLE = array(
-		'openai_chat_action',
-		'claude_messages_action',
-		'gemini_generate_content_action',
-		'openrouter_chat_action',
-		'groq_chat_action',
-		'deepseek_chat_action',
 		'telegram_send_message_action',
 		'whatsapp_cloud_send_message_action',
 		'google_sheets_append_row_action',
@@ -51,18 +43,6 @@ class ConnectionVerifier {
 	 * @var array<string, string>
 	 */
 	private const ALIASES = array(
-		'openai' => 'openai_chat_action',
-		'openai_chat' => 'openai_chat_action',
-		'chatgpt' => 'openai_chat_action',
-		'claude' => 'claude_messages_action',
-		'anthropic' => 'claude_messages_action',
-		'gemini' => 'gemini_generate_content_action',
-		'google_gemini' => 'gemini_generate_content_action',
-		'openrouter' => 'openrouter_chat_action',
-		'open_router' => 'openrouter_chat_action',
-		'groq' => 'groq_chat_action',
-		'deepseek' => 'deepseek_chat_action',
-		'deep_seek' => 'deepseek_chat_action',
 		'telegram' => 'telegram_send_message_action',
 		'whatsapp' => 'whatsapp_cloud_send_message_action',
 		'whatsapp_cloud' => 'whatsapp_cloud_send_message_action',
@@ -117,24 +97,6 @@ class ConnectionVerifier {
 		}
 
 		switch ( $target ) {
-			case 'openai_chat_action':
-				return $this->verifyOpenAi( $secret );
-
-			case 'claude_messages_action':
-				return $this->verifyClaude( $secret );
-
-			case 'gemini_generate_content_action':
-				return $this->verifyGemini( $secret );
-
-			case 'openrouter_chat_action':
-				return $this->verifyOpenRouter( $secret );
-
-			case 'groq_chat_action':
-				return $this->verifyGroq( $secret );
-
-			case 'deepseek_chat_action':
-				return $this->verifyDeepSeek( $secret );
-
 			case 'telegram_send_message_action':
 				return $this->verifyTelegram( $secret );
 
@@ -192,98 +154,6 @@ class ConnectionVerifier {
 			default:
 				return trim( (string) ( $field_values['api_key'] ?? '' ) );
 		}
-	}
-
-	/**
-	 * @param string $api_key API key or bearer token.
-	 *
-	 * @return array{success: bool, error?: string}
-	 */
-	private function verifyOpenAi( string $api_key ): array {
-		return $this->remoteGet(
-			'https://api.openai.com/v1/models',
-			array(
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'OpenAI'
-		);
-	}
-
-	/**
-	 * @param string $api_key API key.
-	 *
-	 * @return array{success: bool, error?: string}
-	 */
-	private function verifyOpenRouter( string $api_key ): array {
-		return $this->remoteGet(
-			'https://openrouter.ai/api/v1/models',
-			array(
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'OpenRouter'
-		);
-	}
-
-	/**
-	 * @param string $api_key API key.
-	 *
-	 * @return array{success: bool, error?: string}
-	 */
-	private function verifyGroq( string $api_key ): array {
-		return $this->remoteGet(
-			'https://api.groq.com/openai/v1/models',
-			array(
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'Groq'
-		);
-	}
-
-	/**
-	 * @param string $api_key API key.
-	 *
-	 * @return array{success: bool, error?: string}
-	 */
-	private function verifyDeepSeek( string $api_key ): array {
-		return $this->remoteGet(
-			'https://api.deepseek.com/models',
-			array(
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'DeepSeek'
-		);
-	}
-
-	/**
-	 * @param string $api_key API key.
-	 *
-	 * @return array{success: bool, error?: string}
-	 */
-	private function verifyClaude( string $api_key ): array {
-		return $this->remoteGet(
-			'https://api.anthropic.com/v1/models',
-			array(
-				'x-api-key' => $api_key,
-				'anthropic-version' => self::ANTHROPIC_API_VERSION,
-			),
-			'Claude'
-		);
-	}
-
-	/**
-	 * @param string $api_key Gemini API key.
-	 *
-	 * @return array{success: bool, error?: string}
-	 */
-	private function verifyGemini( string $api_key ): array {
-		return $this->remoteGet(
-			sprintf(
-				'https://generativelanguage.googleapis.com/v1beta/models?key=%s',
-				rawurlencode( $api_key )
-			),
-			array(),
-			'Gemini'
-		);
 	}
 
 	/**

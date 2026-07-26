@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class DeepSeekChatAction extends AbstractOpenAiCompatibleChatAction {
+class DeepSeekChatAction extends AbstractAiClientChatAction {
 
 	public function slug(): string {
 		return 'deepseek_chat_action';
@@ -24,22 +24,14 @@ class DeepSeekChatAction extends AbstractOpenAiCompatibleChatAction {
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to DeepSeek (OpenAI-compatible API) and returns the reply.', 'workflow-automate' );
+		return __( 'Sends a prompt to DeepSeek and returns the reply.', 'workflow-automate' );
 	}
 
-	protected function apiUrl(): string {
-		return 'https://api.deepseek.com/chat/completions';
+	protected function providerSlug(): string {
+		return 'deepseek';
 	}
 
 	protected function defaultModel(): string {
 		return 'deepseek-chat';
-	}
-
-	protected function providerName(): string {
-		return 'DeepSeek';
-	}
-
-	protected function connectionLabel(): string {
-		return __( 'DeepSeek API connection', 'workflow-automate' );
 	}
 }

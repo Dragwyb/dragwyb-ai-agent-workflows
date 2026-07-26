@@ -256,18 +256,9 @@ class ConnectionsController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function getModels( $request ) {
-		$connection_id = (int) $request['id'];
-		$node_type     = (string) $request->get_param( 'node_type' );
+		$node_type = (string) $request->get_param( 'node_type' );
 
-		if ( null === $this->connections->find( $connection_id ) ) {
-			return new WP_Error(
-				'wfa_rest_not_found',
-				__( 'Connection not found.', 'workflow-automate' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		$result = $this->ai_models->listForConnection( $connection_id, $node_type );
+		$result = $this->ai_models->listForConnection( (int) $request['id'], $node_type );
 
 		return rest_ensure_response( $result );
 	}

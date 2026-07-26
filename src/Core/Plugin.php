@@ -36,10 +36,11 @@ use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
-use WorkflowAutomate\Plugin\Service\Agent\AgentLlmClient;
+use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
 use WorkflowAutomate\Plugin\Service\Agent\AgentService;
 use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
 use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
 use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
 use WorkflowAutomate\Plugin\Service\ChatMessageService;
@@ -157,6 +158,8 @@ class Plugin {
 
 		Capabilities::register();
 
+		AiClientBootstrap::register();
+
 		// Defensive re-grant for already-active installs that predate
 		// roadmap item 14 (or whose administrator role lost the caps).
 		// Idempotent; cheap when caps are already present.
@@ -263,9 +266,9 @@ class Plugin {
 		);
 
 		$this->container->singleton(
-			AgentLlmClient::class,
-			static function (): AgentLlmClient {
-				return new AgentLlmClient();
+			AgentAiClient::class,
+			static function (): AgentAiClient {
+				return new AgentAiClient();
 			}
 		);
 
@@ -287,10 +290,9 @@ class Plugin {
 			AgentService::class,
 			static function ( Container $container ): AgentService {
 				return new AgentService(
-					$container->get( ConnectionService::class ),
 					$container->get( AgentToolSchemaBuilder::class ),
 					$container->get( AgentToolExecutor::class ),
-					$container->get( AgentLlmClient::class )
+					$container->get( AgentAiClient::class )
 				);
 			}
 		);
@@ -404,8 +406,8 @@ class Plugin {
 
 		$this->container->singleton(
 			AiModelsService::class,
-			static function ( Container $container ): AiModelsService {
-				return new AiModelsService( $container->get( ConnectionService::class ) );
+			static function (): AiModelsService {
+				return new AiModelsService();
 			}
 		);
 
@@ -464,7 +466,8 @@ class Plugin {
 		$built_in_node_types = new BuiltInNodeTypes(
 			$this->container->get( ConnectionService::class ),
 			$this->container->get( GoogleOAuthService::class ),
-			$this->container->get( AgentService::class )
+			$this->container->get( AgentService::class ),
+			$this->container->get( AgentAiClient::class )
 		);
 
 		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );

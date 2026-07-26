@@ -29,6 +29,7 @@ use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
 use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionRegistrar;
 use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
 use WorkflowAutomate\Plugin\Service\Agent\AgentService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
@@ -54,14 +55,18 @@ class BuiltInNodeTypes {
 
 	private AgentService $agent;
 
+	private AgentAiClient $ai_client;
+
 	public function __construct(
 		ConnectionService $connections,
 		GoogleOAuthService $google_oauth,
-		AgentService $agent
+		AgentService $agent,
+		AgentAiClient $ai_client
 	) {
 		$this->connections  = $connections;
 		$this->google_oauth = $google_oauth;
 		$this->agent        = $agent;
+		$this->ai_client    = $ai_client;
 	}
 
 	/**
@@ -79,14 +84,14 @@ class BuiltInNodeTypes {
 		$registry->registerAction( new HttpRequestAction( $this->connections ) );
 		$registry->registerAction( new SendEmailAction() );
 		$registry->registerAction( new SlackIncomingWebhookAction() );
-		$registry->registerAction( new OpenAiChatAction( $this->connections ) );
+		$registry->registerAction( new OpenAiChatAction( $this->ai_client ) );
 		$registry->registerAction( new TelegramSendMessageAction( $this->connections ) );
 		$registry->registerAction( new WhatsAppCloudSendMessageAction( $this->connections ) );
-		$registry->registerAction( new GeminiGenerateContentAction( $this->connections ) );
-		$registry->registerAction( new ClaudeMessagesAction( $this->connections ) );
-		$registry->registerAction( new OpenRouterChatAction( $this->connections ) );
-		$registry->registerAction( new GroqChatAction( $this->connections ) );
-		$registry->registerAction( new DeepSeekChatAction( $this->connections ) );
+		$registry->registerAction( new GeminiGenerateContentAction( $this->ai_client ) );
+		$registry->registerAction( new ClaudeMessagesAction( $this->ai_client ) );
+		$registry->registerAction( new OpenRouterChatAction( $this->ai_client ) );
+		$registry->registerAction( new GroqChatAction( $this->ai_client ) );
+		$registry->registerAction( new DeepSeekChatAction( $this->ai_client ) );
 		$registry->registerAction( new AiAgentAction( $this->agent ) );
 		$registry->registerAction( new StructuredOutputParserAction() );
 		$registry->registerAction( new RouterAction() );

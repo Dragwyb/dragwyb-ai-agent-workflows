@@ -64,17 +64,17 @@ class AiAgentAction implements ActionInterface {
 					array( 'value' => 'deepseek', 'label' => 'DeepSeek' ),
 				),
 			),
-			'connection_id' => array(
-				'type' => 'connection',
-				'label' => __( 'API key connection (fallback)', 'workflow-automate' ),
-				'default' => 0,
+			'api_credentials' => array(
+				'type'            => 'ai_credentials',
+				'label'           => __( 'API key (fallback provider)', 'workflow-automate' ),
+				'provider_field'  => 'provider',
 			),
 			'model' => array(
 				'type' => 'dynamic_select',
 				'label' => __( 'AI model (fallback)', 'workflow-automate' ),
 				'default' => 'gpt-4o-mini',
 				'options_source' => 'ai_models',
-				'connection_field' => 'connection_id',
+				'provider_field' => 'provider',
 			),
 			'system_prompt' => array(
 				'type' => 'string',

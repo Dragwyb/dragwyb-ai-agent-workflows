@@ -78,6 +78,11 @@ class RestApi {
 		);
 		$connections_controller->register_routes();
 
+		$ai_providers_controller = new AiProvidersController(
+			$this->container->get( AiModelsService::class )
+		);
+		$ai_providers_controller->register_routes();
+
 		$webhook_ingress_controller = new WebhookIngressController( $this->container->get( WebhookService::class ) );
 		$webhook_ingress_controller->register_routes();
 

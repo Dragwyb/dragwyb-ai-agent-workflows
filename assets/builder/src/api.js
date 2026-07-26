@@ -130,6 +130,7 @@ export function getBootstrap() {
 			workflowId: 0,
 			listUrl: '',
 			connectionsUrl: '',
+			aiCredentialsUrl: '',
 			googleCredentialsUrl: 'https://console.cloud.google.com/apis/credentials',
 			googleOAuthCallbackUrl: '',
 		}
@@ -137,14 +138,66 @@ export function getBootstrap() {
 }
 
 /**
+ * @param {string} provider Provider slug or node type slug.
+ * @param {string} [nodeType] Optional node type for mapping.
+ * @return {Promise<{options: Array<{value: string, label: string}>, error: string|null, configured?: boolean}>}
+ */
+export function fetchAiProviderModels(provider, nodeType = '') {
+	const params = new URLSearchParams();
+	if (provider) {
+		params.set('provider', provider);
+	}
+	if (nodeType) {
+		params.set('node_type', nodeType);
+	}
+	return apiFetch({
+		path: `/wfa/v1/ai/models?${params.toString()}`,
+	});
+}
+
+/**
+ * @return {Promise<{available: boolean, providers: Object<string, boolean>}>}
+ */
+export function fetchAiProviderStatus() {
+	return apiFetch({ path: '/wfa/v1/ai/status' });
+}
+
+/**
+ * @param {string} provider
+ * @param {string} apiKey
+ * @return {Promise<{success: boolean, provider: string, configured: boolean}>}
+ */
+export function saveAiProviderCredentials(provider, apiKey) {
+	return apiFetch({
+		path: '/wfa/v1/ai/credentials',
+		method: 'POST',
+		data: {
+			provider,
+			api_key: apiKey,
+		},
+	});
+}
+
+/**
+ * @param {string} provider
+ * @return {Promise<{success: boolean, provider: string, configured: boolean}>}
+ */
+export function clearAiProviderCredentials(provider) {
+	const params = new URLSearchParams({ provider });
+	return apiFetch({
+		path: `/wfa/v1/ai/credentials?${params.toString()}`,
+		method: 'DELETE',
+	});
+}
+
+/**
+ * @deprecated Use fetchAiProviderModels — kept for temporary compatibility.
  * @param {number} connectionId
  * @param {string} nodeType
  * @return {Promise<{options: Array<{value: string, label: string}>, error: string|null}>}
  */
 export function fetchConnectionModels(connectionId, nodeType) {
-	return apiFetch({
-		path: `/wfa/v1/connections/${connectionId}/models?node_type=${encodeURIComponent(nodeType)}`,
-	});
+	return fetchAiProviderModels(nodeType || 'openai', nodeType);
 }
 
 /**

@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Service\Agent;
 
+use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
 use WorkflowAutomate\Plugin\Service\ConfigInterpolator;
-use WorkflowAutomate\Plugin\Service\ConnectionSecretResolver;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,27 +25,23 @@ class AgentService {
 
 	private const MAX_ITERATIONS_CAP = 10;
 
-	private ConnectionSecretResolver $secrets;
-
 	private AgentToolSchemaBuilder $schema_builder;
 
 	private AgentToolExecutor $tool_executor;
 
-	private AgentLlmClient $llm_client;
+	private AgentAiClient $llm_client;
 
 	private AgentStructuredOutputParser $structured_parser;
 
 	public function __construct(
-		ConnectionService $connections,
 		AgentToolSchemaBuilder $schema_builder,
 		AgentToolExecutor $tool_executor,
-		AgentLlmClient $llm_client
+		AgentAiClient $llm_client
 	) {
-		$this->secrets            = new ConnectionSecretResolver( $connections );
-		$this->schema_builder     = $schema_builder;
-		$this->tool_executor      = $tool_executor;
-		$this->llm_client         = $llm_client;
-		$this->structured_parser  = new AgentStructuredOutputParser();
+		$this->schema_builder    = $schema_builder;
+		$this->tool_executor     = $tool_executor;
+		$this->llm_client        = $llm_client;
+		$this->structured_parser = new AgentStructuredOutputParser();
 	}
 
 	/**
@@ -119,10 +114,11 @@ class AgentService {
 		$attachments = AgentGraphHelper::resolveAttachments( $graph_nodes, $agent_node_id );
 		$chat        = AgentGraphHelper::resolveChatModelConfig( $attachments['chat_model'], $config );
 
-		$api_key = $this->secrets->resolveBearerSecret( $chat['connection_id'] );
-
-		if ( is_array( $api_key ) ) {
-			return $api_key;
+		if ( ! AiClientBootstrap::isProviderConfigured( $chat['provider'] ) ) {
+			return array(
+				'success' => false,
+				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'workflow-automate' ),
+			);
 		}
 
 		$prompt = isset( $config['prompt'] ) ? trim( (string) $config['prompt'] ) : '';
@@ -146,7 +142,6 @@ class AgentService {
 
 		$loop = $this->runAgentLoop(
 			$chat['provider'],
-			$api_key,
 			$model,
 			$messages,
 			$tool_schemas,
@@ -158,10 +153,9 @@ class AgentService {
 		);
 
 		if ( empty( $loop['success'] ) && ! empty( $config['fallback_enabled'] ) && is_array( $attachments['fallback_chat_model'] ) ) {
-			$fallback     = AgentGraphHelper::resolveChatModelConfig( $attachments['fallback_chat_model'], $config );
-			$fallback_key = $this->secrets->resolveBearerSecret( $fallback['connection_id'] );
+			$fallback = AgentGraphHelper::resolveChatModelConfig( $attachments['fallback_chat_model'], $config );
 
-			if ( ! is_array( $fallback_key ) ) {
+			if ( AiClientBootstrap::isProviderConfigured( $fallback['provider'] ) ) {
 				$fallback_model = trim( $fallback['model'] );
 
 				if ( '' === $fallback_model ) {
@@ -170,7 +164,6 @@ class AgentService {
 
 				$fallback_loop = $this->runAgentLoop(
 					$fallback['provider'],
-					$fallback_key,
 					$fallback_model,
 					$messages,
 					$tool_schemas,
@@ -198,7 +191,6 @@ class AgentService {
 
 		if ( is_array( $attachments['output_parser'] ) ) {
 			$fix_provider = $chat['provider'];
-			$fix_api_key  = $api_key;
 			$fix_model    = $model;
 
 			$parser_id    = (string) ( $attachments['output_parser']['id'] ?? '' );
@@ -206,11 +198,8 @@ class AgentService {
 
 			if ( is_array( $parser_model ) ) {
 				$parser_chat = AgentGraphHelper::resolveChatModelConfig( $parser_model, array() );
-				$parser_key  = $this->secrets->resolveBearerSecret( $parser_chat['connection_id'] );
-
-				if ( ! is_array( $parser_key ) ) {
+				if ( AiClientBootstrap::isProviderConfigured( $parser_chat['provider'] ) ) {
 					$fix_provider = $parser_chat['provider'];
-					$fix_api_key  = $parser_key;
 					$fix_model    = trim( $parser_chat['model'] );
 
 					if ( '' === $fix_model ) {
@@ -223,7 +212,6 @@ class AgentService {
 				$response,
 				$attachments['output_parser'],
 				$fix_provider,
-				$fix_api_key,
 				$fix_model
 			);
 
@@ -636,7 +624,6 @@ class AgentService {
 
 	/**
 	 * @param string               $provider       Provider slug.
-	 * @param string               $api_key        API key.
 	 * @param string               $model          Model id.
 	 * @param array<int, mixed>    $messages       Messages.
 	 * @param array<int, mixed>    $tool_schemas   Tool schemas.
@@ -650,7 +637,6 @@ class AgentService {
 	 */
 	private function runAgentLoop(
 		string $provider,
-		string $api_key,
 		string $model,
 		array $messages,
 		array $tool_schemas,
@@ -670,7 +656,6 @@ class AgentService {
 
 			$completion = $this->llm_client->complete(
 				$provider,
-				$api_key,
 				$model,
 				$messages,
 				$tool_schemas,
@@ -910,7 +895,6 @@ class AgentService {
 	 * @param string               $response    Raw model reply.
 	 * @param array<string, mixed> $parser_node Output parser attachment.
 	 * @param string               $provider    Chat provider.
-	 * @param string               $api_key     API key.
 	 * @param string               $model       Model id.
 	 *
 	 * @return array{success: true, data: mixed, auto_fixed?: bool}|array{success: false, error: string, response?: string}
@@ -919,7 +903,6 @@ class AgentService {
 		string $response,
 		array $parser_node,
 		string $provider,
-		string $api_key,
 		string $model
 	): array {
 		$resolved = $this->structured_parser->resolve( $parser_node );
@@ -959,7 +942,6 @@ class AgentService {
 
 		$completion = $this->llm_client->complete(
 			$provider,
-			$api_key,
 			$model,
 			array(
 				array(
