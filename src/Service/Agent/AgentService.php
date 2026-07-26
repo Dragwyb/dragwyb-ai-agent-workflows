@@ -21,9 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class AgentService {
 
-	private const DEFAULT_MAX_ITERATIONS = 5;
+	private const DEFAULT_MAX_ITERATIONS = 8;
 
-	private const MAX_ITERATIONS_CAP = 10;
+	private const MAX_ITERATIONS_CAP = 20;
 
 	private AgentToolSchemaBuilder $schema_builder;
 
@@ -499,6 +499,18 @@ class AgentService {
 			$max = self::DEFAULT_MAX_ITERATIONS;
 		}
 
+		/**
+		 * Filters the AI Agent max tool-loop iterations (capped).
+		 *
+		 * @param int                  $max    Requested iterations.
+		 * @param array<string, mixed> $config Agent node config.
+		 */
+		$max = (int) apply_filters( 'wfa_agent_max_iterations', $max, $config );
+
+		if ( $max < 1 ) {
+			$max = self::DEFAULT_MAX_ITERATIONS;
+		}
+
 		return min( $max, self::MAX_ITERATIONS_CAP );
 	}
 
@@ -649,6 +661,7 @@ class AgentService {
 		$iteration    = 0;
 		$all_tool_calls = array();
 		$seen_calls   = array();
+		$created_post_id = 0;
 		$messages     = $this->sanitizeMessages( $messages );
 
 		while ( $iteration < $max_iterations ) {
@@ -704,22 +717,40 @@ class AgentService {
 
 				$signature = md5( $function_name . wp_json_encode( $args ) );
 
-				if ( isset( $seen_calls[ $signature ] ) ) {
-					return array(
-						'success' => false,
-						'error'   => __( 'Repeated tool call detected (loop prevention).', 'workflow-automate' ),
+				if ( isset( $seen_calls[ $signature ] ) && is_array( $seen_calls[ $signature ] ) ) {
+					// Same tool+args again: reuse cached result instead of aborting the run.
+					$tool_result = $seen_calls[ $signature ];
+					if ( ! isset( $tool_result['note'] ) ) {
+						$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'workflow-automate' );
+					}
+				} elseif ( $created_post_id > 0 && $this->isCreatePostToolName( $function_name ) ) {
+					// One create per agent run — further creates burn API and duplicate content.
+					$tool_result = array(
+						'error'   => sprintf(
+							/* translators: %d: existing post id */
+							__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'workflow-automate' ),
+							$created_post_id
+						),
+						'post_id' => $created_post_id,
 					);
+					$seen_calls[ $signature ] = $tool_result;
+				} else {
+					$tool_result = $this->tool_executor->execute(
+						$function_name,
+						$args,
+						$graph_nodes,
+						$workflow_id,
+						$context
+					);
+					$seen_calls[ $signature ] = $tool_result;
+
+					if ( $this->isCreatePostToolName( $function_name ) ) {
+						$new_id = $this->extractCreatedPostId( $tool_result );
+						if ( $new_id > 0 ) {
+							$created_post_id = $new_id;
+						}
+					}
 				}
-
-				$seen_calls[ $signature ] = true;
-
-				$tool_result = $this->tool_executor->execute(
-					$function_name,
-					$args,
-					$graph_nodes,
-					$workflow_id,
-					$context
-				);
 
 				$all_tool_calls[] = array(
 					'id'        => $tool_call_id,
@@ -867,6 +898,12 @@ class AgentService {
 		if ( ! empty( $attachments['tools'] ) ) {
 			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'workflow-automate' );
 			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'workflow-automate' );
+			$parts[] = __( 'Tool usage rules: Read tool results before claiming success. Prefer IDs returned by previous tools. For list tools, use limit/search filters—do not dump entire databases. Omit optional URL fields (images, media) unless you have a real direct URL. If a tool returns a warning, the main action still succeeded—do not create another post/page to “fix” it; report once and finish. Create Post at most once per task; for fixes use Update Post with the returned post_id. Never repeat the same tool call; use the prior result and continue.', 'workflow-automate' );
+
+			if ( $this->attachmentsIncludePostTools( $attachments['tools'] ) ) {
+				$parts[] = __( 'WordPress page/post design rules: When the user asks for a page, set post_type to "page". For designed/modern/colorful layouts, pass design_sections as a JSON array of sections (types: hero, heading, paragraph, columns, cta, buttons, spacer, separator, group) with colors—do not rely on a single plain paragraph. You may instead put full Gutenberg block markup (<!-- wp:... -->) in content. Omit featured_image unless you have a real direct image URL (not example.com or generic search URLs). Never claim the page was designed unless design_sections or Gutenberg block markup was used.', 'workflow-automate' );
+				$parts[] = __( 'Post type from trigger: If the workflow trigger includes post_type (e.g. page), pass that same post_type to Create/Update Post unless the user explicitly requests a different type. Do not default everything to "post" when the trigger saved a page.', 'workflow-automate' );
+			}
 		}
 
 		$parser_resolved = null;
@@ -887,6 +924,49 @@ class AgentService {
 		}
 
 		return implode( "\n\n", $parts );
+	}
+
+	/**
+	 * @param array<int, mixed> $tools Attached tool nodes.
+	 */
+	private function attachmentsIncludePostTools( array $tools ): bool {
+		foreach ( $tools as $tool ) {
+			if ( ! is_array( $tool ) ) {
+				continue;
+			}
+			$type = (string) ( $tool['type'] ?? '' );
+			if ( 'wp_create_post_action' === $type || 'wp_update_post_action' === $type ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param string $function_name LLM tool function name.
+	 */
+	private function isCreatePostToolName( string $function_name ): bool {
+		return 0 === strpos( $function_name, 'wp_create_post_action' );
+	}
+
+	/**
+	 * @param array<string, mixed> $tool_result Tool execution result.
+	 */
+	private function extractCreatedPostId( array $tool_result ): int {
+		if ( ! empty( $tool_result['error'] ) ) {
+			return 0;
+		}
+
+		if ( isset( $tool_result['post_id'] ) ) {
+			return (int) $tool_result['post_id'];
+		}
+
+		if ( isset( $tool_result['data']['post_id'] ) ) {
+			return (int) $tool_result['data']['post_id'];
+		}
+
+		return 0;
 	}
 
 	/**

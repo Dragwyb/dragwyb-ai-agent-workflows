@@ -24,15 +24,24 @@ class AgentToolSchemaBuilder {
 	private NodeTypeRegistry $registry;
 
 	/**
+	 * OpenAI/Anthropic/Gemini function-name max length.
+	 */
+	private const MAX_TOOL_NAME_LENGTH = 64;
+
+	/**
 	 * Config field types the agent may fill at runtime.
 	 *
 	 * @var array<string, true>
 	 */
 	private const AGENT_FILLABLE_TYPES = array(
-		'string' => true,
-		'integer' => true,
-		'boolean' => true,
-		'number' => true,
+		'string'    => true,
+		'integer'   => true,
+		'boolean'   => true,
+		'number'    => true,
+		'select'    => true,
+		'object'    => true,
+		'array'     => true,
+		'key_value' => true,
 	);
 
 	/**
@@ -41,13 +50,13 @@ class AgentToolSchemaBuilder {
 	 * @var array<string, true>
 	 */
 	private const EXCLUDED_FIELDS = array(
-		'connection_id' => true,
-		'model' => true,
-		'true_branch_node_id' => true,
-		'false_branch_node_id' => true,
-		'conditions' => true,
+		'connection_id'          => true,
+		'model'                  => true,
+		'true_branch_node_id'    => true,
+		'false_branch_node_id'   => true,
+		'conditions'             => true,
 		'default_branch_node_id' => true,
-		'routes' => true,
+		'routes'                 => true,
 	);
 
 	public function __construct( NodeTypeRegistry $registry ) {
@@ -92,13 +101,18 @@ class AgentToolSchemaBuilder {
 			return null;
 		}
 
-		$config        = isset( $tool_node['config'] ) && is_array( $tool_node['config'] ) ? $tool_node['config'] : array();
-		$parameters    = $this->extractParameters( $action, $config );
-		$tool_name     = self::toolName( $node_type, $node_id );
-		$description   = trim( $action->description() );
+		$config      = isset( $tool_node['config'] ) && is_array( $tool_node['config'] ) ? $tool_node['config'] : array();
+		$parameters  = $this->extractParameters( $action, $config );
+		$tool_name   = self::toolName( $node_type, $node_id );
+		$description = trim( $action->description() );
 
 		if ( '' === $description ) {
 			$description = $action->label();
+		}
+
+		$label = isset( $tool_node['label'] ) ? trim( (string) $tool_node['label'] ) : '';
+		if ( '' !== $label && $label !== $action->label() ) {
+			$description = $label . ' — ' . $description;
 		}
 
 		return array(
@@ -115,9 +129,9 @@ class AgentToolSchemaBuilder {
 	 * @param ActionInterface      $action Action metadata.
 	 * @param array<string, mixed> $config Saved node config.
 	 *
-	 * @return array<string, mixed>|object
+	 * @return array<string, mixed>
 	 */
-	private function extractParameters( ActionInterface $action, array $config ): array|object {
+	private function extractParameters( ActionInterface $action, array $config ): array {
 		$schema     = $action->configSchema();
 		$properties = array();
 		$required   = array();
@@ -133,11 +147,7 @@ class AgentToolSchemaBuilder {
 
 			$field_type = (string) ( $field_def['type'] ?? 'string' );
 
-			if ( ! isset( self::AGENT_FILLABLE_TYPES[ $field_type ] ) && 'object' !== $field_type ) {
-				continue;
-			}
-
-			if ( ! $this->fieldIsAgentFillable( $field_key, $field_def, $config ) ) {
+			if ( ! isset( self::AGENT_FILLABLE_TYPES[ $field_type ] ) ) {
 				continue;
 			}
 
@@ -146,12 +156,13 @@ class AgentToolSchemaBuilder {
 				? trim( $field_def['description'] )
 				: $label;
 
-			$properties[ $field_key ] = array(
-				'type'        => 'object' === $field_type ? 'string' : $field_type,
-				'description' => $this->parameterDescription( $field_key, $description ),
-			);
+			$description = $this->parameterDescription( $field_key, $field_type, $description, $config );
 
-			if ( ! empty( $field_def['required'] ) ) {
+			$property = $this->buildPropertySchema( $field_type, $field_def, $description );
+
+			$properties[ $field_key ] = $property;
+
+			if ( ! empty( $field_def['required'] ) && $this->configValueIsEmpty( $config[ $field_key ] ?? null ) ) {
 				$required[] = $field_key;
 			}
 		}
@@ -163,31 +174,112 @@ class AgentToolSchemaBuilder {
 			);
 		}
 
-		return array(
+		$result = array(
 			'type'       => 'object',
 			'properties' => $properties,
-			'required'   => $required,
 		);
+
+		if ( array() !== $required ) {
+			$result['required'] = $required;
+		}
+
+		return $result;
 	}
 
 	/**
-	 * @param string               $field_key Field key.
-	 * @param array<string, mixed> $field_def Schema entry.
-	 * @param array<string, mixed> $config    Saved config.
+	 * @param string               $field_type  Schema type.
+	 * @param array<string, mixed> $field_def   Field definition.
+	 * @param string               $description Parameter description.
 	 *
-	 * @return bool
+	 * @return array<string, mixed>
 	 */
-	private function fieldIsAgentFillable( string $field_key, array $field_def, array $config ): bool {
-		if ( ! empty( $field_def['agent_fillable'] ) ) {
-			return true;
+	private function buildPropertySchema( string $field_type, array $field_def, string $description ): array {
+		if ( 'array' === $field_type ) {
+			return array(
+				'type'        => 'array',
+				'items'       => array( 'type' => 'string' ),
+				'description' => $description,
+			);
 		}
 
-		if ( ! array_key_exists( $field_key, $config ) ) {
-			return true;
+		if ( 'key_value' === $field_type ) {
+			return array(
+				'type'                 => 'object',
+				'additionalProperties' => array(
+					'type' => array( 'string', 'number', 'boolean' ),
+				),
+				'description'          => $description,
+			);
 		}
 
-		$value = $config[ $field_key ];
+		$property = array(
+			'type'        => in_array( $field_type, array( 'object', 'select' ), true ) ? 'string' : $field_type,
+			'description' => $description,
+		);
 
+		if ( 'select' === $field_type && ! empty( $field_def['options'] ) && is_array( $field_def['options'] ) ) {
+			$enum = array();
+			foreach ( $field_def['options'] as $option ) {
+				if ( is_array( $option ) && array_key_exists( 'value', $option ) ) {
+					$enum[] = (string) $option['value'];
+				} elseif ( is_scalar( $option ) ) {
+					$enum[] = (string) $option;
+				}
+			}
+			$enum = array_values( array_filter( $enum, static fn( string $v ): bool => '' !== $v ) );
+			if ( array() !== $enum ) {
+				$property['enum'] = $enum;
+			}
+		}
+
+		return $property;
+	}
+
+	/**
+	 * @param string               $field_key   Config field key.
+	 * @param string               $field_type  Field type.
+	 * @param string               $description Base field description.
+	 * @param array<string, mixed> $config      Saved node config.
+	 *
+	 * @return string
+	 */
+	private function parameterDescription( string $field_key, string $field_type, string $description, array $config ): string {
+		$parts = array( $description );
+
+		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
+			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'workflow-automate' );
+		}
+
+		if ( 'post_type' === $field_key ) {
+			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'workflow-automate' );
+		}
+
+		if ( 'array' === $field_type ) {
+			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'workflow-automate' );
+		}
+
+		if ( 'key_value' === $field_type ) {
+			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'workflow-automate' );
+		}
+
+		if ( array_key_exists( $field_key, $config ) && ! $this->configValueIsEmpty( $config[ $field_key ] ) ) {
+			$default = $config[ $field_key ];
+			if ( is_scalar( $default ) ) {
+				$parts[] = sprintf(
+					/* translators: %s: current default value */
+					__( 'Current node default: %s. You may override this value.', 'workflow-automate' ),
+					(string) $default
+				);
+			}
+		}
+
+		return implode( ' ', $parts );
+	}
+
+	/**
+	 * @param mixed $value Config value.
+	 */
+	private function configValueIsEmpty( $value ): bool {
 		if ( null === $value ) {
 			return true;
 		}
@@ -204,28 +296,28 @@ class AgentToolSchemaBuilder {
 	}
 
 	/**
-	 * @param string $field_key   Config field key.
-	 * @param string $description Base field description.
+	 * Stable tool function name ≤ 64 chars (provider limit).
 	 *
-	 * @return string
-	 */
-	private function parameterDescription( string $field_key, string $description ): string {
-		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
-			return $description . ' '
-				. __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'workflow-automate' );
-		}
-
-		return $description;
-	}
-
-	/**
 	 * @param string $node_type Node type slug.
 	 * @param string $node_id   Client node id.
 	 *
 	 * @return string
 	 */
 	public static function toolName( string $node_type, string $node_id ): string {
-		return $node_type . '__' . $node_id;
+		$hash      = substr( md5( $node_id ), 0, 8 );
+		$separator = '__';
+		$max_type  = self::MAX_TOOL_NAME_LENGTH - strlen( $separator ) - strlen( $hash );
+
+		if ( $max_type < 8 ) {
+			$max_type = 8;
+		}
+
+		$type = $node_type;
+		if ( strlen( $type ) > $max_type ) {
+			$type = substr( $type, 0, $max_type );
+		}
+
+		return $type . $separator . $hash;
 	}
 
 	/**
@@ -259,6 +351,12 @@ class AgentToolSchemaBuilder {
 			}
 
 			if ( self::toolName( (string) $graph_node['type'], (string) $graph_node['id'] ) === $tool_name ) {
+				return $graph_node;
+			}
+
+			// Legacy long names (pre-hash) for in-flight runs.
+			$legacy = (string) $graph_node['type'] . '__' . (string) $graph_node['id'];
+			if ( $legacy === $tool_name ) {
 				return $graph_node;
 			}
 		}

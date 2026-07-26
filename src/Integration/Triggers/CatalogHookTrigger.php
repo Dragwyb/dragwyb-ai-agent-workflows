@@ -38,6 +38,12 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 	}
 
 	public function description(): string {
+		$hook = (string) ( $this->definition['hook_name'] ?? '' );
+
+		if ( self::isPostContentHook( $hook ) ) {
+			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'workflow-automate' );
+		}
+
 		return __( 'Starts the workflow when this WordPress event fires.', 'workflow-automate' );
 	}
 
@@ -54,7 +60,7 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 	}
 
 	public function configSchema(): array {
-		return array(
+		$schema = array(
 			'hook_name' => array(
 				'type' => 'string',
 				'default' => (string) $this->definition['hook_name'],
@@ -71,6 +77,18 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 				'hidden' => true,
 			),
 		);
+
+		if ( self::isPostContentHook( (string) $this->definition['hook_name'] ) ) {
+			$schema['post_types'] = array(
+				'type'        => 'string',
+				'label'       => __( 'Post Types', 'workflow-automate' ),
+				'default'     => '',
+				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'workflow-automate' ),
+				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'workflow-automate' ),
+			);
+		}
+
+		return $schema;
 	}
 
 	public function bind( array $config, callable $on_fire ): void {
@@ -83,37 +101,86 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		$priority      = (int) ( $config['priority'] ?? $this->definition['priority'] ?? 10 );
 		$accepted_args = max( 0, (int) ( $config['accepted_args'] ?? $this->definition['accepted_args'] ?? 1 ) );
 
-		add_action(
-			$hook_name,
-			static function ( ...$args ) use ( $on_fire, $config, $hook_name ) {
-				if ( self::shouldIgnoreEvent( $hook_name, $args ) ) {
-					return;
-				}
+		$hooks = array( $hook_name );
 
-				$payload = TriggerPayloadNormalizer::normalize( $hook_name, $args );
-				$on_fire( $payload, $config );
-			},
-			$priority,
-			$accepted_args
-		);
+		// Also listen on save_post_{type} so page (and filtered CPT) editor
+		 // saves are never missed if something interferes with generic save_post.
+		if ( 'save_post' === $hook_name ) {
+			foreach ( self::extraSavePostTypeHooks( $config ) as $type_hook ) {
+				$hooks[] = $type_hook;
+			}
+		}
+
+		$hooks = array_values( array_unique( $hooks ) );
+
+		foreach ( $hooks as $hook ) {
+			add_action(
+				$hook,
+				static function ( ...$args ) use ( $on_fire, $config, $hook_name ) {
+					// Normalize against the catalog hook (save_post), not save_post_page.
+					if ( self::shouldIgnoreEvent( $hook_name, $args, $config ) ) {
+						return;
+					}
+
+					$payload = TriggerPayloadNormalizer::normalize( $hook_name, $args );
+					$on_fire( $payload, $config );
+				},
+				$priority,
+				$accepted_args
+			);
+		}
 	}
 
 	/**
-	 * Skips noise and automation-origin events that would feed a loop.
+	 * Type-specific save_post_* hooks to bind alongside generic save_post.
 	 *
-	 * @param string            $hook_name Hook name.
-	 * @param array<int, mixed> $args      Hook arguments.
+	 * @param array<string, mixed> $config Trigger config.
 	 *
-	 * @return bool
+	 * @return array<int, string>
 	 */
-	private static function shouldIgnoreEvent( string $hook_name, array $args ): bool {
+	private static function extraSavePostTypeHooks( array $config ): array {
+		$raw = $config['post_types'] ?? '';
+		$types = is_array( $raw )
+			? array_values(
+				array_filter(
+					array_map(
+						static fn( $item ): string => sanitize_key( (string) $item ),
+						$raw
+					)
+				)
+			)
+			: array_map( 'sanitize_key', WordPressActionHelper::parseList( $raw ) );
+
+		// Empty filter = all content types — at minimum ensure page + post
+		// type-specific hooks are bound (Gutenberg page editor path).
+		if ( array() === $types ) {
+			$types = array( 'post', 'page' );
+		}
+
+		$hooks = array();
+		foreach ( $types as $type ) {
+			if ( '' === $type || self::isIgnoredInternalPostType( $type ) ) {
+				continue;
+			}
+			$hooks[] = 'save_post_' . $type;
+		}
+
+		return $hooks;
+	}
+
+	/**
+	 * @param string               $hook_name Hook name.
+	 * @param array<int, mixed>    $args      Hook arguments.
+	 * @param array<string, mixed> $config    Trigger node config.
+	 */
+	private static function shouldIgnoreEvent( string $hook_name, array $args, array $config = array() ): bool {
 		$guard = TriggerReentrancyGuard::instance();
 
 		if ( null !== $guard && $guard->isWriting() ) {
 			return true;
 		}
 
-		if ( self::shouldIgnorePostEvent( $hook_name, $args ) ) {
+		if ( self::shouldIgnorePostEvent( $hook_name, $args, $config ) ) {
 			return true;
 		}
 
@@ -133,16 +200,11 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 	}
 
 	/**
-	 * Skips autosaves, revisions, trash, auto-drafts, and posts this plugin
-	 * already created — otherwise one editor "Update" (or trashing the
-	 * translated post the agent just made) starts another run.
-	 *
-	 * @param string            $hook_name Hook name.
-	 * @param array<int, mixed> $args      Hook arguments.
-	 *
-	 * @return bool
+	 * @param string               $hook_name Hook name.
+	 * @param array<int, mixed>    $args      Hook arguments.
+	 * @param array<string, mixed> $config    Trigger node config.
 	 */
-	private static function shouldIgnorePostEvent( string $hook_name, array $args ): bool {
+	private static function shouldIgnorePostEvent( string $hook_name, array $args, array $config = array() ): bool {
 		static $post_hooks = array(
 			'save_post'            => true,
 			'wp_insert_post'       => true,
@@ -187,8 +249,6 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 			return true;
 		}
 
-		// Status noise only for save/insert style hooks — dedicated trash
-		// triggers still fire for human-managed posts.
 		static $status_noise_hooks = array(
 			'save_post'            => true,
 			'wp_insert_post'       => true,
@@ -196,11 +256,11 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 			'post_updated'         => true,
 		);
 
-		if ( ! isset( $status_noise_hooks[ $hook_name ] ) ) {
-			return false;
-		}
-
 		$post = $args[1] ?? null;
+
+		if ( 'transition_post_status' === $hook_name ) {
+			$post = $args[2] ?? null;
+		}
 
 		if ( ! $post instanceof \WP_Post ) {
 			$post = get_post( $post_id );
@@ -210,8 +270,18 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 			return false;
 		}
 
-		if ( 'revision' === $post->post_type ) {
+		$post_type = (string) $post->post_type;
+
+		if ( self::isIgnoredInternalPostType( $post_type ) ) {
 			return true;
+		}
+
+		if ( ! self::postTypeAllowed( $post_type, $config ) ) {
+			return true;
+		}
+
+		if ( ! isset( $status_noise_hooks[ $hook_name ] ) ) {
+			return false;
 		}
 
 		if ( in_array( (string) $post->post_status, array( 'auto-draft', 'inherit', 'trash' ), true ) ) {
@@ -219,6 +289,83 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Whether this hook can carry a configurable post-type filter.
+	 */
+	private static function isPostContentHook( string $hook_name ): bool {
+		static $hooks = array(
+			'save_post'              => true,
+			'wp_insert_post'         => true,
+			'wp_after_insert_post'   => true,
+			'post_updated'           => true,
+			'transition_post_status' => true,
+			'wp_trash_post'          => true,
+			'untrash_post'           => true,
+			'before_delete_post'     => true,
+			'delete_post'            => true,
+			'deleted_post'           => true,
+		);
+
+		return isset( $hooks[ $hook_name ] );
+	}
+
+	/**
+	 * System / internal types that should never start content workflows.
+	 * Pages and public CPTs are intentionally not listed.
+	 */
+	private static function isIgnoredInternalPostType( string $post_type ): bool {
+		static $ignored = array(
+			'revision'            => true,
+			'attachment'          => true,
+			'nav_menu_item'       => true,
+			'customize_changeset' => true,
+			'custom_css'          => true,
+			'oembed_cache'        => true,
+			'user_request'        => true,
+			'wp_block'            => true,
+			'wp_template'         => true,
+			'wp_template_part'    => true,
+			'wp_global_styles'    => true,
+			'wp_navigation'       => true,
+			'wp_font_family'      => true,
+			'wp_font_face'        => true,
+		);
+
+		return isset( $ignored[ $post_type ] );
+	}
+
+	/**
+	 * @param array<string, mixed> $config Trigger config.
+	 */
+	private static function postTypeAllowed( string $post_type, array $config ): bool {
+		$raw = $config['post_types'] ?? '';
+
+		if ( is_array( $raw ) ) {
+			$allowed = array_values(
+				array_filter(
+					array_map(
+						static fn( $item ): string => strtolower( trim( (string) $item ) ),
+						$raw
+					),
+					static fn( string $item ): bool => '' !== $item
+				)
+			);
+		} else {
+			$allowed = WordPressActionHelper::parseList( $raw );
+			$allowed = array_map(
+				static fn( string $item ): string => strtolower( $item ),
+				$allowed
+			);
+		}
+
+		// Empty = all content types (posts, pages, public CPTs).
+		if ( array() === $allowed ) {
+			return true;
+		}
+
+		return in_array( strtolower( $post_type ), $allowed, true );
 	}
 
 	/**

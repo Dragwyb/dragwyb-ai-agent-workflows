@@ -72,17 +72,52 @@ final class WordPressActionHelper {
 	}
 
 	/**
+	 * Default cap for list queries returned to agents / workflows.
+	 */
+	public const DEFAULT_LIST_LIMIT = 50;
+
+	/**
+	 * Hard ceiling for list queries.
+	 */
+	public const MAX_LIST_LIMIT = 200;
+
+	/**
+	 * Resolves a safe list limit (filterable).
+	 *
+	 * @param int|null $requested Optional requested limit from action config.
+	 */
+	public static function resolveListLimit( ?int $requested = null ): int {
+		$limit = null !== $requested && $requested > 0 ? $requested : self::DEFAULT_LIST_LIMIT;
+
+		/**
+		 * Filters WordPress list action result size (posts, media, comments, users).
+		 *
+		 * @param int $limit Requested limit.
+		 */
+		$limit = (int) apply_filters( 'wfa_wp_list_limit', $limit );
+
+		if ( $limit < 1 ) {
+			$limit = self::DEFAULT_LIST_LIMIT;
+		}
+
+		return min( $limit, self::MAX_LIST_LIMIT );
+	}
+
+	/**
 	 * @param null|string             $postType Post type slug, or null for any.
 	 * @param null|array<int, mixed>  $metaQuery WP_Query meta_query clauses.
 	 * @param null|string             $search    Free-text search term.
 	 * @param string                  $status    Post status (default 'any').
+	 * @param int|null                $limit     Max posts (default DEFAULT_LIST_LIMIT).
 	 *
 	 * @return \WP_Post[]
 	 */
-	public static function getPosts( ?string $postType = null, ?array $metaQuery = null, ?string $search = null, string $status = 'any' ): array {
+	public static function getPosts( ?string $postType = null, ?array $metaQuery = null, ?string $search = null, string $status = 'any', ?int $limit = null ): array {
 		$args = array(
-			'posts_per_page' => -1,
-			'post_status' => $status,
+			'posts_per_page' => self::resolveListLimit( $limit ),
+			'post_status'    => $status,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
 		);
 
 		if ( ! empty( $postType ) ) {
@@ -104,11 +139,16 @@ final class WordPressActionHelper {
 	 * @param null|int    $postId Restrict to this post, or null for any.
 	 * @param null|int    $userId Restrict to this comment author user id, or null for any.
 	 * @param null|string $email  Restrict to this comment author email, or null for any.
+	 * @param int|null    $limit  Max comments.
 	 *
-	 * @return \WP_Comment[]
+	 * @return array<int, array<string, mixed>>
 	 */
-	public static function getComments( ?int $postId = null, ?int $userId = null, ?string $email = null ): array {
-		$args = array( 'order' => 'ASC' );
+	public static function getComments( ?int $postId = null, ?int $userId = null, ?string $email = null, ?int $limit = null ): array {
+		$args = array(
+			'order'   => 'ASC',
+			'number'  => self::resolveListLimit( $limit ),
+			'status'  => 'approve',
+		);
 
 		if ( ! empty( $postId ) ) {
 			$args['post_id'] = $postId;
@@ -122,7 +162,15 @@ final class WordPressActionHelper {
 			$args['author_email'] = $email;
 		}
 
-		return get_comments( $args );
+		$comments = get_comments( $args );
+		if ( ! is_array( $comments ) ) {
+			return array();
+		}
+
+		return array_map(
+			static fn( $comment ): array => self::serializeComment( $comment ),
+			$comments
+		);
 	}
 
 	/**
@@ -357,13 +405,16 @@ final class WordPressActionHelper {
 	 * Sets a post's featured image from either an attachment id or a
 	 * remote image URL (sideloaded into the media library).
 	 *
-	 * @param int                   $postId Target post id.
-	 * @param array<string, mixed>  $config Action config (`featured_image_id` or `featured_image`).
+	 * Invalid / failed images are skipped with a warning — they must not
+	 * abort the surrounding create/update post call.
 	 *
-	 * @return null|array{success: bool, error: string} Null when there is nothing to do or it succeeded.
+	 * @param int                  $postId Target post id.
+	 * @param array<string, mixed> $config Action config (`featured_image_id` or `featured_image`).
+	 *
+	 * @return null|array{warning: string} Null on success/noop; warning when image is skipped.
 	 */
 	public static function setPostFeaturedImage( int $postId, array $config ): ?array {
-		$imageId = isset( $config['featured_image_id'] ) ? (int) $config['featured_image_id'] : 0;
+		$imageId  = isset( $config['featured_image_id'] ) ? (int) $config['featured_image_id'] : 0;
 		$imageUrl = isset( $config['featured_image'] ) ? trim( (string) $config['featured_image'] ) : '';
 
 		if ( $imageId <= 0 && '' === $imageUrl ) {
@@ -373,27 +424,42 @@ final class WordPressActionHelper {
 		self::ensureMediaIncludes();
 
 		if ( $imageId <= 0 ) {
+			if ( ! filter_var( $imageUrl, FILTER_VALIDATE_URL ) ) {
+				return array(
+					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'workflow-automate' ),
+				);
+			}
+
 			$sanitizedUrl = filter_var( $imageUrl, FILTER_SANITIZE_URL );
-			$sideloaded = media_sideload_image( $sanitizedUrl, $postId, null, 'id' );
+			$sideloaded   = media_sideload_image( $sanitizedUrl, $postId, null, 'id' );
 
 			if ( is_wp_error( $sideloaded ) ) {
-				return self::fail( $sideloaded->get_error_message() );
+				return array(
+					'warning' => sprintf(
+						/* translators: %s: error message */
+						__( 'Featured image skipped: %s', 'workflow-automate' ),
+						$sideloaded->get_error_message()
+					),
+				);
 			}
 
 			$imageId = (int) $sideloaded;
 		}
 
 		if ( $imageId <= 0 || ! wp_attachment_is_image( $imageId ) ) {
-			return self::fail( __( 'Invalid featured image attachment.', 'workflow-automate' ) );
+			return array(
+				'warning' => __( 'Featured image skipped: invalid attachment.', 'workflow-automate' ),
+			);
 		}
 
 		if ( ! set_post_thumbnail( $postId, $imageId ) ) {
-			return self::fail( __( 'Failed to set the featured image.', 'workflow-automate' ) );
+			return array(
+				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'workflow-automate' ),
+			);
 		}
 
 		return null;
 	}
-
 	/**
 	 * Normalizes a comma-separated string or array into a list of unique,
 	 * non-empty, trimmed string values.
@@ -456,29 +522,74 @@ final class WordPressActionHelper {
 	}
 
 	/**
+	 * @param \WP_Post $post         Post object.
+	 * @param bool     $full_content When false, truncate content for list payloads.
+	 *
 	 * @return array<string, mixed>
 	 */
-	public static function serializePost( \WP_Post $post ): array {
+	public static function serializePost( \WP_Post $post, bool $full_content = true ): array {
+		$content = (string) $post->post_content;
+		$content_truncated = false;
+
+		if ( ! $full_content && strlen( $content ) > 800 ) {
+			$content           = substr( $content, 0, 800 ) . '…';
+			$content_truncated = true;
+		}
+
+		$thumb_id = (int) get_post_thumbnail_id( $post );
+
 		return array(
-			'id' => (int) $post->ID,
-			'title' => (string) $post->post_title,
-			'content' => (string) $post->post_content,
-			'excerpt' => (string) $post->post_excerpt,
-			'status' => (string) $post->post_status,
-			'type' => (string) $post->post_type,
-			'slug' => (string) $post->post_name,
-			'date' => (string) $post->post_date,
-			'date_gmt' => (string) $post->post_date_gmt,
-			'author' => (int) $post->post_author,
-			'parent_id' => (int) $post->post_parent,
-			'permalink' => (string) get_permalink( $post ),
-			'featured_image_id' => (int) get_post_thumbnail_id( $post ),
+			'id'                => (int) $post->ID,
+			'title'             => (string) $post->post_title,
+			'content'           => $content,
+			'content_truncated' => $content_truncated,
+			'excerpt'           => (string) $post->post_excerpt,
+			'status'            => (string) $post->post_status,
+			'type'              => (string) $post->post_type,
+			'slug'              => (string) $post->post_name,
+			'date'              => (string) $post->post_date,
+			'date_gmt'          => (string) $post->post_date_gmt,
+			'author'            => (int) $post->post_author,
+			'parent_id'         => (int) $post->post_parent,
+			'permalink'         => (string) get_permalink( $post ),
+			'featured_image_id' => $thumb_id,
+			'featured_image_url'=> $thumb_id > 0 ? (string) wp_get_attachment_url( $thumb_id ) : '',
+			'categories'        => wp_get_post_categories( (int) $post->ID ),
+			'tags'              => wp_get_post_tags( (int) $post->ID, array( 'fields' => 'names' ) ),
 		);
 	}
 
 	/**
-	 * Marks a post as created by Workflow Automate so later save_post events
-	 * for that post do not start another run of the same kind of workflow.
+	 * @param \WP_Comment|object $comment Comment object.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function serializeComment( $comment ): array {
+		if ( ! is_object( $comment ) ) {
+			return array();
+		}
+
+		return array(
+			'id'           => isset( $comment->comment_ID ) ? (int) $comment->comment_ID : 0,
+			'post_id'      => isset( $comment->comment_post_ID ) ? (int) $comment->comment_post_ID : 0,
+			'author'       => isset( $comment->comment_author ) ? (string) $comment->comment_author : '',
+			'author_email' => isset( $comment->comment_author_email ) ? (string) $comment->comment_author_email : '',
+			'content'      => isset( $comment->comment_content ) ? (string) $comment->comment_content : '',
+			'date'         => isset( $comment->comment_date ) ? (string) $comment->comment_date : '',
+			'status'       => isset( $comment->comment_approved ) ? (string) $comment->comment_approved : '',
+			'parent_id'    => isset( $comment->comment_parent ) ? (int) $comment->comment_parent : 0,
+			'user_id'      => isset( $comment->user_id ) ? (int) $comment->user_id : 0,
+		);
+	}
+
+	/**
+	 * Marks a post as created/updated by Workflow Automate.
+	 *
+	 * Stores a unix timestamp so triggers only suppress the brief follow-up
+	 * saves right after our write — not forever. Permanent suppression blocked
+	 * human edits of agent-created pages (e.g. Save Post never fired for page).
+	 *
+	 * Mid-write loops are still prevented by TriggerReentrancyGuard::isWriting().
 	 *
 	 * @param int $post_id Post id.
 	 *
@@ -489,10 +600,12 @@ final class WordPressActionHelper {
 			return;
 		}
 
-		update_post_meta( $post_id, self::AUTOMATED_META_KEY, '1' );
+		update_post_meta( $post_id, self::AUTOMATED_META_KEY, (string) time() );
 	}
 
 	/**
+	 * True when this post was just written by a WFA action (short grace window).
+	 *
 	 * @param int $post_id Post id.
 	 *
 	 * @return bool
@@ -502,7 +615,36 @@ final class WordPressActionHelper {
 			return false;
 		}
 
-		return '' !== (string) get_post_meta( $post_id, self::AUTOMATED_META_KEY, true );
+		$value = get_post_meta( $post_id, self::AUTOMATED_META_KEY, true );
+
+		if ( '' === (string) $value || false === $value || null === $value ) {
+			return false;
+		}
+
+		/**
+		 * Seconds after a WFA create/update during which save_post is ignored
+		 * for that post (prevents immediate echo triggers). After this window,
+		 * human edits of the post may start workflows again.
+		 *
+		 * @param int $seconds Grace period in seconds.
+		 * @param int $post_id Post id.
+		 */
+		$grace = (int) apply_filters( 'wfa_automated_post_grace_seconds', 45, $post_id );
+
+		if ( $grace < 1 ) {
+			$grace = 45;
+		}
+
+		// New format: unix timestamp.
+		if ( is_numeric( $value ) ) {
+			$age = time() - (int) $value;
+
+			return $age >= 0 && $age < $grace;
+		}
+
+		// Legacy permanent "1" marks: do not block human edits anymore.
+		// Mid-write protection remains via TriggerReentrancyGuard::isWriting().
+		return false;
 	}
 
 	/**

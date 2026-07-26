@@ -77,6 +77,13 @@ final class WordPressServices {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function fetchUsers( array $args = array() ): array {
+		if ( ! isset( $args['number'] ) ) {
+			$args['number'] = WordPressActionHelper::resolveListLimit(
+				isset( $args['limit'] ) ? (int) $args['limit'] : null
+			);
+			unset( $args['limit'] );
+		}
+
 		return array_map(
 			static fn( $user ): array => WordPressActionHelper::serializeUser( $user ),
 			get_users( $args )
@@ -293,9 +300,15 @@ final class WordPressServices {
 	}
 
 	public function getAllUsers( array $config ): array {
-		unset( $config );
+		$limit = $this->int( $config, 'limit' );
 
-		return WordPressActionHelper::ok( $this->fetchUsers() );
+		return WordPressActionHelper::ok(
+			$this->fetchUsers(
+				array(
+					'limit' => $limit > 0 ? $limit : null,
+				)
+			)
+		);
 	}
 
 	public function getAllUsersByRole( array $config ): array {
@@ -672,16 +685,24 @@ final class WordPressServices {
 
 	public function getAllPosts( array $config ): array {
 		$postType = $this->str( $config, 'post_type' );
-		$status = $this->str( $config, 'post_status', 'any' );
+		$status   = $this->str( $config, 'post_status', 'any' );
+		$limit    = $this->int( $config, 'limit' );
+		$search   = $this->str( $config, 'search' );
 
 		$posts = WordPressActionHelper::getPosts(
 			'' === $postType ? null : $postType,
 			null,
-			null,
-			'' === $status ? 'any' : $status
+			'' === $search ? null : $search,
+			'' === $status ? 'any' : $status,
+			$limit > 0 ? $limit : null
 		);
 
-		return WordPressActionHelper::ok( array_map( array( WordPressActionHelper::class, 'serializePost' ), $posts ) );
+		return WordPressActionHelper::ok(
+			array_map(
+				static fn( \WP_Post $post ): array => WordPressActionHelper::serializePost( $post, false ),
+				$posts
+			)
+		);
 	}
 
 	public function getPostById( array $config ): array {
@@ -697,19 +718,25 @@ final class WordPressServices {
 			return WordPressActionHelper::fail( __( 'Post not found.', 'workflow-automate' ) );
 		}
 
-		return WordPressActionHelper::ok( WordPressActionHelper::serializePost( $post ) );
+		return WordPressActionHelper::ok( WordPressActionHelper::serializePost( $post, true ) );
 	}
 
 	public function getPostsByPostType( array $config ): array {
 		$postType = $this->str( $config, 'post_type' );
+		$limit    = $this->int( $config, 'limit' );
 
 		if ( '' === $postType ) {
 			return WordPressActionHelper::fail( __( 'Post type is required.', 'workflow-automate' ) );
 		}
 
-		$posts = WordPressActionHelper::getPosts( $postType );
+		$posts = WordPressActionHelper::getPosts( $postType, null, null, 'any', $limit > 0 ? $limit : null );
 
-		return WordPressActionHelper::ok( array_map( array( WordPressActionHelper::class, 'serializePost' ), $posts ) );
+		return WordPressActionHelper::ok(
+			array_map(
+				static fn( \WP_Post $post ): array => WordPressActionHelper::serializePost( $post, false ),
+				$posts
+			)
+		);
 	}
 
 	public function getPostsByMetadata( array $config ): array {
@@ -736,10 +763,18 @@ final class WordPressServices {
 					'key' => $metaKey,
 					'value' => $metaValue,
 				),
-			)
+			),
+			null,
+			'any',
+			$this->int( $config, 'limit' ) > 0 ? $this->int( $config, 'limit' ) : null
 		);
 
-		return WordPressActionHelper::ok( array_map( array( WordPressActionHelper::class, 'serializePost' ), $posts ) );
+		return WordPressActionHelper::ok(
+			array_map(
+				static fn( \WP_Post $post ): array => WordPressActionHelper::serializePost( $post, false ),
+				$posts
+			)
+		);
 	}
 
 	public function getPostMetadata( array $config ): array {
@@ -845,6 +880,10 @@ final class WordPressServices {
 	public function createNewPost( array $config ): array {
 		$title = $this->str( $config, 'title' );
 		$postType = $this->str( $config, 'post_type', 'post' );
+
+		if ( '' === $postType || '{{trigger.post_type}}' === $postType ) {
+			$postType = 'post';
+		}
 		$postStatus = $this->str( $config, 'post_status', 'draft' );
 
 		if ( '' === $title ) {
@@ -858,6 +897,8 @@ final class WordPressServices {
 		if ( '' === $postStatus ) {
 			return WordPressActionHelper::fail( __( 'Post status is required.', 'workflow-automate' ) );
 		}
+
+		$config = $this->applyDesignSectionsToConfig( $config );
 
 		$postData = WordPressActionHelper::mapPostFields( $config );
 		$postData['post_title'] = $title;
@@ -897,13 +938,18 @@ final class WordPressServices {
 
 		$this->applyPostTaxonomies( $postId, $config, false );
 
-		$imageError = WordPressActionHelper::setPostFeaturedImage( $postId, $config );
+		$payload = array(
+			'post_id'           => (int) $postId,
+			'designed_with_blocks' => $this->contentLooksDesigned( (string) ( $postData['post_content'] ?? '' ) ),
+		);
 
-		if ( null !== $imageError ) {
-			return $imageError;
+		$imageWarning = WordPressActionHelper::setPostFeaturedImage( (int) $postId, $config );
+		if ( is_array( $imageWarning ) && ! empty( $imageWarning['warning'] ) ) {
+			$payload['warning'] = (string) $imageWarning['warning'];
+			$payload['featured_image_skipped'] = true;
 		}
 
-		return WordPressActionHelper::ok( array( 'post_id' => $postId ) );
+		return WordPressActionHelper::ok( $payload );
 	}
 
 	public function updateExistingPost( array $config ): array {
@@ -912,6 +958,8 @@ final class WordPressServices {
 		if ( $postId <= 0 ) {
 			return WordPressActionHelper::fail( __( 'Post id is required.', 'workflow-automate' ) );
 		}
+
+		$config = $this->applyDesignSectionsToConfig( $config );
 
 		$postData = WordPressActionHelper::mapPostFields( $config );
 		$postData['ID'] = $postId;
@@ -930,13 +978,52 @@ final class WordPressServices {
 
 		$this->applyPostTaxonomies( $postId, $config, true );
 
-		$imageError = WordPressActionHelper::setPostFeaturedImage( $postId, $config );
+		$payload = array(
+			'post_id'              => $postId,
+			'designed_with_blocks' => isset( $postData['post_content'] )
+				? $this->contentLooksDesigned( (string) $postData['post_content'] )
+				: null,
+		);
 
-		if ( null !== $imageError ) {
-			return $imageError;
+		$imageWarning = WordPressActionHelper::setPostFeaturedImage( $postId, $config );
+		if ( is_array( $imageWarning ) && ! empty( $imageWarning['warning'] ) ) {
+			$payload['warning'] = (string) $imageWarning['warning'];
+			$payload['featured_image_skipped'] = true;
 		}
 
-		return WordPressActionHelper::ok( array( 'post_id' => $postId ) );
+		return WordPressActionHelper::ok( $payload );
+	}
+
+	/**
+	 * If design_sections is present, convert to Gutenberg markup and set content.
+	 *
+	 * @param array<string, mixed> $config Action config.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function applyDesignSectionsToConfig( array $config ): array {
+		if ( ! array_key_exists( 'design_sections', $config ) ) {
+			return $config;
+		}
+
+		$raw = $config['design_sections'];
+		if ( null === $raw || ( is_string( $raw ) && '' === trim( $raw ) ) || ( is_array( $raw ) && array() === $raw ) ) {
+			return $config;
+		}
+
+		$markup = GutenbergBlockBuilder::fromSections( $raw );
+		if ( '' !== $markup ) {
+			$config['content'] = $markup;
+		}
+
+		return $config;
+	}
+
+	/**
+	 * @param string $content Post content.
+	 */
+	private function contentLooksDesigned( string $content ): bool {
+		return str_contains( $content, '<!-- wp:' );
 	}
 
 	public function updatePostStatus( array $config ): array {
@@ -1379,6 +1466,19 @@ final class WordPressServices {
 			return WordPressActionHelper::fail( __( 'Image URL is required.', 'workflow-automate' ) );
 		}
 
+		if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Image URL is not valid. Pass a real direct image URL (https://…/file.jpg). Omit invented or example.com URLs.', 'workflow-automate' )
+			);
+		}
+
+		$host = (string) wp_parse_url( $url, PHP_URL_HOST );
+		if ( '' !== $host && preg_match( '/^(localhost|example\.(com|org|net)|placeholder\.|via\.placeholder)/i', $host ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Image URL looks like a placeholder. Use a real publicly reachable image URL, or skip this tool.', 'workflow-automate' )
+			);
+		}
+
 		$title = $this->str( $config, 'title' );
 		$altText = $this->str( $config, 'alt_text' );
 		$caption = $this->str( $config, 'caption' );
@@ -1390,7 +1490,13 @@ final class WordPressServices {
 		$imageId = media_sideload_image( $sanitizedUrl, 0, '' === $title ? null : $title, 'id' );
 
 		if ( is_wp_error( $imageId ) ) {
-			return WordPressActionHelper::fail( $imageId->get_error_message() );
+			return WordPressActionHelper::fail(
+				sprintf(
+					/* translators: %s: error message */
+					__( 'Could not download image: %s. Use a direct image URL, or skip media upload.', 'workflow-automate' ),
+					$imageId->get_error_message()
+				)
+			);
 		}
 
 		$imageId = (int) $imageId;
@@ -1482,11 +1588,15 @@ final class WordPressServices {
 	}
 
 	public function getAllMedia( array $config ): array {
-		unset( $config );
+		$limit = $this->int( $config, 'limit' );
+		$media = WordPressActionHelper::getPosts( 'attachment', null, null, 'inherit', $limit > 0 ? $limit : null );
 
-		$media = WordPressActionHelper::getPosts( 'attachment', null, null, 'inherit' );
-
-		return WordPressActionHelper::ok( array_map( array( WordPressActionHelper::class, 'serializePost' ), $media ) );
+		return WordPressActionHelper::ok(
+			array_map(
+				static fn( \WP_Post $post ): array => WordPressActionHelper::serializePost( $post, false ),
+				$media
+			)
+		);
 	}
 
 	public function getMediaByTitle( array $config ): array {

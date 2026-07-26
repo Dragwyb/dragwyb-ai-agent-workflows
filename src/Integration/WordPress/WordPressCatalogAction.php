@@ -76,7 +76,7 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 	}
 
 	public function execute( array $config, array $context ): array {
-		unset( $context );
+		$config = $this->applyDynamicPostTypeFromTrigger( $config, $context );
 
 		$method = $this->definition['method'];
 		$args = $this->definition['method_args'] ?? array();
@@ -94,5 +94,43 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 				$guard->endWrite();
 			}
 		}
+	}
+
+	/**
+	 * When Create/Update Post still has the dynamic token (or empty), fill
+	 * post_type from the trigger payload. A manual value always wins.
+	 *
+	 * @param array<string, mixed> $config  Interpolated node config.
+	 * @param array<string, mixed> $context Runtime context.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function applyDynamicPostTypeFromTrigger( array $config, array $context ): array {
+		$slug = $this->definition['slug'] ?? '';
+
+		if ( ! in_array( $slug, array( 'wp_create_post_action', 'wp_update_post_action' ), true ) ) {
+			return $config;
+		}
+
+		$configured = isset( $config['post_type'] ) ? trim( (string) $config['post_type'] ) : '';
+		$trigger_type = '';
+
+		if ( isset( $context['trigger'] ) && is_array( $context['trigger'] ) ) {
+			$trigger_type = isset( $context['trigger']['post_type'] )
+				? trim( (string) $context['trigger']['post_type'] )
+				: '';
+		}
+
+		$uses_dynamic = (
+			'' === $configured
+			|| '{{trigger.post_type}}' === $configured
+			|| 'trigger.post_type' === $configured
+		);
+
+		if ( $uses_dynamic ) {
+			$config['post_type'] = '' !== $trigger_type ? $trigger_type : 'post';
+		}
+
+		return $config;
 	}
 }

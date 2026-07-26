@@ -44,32 +44,20 @@ class AgentToolExecutor {
 		int $workflow_id,
 		array $context
 	): array {
-		$parsed = AgentToolSchemaBuilder::parseToolName( $tool_name );
+		$tool_node = AgentToolSchemaBuilder::findToolNodeByName( $graph_nodes, $tool_name );
 
-		if ( null === $parsed ) {
-			$tool_node = AgentToolSchemaBuilder::findToolNodeByName( $graph_nodes, $tool_name );
-
-			if ( null === $tool_node ) {
-				return array(
-					'error' => sprintf(
-						/* translators: %s: tool function name */
-						__( 'Unrecognized tool name "%s".', 'workflow-automate' ),
-						$tool_name
-					),
-				);
-			}
-		} else {
-			$tool_node = AgentGraphHelper::findNode( $graph_nodes, $parsed['id'] );
-
-			if ( null === $tool_node || (string) ( $tool_node['type'] ?? '' ) !== $parsed['type'] ) {
-				return array(
-					'error' => __( 'Tool node not found for this agent.', 'workflow-automate' ),
-				);
-			}
+		if ( null === $tool_node ) {
+			return array(
+				'error' => sprintf(
+					/* translators: %s: tool function name */
+					__( 'Unrecognized tool name "%s".', 'workflow-automate' ),
+					$tool_name
+				),
+			);
 		}
 
 		$config = isset( $tool_node['config'] ) && is_array( $tool_node['config'] ) ? $tool_node['config'] : array();
-		$config = $this->mergeToolArguments( $config, $arguments );
+		$config = $this->mergeToolArguments( $config, $arguments, (string) $tool_node['type'] );
 		$config = ( new ConfigInterpolator() )->interpolateConfig( $config, $context );
 
 		$node = new WorkflowNode(
@@ -97,41 +85,124 @@ class AgentToolExecutor {
 	}
 
 	/**
+	 * Non-empty LLM arguments always win over saved node config defaults.
+	 *
 	 * @param array<string, mixed> $config    Saved node config.
 	 * @param array<string, mixed> $arguments LLM arguments.
+	 * @param string               $node_type Action slug (unused reserved for future schema lookup).
 	 *
 	 * @return array<string, mixed>
 	 */
-	private function mergeToolArguments( array $config, array $arguments ): array {
+	private function mergeToolArguments( array $config, array $arguments, string $node_type ): array {
+		unset( $node_type );
+
 		foreach ( $arguments as $key => $value ) {
 			if ( ! is_string( $key ) ) {
 				continue;
 			}
 
+			$value = $this->normalizeArgumentValue( $value );
+
 			if ( $this->isEmptyConfigValue( $value ) ) {
 				continue;
 			}
 
-			if ( ! array_key_exists( $key, $config ) || $this->isEmptyConfigValue( $config[ $key ] ) ) {
-				$config[ $key ] = $value;
-				continue;
-			}
-
-			if ( is_string( $value ) && is_string( $config[ $key ] ) && $this->containsUnresolvedTokens( $config[ $key ] ) ) {
-				$config[ $key ] = $value;
-			}
+			$config[ $key ] = $value;
 		}
 
 		return $config;
 	}
 
 	/**
-	 * @param string $value Config or template string.
+	 * Normalize LLM shapes: CSV strings → list, flat objects → key_value rows.
 	 *
-	 * @return bool
+	 * @param mixed $value Raw LLM argument.
+	 *
+	 * @return mixed
 	 */
-	private function containsUnresolvedTokens( string $value ): bool {
-		return (bool) preg_match( '/\{\{\s*[a-zA-Z0-9_.-]+\s*\}\}/', $value );
+	private function normalizeArgumentValue( $value ) {
+		if ( is_string( $value ) ) {
+			$trimmed = trim( $value );
+			// JSON array/object encoded as a string.
+			if ( ( str_starts_with( $trimmed, '[' ) && str_ends_with( $trimmed, ']' ) )
+				|| ( str_starts_with( $trimmed, '{' ) && str_ends_with( $trimmed, '}' ) ) ) {
+				$decoded = json_decode( $trimmed, true );
+				if ( is_array( $decoded ) ) {
+					return $this->normalizeArgumentValue( $decoded );
+				}
+			}
+
+			return $value;
+		}
+
+		if ( ! is_array( $value ) ) {
+			return $value;
+		}
+
+		// Flat associative map → key_value rows expected by WordPressServices::keyValue().
+		if ( $this->isFlatAssociativeMap( $value ) ) {
+			$rows = array();
+			foreach ( $value as $map_key => $map_val ) {
+				if ( ! is_string( $map_key ) && ! is_int( $map_key ) ) {
+					continue;
+				}
+				$rows[] = array(
+					'key'   => (string) $map_key,
+					'value' => is_scalar( $map_val ) || null === $map_val ? (string) $map_val : wp_json_encode( $map_val ),
+				);
+			}
+
+			return $rows;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param array<mixed> $value Candidate map.
+	 */
+	private function isFlatAssociativeMap( array $value ): bool {
+		if ( array() === $value ) {
+			return false;
+		}
+
+		// Already key_value rows.
+		$first = reset( $value );
+		if ( is_array( $first ) && ( array_key_exists( 'key', $first ) || array_key_exists( 'value', $first ) ) ) {
+			return false;
+		}
+
+		// List of scalars (array field) — keep as-is.
+		if ( $this->isListArray( $value ) ) {
+			return false;
+		}
+
+		foreach ( $value as $v ) {
+			if ( is_array( $v ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array<mixed> $value Array to test.
+	 */
+	private function isListArray( array $value ): bool {
+		if ( function_exists( 'array_is_list' ) ) {
+			return array_is_list( $value );
+		}
+
+		$expected = 0;
+		foreach ( $value as $key => $_ ) {
+			if ( $key !== $expected ) {
+				return false;
+			}
+			++$expected;
+		}
+
+		return true;
 	}
 
 	/**

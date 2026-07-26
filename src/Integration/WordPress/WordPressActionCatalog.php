@@ -174,12 +174,14 @@ final class WordPressActionCatalog {
 		$definitions[] = array(
 			'slug' => 'wp_get_all_users_action',
 			'label' => __( 'Get All Users', 'workflow-automate' ),
-			'description' => __( 'Retrieves every WordPress user.', 'workflow-automate' ),
+			'description' => __( 'Retrieves WordPress users (capped; pass limit). Prefer get-by-id/email when you know the target.', 'workflow-automate' ),
 			'group' => 'user_retrieval',
 			'group_label' => $groups['user_retrieval'],
 			'method' => 'getAllUsers',
 			'method_args' => array(),
-			'config_schema' => array(),
+			'config_schema' => array(
+				'limit' => self::field( 'integer', __( 'Limit', 'workflow-automate' ), array( 'default' => 50, 'description' => __( 'Max users to return (default 50, max 200).', 'workflow-automate' ) ) ),
+			),
 		);
 
 		$definitions[] = array(
@@ -484,7 +486,7 @@ final class WordPressActionCatalog {
 		$definitions[] = array(
 			'slug' => 'wp_get_all_posts_action',
 			'label' => __( 'Get Post (All)', 'workflow-automate' ),
-			'description' => __( 'Retrieves every post, optionally filtered by type and status.', 'workflow-automate' ),
+			'description' => __( 'Lists posts (capped). Results include language + translations map for WPML/Polylang. Prefer Get Post by ID for full content.', 'workflow-automate' ),
 			'group' => 'post',
 			'group_label' => $groups['post'],
 			'method' => 'getAllPosts',
@@ -492,13 +494,15 @@ final class WordPressActionCatalog {
 			'config_schema' => array(
 				'post_type' => self::field( 'string', __( 'Post Type (optional)', 'workflow-automate' ) ),
 				'post_status' => self::field( 'string', __( 'Post Status (optional, default any)', 'workflow-automate' ), array( 'default' => 'any' ) ),
+				'search' => self::field( 'string', __( 'Search (optional)', 'workflow-automate' ), array( 'description' => __( 'Free-text search to narrow results.', 'workflow-automate' ) ) ),
+				'limit' => self::field( 'integer', __( 'Limit', 'workflow-automate' ), array( 'default' => 50, 'description' => __( 'Max posts to return (default 50, max 200). Content is truncated in list results.', 'workflow-automate' ) ) ),
 			),
 		);
 
 		$definitions[] = array(
 			'slug' => 'wp_get_post_by_id_action',
 			'label' => __( 'Get Post (Single)', 'workflow-automate' ),
-			'description' => __( 'Retrieves a single post by its ID.', 'workflow-automate' ),
+			'description' => __( 'Retrieves a single post by its ID (full content + language/translations).', 'workflow-automate' ),
 			'group' => 'post',
 			'group_label' => $groups['post'],
 			'method' => 'getPostById',
@@ -511,13 +515,14 @@ final class WordPressActionCatalog {
 		$definitions[] = array(
 			'slug' => 'wp_get_posts_by_post_type_action',
 			'label' => __( 'Get Posts By Post Type', 'workflow-automate' ),
-			'description' => __( 'Retrieves every post of a given post type.', 'workflow-automate' ),
+			'description' => __( 'Lists posts of a given type (capped; includes language/translations).', 'workflow-automate' ),
 			'group' => 'post',
 			'group_label' => $groups['post'],
 			'method' => 'getPostsByPostType',
 			'method_args' => array(),
 			'config_schema' => array(
 				'post_type' => self::field( 'string', __( 'Post Type', 'workflow-automate' ), array( 'required' => true ) ),
+				'limit' => self::field( 'integer', __( 'Limit', 'workflow-automate' ), array( 'default' => 50, 'description' => __( 'Max posts (default 50, max 200).', 'workflow-automate' ) ) ),
 			),
 		);
 
@@ -533,6 +538,7 @@ final class WordPressActionCatalog {
 				'post_type' => self::field( 'string', __( 'Post Type', 'workflow-automate' ), array( 'required' => true ) ),
 				'meta_key' => self::field( 'string', __( 'Meta Key', 'workflow-automate' ), array( 'required' => true ) ),
 				'meta_value' => self::field( 'string', __( 'Meta Value', 'workflow-automate' ), array( 'required' => true ) ),
+				'limit' => self::field( 'integer', __( 'Limit', 'workflow-automate' ), array( 'default' => 50 ) ),
 			),
 		);
 
@@ -626,16 +632,40 @@ final class WordPressActionCatalog {
 		$definitions[] = array(
 			'slug' => 'wp_create_post_action',
 			'label' => __( 'Create New Post', 'workflow-automate' ),
-			'description' => __( 'Creates a new post of any post type.', 'workflow-automate' ),
+			'description' => __( 'Creates a new post or page. For designed/colorful layouts pass design_sections JSON (hero/columns/cta) or Gutenberg block markup in content.', 'workflow-automate' ),
 			'group' => 'post',
 			'group_label' => $groups['post'],
 			'method' => 'createNewPost',
 			'method_args' => array(),
 			'config_schema' => array(
 				'title' => self::field( 'string', __( 'Title', 'workflow-automate' ), array( 'required' => true ) ),
-				'content' => self::field( 'string', __( 'Content', 'workflow-automate' ), array( 'multiline' => true ) ),
+				'content' => self::field(
+					'string',
+					__( 'Content', 'workflow-automate' ),
+					array(
+						'multiline'   => true,
+						'description' => __( 'Post/page body. For designed pages prefer design_sections, or pass full Gutenberg block markup (<!-- wp:heading -->…<!-- /wp:heading -->). Plain paragraphs alone are not a designed page.', 'workflow-automate' ),
+					)
+				),
+				'design_sections' => self::field(
+					'string',
+					__( 'Design sections (JSON)', 'workflow-automate' ),
+					array(
+						'multiline'   => true,
+						'description' => __( 'Preferred for designed pages. JSON array of sections converted server-side into Gutenberg blocks. Example: [{"type":"hero","heading":"Title","text":"Subtitle","background":"#0f172a","text_color":"#ffffff","button_text":"Explore","button_url":"/"},{"type":"columns","items":[{"title":"One","text":"…"},{"title":"Two","text":"…"}]},{"type":"cta","heading":"Ready?","button_text":"Go","background":"#f97316"}]. Types: hero, heading, paragraph, columns, cta, buttons, spacer, separator, group. When set, overrides content.', 'workflow-automate' ),
+					)
+				),
 				'excerpt' => self::field( 'string', __( 'Excerpt', 'workflow-automate' ), array( 'multiline' => true ) ),
-				'post_type' => self::field( 'string', __( 'Post Type', 'workflow-automate' ), array( 'required' => true, 'default' => 'post' ) ),
+				'post_type' => self::field(
+					'string',
+					__( 'Post Type', 'workflow-automate' ),
+					array(
+						'required'    => true,
+						'default'     => '{{trigger.post_type}}',
+						'description' => __( 'Defaults to the trigger post type ({{trigger.post_type}}). Change manually to force a type (e.g. page or post); a manual value always wins over the trigger.', 'workflow-automate' ),
+						'help'        => __( 'Leave as {{trigger.post_type}} to follow the saved post/page. Replace with page, post, or a CPT slug to override.', 'workflow-automate' ),
+					)
+				),
 				'post_status' => self::field( 'select', __( 'Post Status', 'workflow-automate' ), array( 'required' => true, 'default' => 'draft', 'options' => $postStatusOptions ) ),
 				'slug' => self::field( 'string', __( 'Slug', 'workflow-automate' ) ),
 				'date' => self::field( 'string', __( 'Date (Y-m-d H:i:s, optional)', 'workflow-automate' ) ),
@@ -648,7 +678,7 @@ final class WordPressActionCatalog {
 				'taxonomy' => self::field( 'string', __( 'Custom Taxonomy (optional)', 'workflow-automate' ) ),
 				'terms' => self::field( 'string', __( 'Custom Taxonomy Terms (comma-separated)', 'workflow-automate' ) ),
 				'custom_fields' => self::field( 'key_value', __( 'Custom Fields', 'workflow-automate' ), array( 'default' => array() ) ),
-				'featured_image' => self::field( 'string', __( 'Featured Image URL', 'workflow-automate' ) ),
+				'featured_image' => self::field( 'string', __( 'Featured Image URL', 'workflow-automate' ), array( 'description' => __( 'Optional. Only a real, direct image URL (ending in .jpg/.png/.webp etc.). Omit rather than using example.com or generic search URLs. Invalid URLs are skipped without failing the create.', 'workflow-automate' ) ) ),
 				'featured_image_id' => self::field( 'string', __( 'Featured Image Attachment ID', 'workflow-automate' ) ),
 			),
 		);
@@ -664,9 +694,24 @@ final class WordPressActionCatalog {
 			'config_schema' => array(
 				'post_id' => self::field( 'string', __( 'Post ID', 'workflow-automate' ), array( 'required' => true ) ),
 				'title' => self::field( 'string', __( 'Title', 'workflow-automate' ) ),
-				'content' => self::field( 'string', __( 'Content', 'workflow-automate' ), array( 'multiline' => true ) ),
+				'content' => self::field(
+					'string',
+					__( 'Content', 'workflow-automate' ),
+					array(
+						'multiline'   => true,
+						'description' => __( 'Post/page body. For designed pages prefer design_sections, or pass full Gutenberg block markup. Plain paragraphs alone are not a designed page.', 'workflow-automate' ),
+					)
+				),
+				'design_sections' => self::field(
+					'string',
+					__( 'Design sections (JSON)', 'workflow-automate' ),
+					array(
+						'multiline'   => true,
+						'description' => __( 'Preferred for designed pages. JSON array of sections (hero, heading, paragraph, columns, cta, buttons, spacer, separator, group) converted into Gutenberg blocks. When set, overrides content.', 'workflow-automate' ),
+					)
+				),
 				'excerpt' => self::field( 'string', __( 'Excerpt', 'workflow-automate' ), array( 'multiline' => true ) ),
-				'post_type' => self::field( 'string', __( 'Post Type', 'workflow-automate' ) ),
+				'post_type' => self::field( 'string', __( 'Post Type', 'workflow-automate' ), array( 'description' => __( 'Use "page" when updating a page.', 'workflow-automate' ) ) ),
 				'post_status' => self::field( 'select', __( 'Post Status', 'workflow-automate' ), array( 'default' => '', 'options' => $postStatusOptions ) ),
 				'slug' => self::field( 'string', __( 'Slug', 'workflow-automate' ) ),
 				'date' => self::field( 'string', __( 'Date (Y-m-d H:i:s, optional)', 'workflow-automate' ) ),
@@ -679,7 +724,7 @@ final class WordPressActionCatalog {
 				'taxonomy' => self::field( 'string', __( 'Custom Taxonomy (optional)', 'workflow-automate' ) ),
 				'terms' => self::field( 'string', __( 'Custom Taxonomy Terms (comma-separated)', 'workflow-automate' ) ),
 				'custom_fields' => self::field( 'key_value', __( 'Custom Fields', 'workflow-automate' ), array( 'default' => array() ) ),
-				'featured_image' => self::field( 'string', __( 'Featured Image URL', 'workflow-automate' ) ),
+				'featured_image' => self::field( 'string', __( 'Featured Image URL', 'workflow-automate' ), array( 'description' => __( 'Optional. Only a real direct image URL. Invalid URLs are skipped without failing the update.', 'workflow-automate' ) ) ),
 				'featured_image_id' => self::field( 'string', __( 'Featured Image Attachment ID', 'workflow-automate' ) ),
 			),
 		);
@@ -1016,13 +1061,13 @@ final class WordPressActionCatalog {
 		$definitions[] = array(
 			'slug' => 'wp_add_new_image_action',
 			'label' => __( 'Add New Image To Media Library', 'workflow-automate' ),
-			'description' => __( 'Sideloads a remote image URL into the media library.', 'workflow-automate' ),
+			'description' => __( 'Sideloads a remote image URL into the media library. Only call with a real direct image URL; skip rather than inventing URLs.', 'workflow-automate' ),
 			'group' => 'media',
 			'group_label' => $groups['media'],
 			'method' => 'addNewImage',
 			'method_args' => array(),
 			'config_schema' => array(
-				'url' => self::field( 'string', __( 'Image URL', 'workflow-automate' ), array( 'required' => true ) ),
+				'url' => self::field( 'string', __( 'Image URL', 'workflow-automate' ), array( 'required' => true, 'description' => __( 'Direct https image URL (.jpg/.png/.webp). Do not use example.com or search-page URLs.', 'workflow-automate' ) ) ),
 				'title' => self::field( 'string', __( 'Title', 'workflow-automate' ) ),
 				'alt_text' => self::field( 'string', __( 'Alt Text', 'workflow-automate' ) ),
 				'caption' => self::field( 'string', __( 'Caption', 'workflow-automate' ) ),
@@ -1061,12 +1106,14 @@ final class WordPressActionCatalog {
 		$definitions[] = array(
 			'slug' => 'wp_get_all_media_action',
 			'label' => __( 'Get Media (All)', 'workflow-automate' ),
-			'description' => __( 'Retrieves every item in the media library.', 'workflow-automate' ),
+			'description' => __( 'Lists media library items (capped). Prefer get-by-id/title when possible.', 'workflow-automate' ),
 			'group' => 'media',
 			'group_label' => $groups['media'],
 			'method' => 'getAllMedia',
 			'method_args' => array(),
-			'config_schema' => array(),
+			'config_schema' => array(
+				'limit' => self::field( 'integer', __( 'Limit', 'workflow-automate' ), array( 'default' => 50, 'description' => __( 'Max items (default 50, max 200).', 'workflow-automate' ) ) ),
+			),
 		);
 
 		$definitions[] = array(
