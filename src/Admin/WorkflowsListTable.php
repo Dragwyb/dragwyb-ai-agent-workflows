@@ -200,6 +200,7 @@ class WorkflowsListTable extends WP_List_Table {
 			$actions = array(
 				'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
 				'runs' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'workflow-automate' ) ),
+				'export' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->exportUrl( $item->id() ) ), esc_html__( 'Export', 'workflow-automate' ) ),
 			);
 
 			if ( Workflow::STATUS_ACTIVE === $item->status() ) {
@@ -280,6 +281,26 @@ class WorkflowsListTable extends WP_List_Table {
 				'workflow_id' => $id,
 			),
 			admin_url( 'admin.php' )
+		);
+	}
+
+	/**
+	 * Nonced download URL for a portable JSON export of this workflow.
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return string
+	 */
+	private function exportUrl( int $id ): string {
+		return wp_nonce_url(
+			add_query_arg(
+				array(
+					'action'      => 'wfa_workflow_export',
+					'workflow_id' => $id,
+				),
+				admin_url( 'admin-post.php' )
+			),
+			'wfa_workflow_export_' . $id
 		);
 	}
 

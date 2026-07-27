@@ -246,3 +246,35 @@
 .wfa-detached-row-action-forms {
 	display: none;
 }
+
+/*
+ * Import control next to "Add New" — looks like a page-title-action but
+ * wraps a hidden file input that auto-submits on change.
+ */
+.wfa-workflow-import-form.page-title-action {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 4px;
+	padding: 0;
+	cursor: pointer;
+	overflow: hidden;
+	position: relative;
+}
+
+.wfa-workflow-import-form__label {
+	display: inline-flex;
+	align-items: center;
+	margin: 0;
+	padding: 4px 8px;
+	cursor: pointer;
+	line-height: 2;
+}
+
+.wfa-workflow-import-form__input {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+}

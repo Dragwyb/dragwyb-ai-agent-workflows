@@ -21,7 +21,7 @@ const WORKFLOW_STATUS_LABELS = {
 };
 
 /**
- * Top bar: back link, editable title, workflow status, test flow, save, activate/pause.
+ * Top bar: back link, editable title, workflow status, import/export, test, save, activate/pause.
  */
 export default function Header({
 	title,
@@ -31,6 +31,8 @@ export default function Header({
 	onToggleActive,
 	toggleActiveBusy,
 	onSave,
+	onExport,
+	onImportFile,
 	listUrl,
 	saveDisabled,
 	testFlow,
@@ -42,6 +44,7 @@ export default function Header({
 	const statusLabel =
 		WORKFLOW_STATUS_LABELS[workflowStatus] || WORKFLOW_STATUS_LABELS[0];
 	const testWrapRef = useRef(null);
+	const importInputRef = useRef(null);
 
 	useEffect(() => {
 		if (!testFlow?.menuOpen) {
@@ -109,6 +112,48 @@ export default function Header({
 				>
 					{SAVE_STATUS_LABELS[status] || ''}
 				</span>
+				{typeof onImportFile === 'function' && (
+					<>
+						<input
+							ref={importInputRef}
+							type="file"
+							accept="application/json,.json"
+							className="wfa-builder-header__import-input"
+							aria-hidden="true"
+							tabIndex={-1}
+							onChange={(event) => {
+								const file = event.target.files?.[0] || null;
+								event.target.value = '';
+
+								if (file) {
+									onImportFile(file);
+								}
+							}}
+						/>
+						<Button
+							isSecondary
+							onClick={() => importInputRef.current?.click()}
+							aria-label={__(
+								'Import workflow from JSON',
+								'workflow-automate'
+							)}
+						>
+							{__('Import', 'workflow-automate')}
+						</Button>
+					</>
+				)}
+				{typeof onExport === 'function' && (
+					<Button
+						isSecondary
+						onClick={onExport}
+						aria-label={__(
+							'Export workflow as JSON',
+							'workflow-automate'
+						)}
+					>
+						{__('Export', 'workflow-automate')}
+					</Button>
+				)}
 				{testFlow && (
 					<div
 						className="wfa-builder-header__test-wrap"

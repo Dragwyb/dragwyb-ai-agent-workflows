@@ -118,6 +118,7 @@ class WorkflowsPage implements AdminPage {
 			esc_url( admin_url( 'admin.php?page=' . BuilderPage::SLUG ) ),
 			esc_html__( 'Add New', 'workflow-automate' )
 		);
+		$this->renderImportButton();
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
@@ -223,11 +224,42 @@ class WorkflowsPage implements AdminPage {
 				'message' => __( 'Workflow paused. Triggers will not start new runs until it is activated again.', 'workflow-automate' ),
 				'type' => 'success',
 			),
+			'imported' => array(
+				'message' => __( 'Workflow imported from JSON.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'import_error' => array(
+				'message' => __( 'Could not import that JSON file. Use a Workflow Automate export (not an n8n file).', 'workflow-automate' ),
+				'type' => 'error',
+			),
 			'error' => array(
 				'message' => __( 'That workflow action could not be completed.', 'workflow-automate' ),
 				'type' => 'error',
 			),
 		);
+	}
+
+	/**
+	 * Renders the page-title "Import" control (JSON file upload).
+	 *
+	 * @return void
+	 */
+	private function renderImportButton(): void {
+		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-workflow-import-form page-title-action">';
+		echo '<input type="hidden" name="action" value="wfa_workflow_import" />';
+		wp_nonce_field( 'wfa_workflow_import' );
+		echo '<label class="wfa-workflow-import-form__label">';
+		echo '<span class="screen-reader-text">' . esc_html__( 'Import workflow JSON', 'workflow-automate' ) . '</span>';
+		echo '<span aria-hidden="true">' . esc_html__( 'Import', 'workflow-automate' ) . '</span>';
+		echo '<input type="file" name="wfa_workflow_json" accept="application/json,.json" class="wfa-workflow-import-form__input" required />';
+		echo '</label>';
+		echo '<button type="submit" class="wfa-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'workflow-automate' ) . '</button>';
+		echo '</form>';
+
+		// Auto-submit when a file is chosen so the Import control feels like a single click.
+		echo '<script>';
+		echo '(function(){var f=document.querySelector(".wfa-workflow-import-form");if(!f)return;var i=f.querySelector(".wfa-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();';
+		echo '</script>';
 	}
 
 	/**

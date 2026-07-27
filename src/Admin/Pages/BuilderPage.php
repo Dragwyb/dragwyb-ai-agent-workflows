@@ -173,7 +173,27 @@ class BuilderPage implements AdminPage {
 		}
 
 		echo '<div class="wrap wfa-admin-page wfa-builder-page">';
+		$this->renderImportNotice();
 		echo '<div id="wfa-builder-root"></div>';
 		echo '</div>';
+	}
+
+	/**
+	 * Shows a one-shot notice after list-page JSON import redirects here.
+	 *
+	 * @return void
+	 */
+	private function renderImportNotice(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
+		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+
+		if ( 'imported' !== $key ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+			esc_html__( 'Workflow imported from JSON.', 'workflow-automate' )
+		);
 	}
 }

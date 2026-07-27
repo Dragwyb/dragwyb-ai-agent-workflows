@@ -9,8 +9,12 @@ declare(strict_types=1);
 
 namespace WorkflowAutomate\Plugin\Admin;
 
+use InvalidArgumentException;
+use RuntimeException;
+use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Workflow;
+use WorkflowAutomate\Plugin\Service\WorkflowImportExport;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
@@ -30,6 +34,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WorkflowActionsController {
 
 	private const ALLOWED_OPS = array( 'trash', 'restore', 'delete', 'activate', 'pause' );
+
+	private const MAX_IMPORT_BYTES = 2097152; // 2 MiB.
 
 	private WorkflowService $workflows;
 
@@ -53,6 +59,8 @@ class WorkflowActionsController {
 	 */
 	public function register(): void {
 		add_action( 'admin_post_wfa_workflow_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_wfa_workflow_import', array( $this, 'handleImport' ) );
+		add_action( 'admin_post_wfa_workflow_export', array( $this, 'handleExport' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleWorkflowsBulkFromList' ), 5 );
 	}
 
@@ -100,6 +108,115 @@ class WorkflowActionsController {
 		$success = $this->perform( $op, $workflow_id );
 
 		$this->redirect( $success ? $this->successNotice( $op ) : 'error' );
+	}
+
+	/**
+	 * Creates a workflow from an uploaded JSON definition, then opens the builder.
+	 *
+	 * @return void
+	 */
+	public function handleImport(): void {
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+		}
+
+		check_admin_referer( 'wfa_workflow_import' );
+
+		if ( empty( $_FILES['wfa_workflow_json'] ) || ! is_array( $_FILES['wfa_workflow_json'] ) ) {
+			$this->redirect( 'import_error' );
+		}
+
+		$file  = $_FILES['wfa_workflow_json'];
+		$error = isset( $file['error'] ) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
+
+		if ( UPLOAD_ERR_OK !== $error ) {
+			$this->redirect( 'import_error' );
+		}
+
+		$size = isset( $file['size'] ) ? (int) $file['size'] : 0;
+		$tmp  = isset( $file['tmp_name'] ) ? (string) $file['tmp_name'] : '';
+
+		if ( $size <= 0 || $size > self::MAX_IMPORT_BYTES || '' === $tmp || ! is_uploaded_file( $tmp ) ) {
+			$this->redirect( 'import_error' );
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading an uploaded temp file.
+		$raw = file_get_contents( $tmp );
+
+		if ( false === $raw ) {
+			$this->redirect( 'import_error' );
+		}
+
+		try {
+			$payload    = WorkflowImportExport::decodeJson( $raw );
+			$attributes = WorkflowImportExport::parseImportPayload( $payload );
+			$workflow   = $this->workflows->create(
+				array(
+					'title'    => $attributes['title'],
+					'graph'    => $attributes['graph'],
+					'settings' => $attributes['settings'],
+				)
+			);
+		} catch ( InvalidArgumentException $e ) {
+			$this->redirect( 'import_error' );
+		} catch ( RuntimeException $e ) {
+			$this->redirect( 'import_error' );
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'       => BuilderPage::SLUG,
+					'workflow'   => $workflow->id(),
+					'wfa_notice' => 'imported',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Streams a portable JSON definition for a workflow.
+	 *
+	 * @return void
+	 */
+	public function handleExport(): void {
+		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below.
+		$workflow_id = isset( $_REQUEST['workflow_id'] ) ? absint( wp_unslash( $_REQUEST['workflow_id'] ) ) : 0;
+
+		if ( $workflow_id <= 0 ) {
+			$this->redirect( 'error' );
+		}
+
+		check_admin_referer( 'wfa_workflow_export_' . $workflow_id );
+
+		$workflow = $this->workflows->find( $workflow_id );
+
+		if ( null === $workflow ) {
+			$this->redirect( 'error' );
+		}
+
+		$payload  = WorkflowImportExport::exportWorkflow( $workflow );
+		$filename = WorkflowImportExport::exportFilename( $workflow );
+		$json     = wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+
+		if ( false === $json ) {
+			$this->redirect( 'error' );
+		}
+
+		nocache_headers();
+		header( 'Content-Type: application/json; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Content-Length: ' . (string) strlen( $json ) );
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw JSON download body.
+		echo $json;
+		exit;
 	}
 
 	/**
@@ -228,7 +345,7 @@ class WorkflowActionsController {
 	/**
 	 * Redirects back to the Workflows list with a notice, then exits.
 	 *
-	 * @param string               $notice One of the keys understood by WorkflowsPage::renderNotice().
+	 * @param string                $notice One of the keys understood by WorkflowsPage::renderNotice().
 	 * @param array<string, scalar> $extra  Optional query args to preserve.
 	 *
 	 * @return void
@@ -238,7 +355,7 @@ class WorkflowActionsController {
 			add_query_arg(
 				array_merge(
 					array(
-						'page' => $this->redirectSlug,
+						'page'       => $this->redirectSlug,
 						'wfa_notice' => $notice,
 					),
 					$extra

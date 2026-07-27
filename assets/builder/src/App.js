@@ -33,6 +33,13 @@ import {
 	sortNodesForFlow,
 } from './utils';
 import {
+	buildExportPayload,
+	downloadWorkflowJson,
+	exportFilenameFromTitle,
+	parseImportJson,
+	readFileAsText,
+} from './utils/workflowJson';
+import {
 	createEmptyConditionRow,
 	defaultBranchNodePosition,
 	getConditionRows,
@@ -409,6 +416,83 @@ export default function App() {
 
 		persist();
 	}, [persist]);
+
+	const handleExportWorkflow = useCallback(() => {
+		const current = latestRef.current;
+		const payload = buildExportPayload({
+			name: current.title,
+			graph: current.graph,
+			active: workflowStatus === 1,
+			id: current.workflowId,
+		});
+
+		downloadWorkflowJson(
+			payload,
+			exportFilenameFromTitle(current.title || __('workflow', 'workflow-automate'))
+		);
+	}, [workflowStatus]);
+
+	const handleImportWorkflowFile = useCallback(
+		async (file) => {
+			if (!file) {
+				return;
+			}
+
+			const current = latestRef.current;
+			const hasNodes =
+				Array.isArray(current.graph?.nodes) &&
+				current.graph.nodes.length > 0;
+
+			if (
+				hasNodes &&
+				!window.confirm(
+					__(
+						'Importing will replace the current workflow on the canvas. Continue?',
+						'workflow-automate'
+					)
+				)
+			) {
+				return;
+			}
+
+			try {
+				const text = await readFileAsText(file);
+				const imported = parseImportJson(text);
+				const nextGraph = normalizeGraph(imported.graph);
+
+				setTitle(imported.name);
+				setGraph(nextGraph);
+				setSelectedNodeId(null);
+				setSelectedConnection(null);
+				setPicker(null);
+				setCapturedPayload(null);
+				setCapturedAt(null);
+				setNodeOutputSamples({});
+
+				// Import counts as an edit — let autosave / manual save persist it.
+				skipNextAutosaveRef.current = false;
+				setSaveStatus('dirty');
+
+				if (autosaveTimeoutRef.current) {
+					clearTimeout(autosaveTimeoutRef.current);
+				}
+
+				autosaveTimeoutRef.current = setTimeout(() => {
+					persist();
+				}, AUTOSAVE_DELAY_MS);
+			} catch (error) {
+				window.alert(
+					error && error.message
+						? error.message
+						: __(
+								'Failed to import the workflow JSON.',
+								'workflow-automate'
+							)
+				);
+			}
+		},
+		[persist]
+	);
 
 	const handleToggleActive = useCallback(async () => {
 		const current = latestRef.current;
@@ -1805,6 +1889,8 @@ export default function App() {
 				onToggleActive={handleToggleActive}
 				toggleActiveBusy={toggleActiveBusy}
 				onSave={handleManualSave}
+				onExport={handleExportWorkflow}
+				onImportFile={handleImportWorkflowFile}
 				listUrl={bootstrap.listUrl}
 				saveDisabled={saveStatus === 'saving' || toggleActiveBusy}
 				testFlow={testFlow}
