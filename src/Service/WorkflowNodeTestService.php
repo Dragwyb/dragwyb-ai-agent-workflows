@@ -2,17 +2,17 @@
 /**
  * Executes a single builder node for "Test node" previews.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
-use WorkflowAutomate\Plugin\Service\Agent\AgentGraphHelper;
-use WorkflowAutomate\Plugin\Service\ConfigInterpolator;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Domain\WorkflowNode;
+use AIAWAB\Plugin\Service\Agent\AgentGraphHelper;
+use AIAWAB\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,8 +56,8 @@ class WorkflowNodeTestService {
 		if ( null === $workflow ) {
 			return array(
 				'success' => false,
-				'kind' => 'unknown',
-				'error' => __( 'Workflow not found.', 'workflow-automate' ),
+				'kind'    => 'unknown',
+				'error'   => __( 'Workflow not found.', 'workflow-automate' ),
 			);
 		}
 
@@ -70,8 +70,8 @@ class WorkflowNodeTestService {
 		if ( ! is_array( $graph_nodes ) || array() === $graph_nodes ) {
 			return array(
 				'success' => false,
-				'kind' => 'unknown',
-				'error' => __( 'This workflow has no nodes to test.', 'workflow-automate' ),
+				'kind'    => 'unknown',
+				'error'   => __( 'This workflow has no nodes to test.', 'workflow-automate' ),
 			);
 		}
 
@@ -88,8 +88,8 @@ class WorkflowNodeTestService {
 		if ( null === $target || empty( $target['type'] ) ) {
 			return array(
 				'success' => false,
-				'kind' => 'unknown',
-				'error' => __( 'Node not found in this workflow.', 'workflow-automate' ),
+				'kind'    => 'unknown',
+				'error'   => __( 'Node not found in this workflow.', 'workflow-automate' ),
 			);
 		}
 
@@ -100,16 +100,16 @@ class WorkflowNodeTestService {
 			if ( array() === $trigger_payload ) {
 				return array(
 					'success' => false,
-					'kind' => 'trigger',
-					'error' => __( 'No captured trigger data yet. Use Test Flow → Listen new response first.', 'workflow-automate' ),
+					'kind'    => 'trigger',
+					'error'   => __( 'No captured trigger data yet. Use Test Flow → Listen new response first.', 'workflow-automate' ),
 				);
 			}
 
 			return array(
 				'success' => true,
-				'kind' => 'trigger',
-				'input' => $this->buildTriggerTestInput( $target ),
-				'output' => $this->buildTriggerTestOutput( $trigger_payload ),
+				'kind'    => 'trigger',
+				'input'   => $this->buildTriggerTestInput( $target ),
+				'output'  => $this->buildTriggerTestOutput( $trigger_payload ),
 			);
 		}
 
@@ -127,7 +127,7 @@ class WorkflowNodeTestService {
 				$context,
 				array( 'current_node_id' => (string) $target['id'] )
 			);
-			$raw = $this->runActionNode( $workflow_id, $target, $node_context );
+			$raw          = $this->runActionNode( $workflow_id, $target, $node_context );
 
 			return $this->formatActionTestResponse( $target, $node_context, $raw );
 		}
@@ -142,7 +142,7 @@ class WorkflowNodeTestService {
 					$context,
 					array( 'current_node_id' => (string) $graph_node['id'] )
 				);
-				$raw = $this->runActionNode( $workflow_id, $graph_node, $node_context );
+				$raw          = $this->runActionNode( $workflow_id, $graph_node, $node_context );
 
 				return $this->formatActionTestResponse( $graph_node, $node_context, $raw );
 			}
@@ -162,14 +162,14 @@ class WorkflowNodeTestService {
 
 				return array(
 					'success' => false,
-					'kind' => 'action',
-					'error' => sprintf(
+					'kind'    => 'action',
+					'error'   => sprintf(
 						/* translators: %s: prior node label */
 						__( 'A prior step failed (%s), so this node could not be tested.', 'workflow-automate' ),
 						$label
 					),
-					'input' => $this->buildTestInput( $target, $context ),
-					'output' => $this->buildTestOutput( $prior_raw ),
+					'input'   => $this->buildTestInput( $target, $context ),
+					'output'  => $this->buildTestOutput( $prior_raw ),
 				);
 			}
 
@@ -178,8 +178,8 @@ class WorkflowNodeTestService {
 
 		return array(
 			'success' => false,
-			'kind' => 'unknown',
-			'error' => __( 'Node not found in execution order.', 'workflow-automate' ),
+			'kind'    => 'unknown',
+			'error'   => __( 'Node not found in execution order.', 'workflow-automate' ),
 		);
 	}
 
@@ -194,7 +194,7 @@ class WorkflowNodeTestService {
 		if ( null === $this->registry->action( (string) $graph_node['type'] ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'This node type is not registered or cannot be executed.', 'workflow-automate' ),
+				'error'   => __( 'This node type is not registered or cannot be executed.', 'workflow-automate' ),
 			);
 		}
 
@@ -235,9 +235,9 @@ class WorkflowNodeTestService {
 	private function formatActionTestResponse( array $graph_node, array $context, array $result ): array {
 		$response = array(
 			'success' => ! empty( $result['success'] ),
-			'kind' => 'action',
-			'input' => $this->buildTestInput( $graph_node, $context ),
-			'output' => $this->buildTestOutput( $result ),
+			'kind'    => 'action',
+			'input'   => $this->buildTestInput( $graph_node, $context ),
+			'output'  => $this->buildTestOutput( $result ),
 		);
 
 		if ( empty( $result['success'] ) ) {
@@ -343,7 +343,7 @@ class WorkflowNodeTestService {
 	 * @return array<string, mixed>
 	 */
 	private function buildTestInput( array $graph_node, array $context ): array {
-		$config = isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : array();
+		$config   = isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : array();
 		$resolved = ( new ConfigInterpolator() )->interpolateConfig( $config, $context );
 		$hidden   = array( 'connection_id', 'webhook_url' );
 		$input    = array();

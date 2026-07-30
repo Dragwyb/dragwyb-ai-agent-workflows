@@ -2,12 +2,12 @@
 /**
  * Built-in connection authentication type definitions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,44 +76,44 @@ class ConnectionAuthTypes {
 			case self::BASIC:
 				return array(
 					'username' => array(
-						'label' => __( 'Username', 'workflow-automate' ),
+						'label'  => __( 'Username', 'workflow-automate' ),
 						'secret' => false,
 					),
 					'password' => array(
-						'label' => __( 'Password', 'workflow-automate' ),
+						'label'  => __( 'Password', 'workflow-automate' ),
 						'secret' => true,
 					),
 				);
 			case self::BEARER_TOKEN:
 				return array(
 					'token' => array(
-						'label' => __( 'Bearer Token', 'workflow-automate' ),
+						'label'  => __( 'Bearer Token', 'workflow-automate' ),
 						'secret' => true,
 					),
 				);
 			case self::OAUTH2:
 				return array(
-					'client_id' => array(
-						'label' => __( 'Client ID', 'workflow-automate' ),
+					'client_id'     => array(
+						'label'  => __( 'Client ID', 'workflow-automate' ),
 						'secret' => false,
 					),
 					'client_secret' => array(
-						'label' => __( 'Client Secret', 'workflow-automate' ),
+						'label'  => __( 'Client Secret', 'workflow-automate' ),
 						'secret' => true,
 					),
-					'access_token' => array(
-						'label' => __( 'Access Token', 'workflow-automate' ),
-						'secret' => true,
+					'access_token'  => array(
+						'label'              => __( 'Access Token', 'workflow-automate' ),
+						'secret'             => true,
 						'required_on_create' => false,
 					),
 					'refresh_token' => array(
-						'label' => __( 'Refresh Token', 'workflow-automate' ),
-						'secret' => true,
+						'label'              => __( 'Refresh Token', 'workflow-automate' ),
+						'secret'             => true,
 						'required_on_create' => false,
 					),
-					'expires_at' => array(
-						'label' => __( 'Token Expires At', 'workflow-automate' ),
-						'secret' => false,
+					'expires_at'    => array(
+						'label'              => __( 'Token Expires At', 'workflow-automate' ),
+						'secret'             => false,
 						'required_on_create' => false,
 					),
 				);
@@ -121,7 +121,7 @@ class ConnectionAuthTypes {
 			default:
 				return array(
 					'api_key' => array(
-						'label' => __( 'API Key', 'workflow-automate' ),
+						'label'  => __( 'API Key', 'workflow-automate' ),
 						'secret' => true,
 					),
 				);

@@ -2,15 +2,15 @@
 /**
  * AI Agent execution engine (tool-calling loop).
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
-use WorkflowAutomate\Plugin\Service\ConfigInterpolator;
+use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWAB\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -305,8 +305,8 @@ class AgentService {
 			}
 
 			$loop['response'] = $response;
-			$clean_output   = $this->buildCleanOutput( $response, $config );
-			$loop['output'] = $clean_output;
+			$clean_output     = $this->buildCleanOutput( $response, $config );
+			$loop['output']   = $clean_output;
 
 			if ( is_array( $parsed ) ) {
 				$loop['parsed'] = $parsed;
@@ -598,12 +598,12 @@ class AgentService {
 	}
 
 	/**
-	 * @param array<string, mixed>      $config        Agent config.
-	 * @param array<string, mixed>      $context       Context.
-	 * @param string                    $agent_node_id Agent id.
-	 * @param array<string, mixed>      $attachments   Resolved attachments.
-	 * @param string                    $system_prompt System prompt.
-	 * @param string                    $user_message  User message.
+	 * @param array<string, mixed> $config        Agent config.
+	 * @param array<string, mixed> $context       Context.
+	 * @param string               $agent_node_id Agent id.
+	 * @param array<string, mixed> $attachments   Resolved attachments.
+	 * @param string               $system_prompt System prompt.
+	 * @param string               $user_message  User message.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
@@ -712,11 +712,11 @@ class AgentService {
 		int $workflow_id,
 		array $context
 	): array {
-		$iteration    = 0;
-		$all_tool_calls = array();
-		$seen_calls   = array();
+		$iteration       = 0;
+		$all_tool_calls  = array();
+		$seen_calls      = array();
 		$created_post_id = 0;
-		$messages     = $this->sanitizeMessages( $messages );
+		$messages        = $this->sanitizeMessages( $messages );
 
 		while ( $iteration < $max_iterations ) {
 			++$iteration;
@@ -749,11 +749,11 @@ class AgentService {
 
 			if ( empty( $message['tool_calls'] ) || ! is_array( $message['tool_calls'] ) ) {
 				return array(
-					'success'       => true,
-					'response'      => (string) ( $message['content'] ?? '' ),
-					'iterations'    => $iteration,
-					'finish_reason' => (string) ( $completion['finish_reason'] ?? 'stop' ),
-					'tool_calls'    => $this->formatToolCalls( $all_tool_calls ),
+					'success'               => true,
+					'response'              => (string) ( $message['content'] ?? '' ),
+					'iterations'            => $iteration,
+					'finish_reason'         => (string) ( $completion['finish_reason'] ?? 'stop' ),
+					'tool_calls'            => $this->formatToolCalls( $all_tool_calls ),
 					'conversation_messages' => $messages,
 				);
 			}
@@ -811,7 +811,7 @@ class AgentService {
 				$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'workflow-automate' );
 			}
 		} elseif ( $created_post_id > 0 && $this->isCreatePostToolName( $function_name ) ) {
-			$tool_result = array(
+			$tool_result              = array(
 				'error'   => sprintf(
 					/* translators: %d: existing post id */
 					__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'workflow-automate' ),
@@ -821,7 +821,7 @@ class AgentService {
 			);
 			$seen_calls[ $signature ] = $tool_result;
 		} else {
-			$tool_result = $this->tool_executor->execute(
+			$tool_result              = $this->tool_executor->execute(
 				$function_name,
 				$args,
 				$graph_nodes,
@@ -1203,9 +1203,9 @@ class AgentService {
 	 * @return string
 	 */
 	private function normalizeOutputForTransport( string $text ): string {
-		$text = str_replace( array( "\r\n", "\r", "\n", "\t" ), ' ', $text );
-		$stripped = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text );
-		$text     = is_string( $stripped ) ? $stripped : $text;
+		$text      = str_replace( array( "\r\n", "\r", "\n", "\t" ), ' ', $text );
+		$stripped  = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text );
+		$text      = is_string( $stripped ) ? $stripped : $text;
 		$collapsed = preg_replace( '/\s+/', ' ', $text );
 		$text      = is_string( $collapsed ) ? $collapsed : $text;
 
@@ -1235,7 +1235,7 @@ class AgentService {
 		// One or more fenced blocks inside other text — prefer first fence body
 		// when it is the dominant content.
 		if ( preg_match( '/```[a-zA-Z0-9_-]*\s*\r?\n([\s\S]*?)\r?\n```/', $trimmed, $matches ) ) {
-			$inner = trim( (string) $matches[1] );
+			$inner          = trim( (string) $matches[1] );
 			$without_fences = trim(
 				(string) preg_replace( '/```[a-zA-Z0-9_-]*\s*\r?\n[\s\S]*?\r?\n```/', '', $trimmed )
 			);

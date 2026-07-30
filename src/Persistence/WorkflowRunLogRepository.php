@@ -2,15 +2,15 @@
 /**
  * Workflow run log repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace AIAWAB\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
+use AIAWAB\Plugin\Database\Table;
+use AIAWAB\Plugin\Domain\WorkflowRunLog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,16 +57,16 @@ class WorkflowRunLogRepository {
 		global $wpdb;
 
 		$data = array(
-			'run_id' => (int) $attributes['run_id'],
-			'node_id' => isset( $attributes['node_id'] ) ? (int) $attributes['node_id'] : null,
-			'node_type' => isset( $attributes['node_type'] ) ? (string) $attributes['node_type'] : null,
-			'node_label' => isset( $attributes['node_label'] ) ? (string) $attributes['node_label'] : null,
-			'status' => (string) $attributes['status'],
-			'input_json' => isset( $attributes['input'] ) ? wp_json_encode( $attributes['input'] ) : null,
+			'run_id'      => (int) $attributes['run_id'],
+			'node_id'     => isset( $attributes['node_id'] ) ? (int) $attributes['node_id'] : null,
+			'node_type'   => isset( $attributes['node_type'] ) ? (string) $attributes['node_type'] : null,
+			'node_label'  => isset( $attributes['node_label'] ) ? (string) $attributes['node_label'] : null,
+			'status'      => (string) $attributes['status'],
+			'input_json'  => isset( $attributes['input'] ) ? wp_json_encode( $attributes['input'] ) : null,
 			'output_json' => isset( $attributes['output'] ) ? wp_json_encode( $attributes['output'] ) : null,
-			'message' => isset( $attributes['message'] ) ? (string) $attributes['message'] : null,
+			'message'     => isset( $attributes['message'] ) ? (string) $attributes['message'] : null,
 			'duration_ms' => isset( $attributes['duration_ms'] ) ? (int) $attributes['duration_ms'] : null,
-			'created_at' => current_time( 'mysql', true ),
+			'created_at'  => current_time( 'mysql', true ),
 		);
 
 		$formats = array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s' );
@@ -91,7 +91,7 @@ class WorkflowRunLogRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
 		return $row ? WorkflowRunLog::fromRow( $row ) : null;
 	}
@@ -107,8 +107,8 @@ class WorkflowRunLogRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $run_id, self::MAX_LOGS_PER_RUN ) );
+		$sql   = "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$rows  = $wpdb->get_results( $wpdb->prepare( $sql, $run_id, self::MAX_LOGS_PER_RUN ) );
 
 		return array_map( array( WorkflowRunLog::class, 'fromRow' ), $rows );
 	}
@@ -130,11 +130,11 @@ class WorkflowRunLogRepository {
 			return true;
 		}
 
-		$run_ids = array_map( 'intval', $run_ids );
+		$run_ids      = array_map( 'intval', $run_ids );
 		$placeholders = implode( ', ', array_fill( 0, count( $run_ids ), '%d' ) );
-		$table = $this->table();
+		$table        = $this->table();
 
-		$sql = "DELETE FROM {$table} WHERE run_id IN ({$placeholders})"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
+		$sql     = "DELETE FROM {$table} WHERE run_id IN ({$placeholders})"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
 		$deleted = $wpdb->query( $wpdb->prepare( $sql, $run_ids ) );
 
 		return false !== $deleted;

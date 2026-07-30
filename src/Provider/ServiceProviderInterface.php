@@ -2,14 +2,14 @@
 /**
  * Service provider contract.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace AIAWAB\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
+use AIAWAB\Plugin\Core\Container;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

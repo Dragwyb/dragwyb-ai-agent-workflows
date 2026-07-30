@@ -2,22 +2,22 @@
 /**
  * Workflow application service.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Domain\WorkflowNode;
+use AIAWAB\Plugin\Persistence\WebhookRepository;
+use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -50,10 +50,10 @@ class WorkflowService {
 		WebhookRepository $webhooks
 	) {
 		$this->workflows = $workflows;
-		$this->nodes = $nodes;
-		$this->runs = $runs;
-		$this->runLogs = $runLogs;
-		$this->webhooks = $webhooks;
+		$this->nodes     = $nodes;
+		$this->runs      = $runs;
+		$this->runLogs   = $runLogs;
+		$this->webhooks  = $webhooks;
 	}
 
 	/**
@@ -79,9 +79,9 @@ class WorkflowService {
 
 		$workflow = $this->workflows->insert(
 			array(
-				'title' => $title,
-				'status' => Workflow::STATUS_DRAFT,
-				'graph' => $attributes['graph'] ?? array(),
+				'title'    => $title,
+				'status'   => Workflow::STATUS_DRAFT,
+				'graph'    => $attributes['graph'] ?? array(),
 				'settings' => $attributes['settings'] ?? null,
 			)
 		);
@@ -108,8 +108,8 @@ class WorkflowService {
 	/**
 	 * Updates a workflow's title, graph, and/or settings.
 	 *
-	 * @param int                   $id         Workflow id.
-	 * @param array<string, mixed>  $attributes Any of: title, graph, settings.
+	 * @param int                  $id         Workflow id.
+	 * @param array<string, mixed> $attributes Any of: title, graph, settings.
 	 *
 	 * @return Workflow|null Null if no workflow exists with the given id.
 	 */
@@ -201,8 +201,8 @@ class WorkflowService {
 	/**
 	 * Adds a node to an existing workflow.
 	 *
-	 * @param int                   $workflow_id Workflow id.
-	 * @param array<string, mixed>  $attributes  See WorkflowNodeRepository::insert().
+	 * @param int                  $workflow_id Workflow id.
+	 * @param array<string, mixed> $attributes  See WorkflowNodeRepository::insert().
 	 *
 	 * @throws InvalidArgumentException When the workflow does not exist or required fields are missing.
 	 * @throws RuntimeException         When the underlying insert fails (e.g. duplicate client_node_id).
@@ -215,7 +215,7 @@ class WorkflowService {
 		}
 
 		$client_node_id = isset( $attributes['client_node_id'] ) ? trim( (string) $attributes['client_node_id'] ) : '';
-		$node_type = isset( $attributes['node_type'] ) ? trim( (string) $attributes['node_type'] ) : '';
+		$node_type      = isset( $attributes['node_type'] ) ? trim( (string) $attributes['node_type'] ) : '';
 
 		if ( '' === $client_node_id || '' === $node_type ) {
 			throw new InvalidArgumentException( esc_html__( 'A node requires both a client node id and a node type.', 'workflow-automate' ) );
@@ -223,11 +223,11 @@ class WorkflowService {
 
 		$node = $this->nodes->insert(
 			array(
-				'workflow_id' => $workflow_id,
+				'workflow_id'    => $workflow_id,
 				'client_node_id' => $client_node_id,
-				'node_type' => $node_type,
-				'label' => $attributes['label'] ?? null,
-				'config' => $attributes['config'] ?? null,
+				'node_type'      => $node_type,
+				'label'          => $attributes['label'] ?? null,
+				'config'         => $attributes['config'] ?? null,
 			)
 		);
 
@@ -241,8 +241,8 @@ class WorkflowService {
 	/**
 	 * Updates an existing node.
 	 *
-	 * @param int                   $node_id    Node id.
-	 * @param array<string, mixed>  $attributes See WorkflowNodeRepository::update().
+	 * @param int                  $node_id    Node id.
+	 * @param array<string, mixed> $attributes See WorkflowNodeRepository::update().
 	 *
 	 * @return WorkflowNode|null Null if no node exists with the given id.
 	 */
@@ -305,7 +305,7 @@ class WorkflowService {
 			$existing_by_client_id[ $node->clientNodeId() ] = $node;
 		}
 
-		$seen = array();
+		$seen   = array();
 		$synced = array();
 
 		foreach ( $graph_nodes as $graph_node ) {
@@ -313,13 +313,13 @@ class WorkflowService {
 				continue; // Defensively skip a malformed graph entry rather than fail the whole sync.
 			}
 
-			$client_node_id = (string) $graph_node['id'];
+			$client_node_id          = (string) $graph_node['id'];
 			$seen[ $client_node_id ] = true;
 
 			$attributes = array(
 				'node_type' => (string) $graph_node['type'],
-				'label' => isset( $graph_node['label'] ) ? (string) $graph_node['label'] : null,
-				'config' => isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : null,
+				'label'     => isset( $graph_node['label'] ) ? (string) $graph_node['label'] : null,
+				'config'    => isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : null,
 			);
 
 			if ( isset( $existing_by_client_id[ $client_node_id ] ) ) {
@@ -328,7 +328,7 @@ class WorkflowService {
 				$node = $this->nodes->insert(
 					array_merge(
 						array(
-							'workflow_id' => $workflow_id,
+							'workflow_id'    => $workflow_id,
 							'client_node_id' => $client_node_id,
 						),
 						$attributes
@@ -353,8 +353,8 @@ class WorkflowService {
 	/**
 	 * Orders synced nodes top-to-bottom (then left-to-right) to match the builder canvas.
 	 *
-	 * @param WorkflowNode[]       $nodes       Synced node rows.
-	 * @param array<int, mixed>    $graph_nodes Raw graph node entries.
+	 * @param WorkflowNode[]    $nodes       Synced node rows.
+	 * @param array<int, mixed> $graph_nodes Raw graph node entries.
 	 *
 	 * @return WorkflowNode[]
 	 */
@@ -375,8 +375,14 @@ class WorkflowService {
 		usort(
 			$nodes,
 			static function ( WorkflowNode $a, WorkflowNode $b ) use ( $positions ): int {
-				$pos_a = $positions[ $a->clientNodeId() ] ?? array( 'y' => 0, 'x' => 0 );
-				$pos_b = $positions[ $b->clientNodeId() ] ?? array( 'y' => 0, 'x' => 0 );
+				$pos_a = $positions[ $a->clientNodeId() ] ?? array(
+					'y' => 0,
+					'x' => 0,
+				);
+				$pos_b = $positions[ $b->clientNodeId() ] ?? array(
+					'y' => 0,
+					'x' => 0,
+				);
 
 				if ( $pos_a['y'] !== $pos_b['y'] ) {
 					return $pos_a['y'] <=> $pos_b['y'];

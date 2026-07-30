@@ -13,7 +13,7 @@
  * Text Domain:       workflow-automate
  * Domain Path:       /languages
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 // Prevent direct file access.
@@ -116,7 +116,7 @@ if ( file_exists( WFA_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php' )
 	require_once WFA_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
 }
 
-register_activation_hook( WFA_PLUGIN_FILE, array( 'WorkflowAutomate\\Plugin\\Core\\Activator', 'activate' ) );
-register_deactivation_hook( WFA_PLUGIN_FILE, array( 'WorkflowAutomate\\Plugin\\Core\\Deactivator', 'deactivate' ) );
+register_activation_hook( WFA_PLUGIN_FILE, array( 'AIAWAB\\Plugin\\Core\\Activator', 'activate' ) );
+register_deactivation_hook( WFA_PLUGIN_FILE, array( 'AIAWAB\\Plugin\\Core\\Deactivator', 'deactivate' ) );
 
-WorkflowAutomate\Plugin\Core\Plugin::instance()->boot();
+AIAWAB\Plugin\Core\Plugin::instance()->boot();

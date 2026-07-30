@@ -2,17 +2,17 @@
 /**
  * Plugin activation handler.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace AIAWAB\Plugin\Core;
 
-use WorkflowAutomate\Plugin\Database\MigrationRunner;
-use WorkflowAutomate\Plugin\Database\SchemaMigrations;
-use WorkflowAutomate\Plugin\Service\BackgroundRunner;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
+use AIAWAB\Plugin\Database\MigrationRunner;
+use AIAWAB\Plugin\Database\SchemaMigrations;
+use AIAWAB\Plugin\Service\BackgroundRunner;
+use AIAWAB\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

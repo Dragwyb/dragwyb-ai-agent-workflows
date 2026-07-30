@@ -2,15 +2,15 @@
 /**
  * Router tool — branch workflow based on a field value.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace AIAWAB\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\ContextPathResolver;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Service\ContextPathResolver;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,20 +32,20 @@ class RouterAction implements ActionInterface {
 
 	public function configSchema(): array {
 		return array(
-			'route_field' => array(
-				'type' => 'string',
-				'label' => __( 'Value to check', 'workflow-automate' ),
+			'route_field'            => array(
+				'type'               => 'string',
+				'label'              => __( 'Value to check', 'workflow-automate' ),
 				'supports_variables' => true,
-				'required' => true,
+				'required'           => true,
 			),
-			'routes' => array(
-				'type' => 'router_routes',
-				'label' => __( 'Matching rules', 'workflow-automate' ),
+			'routes'                 => array(
+				'type'    => 'router_routes',
+				'label'   => __( 'Matching rules', 'workflow-automate' ),
 				'default' => array(),
 			),
 			'default_branch_node_id' => array(
-				'type' => 'node_select',
-				'label' => __( 'Otherwise, run this step', 'workflow-automate' ),
+				'type'    => 'node_select',
+				'label'   => __( 'Otherwise, run this step', 'workflow-automate' ),
 				'default' => '',
 			),
 		);
@@ -80,9 +80,9 @@ class RouterAction implements ActionInterface {
 		}
 
 		return array(
-			'success' => true,
-			'matched_route' => $matched_route,
-			'field_value' => $value_str,
+			'success'        => true,
+			'matched_route'  => $matched_route,
+			'field_value'    => $value_str,
 			'branch_node_id' => $matched_node_id,
 		);
 	}

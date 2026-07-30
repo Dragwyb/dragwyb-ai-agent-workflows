@@ -2,16 +2,16 @@
 /**
  * Built-in "HTTP Request" action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace AIAWAB\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Service\ConnectionAuthTypes;
+use AIAWAB\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,92 +74,146 @@ class HttpRequestAction implements ActionInterface {
 	 */
 	public function configSchema(): array {
 		return array(
-			'method' => array(
-				'type' => 'select',
-				'label' => __( 'Method', 'workflow-automate' ),
+			'method'            => array(
+				'type'    => 'select',
+				'label'   => __( 'Method', 'workflow-automate' ),
 				'default' => self::DEFAULT_METHOD,
 				'options' => array(
-					array( 'value' => 'GET', 'label' => 'GET' ),
-					array( 'value' => 'POST', 'label' => 'POST' ),
-					array( 'value' => 'PUT', 'label' => 'PUT' ),
-					array( 'value' => 'PATCH', 'label' => 'PATCH' ),
-					array( 'value' => 'DELETE', 'label' => 'DELETE' ),
-					array( 'value' => 'HEAD', 'label' => 'HEAD' ),
-					array( 'value' => 'OPTIONS', 'label' => 'OPTIONS' ),
+					array(
+						'value' => 'GET',
+						'label' => 'GET',
+					),
+					array(
+						'value' => 'POST',
+						'label' => 'POST',
+					),
+					array(
+						'value' => 'PUT',
+						'label' => 'PUT',
+					),
+					array(
+						'value' => 'PATCH',
+						'label' => 'PATCH',
+					),
+					array(
+						'value' => 'DELETE',
+						'label' => 'DELETE',
+					),
+					array(
+						'value' => 'HEAD',
+						'label' => 'HEAD',
+					),
+					array(
+						'value' => 'OPTIONS',
+						'label' => 'OPTIONS',
+					),
 				),
 			),
-			'url' => array(
-				'type' => 'string',
-				'label' => __( 'URL', 'workflow-automate' ),
-				'required' => true,
+			'url'               => array(
+				'type'               => 'string',
+				'label'              => __( 'URL', 'workflow-automate' ),
+				'required'           => true,
 				'supports_variables' => true,
 			),
-			'connection_id' => array(
-				'type' => 'connection',
-				'label' => __( 'Authentication (optional)', 'workflow-automate' ),
+			'connection_id'     => array(
+				'type'    => 'connection',
+				'label'   => __( 'Authentication (optional)', 'workflow-automate' ),
 				'default' => 0,
 			),
-			'headers' => array(
-				'type' => 'object',
-				'label' => __( 'Headers', 'workflow-automate' ),
+			'headers'           => array(
+				'type'    => 'object',
+				'label'   => __( 'Headers', 'workflow-automate' ),
 				'default' => array(),
 			),
 			'allow_unsafe_urls' => array(
-				'type' => 'boolean',
-				'label' => __( 'Allow local/unsafe URLs', 'workflow-automate' ),
+				'type'    => 'boolean',
+				'label'   => __( 'Allow local/unsafe URLs', 'workflow-automate' ),
 				'default' => false,
-				'help' => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'workflow-automate' ),
+				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'workflow-automate' ),
 			),
-			'send_body' => array(
-				'type' => 'boolean',
-				'label' => __( 'Send Body', 'workflow-automate' ),
+			'send_body'         => array(
+				'type'    => 'boolean',
+				'label'   => __( 'Send Body', 'workflow-automate' ),
 				'default' => false,
 			),
 			'body_content_type' => array(
-				'type' => 'select',
-				'label' => __( 'Body Content Type', 'workflow-automate' ),
-				'default' => self::DEFAULT_BODY_CONTENT_TYPE,
+				'type'      => 'select',
+				'label'     => __( 'Body Content Type', 'workflow-automate' ),
+				'default'   => self::DEFAULT_BODY_CONTENT_TYPE,
 				'show_when' => array(
-					array( 'field' => 'send_body', 'equals' => true ),
+					array(
+						'field'  => 'send_body',
+						'equals' => true,
+					),
 				),
-				'options' => array(
-					array( 'value' => 'json', 'label' => __( 'JSON', 'workflow-automate' ) ),
-					array( 'value' => 'form_urlencoded', 'label' => __( 'Form URL Encoded', 'workflow-automate' ) ),
-					array( 'value' => 'raw', 'label' => __( 'Raw', 'workflow-automate' ) ),
+				'options'   => array(
+					array(
+						'value' => 'json',
+						'label' => __( 'JSON', 'workflow-automate' ),
+					),
+					array(
+						'value' => 'form_urlencoded',
+						'label' => __( 'Form URL Encoded', 'workflow-automate' ),
+					),
+					array(
+						'value' => 'raw',
+						'label' => __( 'Raw', 'workflow-automate' ),
+					),
 				),
 			),
-			'body_specify' => array(
-				'type' => 'select',
-				'label' => __( 'Specify Body', 'workflow-automate' ),
-				'default' => 'json',
+			'body_specify'      => array(
+				'type'      => 'select',
+				'label'     => __( 'Specify Body', 'workflow-automate' ),
+				'default'   => 'json',
 				'show_when' => array(
-					array( 'field' => 'send_body', 'equals' => true ),
+					array(
+						'field'  => 'send_body',
+						'equals' => true,
+					),
 				),
-				'options' => array(
-					array( 'value' => 'json', 'label' => __( 'Using JSON', 'workflow-automate' ) ),
-					array( 'value' => 'fields', 'label' => __( 'Using Fields Below', 'workflow-automate' ) ),
+				'options'   => array(
+					array(
+						'value' => 'json',
+						'label' => __( 'Using JSON', 'workflow-automate' ),
+					),
+					array(
+						'value' => 'fields',
+						'label' => __( 'Using Fields Below', 'workflow-automate' ),
+					),
 				),
 			),
-			'body' => array(
-				'type' => 'string',
-				'label' => __( 'Body', 'workflow-automate' ),
-				'default' => '',
+			'body'              => array(
+				'type'               => 'string',
+				'label'              => __( 'Body', 'workflow-automate' ),
+				'default'            => '',
 				'supports_variables' => true,
-				'help' => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'workflow-automate' ),
-				'show_when' => array(
-					array( 'field' => 'send_body', 'equals' => true ),
-					array( 'field' => 'body_specify', 'equals' => 'json' ),
+				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'workflow-automate' ),
+				'show_when'          => array(
+					array(
+						'field'  => 'send_body',
+						'equals' => true,
+					),
+					array(
+						'field'  => 'body_specify',
+						'equals' => 'json',
+					),
 				),
 			),
-			'body_parameters' => array(
-				'type' => 'key_value',
-				'label' => __( 'Body Parameters', 'workflow-automate' ),
-				'default' => array(),
-				'button_label' => __( 'Add Body Field', 'workflow-automate' ),
+			'body_parameters'   => array(
+				'type'               => 'key_value',
+				'label'              => __( 'Body Parameters', 'workflow-automate' ),
+				'default'            => array(),
+				'button_label'       => __( 'Add Body Field', 'workflow-automate' ),
 				'supports_variables' => true,
-				'show_when' => array(
-					array( 'field' => 'send_body', 'equals' => true ),
-					array( 'field' => 'body_specify', 'equals' => 'fields' ),
+				'show_when'          => array(
+					array(
+						'field'  => 'send_body',
+						'equals' => true,
+					),
+					array(
+						'field'  => 'body_specify',
+						'equals' => 'fields',
+					),
 				),
 			),
 		);
@@ -174,7 +228,7 @@ class HttpRequestAction implements ActionInterface {
 		if ( '' === $url ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No request URL configured.', 'workflow-automate' ),
+				'error'   => __( 'No request URL configured.', 'workflow-automate' ),
 			);
 		}
 
@@ -194,13 +248,13 @@ class HttpRequestAction implements ActionInterface {
 			if ( null !== $auth_error ) {
 				return array(
 					'success' => false,
-					'error' => $auth_error,
+					'error'   => $auth_error,
 				);
 			}
 		}
 
 		$args = array(
-			'method' => $method,
+			'method'  => $method,
 			'timeout' => self::TIMEOUT_SECONDS,
 			'headers' => $headers,
 		);
@@ -222,14 +276,14 @@ class HttpRequestAction implements ActionInterface {
 		if ( is_wp_error( $response ) ) {
 			return array(
 				'success' => false,
-				'error' => $response->get_error_message(),
+				'error'   => $response->get_error_message(),
 			);
 		}
 
 		return array(
-			'success' => true,
+			'success'     => true,
 			'status_code' => wp_remote_retrieve_response_code( $response ),
-			'body' => wp_remote_retrieve_body( $response ),
+			'body'        => wp_remote_retrieve_body( $response ),
 		);
 	}
 

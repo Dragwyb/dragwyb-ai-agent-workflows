@@ -2,15 +2,15 @@
 /**
  * Workflow JSON import/export (n8n-style portable definition).
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 use InvalidArgumentException;
-use WorkflowAutomate\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

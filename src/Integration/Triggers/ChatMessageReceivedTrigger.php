@@ -2,15 +2,15 @@
 /**
  * Chat Message Received trigger (n8n-style Chat Trigger).
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace AIAWAB\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerGroupInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * so AI Agent "Connected Chat Trigger Node" prompt source works out of the box.
  *
  * Fired via {@see do_action( 'wfa_chat_message_received', $payload )} from
- * {@see \WorkflowAutomate\Plugin\Rest\ChatMessageIngressController}.
+ * {@see \AIAWAB\Plugin\Rest\ChatMessageIngressController}.
  */
 class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterface {
 
@@ -69,7 +69,7 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	 */
 	public function configSchema(): array {
 		return array(
-			'endpoint_id' => array(
+			'endpoint_id'       => array(
 				'type'        => 'string',
 				'label'       => __( 'Chat endpoint ID', 'workflow-automate' ),
 				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'workflow-automate' ),
@@ -77,18 +77,18 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 				'default'     => '',
 				'hidden'      => true,
 			),
-			'public' => array(
+			'public'            => array(
 				'type'        => 'boolean',
 				'label'       => __( 'Make chat publicly available', 'workflow-automate' ),
 				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'workflow-automate' ),
 				'default'     => true,
 			),
-			'title' => array(
+			'title'             => array(
 				'type'    => 'string',
 				'label'   => __( 'Title', 'workflow-automate' ),
 				'default' => __( 'Hi there! 👋', 'workflow-automate' ),
 			),
-			'subtitle' => array(
+			'subtitle'          => array(
 				'type'    => 'string',
 				'label'   => __( 'Subtitle', 'workflow-automate' ),
 				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'workflow-automate' ),
@@ -98,14 +98,14 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 				'label'   => __( 'Input placeholder', 'workflow-automate' ),
 				'default' => __( 'Type your question…', 'workflow-automate' ),
 			),
-			'initial_messages' => array(
+			'initial_messages'  => array(
 				'type'        => 'string',
 				'label'       => __( 'Initial message(s)', 'workflow-automate' ),
 				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'workflow-automate' ),
 				'multiline'   => true,
 				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'workflow-automate' ),
 			),
-			'response_mode' => array(
+			'response_mode'     => array(
 				'type'    => 'select',
 				'label'   => __( 'Response mode', 'workflow-automate' ),
 				'default' => 'lastNode',

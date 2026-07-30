@@ -2,12 +2,12 @@
 /**
  * Replaces {{path.to.value}} tokens in action config strings.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,13 +31,13 @@ class ConfigInterpolator {
 	 */
 	private const TRIGGER_FIELD_ALIASES = array(
 		'customer_name' => 'billing_first_name',
-		'first_name' => 'billing_first_name',
-		'name' => 'billing_first_name',
-		'last_name' => 'billing_last_name',
-		'email' => 'billing_email',
-		'order_number' => 'order_id',
-		'amount' => 'total',
-		'order_total' => 'total',
+		'first_name'    => 'billing_first_name',
+		'name'          => 'billing_first_name',
+		'last_name'     => 'billing_last_name',
+		'email'         => 'billing_email',
+		'order_number'  => 'order_id',
+		'amount'        => 'total',
+		'order_total'   => 'total',
 	);
 
 	/**

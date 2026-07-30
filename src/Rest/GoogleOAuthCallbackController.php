@@ -2,16 +2,16 @@
 /**
  * Google OAuth callback REST endpoint.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 use WP_REST_Request;
 
 // Prevent direct file access.
@@ -31,8 +31,8 @@ class GoogleOAuthCallbackController {
 	private GoogleOAuthService $google_oauth;
 
 	public function __construct( ConnectionService $connections, GoogleOAuthService $google_oauth ) {
-		$this->connections   = $connections;
-		$this->google_oauth  = $google_oauth;
+		$this->connections  = $connections;
+		$this->google_oauth = $google_oauth;
 	}
 
 	/**
@@ -43,23 +43,23 @@ class GoogleOAuthCallbackController {
 			self::API_NAMESPACE,
 			'/oauth/google/callback',
 			array(
-				'methods' => 'GET',
-				'callback' => array( $this, 'handleCallback' ),
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'handleCallback' ),
 				'permission_callback' => '__return_true',
-				'args' => array(
-					'code' => array(
-						'type' => 'string',
-						'required' => false,
+				'args'                => array(
+					'code'  => array(
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'state' => array(
-						'type' => 'string',
-						'required' => false,
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'error' => array(
-						'type' => 'string',
-						'required' => false,
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
@@ -160,7 +160,7 @@ class GoogleOAuthCallbackController {
 		}
 
 		$args = array(
-			'page' => ConnectionFormPage::SLUG,
+			'page'       => ConnectionFormPage::SLUG,
 			'wfa_notice' => $notice,
 		);
 

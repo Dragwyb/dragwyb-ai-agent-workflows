@@ -2,18 +2,18 @@
 /**
  * Optional co-plugin triggers — catalog + availability checks.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration;
+namespace AIAWAB\Plugin\Integration;
 
-use WorkflowAutomate\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
+use AIAWAB\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use AIAWAB\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
+use AIAWAB\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
+use AIAWAB\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use AIAWAB\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,43 +39,43 @@ class IntegrationTriggerCatalog {
 	public static function definitions(): array {
 		$entries = array(
 			array(
-				'slug' => 'elementor_form_submitted_trigger',
-				'app' => 'elementor',
+				'slug'            => 'elementor_form_submitted_trigger',
+				'app'             => 'elementor',
 				'requires_plugin' => 'Elementor Pro',
-				'class' => ElementorFormSubmittedTrigger::class,
-				'active' => self::isElementorProActive(),
+				'class'           => ElementorFormSubmittedTrigger::class,
+				'active'          => self::isElementorProActive(),
 			),
 			array(
-				'slug' => 'elementor_atomic_form_submitted_trigger',
-				'app' => 'elementor',
+				'slug'            => 'elementor_atomic_form_submitted_trigger',
+				'app'             => 'elementor',
 				'requires_plugin' => 'Elementor Pro',
-				'class' => ElementorAtomicFormSubmittedTrigger::class,
-				'active' => self::isElementorAtomicFormsActive(),
+				'class'           => ElementorAtomicFormSubmittedTrigger::class,
+				'active'          => self::isElementorAtomicFormsActive(),
 			),
 			array(
-				'slug' => 'contact_form7_submitted_trigger',
-				'app' => 'contact-form-7',
+				'slug'            => 'contact_form7_submitted_trigger',
+				'app'             => 'contact-form-7',
 				'requires_plugin' => 'Contact Form 7',
-				'class' => ContactForm7SubmittedTrigger::class,
-				'active' => self::isContactForm7Active(),
+				'class'           => ContactForm7SubmittedTrigger::class,
+				'active'          => self::isContactForm7Active(),
 			),
 			array(
-				'slug' => 'wpforms_submitted_trigger',
-				'app' => 'wpforms',
+				'slug'            => 'wpforms_submitted_trigger',
+				'app'             => 'wpforms',
 				'requires_plugin' => 'WPForms',
-				'class' => WpFormsSubmittedTrigger::class,
-				'active' => self::isWpFormsActive(),
+				'class'           => WpFormsSubmittedTrigger::class,
+				'active'          => self::isWpFormsActive(),
 			),
 		);
 
 		foreach ( WooCommerceTriggerCatalog::definitions() as $wc_definition ) {
 			$entries[] = array(
-				'slug' => (string) $wc_definition['slug'],
-				'app' => 'woocommerce',
+				'slug'            => (string) $wc_definition['slug'],
+				'app'             => 'woocommerce',
 				'requires_plugin' => 'WooCommerce',
-				'class' => WooCommerceCatalogTrigger::class,
-				'definition' => $wc_definition,
-				'active' => self::isWooCommerceActive(),
+				'class'           => WooCommerceCatalogTrigger::class,
+				'definition'      => $wc_definition,
+				'active'          => self::isWooCommerceActive(),
 			);
 		}
 

@@ -2,14 +2,14 @@
 /**
  * Admin menu bootstrap.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Core\Capabilities;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

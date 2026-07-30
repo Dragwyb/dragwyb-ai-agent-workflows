@@ -2,21 +2,21 @@
 /**
  * Workflow execution service.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\Agent\AgentGraphHelper;
+use AIAWAB\Plugin\Domain\WorkflowNode;
+use AIAWAB\Plugin\Domain\WorkflowRun;
+use AIAWAB\Plugin\Domain\WorkflowRunLog;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Service\Agent\AgentGraphHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -110,12 +110,12 @@ class WorkflowExecutionService {
 		SettingsService $settings,
 		TriggerReentrancyGuard $trigger_guard
 	) {
-		$this->workflows = $workflows;
-		$this->registry = $registry;
-		$this->nodeExecutor = $nodeExecutor;
-		$this->runs = $runs;
-		$this->runLogs = $runLogs;
-		$this->settings = $settings;
+		$this->workflows     = $workflows;
+		$this->registry      = $registry;
+		$this->nodeExecutor  = $nodeExecutor;
+		$this->runs          = $runs;
+		$this->runLogs       = $runLogs;
+		$this->settings      = $settings;
 		$this->trigger_guard = $trigger_guard;
 	}
 
@@ -126,8 +126,8 @@ class WorkflowExecutionService {
 	 * Deliberately not restricted to active workflows: a manual "test this
 	 * workflow" action is valid for a draft workflow too.
 	 *
-	 * @param int                   $workflow_id     Workflow id.
-	 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
+	 * @param int                  $workflow_id     Workflow id.
+	 * @param array<string, mixed> $trigger_payload Data the triggering event provided; empty for a manual run.
 	 *
 	 * @throws InvalidArgumentException When the workflow does not exist.
 	 * @throws RuntimeException         When the run could not be recorded.
@@ -141,8 +141,8 @@ class WorkflowExecutionService {
 
 		$run = $this->runs->insert(
 			array(
-				'workflow_id' => $workflow_id,
-				'status' => WorkflowRun::STATUS_RUNNING,
+				'workflow_id'     => $workflow_id,
+				'status'          => WorkflowRun::STATUS_RUNNING,
 				'trigger_payload' => $trigger_payload,
 			)
 		);
@@ -183,9 +183,9 @@ class WorkflowExecutionService {
 
 		$run = $this->runs->insert(
 			array(
-				'workflow_id' => $original->workflowId(),
-				'parent_run_id' => $original->id(),
-				'status' => WorkflowRun::STATUS_RUNNING,
+				'workflow_id'     => $original->workflowId(),
+				'parent_run_id'   => $original->id(),
+				'status'          => WorkflowRun::STATUS_RUNNING,
 				'trigger_payload' => $original->triggerPayload(),
 			)
 		);
@@ -218,8 +218,8 @@ class WorkflowExecutionService {
 
 		$run = $this->runs->insert(
 			array(
-				'workflow_id' => $workflow_id,
-				'status' => WorkflowRun::STATUS_QUEUED,
+				'workflow_id'     => $workflow_id,
+				'status'          => WorkflowRun::STATUS_QUEUED,
 				'trigger_payload' => $trigger_payload,
 			)
 		);
@@ -274,9 +274,9 @@ class WorkflowExecutionService {
 			// queued; nothing to execute against.
 			$this->runLogs->insert(
 				array(
-					'run_id' => $run->id(),
+					'run_id'  => $run->id(),
 					'node_id' => null,
-					'status' => WorkflowRunLog::STATUS_ERROR,
+					'status'  => WorkflowRunLog::STATUS_ERROR,
 					'message' => __( 'The workflow was deleted or trashed before this queued run could execute.', 'workflow-automate' ),
 				)
 			);
@@ -322,7 +322,7 @@ class WorkflowExecutionService {
 	 * @return WorkflowRun The finished run.
 	 */
 	private function executeNodesGuarded( WorkflowRun $run ): WorkflowRun {
-		$workflow_id = $run->workflowId();
+		$workflow_id     = $run->workflowId();
 		$trigger_payload = $run->triggerPayload();
 
 		/**
@@ -343,10 +343,10 @@ class WorkflowExecutionService {
 		$graph    = null !== $workflow ? $workflow->graph() : array();
 
 		$context = array(
-			'trigger' => $trigger_payload,
-			'nodes' => array(),
+			'trigger'     => $trigger_payload,
+			'nodes'       => array(),
 			'workflow_id' => $workflow_id,
-			'graph' => $graph,
+			'graph'       => $graph,
 		);
 
 		$stats = $this->traverseAndExecuteNodes( $run, $nodes, $graph, $context );
@@ -365,11 +365,11 @@ class WorkflowExecutionService {
 	 * @return array{executed: int, succeeded: int}
 	 */
 	private function traverseAndExecuteNodes( WorkflowRun $run, array $nodes, array $graph, array &$context ): array {
-		$graph_nodes = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
-		$graph_connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
+		$graph_nodes         = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
+		$graph_connections   = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
 		$has_connections_key = array_key_exists( 'connections', $graph ) && is_array( $graph['connections'] );
 
-		$executed = 0;
+		$executed  = 0;
 		$succeeded = 0;
 
 		$planner         = new GraphExecutionPlanner();
@@ -423,13 +423,13 @@ class WorkflowExecutionService {
 			++$executed;
 			$visited[ $client_id ] = true;
 
-			$started_at = microtime( true );
+			$started_at   = microtime( true );
 			$node_context = array_merge(
 				$context,
 				array( 'current_node_id' => $client_id )
 			);
-			$result = $this->nodeExecutor->execute( $node, $node_context );
-			$duration_ms = (int) round( ( microtime( true ) - $started_at ) * 1000 );
+			$result       = $this->nodeExecutor->execute( $node, $node_context );
+			$duration_ms  = (int) round( ( microtime( true ) - $started_at ) * 1000 );
 
 			$success = ! empty( $result['success'] );
 
@@ -455,7 +455,7 @@ class WorkflowExecutionService {
 			$node_type = $node->nodeType();
 
 			if ( in_array( $node_type, GraphExecutionPlanner::BRANCHING_TYPES, true ) ) {
-				$branch_ids = $planner->resolveBranchTargets( $result );
+				$branch_ids  = $planner->resolveBranchTargets( $result );
 				$pending_ids = $planner->stripMainPathAfterBranch( $pending_ids, $client_id, $main_path_ids );
 
 				foreach ( array_reverse( $branch_ids ) as $branch_id ) {
@@ -487,7 +487,7 @@ class WorkflowExecutionService {
 		}
 
 		return array(
-			'executed' => $executed,
+			'executed'  => $executed,
 			'succeeded' => $succeeded,
 		);
 	}
@@ -498,14 +498,14 @@ class WorkflowExecutionService {
 	private function recordNodeLog( WorkflowRun $run, WorkflowNode $node, array $result, bool $success, int $duration_ms ): void {
 		$this->runLogs->insert(
 			array(
-				'run_id' => $run->id(),
-				'node_id' => $node->id(),
-				'node_type' => $node->nodeType(),
-				'node_label' => $node->label(),
-				'status' => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
-				'input' => $node->config(),
-				'output' => $result,
-				'message' => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
+				'run_id'      => $run->id(),
+				'node_id'     => $node->id(),
+				'node_type'   => $node->nodeType(),
+				'node_label'  => $node->label(),
+				'status'      => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
+				'input'       => $node->config(),
+				'output'      => $result,
+				'message'     => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
 				'duration_ms' => $duration_ms,
 			)
 		);
@@ -560,11 +560,11 @@ class WorkflowExecutionService {
 
 		$this->runs->insert(
 			array(
-				'workflow_id' => $run->workflowId(),
-				'parent_run_id' => $run->id(),
-				'status' => WorkflowRun::STATUS_QUEUED,
+				'workflow_id'     => $run->workflowId(),
+				'parent_run_id'   => $run->id(),
+				'status'          => WorkflowRun::STATUS_QUEUED,
 				'trigger_payload' => $run->triggerPayload(),
-				'attempts' => $run->attempts() + 1,
+				'attempts'        => $run->attempts() + 1,
 				'next_attempt_at' => gmdate( 'Y-m-d H:i:s', time() + $delay ),
 			)
 		);
@@ -633,8 +633,8 @@ class WorkflowExecutionService {
 	}
 
 	/**
-	 * @param WorkflowNode         $node
-	 * @param array<int, mixed>    $graph_nodes
+	 * @param WorkflowNode      $node
+	 * @param array<int, mixed> $graph_nodes
 	 *
 	 * @return string
 	 */

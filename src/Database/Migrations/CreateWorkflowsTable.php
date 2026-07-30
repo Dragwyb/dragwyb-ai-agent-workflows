@@ -2,15 +2,15 @@
 /**
  * Creates the workflows table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace AIAWAB\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use AIAWAB\Plugin\Database\Migration;
+use AIAWAB\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

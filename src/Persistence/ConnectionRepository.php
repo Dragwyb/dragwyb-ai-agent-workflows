@@ -2,15 +2,15 @@
 /**
  * Connection repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace AIAWAB\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\Connection;
+use AIAWAB\Plugin\Database\Table;
+use AIAWAB\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -60,12 +60,12 @@ class ConnectionRepository {
 
 		$data = array(
 			'integration_slug' => (string) $attributes['integration_slug'],
-			'auth_type' => (string) $attributes['auth_type'],
-			'label' => (string) $attributes['label'],
+			'auth_type'        => (string) $attributes['auth_type'],
+			'label'            => (string) $attributes['label'],
 			'credentials_json' => wp_json_encode( $attributes['credentials'] ?? array() ),
-			'status' => (int) ( $attributes['status'] ?? Connection::STATUS_PENDING ),
-			'created_at' => $now,
-			'updated_at' => $now,
+			'status'           => (int) ( $attributes['status'] ?? Connection::STATUS_PENDING ),
+			'created_at'       => $now,
+			'updated_at'       => $now,
 		);
 
 		$formats = array( '%s', '%s', '%s', '%s', '%d', '%s', '%s' );
@@ -82,30 +82,30 @@ class ConnectionRepository {
 	/**
 	 * Updates an existing connection row. Only the provided keys are touched.
 	 *
-	 * @param int                   $id         Connection id.
-	 * @param array<string, mixed>  $attributes Any of: label, credentials, status.
+	 * @param int                  $id         Connection id.
+	 * @param array<string, mixed> $attributes Any of: label, credentials, status.
 	 *
 	 * @return Connection|null Null if the connection does not exist or the update failed.
 	 */
 	public function update( int $id, array $attributes ): ?Connection {
 		global $wpdb;
 
-		$data = array();
+		$data    = array();
 		$formats = array();
 
 		if ( array_key_exists( 'label', $attributes ) ) {
 			$data['label'] = (string) $attributes['label'];
-			$formats[] = '%s';
+			$formats[]     = '%s';
 		}
 
 		if ( array_key_exists( 'credentials', $attributes ) ) {
 			$data['credentials_json'] = wp_json_encode( $attributes['credentials'] );
-			$formats[] = '%s';
+			$formats[]                = '%s';
 		}
 
 		if ( array_key_exists( 'status', $attributes ) ) {
 			$data['status'] = (int) $attributes['status'];
-			$formats[] = '%d';
+			$formats[]      = '%d';
 		}
 
 		if ( array() === $data ) {
@@ -113,7 +113,7 @@ class ConnectionRepository {
 		}
 
 		$data['updated_at'] = current_time( 'mysql', true );
-		$formats[] = '%s';
+		$formats[]          = '%s';
 
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
@@ -150,7 +150,7 @@ class ConnectionRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$sql   = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
 		$row = $wpdb->get_row( $wpdb->prepare( $sql, $id ) );
 
@@ -171,33 +171,33 @@ class ConnectionRepository {
 	public function paginate( array $args = array() ): array {
 		global $wpdb;
 
-		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
-		$offset = ( $page - 1 ) * $per_page;
+		$offset   = ( $page - 1 ) * $per_page;
 
-		$where = array();
+		$where  = array();
 		$params = array();
 
 		if ( ! empty( $args['integration_slug'] ) ) {
-			$where[] = 'integration_slug = %s';
+			$where[]  = 'integration_slug = %s';
 			$params[] = (string) $args['integration_slug'];
 		}
 
 		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
-		$table = $this->table();
+		$table     = $this->table();
 
 		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
 
-		$list_sql = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
+		$list_sql    = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		$rows        = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
 
 		return array(
-			'items' => array_map( array( Connection::class, 'fromRow' ), $rows ),
-			'total' => $total,
-			'page' => $page,
+			'items'    => array_map( array( Connection::class, 'fromRow' ), $rows ),
+			'total'    => $total,
+			'page'     => $page,
 			'per_page' => $per_page,
 		);
 	}

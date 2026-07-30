@@ -2,21 +2,21 @@
 /**
  * Binds active workflows' triggers to their real-world event sources.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration;
+namespace AIAWAB\Plugin\Integration;
 
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWAB\Plugin\Service\NodeTypeRegistry;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -84,10 +84,10 @@ class WorkflowTriggerBinder {
 	private TriggerReentrancyGuard $trigger_guard;
 
 	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings, WorkflowTestListenerService $test_listener, TriggerReentrancyGuard $trigger_guard ) {
-		$this->workflows = $workflows;
-		$this->registry = $registry;
-		$this->executor = $executor;
-		$this->settings = $settings;
+		$this->workflows     = $workflows;
+		$this->registry      = $registry;
+		$this->executor      = $executor;
+		$this->settings      = $settings;
 		$this->test_listener = $test_listener;
 		$this->trigger_guard = $trigger_guard;
 	}
@@ -102,7 +102,7 @@ class WorkflowTriggerBinder {
 
 		$active = $this->workflows->list(
 			array(
-				'status' => Workflow::STATUS_ACTIVE,
+				'status'   => Workflow::STATUS_ACTIVE,
 				'per_page' => self::MAX_ACTIVE_WORKFLOWS,
 			)
 		);
@@ -142,7 +142,7 @@ class WorkflowTriggerBinder {
 			return;
 		}
 
-		$workflow_id = $workflow->id();
+		$workflow_id   = $workflow->id();
 		$trigger_bound = false;
 
 		foreach ( $graph_nodes as $graph_node ) {

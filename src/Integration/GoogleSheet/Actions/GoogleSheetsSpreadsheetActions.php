@@ -2,14 +2,14 @@
 /**
  * Spreadsheet-level Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions;
+namespace AIAWAB\Plugin\Integration\GoogleSheet\Actions;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,26 +33,26 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 	public function configSchema(): array {
 		return array(
 			'connection_id' => $this->connectionField(),
-			'title' => array(
-				'type' => 'string',
-				'label' => __( 'Spreadsheet title', 'workflow-automate' ),
-				'description' => __( 'Name for the new spreadsheet file.', 'workflow-automate' ),
-				'required' => true,
+			'title'         => array(
+				'type'           => 'string',
+				'label'          => __( 'Spreadsheet title', 'workflow-automate' ),
+				'description'    => __( 'Name for the new spreadsheet file.', 'workflow-automate' ),
+				'required'       => true,
 				'agent_fillable' => true,
 			),
-			'sheet_title' => array(
-				'type' => 'string',
-				'label' => __( 'First sheet tab name', 'workflow-automate' ),
-				'default' => 'Sheet1',
+			'sheet_title'   => array(
+				'type'           => 'string',
+				'label'          => __( 'First sheet tab name', 'workflow-automate' ),
+				'default'        => 'Sheet1',
 				'agent_fillable' => true,
 			),
-			'header_row' => array(
-				'type' => 'string',
-				'label' => __( 'Header row', 'workflow-automate' ),
-				'description' => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'workflow-automate' ),
+			'header_row'    => array(
+				'type'           => 'string',
+				'label'          => __( 'Header row', 'workflow-automate' ),
+				'description'    => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'workflow-automate' ),
 				'agent_fillable' => true,
 			),
-			'values' => $this->optionalValuesField(),
+			'values'        => $this->optionalValuesField(),
 		);
 	}
 
@@ -70,7 +70,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Spreadsheet title is required.', 'workflow-automate' ),
+				'error'   => __( 'Spreadsheet title is required.', 'workflow-automate' ),
 			);
 		}
 
@@ -150,14 +150,14 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 	public function configSchema(): array {
 		return array(
 			'connection_id' => $this->connectionField(),
-			'title' => array(
-				'type' => 'string',
-				'label' => __( 'Search title', 'workflow-automate' ),
+			'title'         => array(
+				'type'     => 'string',
+				'label'    => __( 'Search title', 'workflow-automate' ),
 				'required' => true,
 			),
-			'limit' => array(
-				'type' => 'string',
-				'label' => __( 'Maximum results', 'workflow-automate' ),
+			'limit'         => array(
+				'type'    => 'string',
+				'label'   => __( 'Maximum results', 'workflow-automate' ),
 				'default' => '10',
 			),
 		);
@@ -177,7 +177,7 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Search title is required.', 'workflow-automate' ),
+				'error'   => __( 'Search title is required.', 'workflow-automate' ),
 			);
 		}
 
@@ -203,7 +203,7 @@ final class GoogleSheetsDeleteSpreadsheetAction extends AbstractGoogleSheetsActi
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 		);
 	}

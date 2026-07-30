@@ -2,15 +2,15 @@
 /**
  * Builds LLM tool schemas from attached workflow action nodes.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Service\NodeTypeRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -151,7 +151,7 @@ class AgentToolSchemaBuilder {
 				continue;
 			}
 
-			$label = (string) ( $field_def['label'] ?? $field_key );
+			$label       = (string) ( $field_def['label'] ?? $field_key );
 			$description = isset( $field_def['description'] ) && is_string( $field_def['description'] ) && '' !== trim( $field_def['description'] )
 				? trim( $field_def['description'] )
 				: $label;

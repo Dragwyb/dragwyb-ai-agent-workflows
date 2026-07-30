@@ -2,38 +2,38 @@
 /**
  * Registers the plugin's own built-in node types.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration;
+namespace AIAWAB\Plugin\Integration;
 
-use WorkflowAutomate\Plugin\Integration\Actions\AiAgentAction;
-use WorkflowAutomate\Plugin\Integration\Actions\ClaudeMessagesAction;
-use WorkflowAutomate\Plugin\Integration\Actions\ConditionAction;
-use WorkflowAutomate\Plugin\Integration\Actions\GeminiGenerateContentAction;
-use WorkflowAutomate\Plugin\Integration\Actions\HttpRequestAction;
-use WorkflowAutomate\Plugin\Integration\Actions\DeepSeekChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\GroqChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\OpenAiChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\OpenRouterChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\RouterAction;
-use WorkflowAutomate\Plugin\Integration\Actions\SendEmailAction;
-use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
-use WorkflowAutomate\Plugin\Integration\Actions\StructuredOutputParserAction;
-use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
-use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
-use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionRegistrar;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
-use WorkflowAutomate\Plugin\Service\Agent\AgentService;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use AIAWAB\Plugin\Integration\Actions\AiAgentAction;
+use AIAWAB\Plugin\Integration\Actions\ClaudeMessagesAction;
+use AIAWAB\Plugin\Integration\Actions\ConditionAction;
+use AIAWAB\Plugin\Integration\Actions\GeminiGenerateContentAction;
+use AIAWAB\Plugin\Integration\Actions\HttpRequestAction;
+use AIAWAB\Plugin\Integration\Actions\DeepSeekChatAction;
+use AIAWAB\Plugin\Integration\Actions\GroqChatAction;
+use AIAWAB\Plugin\Integration\Actions\OpenAiChatAction;
+use AIAWAB\Plugin\Integration\Actions\OpenRouterChatAction;
+use AIAWAB\Plugin\Integration\Actions\RouterAction;
+use AIAWAB\Plugin\Integration\Actions\SendEmailAction;
+use AIAWAB\Plugin\Integration\Actions\SlackIncomingWebhookAction;
+use AIAWAB\Plugin\Integration\Actions\StructuredOutputParserAction;
+use AIAWAB\Plugin\Integration\Actions\TelegramSendMessageAction;
+use AIAWAB\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
+use AIAWAB\Plugin\Integration\Triggers\CatalogHookTrigger;
+use AIAWAB\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use AIAWAB\Plugin\Integration\WordPress\WordPressActionRegistrar;
+use AIAWAB\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use AIAWAB\Plugin\Service\Agent\AgentAiClient;
+use AIAWAB\Plugin\Service\Agent\AgentService;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Service\NodeTypeRegistry;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

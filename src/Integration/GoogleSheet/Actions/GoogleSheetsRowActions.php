@@ -2,14 +2,14 @@
 /**
  * Row and column Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions;
+namespace AIAWAB\Plugin\Integration\GoogleSheet\Actions;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,13 +32,13 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
-			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
-			'values' => $this->valuesField(),
+			'connection_id'      => $this->connectionField(),
+			'spreadsheet_id'     => $this->spreadsheetIdField(),
+			'sheet_title'        => $this->sheetTitleField(),
+			'values'             => $this->valuesField(),
 			'value_input_option' => array(
-				'type' => 'string',
-				'label' => __( 'Value input option (USER_ENTERED or RAW)', 'workflow-automate' ),
+				'type'    => 'string',
+				'label'   => __( 'Value input option (USER_ENTERED or RAW)', 'workflow-automate' ),
 				'default' => 'USER_ENTERED',
 			),
 		);
@@ -64,7 +64,7 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 		if ( array() === $values ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'workflow-automate' ),
 			);
 		}
 
@@ -101,20 +101,20 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
-			'row_number' => array(
-				'type' => 'string',
-				'label' => __( 'Row number (1-based)', 'workflow-automate' ),
+			'sheet_title'    => $this->sheetTitleField(),
+			'row_number'     => array(
+				'type'     => 'string',
+				'label'    => __( 'Row number (1-based)', 'workflow-automate' ),
 				'required' => true,
 			),
-			'target_range' => array(
-				'type' => 'string',
-				'label' => __( 'Target range (optional, e.g. A5:E5)', 'workflow-automate' ),
+			'target_range'   => array(
+				'type'    => 'string',
+				'label'   => __( 'Target range (optional, e.g. A5:E5)', 'workflow-automate' ),
 				'default' => '',
 			),
-			'values' => $this->valuesField(),
+			'values'         => $this->valuesField(),
 		);
 	}
 
@@ -138,7 +138,7 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
 			);
 		}
 
@@ -147,7 +147,7 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'workflow-automate' ),
 			);
 		}
 
@@ -179,15 +179,15 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
-			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
+			'connection_id'   => $this->connectionField(),
+			'spreadsheet_id'  => $this->spreadsheetIdField(),
+			'sheet_title'     => $this->sheetTitleField(),
 			'column_to_match' => array(
-				'type' => 'string',
-				'label' => __( 'Column to match on (letter or index, e.g. A or 0)', 'workflow-automate' ),
+				'type'    => 'string',
+				'label'   => __( 'Column to match on (letter or index, e.g. A or 0)', 'workflow-automate' ),
 				'default' => 'A',
 			),
-			'values' => $this->valuesField(),
+			'values'          => $this->valuesField(),
 		);
 	}
 
@@ -211,7 +211,7 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'workflow-automate' ),
 			);
 		}
 
@@ -242,12 +242,12 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
-			'row_number' => array(
-				'type' => 'string',
-				'label' => __( 'Row number (1-based)', 'workflow-automate' ),
+			'sheet_title'    => $this->sheetTitleField(),
+			'row_number'     => array(
+				'type'     => 'string',
+				'label'    => __( 'Row number (1-based)', 'workflow-automate' ),
 				'required' => true,
 			),
 		);
@@ -273,7 +273,7 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
 			);
 		}
 
@@ -303,9 +303,9 @@ final class GoogleSheetsGetAllRowsAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
+			'sheet_title'    => $this->sheetTitleField(),
 		);
 	}
 
@@ -346,12 +346,12 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
-			'row_number' => array(
-				'type' => 'string',
-				'label' => __( 'Row number (1-based)', 'workflow-automate' ),
+			'sheet_title'    => $this->sheetTitleField(),
+			'row_number'     => array(
+				'type'     => 'string',
+				'label'    => __( 'Row number (1-based)', 'workflow-automate' ),
 				'required' => true,
 			),
 		);
@@ -377,7 +377,7 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
 			);
 		}
 
@@ -407,17 +407,17 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
-			'column_name' => array(
-				'type' => 'string',
-				'label' => __( 'Column header name', 'workflow-automate' ),
+			'sheet_title'    => $this->sheetTitleField(),
+			'column_name'    => array(
+				'type'     => 'string',
+				'label'    => __( 'Column header name', 'workflow-automate' ),
 				'required' => true,
 			),
-			'column_index' => array(
-				'type' => 'string',
-				'label' => __( 'Column index (1-based, leave 0 to append)', 'workflow-automate' ),
+			'column_index'   => array(
+				'type'    => 'string',
+				'label'   => __( 'Column index (1-based, leave 0 to append)', 'workflow-automate' ),
 				'default' => '0',
 			),
 		);
@@ -443,7 +443,7 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 		if ( '' === $column_name ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Column name is required.', 'workflow-automate' ),
+				'error'   => __( 'Column name is required.', 'workflow-automate' ),
 			);
 		}
 

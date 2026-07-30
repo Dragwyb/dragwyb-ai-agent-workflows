@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\OpenRouter;
+namespace AIAWAB\AiProviders\OpenRouter;
 
-use WorkflowAutomate\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use AIAWAB\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * OpenRouter AI provider (OpenAI-compatible).

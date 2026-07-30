@@ -2,15 +2,15 @@
 /**
  * Node type registry.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

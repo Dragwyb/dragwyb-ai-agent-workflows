@@ -2,14 +2,14 @@
 /**
  * Formats run/node execution durations for display.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
+use AIAWAB\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -85,7 +85,7 @@ class RunDuration {
 			);
 		}
 
-		$minutes = (int) floor( $seconds / 60 );
+		$minutes   = (int) floor( $seconds / 60 );
 		$remaining = $seconds % 60;
 
 		return sprintf(

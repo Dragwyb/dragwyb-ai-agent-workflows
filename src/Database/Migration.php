@@ -2,12 +2,12 @@
 /**
  * Base migration contract.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database;
+namespace AIAWAB\Plugin\Database;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

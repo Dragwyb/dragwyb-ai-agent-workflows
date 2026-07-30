@@ -2,14 +2,14 @@
 /**
  * Plugin uninstall handler.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace AIAWAB\Plugin\Core;
 
-use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+use AIAWAB\Plugin\Database\SchemaMigrations;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

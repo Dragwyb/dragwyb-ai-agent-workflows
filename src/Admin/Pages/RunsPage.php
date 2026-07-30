@@ -2,22 +2,22 @@
 /**
  * Runs (execution history) admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Admin\RunActionsController;
-use WorkflowAutomate\Plugin\Admin\RunsListTable;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Admin\EmptyState;
+use AIAWAB\Plugin\Admin\ListTableUi;
+use AIAWAB\Plugin\Admin\RunActionsController;
+use AIAWAB\Plugin\Admin\RunsListTable;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Persistence\WorkflowRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,9 +46,9 @@ class RunsPage implements AdminPage {
 	private RunActionsController $runActions;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings, RunActionsController $runActions ) {
-		$this->runs = $runs;
-		$this->workflows = $workflows;
-		$this->settings = $settings;
+		$this->runs       = $runs;
+		$this->workflows  = $workflows;
+		$this->settings   = $settings;
 		$this->runActions = $runActions;
 	}
 
@@ -129,8 +129,8 @@ class RunsPage implements AdminPage {
 				array(),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-						'label' => __( 'Go to Workflows', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+						'label'   => __( 'Go to Workflows', 'workflow-automate' ),
 						'primary' => true,
 					),
 				)
@@ -191,7 +191,7 @@ class RunsPage implements AdminPage {
 		}
 
 		$workflow = $this->workflows->find( $workflow_id, true );
-		$name = $workflow ? $workflow->title() : __( '(deleted workflow)', 'workflow-automate' );
+		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'workflow-automate' );
 
 		printf(
 			'<p class="wfa-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
@@ -213,25 +213,25 @@ class RunsPage implements AdminPage {
 	 */
 	private function notices(): array {
 		return array(
-			'deleted' => array(
+			'deleted'       => array(
 				'message' => __( 'Run deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'bulk_deleted' => array(
+			'bulk_deleted'  => array(
 				'message' => __( 'Selected runs deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
 			'delete_failed' => array(
 				'message' => __( 'That run could not be deleted.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 			'action_failed' => array(
 				'message' => __( 'That run action could not be completed.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
-			'rerun_failed' => array(
+			'rerun_failed'  => array(
 				'message' => __( 'That run could not be re-run.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 	}
@@ -241,7 +241,7 @@ class RunsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

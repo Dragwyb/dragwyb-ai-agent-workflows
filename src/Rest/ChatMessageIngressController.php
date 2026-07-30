@@ -2,18 +2,18 @@
 /**
  * Public chat-message ingress REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use AIAWAB\Plugin\Service\ChatMessageService;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;

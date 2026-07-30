@@ -2,12 +2,12 @@
 /**
  * Built-in WordPress core hook trigger catalog.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration;
+namespace AIAWAB\Plugin\Integration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -269,12 +269,12 @@ class WordPressHookCatalog {
 		int $accepted_args = 1
 	): array {
 		return array(
-			'slug' => 'wp_' . $slug,
-			'label' => $label,
-			'group' => $group,
-			'group_label' => $group_label,
-			'hook_name' => $hook_name,
-			'priority' => $priority,
+			'slug'          => 'wp_' . $slug,
+			'label'         => $label,
+			'group'         => $group,
+			'group_label'   => $group_label,
+			'hook_name'     => $hook_name,
+			'priority'      => $priority,
 			'accepted_args' => $accepted_args,
 		);
 	}

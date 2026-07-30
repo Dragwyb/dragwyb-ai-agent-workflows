@@ -2,22 +2,22 @@
 /**
  * Webhooks admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Admin\WebhookActionsController;
-use WorkflowAutomate\Plugin\Admin\WebhooksListTable;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Admin\EmptyState;
+use AIAWAB\Plugin\Admin\ListTableUi;
+use AIAWAB\Plugin\Admin\WebhookActionsController;
+use AIAWAB\Plugin\Admin\WebhooksListTable;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,9 +42,9 @@ class WebhooksPage implements AdminPage {
 	private WebhookActionsController $webhookActions;
 
 	public function __construct( WebhookService $webhooks, WorkflowService $workflows, SettingsService $settings, WebhookActionsController $webhookActions ) {
-		$this->webhooks = $webhooks;
-		$this->workflows = $workflows;
-		$this->settings = $settings;
+		$this->webhooks       = $webhooks;
+		$this->workflows      = $workflows;
+		$this->settings       = $settings;
 		$this->webhookActions = $webhookActions;
 	}
 
@@ -130,8 +130,8 @@ class WebhooksPage implements AdminPage {
 				array(),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ),
-						'label' => __( 'Add webhook', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ),
+						'label'   => __( 'Add webhook', 'workflow-automate' ),
 						'primary' => true,
 					),
 				)
@@ -161,25 +161,25 @@ class WebhooksPage implements AdminPage {
 	 */
 	private function notices(): array {
 		return array(
-			'created' => array(
+			'created'      => array(
 				'message' => __( 'Webhook created.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'updated' => array(
+			'updated'      => array(
 				'message' => __( 'Webhook updated.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'deleted' => array(
+			'deleted'      => array(
 				'message' => __( 'Webhook deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
 				'message' => __( 'Selected webhooks deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'error' => array(
+			'error'        => array(
 				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 	}
@@ -189,7 +189,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

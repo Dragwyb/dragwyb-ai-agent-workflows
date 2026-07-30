@@ -2,12 +2,12 @@
 /**
  * Builds / validates structured JSON for AI Agent output parsers.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,7 +59,7 @@ Respond with JSON only — no markdown fences.';
 
 		/** @var array<string, mixed> $schema */
 		$auto_fix = ! array_key_exists( 'auto_fix', $config ) || ! empty( $config['auto_fix'] );
-		$retry      = self::DEFAULT_RETRY_PROMPT;
+		$retry    = self::DEFAULT_RETRY_PROMPT;
 
 		if ( $auto_fix && ! empty( $config['customize_retry_prompt'] ) ) {
 			$custom = isset( $config['retry_prompt'] ) ? trim( (string) $config['retry_prompt'] ) : '';
@@ -71,7 +71,7 @@ Respond with JSON only — no markdown fences.';
 
 		return array(
 			'schema'       => $schema,
-			'auto_fix'    => $auto_fix,
+			'auto_fix'     => $auto_fix,
 			'retry_prompt' => $retry,
 			'instructions' => $this->buildInstructions( $schema ),
 		);
@@ -149,9 +149,9 @@ Respond with JSON only — no markdown fences.';
 			$required   = array();
 
 			foreach ( $value as $key => $child ) {
-				$key_string = (string) $key;
+				$key_string                = (string) $key;
 				$properties[ $key_string ] = $this->schemaFromExample( $child );
-				$required[] = $key_string;
+				$required[]                = $key_string;
 			}
 
 			return array(
@@ -284,7 +284,7 @@ Respond with JSON only — no markdown fences.';
 				$properties = isset( $schema['properties'] ) && is_array( $schema['properties'] )
 					? $schema['properties']
 					: array();
-				$required = isset( $schema['required'] ) && is_array( $schema['required'] )
+				$required   = isset( $schema['required'] ) && is_array( $schema['required'] )
 					? $schema['required']
 					: array();
 
@@ -322,7 +322,10 @@ Respond with JSON only — no markdown fences.';
 					}
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'array':
 				if ( ! is_array( $data ) || ! $this->isListArray( $data ) ) {
@@ -346,7 +349,10 @@ Respond with JSON only — no markdown fences.';
 					}
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'string':
 				if ( ! is_string( $data ) ) {
@@ -360,7 +366,10 @@ Respond with JSON only — no markdown fences.';
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'integer':
 				if ( ! is_int( $data ) && ! ( is_string( $data ) && ctype_digit( $data ) ) ) {
@@ -374,7 +383,10 @@ Respond with JSON only — no markdown fences.';
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'number':
 				if ( ! is_int( $data ) && ! is_float( $data ) && ! is_numeric( $data ) ) {
@@ -388,7 +400,10 @@ Respond with JSON only — no markdown fences.';
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'boolean':
 				if ( ! is_bool( $data ) ) {
@@ -402,7 +417,10 @@ Respond with JSON only — no markdown fences.';
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'null':
 				if ( null !== $data ) {
@@ -416,10 +434,16 @@ Respond with JSON only — no markdown fences.';
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			default:
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 		}
 	}
 

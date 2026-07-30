@@ -2,14 +2,14 @@
 /**
  * Worksheet-level Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions;
+namespace AIAWAB\Plugin\Integration\GoogleSheet\Actions;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,11 +32,11 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => array(
-				'type' => 'string',
-				'label' => __( 'New sheet tab name', 'workflow-automate' ),
+			'sheet_title'    => array(
+				'type'     => 'string',
+				'label'    => __( 'New sheet tab name', 'workflow-automate' ),
 				'required' => true,
 			),
 		);
@@ -62,7 +62,7 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $sheet_title ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Sheet tab name is required.', 'workflow-automate' ),
+				'error'   => __( 'Sheet tab name is required.', 'workflow-automate' ),
 			);
 		}
 
@@ -86,16 +86,16 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'title' => array(
-				'type' => 'string',
-				'label' => __( 'Sheet title to find', 'workflow-automate' ),
+			'title'          => array(
+				'type'     => 'string',
+				'label'    => __( 'Sheet title to find', 'workflow-automate' ),
 				'required' => true,
 			),
-			'exact_match' => array(
-				'type' => 'boolean',
-				'label' => __( 'Exact match', 'workflow-automate' ),
+			'exact_match'    => array(
+				'type'    => 'boolean',
+				'label'   => __( 'Exact match', 'workflow-automate' ),
 				'default' => false,
 			),
 		);
@@ -121,7 +121,7 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Sheet title is required.', 'workflow-automate' ),
+				'error'   => __( 'Sheet title is required.', 'workflow-automate' ),
 			);
 		}
 
@@ -151,12 +151,12 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
-			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
+			'connection_id'              => $this->connectionField(),
+			'spreadsheet_id'             => $this->spreadsheetIdField(),
+			'sheet_title'                => $this->sheetTitleField(),
 			'destination_spreadsheet_id' => array(
-				'type' => 'string',
-				'label' => __( 'Destination spreadsheet ID', 'workflow-automate' ),
+				'type'     => 'string',
+				'label'    => __( 'Destination spreadsheet ID', 'workflow-automate' ),
 				'required' => true,
 			),
 		);
@@ -182,7 +182,7 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $destination ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Destination spreadsheet ID is required.', 'workflow-automate' ),
+				'error'   => __( 'Destination spreadsheet ID is required.', 'workflow-automate' ),
 			);
 		}
 
@@ -212,9 +212,9 @@ final class GoogleSheetsDeleteSheetAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
+			'sheet_title'    => $this->sheetTitleField(),
 		);
 	}
 
@@ -255,12 +255,12 @@ final class GoogleSheetsClearSheetAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
-			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
+			'connection_id'        => $this->connectionField(),
+			'spreadsheet_id'       => $this->spreadsheetIdField(),
+			'sheet_title'          => $this->sheetTitleField(),
 			'is_first_row_headers' => array(
-				'type' => 'boolean',
-				'label' => __( 'Keep first row as headers', 'workflow-automate' ),
+				'type'    => 'boolean',
+				'label'   => __( 'Keep first row as headers', 'workflow-automate' ),
 				'default' => false,
 			),
 		);
@@ -307,12 +307,12 @@ final class GoogleSheetsExportSheetAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'sheet_title' => $this->sheetTitleField(),
-			'format' => array(
-				'type' => 'string',
-				'label' => __( 'Export format (csv, pdf, xlsx)', 'workflow-automate' ),
+			'sheet_title'    => $this->sheetTitleField(),
+			'format'         => array(
+				'type'    => 'string',
+				'label'   => __( 'Export format (csv, pdf, xlsx)', 'workflow-automate' ),
 				'default' => 'csv',
 			),
 		);

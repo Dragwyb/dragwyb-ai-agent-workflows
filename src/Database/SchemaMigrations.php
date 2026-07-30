@@ -2,21 +2,21 @@
 /**
  * Ordered list of all schema migrations.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database;
+namespace AIAWAB\Plugin\Database;
 
-use WorkflowAutomate\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
-use WorkflowAutomate\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
-use WorkflowAutomate\Plugin\Database\Migrations\CreateConnectionsTable;
-use WorkflowAutomate\Plugin\Database\Migrations\CreateWebhooksTable;
-use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowNodesTable;
-use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
-use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowRunsTable;
-use WorkflowAutomate\Plugin\Database\Migrations\CreateWorkflowsTable;
+use AIAWAB\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
+use AIAWAB\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
+use AIAWAB\Plugin\Database\Migrations\CreateConnectionsTable;
+use AIAWAB\Plugin\Database\Migrations\CreateWebhooksTable;
+use AIAWAB\Plugin\Database\Migrations\CreateWorkflowNodesTable;
+use AIAWAB\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
+use AIAWAB\Plugin\Database\Migrations\CreateWorkflowRunsTable;
+use AIAWAB\Plugin\Database\Migrations\CreateWorkflowsTable;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

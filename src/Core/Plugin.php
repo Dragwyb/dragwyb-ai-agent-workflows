@@ -2,66 +2,66 @@
 /**
  * Main plugin bootstrap class.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace AIAWAB\Plugin\Core;
 
-use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
-use WorkflowAutomate\Plugin\Admin\GoogleOAuthStartController;
-use WorkflowAutomate\Plugin\Admin\Menu;
-use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
-use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
-use WorkflowAutomate\Plugin\Admin\Pages\WebhookFormPage;
-use WorkflowAutomate\Plugin\Admin\Pages\WebhooksPage;
-use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
-use WorkflowAutomate\Plugin\Admin\RunActionsController;
-use WorkflowAutomate\Plugin\Admin\SettingsController;
-use WorkflowAutomate\Plugin\Admin\WebhookActionsController;
-use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
-use WorkflowAutomate\Plugin\Database\MigrationRunner;
-use WorkflowAutomate\Plugin\Database\SchemaMigrations;
-use WorkflowAutomate\Plugin\Integration\BuiltInNodeTypes;
-use WorkflowAutomate\Plugin\Integration\WorkflowTriggerBinder;
-use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Rest\RestApi;
-use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
-use WorkflowAutomate\Plugin\Service\Agent\AgentService;
-use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
-use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
-use WorkflowAutomate\Plugin\Service\BackgroundRunner;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
-use WorkflowAutomate\Plugin\Service\NodeExecutionService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
-use WorkflowAutomate\Plugin\Provider\PersistenceServiceProvider;
-use WorkflowAutomate\Plugin\Provider\AdminServiceProvider;
-use WorkflowAutomate\Plugin\Provider\RestServiceProvider;
-use WorkflowAutomate\Plugin\Provider\ExecutionServiceProvider;
+use AIAWAB\Plugin\Admin\ConnectionActionsController;
+use AIAWAB\Plugin\Admin\GoogleOAuthStartController;
+use AIAWAB\Plugin\Admin\Menu;
+use AIAWAB\Plugin\Admin\Pages\BuilderPage;
+use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWAB\Plugin\Admin\Pages\ConnectionsPage;
+use AIAWAB\Plugin\Admin\Pages\RunDetailPage;
+use AIAWAB\Plugin\Admin\Pages\RunsPage;
+use AIAWAB\Plugin\Admin\Pages\SettingsPage;
+use AIAWAB\Plugin\Admin\Pages\WebhookFormPage;
+use AIAWAB\Plugin\Admin\Pages\WebhooksPage;
+use AIAWAB\Plugin\Admin\Pages\WorkflowsPage;
+use AIAWAB\Plugin\Admin\RunActionsController;
+use AIAWAB\Plugin\Admin\SettingsController;
+use AIAWAB\Plugin\Admin\WebhookActionsController;
+use AIAWAB\Plugin\Admin\WorkflowActionsController;
+use AIAWAB\Plugin\Database\MigrationRunner;
+use AIAWAB\Plugin\Database\SchemaMigrations;
+use AIAWAB\Plugin\Integration\BuiltInNodeTypes;
+use AIAWAB\Plugin\Integration\WorkflowTriggerBinder;
+use AIAWAB\Plugin\Persistence\ConnectionRepository;
+use AIAWAB\Plugin\Persistence\WebhookRepository;
+use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Rest\RestApi;
+use AIAWAB\Plugin\Service\Agent\AgentAiClient;
+use AIAWAB\Plugin\Service\Agent\AgentService;
+use AIAWAB\Plugin\Service\Agent\AgentToolExecutor;
+use AIAWAB\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWAB\Plugin\Service\AiModelsService;
+use AIAWAB\Plugin\Service\BackgroundRunner;
+use AIAWAB\Plugin\Service\ChatMessageService;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\ConnectionVerifier;
+use AIAWAB\Plugin\Service\ElementorFormsService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Service\NodeExecutionService;
+use AIAWAB\Plugin\Service\NodeTypeRegistry;
+use AIAWAB\Plugin\Service\RunRetentionService;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
+use AIAWAB\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Service\WorkflowNodeTestService;
+use AIAWAB\Plugin\Service\WorkflowTestListenerService;
+use AIAWAB\Plugin\Provider\PersistenceServiceProvider;
+use AIAWAB\Plugin\Provider\AdminServiceProvider;
+use AIAWAB\Plugin\Provider\RestServiceProvider;
+use AIAWAB\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

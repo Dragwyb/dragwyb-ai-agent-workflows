@@ -2,16 +2,16 @@
 /**
  * Workflow builder admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,7 +90,7 @@ class BuilderPage implements AdminPage {
 			return;
 		}
 
-		$asset = require $asset_file;
+		$asset   = require $asset_file;
 		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
 		// Bust browser caches when the built bundle changes on disk.
 		$built_js = WFA_PLUGIN_DIR . 'assets/builder/build/index.js';
@@ -141,12 +141,12 @@ class BuilderPage implements AdminPage {
 		$workflow_id = isset( $_GET['workflow'] ) ? absint( wp_unslash( $_GET['workflow'] ) ) : 0;
 
 		return array(
-			'workflowId' => $workflow_id,
+			'workflowId'             => $workflow_id,
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
-			'listUrl' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-			'connectionsUrl' => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
-			'aiCredentialsUrl' => \WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
-			'googleCredentialsUrl' => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
+			'listUrl'                => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
+			'aiCredentialsUrl'       => \AIAWAB\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
 			'googleOAuthCallbackUrl' => rest_url( 'wfa/v1/oauth/google/callback' ),
 		);
 	}

@@ -2,19 +2,19 @@
 /**
  * Starts the Google OAuth authorization redirect from wp-admin.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\ConnectionAuthTypes;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,7 +70,7 @@ class GoogleOAuthStartController {
 			$return_url = isset( $_GET['return_url'] ) ? esc_url_raw( wp_unslash( $_GET['return_url'] ) ) : '';
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- opaque builder node id.
 			$node_id = isset( $_GET['node_id'] ) ? sanitize_text_field( wp_unslash( $_GET['node_id'] ) ) : '';
-			$url = $this->google_oauth->buildAuthorizeUrl( $connection, $return_url, $node_id );
+			$url     = $this->google_oauth->buildAuthorizeUrl( $connection, $return_url, $node_id );
 		} catch ( RuntimeException $exception ) {
 			$this->redirectWithError( $connection_id, $exception->getMessage() );
 		}
@@ -87,9 +87,9 @@ class GoogleOAuthStartController {
 	 */
 	private function redirectWithError( int $connection_id, string $message ): void {
 		$args = array(
-			'page' => ConnectionFormPage::SLUG,
+			'page'       => ConnectionFormPage::SLUG,
 			'wfa_notice' => 'error',
-			'wfa_error' => $message,
+			'wfa_error'  => $message,
 		);
 
 		if ( $connection_id > 0 ) {

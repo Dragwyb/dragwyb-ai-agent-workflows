@@ -2,12 +2,12 @@
 /**
  * Anthropic Claude Messages API action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace AIAWAB\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

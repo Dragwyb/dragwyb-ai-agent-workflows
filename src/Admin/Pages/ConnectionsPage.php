@@ -2,21 +2,21 @@
 /**
  * Connections admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
-use WorkflowAutomate\Plugin\Admin\ConnectionsListTable;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Admin\ConnectionActionsController;
+use AIAWAB\Plugin\Admin\ConnectionsListTable;
+use AIAWAB\Plugin\Admin\EmptyState;
+use AIAWAB\Plugin\Admin\ListTableUi;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,8 +44,8 @@ class ConnectionsPage implements AdminPage {
 	private ConnectionActionsController $connectionActions;
 
 	public function __construct( ConnectionService $connections, SettingsService $settings, ConnectionActionsController $connectionActions ) {
-		$this->connections = $connections;
-		$this->settings = $settings;
+		$this->connections       = $connections;
+		$this->settings          = $settings;
 		$this->connectionActions = $connectionActions;
 	}
 
@@ -127,8 +127,8 @@ class ConnectionsPage implements AdminPage {
 				array(),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ),
-						'label' => __( 'Add connection', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ),
+						'label'   => __( 'Add connection', 'workflow-automate' ),
 						'primary' => true,
 					),
 				)
@@ -161,25 +161,25 @@ class ConnectionsPage implements AdminPage {
 	 */
 	private function notices(): array {
 		return array(
-			'created' => array(
+			'created'      => array(
 				'message' => __( 'Connection created.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'updated' => array(
+			'updated'      => array(
 				'message' => __( 'Connection updated.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'deleted' => array(
+			'deleted'      => array(
 				'message' => __( 'Connection deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
 				'message' => __( 'Selected connections deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'error' => array(
+			'error'        => array(
 				'message' => __( 'That connection action could not be completed. Double-check the required fields and try again.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 	}
@@ -189,7 +189,7 @@ class ConnectionsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

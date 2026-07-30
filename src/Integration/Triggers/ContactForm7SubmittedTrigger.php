@@ -2,14 +2,14 @@
 /**
  * Contact Form 7 submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace AIAWAB\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,8 +49,8 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'string',
-				'label' => __( 'Form ID (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'string',
+				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'workflow-automate' ),
 				'default' => '',
 			),
 		);
@@ -121,11 +121,11 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'contact-form-7',
-			'event' => 'form_submitted',
-			'form_id' => $form_id,
+			'source'     => 'contact-form-7',
+			'event'      => 'form_submitted',
+			'form_id'    => $form_id,
 			'form_title' => $form_title,
-			'fields' => $fields,
+			'fields'     => $fields,
 		);
 	}
 }

@@ -2,19 +2,19 @@
 /**
  * Webhook application service.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Encryption;
-use WorkflowAutomate\Plugin\Domain\Webhook;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
+use AIAWAB\Plugin\Core\Encryption;
+use AIAWAB\Plugin\Domain\Webhook;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Persistence\WebhookRepository;
 use WP_Error;
 
 // Prevent direct file access.
@@ -52,10 +52,10 @@ class WebhookService {
 		WorkflowExecutionService $executor,
 		SettingsService $settings
 	) {
-		$this->webhooks = $webhooks;
+		$this->webhooks  = $webhooks;
 		$this->workflows = $workflows;
-		$this->executor = $executor;
-		$this->settings = $settings;
+		$this->executor  = $executor;
+		$this->settings  = $settings;
 	}
 
 	/**
@@ -77,7 +77,7 @@ class WebhookService {
 			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
 		}
 
-		$ip_allow_list = $this->normalizeIpAllowList( $ip_allow_list );
+		$ip_allow_list  = $this->normalizeIpAllowList( $ip_allow_list );
 		$signing_secret = null === $signing_secret ? '' : trim( $signing_secret );
 
 		// Site-wide "require signing" means every webhook must have a
@@ -93,10 +93,10 @@ class WebhookService {
 
 		$webhook = $this->webhooks->insert(
 			array(
-				'workflow_id' => $workflow_id,
-				'public_id' => wp_generate_uuid4(),
+				'workflow_id'    => $workflow_id,
+				'public_id'      => wp_generate_uuid4(),
 				'signing_secret' => '' === $signing_secret ? '' : Encryption::encrypt( $signing_secret ),
-				'ip_allow_list' => $ip_allow_list,
+				'ip_allow_list'  => $ip_allow_list,
 			)
 		);
 
@@ -139,11 +139,11 @@ class WebhookService {
 			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
 		}
 
-		$ip_allow_list = $this->normalizeIpAllowList( $ip_allow_list );
+		$ip_allow_list  = $this->normalizeIpAllowList( $ip_allow_list );
 		$signing_secret = null === $signing_secret ? '' : trim( $signing_secret );
 
 		$attributes = array(
-			'workflow_id' => $workflow_id,
+			'workflow_id'   => $workflow_id,
 			'ip_allow_list' => $ip_allow_list,
 		);
 
@@ -227,7 +227,7 @@ class WebhookService {
 		if ( ! $webhook->hasSigningSecret() ) {
 			return array(
 				'configured' => false,
-				'display' => '',
+				'display'    => '',
 			);
 		}
 
@@ -236,13 +236,13 @@ class WebhookService {
 		if ( null === $plaintext ) {
 			return array(
 				'configured' => true,
-				'display' => __( '(unable to decrypt — please re-enter this value)', 'workflow-automate' ),
+				'display'    => __( '(unable to decrypt — please re-enter this value)', 'workflow-automate' ),
 			);
 		}
 
 		return array(
 			'configured' => true,
-			'display' => self::mask( $plaintext ),
+			'display'    => self::mask( $plaintext ),
 		);
 	}
 
@@ -378,7 +378,7 @@ class WebhookService {
 			}
 
 			if ( preg_match( '/^(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})$/', $entry, $matches ) ) {
-				$ip = $matches[1];
+				$ip     = $matches[1];
 				$prefix = (int) $matches[2];
 
 				if ( false !== filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) && $prefix >= 0 && $prefix <= 32 ) {
@@ -433,9 +433,9 @@ class WebhookService {
 			return false;
 		}
 
-		$prefix = (int) $matches[2];
-		$mask = $prefix > 0 ? ( ~0 << ( 32 - $prefix ) ) : 0;
-		$ip_long = ip2long( $ip );
+		$prefix       = (int) $matches[2];
+		$mask         = $prefix > 0 ? ( ~0 << ( 32 - $prefix ) ) : 0;
+		$ip_long      = ip2long( $ip );
 		$network_long = ip2long( $matches[1] );
 
 		if ( false === $ip_long || false === $network_long ) {
@@ -474,14 +474,14 @@ class WebhookService {
 	 */
 	private function buildPayload( string $raw_body, string $client_ip ): array {
 		$decoded = json_decode( $raw_body, true );
-		$body = ( JSON_ERROR_NONE === json_last_error() && ( is_array( $decoded ) || is_object( $decoded ) ) )
+		$body    = ( JSON_ERROR_NONE === json_last_error() && ( is_array( $decoded ) || is_object( $decoded ) ) )
 			? $decoded
 			: array( 'raw' => $raw_body );
 
 		return array(
-			'source' => 'webhook',
+			'source'    => 'webhook',
 			'client_ip' => $client_ip,
-			'body' => $body,
+			'body'      => $body,
 		);
 	}
 

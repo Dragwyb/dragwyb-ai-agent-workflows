@@ -2,14 +2,14 @@
 /**
  * Registers all WordPress workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace AIAWAB\Plugin\Integration\WordPress;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,7 +27,7 @@ final class WordPressActionRegistrar {
 	 */
 	public static function all(): array {
 		$services = new WordPressServices();
-		$actions = array();
+		$actions  = array();
 
 		foreach ( WordPressActionCatalog::definitions() as $definition ) {
 			$actions[] = new WordPressCatalogAction( $definition, $services );

@@ -2,14 +2,14 @@
 /**
  * Renders a WorkflowRun status as a small colored badge.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
+use AIAWAB\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

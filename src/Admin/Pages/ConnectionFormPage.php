@@ -2,19 +2,19 @@
 /**
  * Connection create/edit admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\Connection;
+use AIAWAB\Plugin\Service\ConnectionAuthTypes;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -329,7 +329,7 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderFieldRow( string $field, string $label, bool $secret, string $current, bool $configured ): void {
 		$input_type = $secret ? 'password' : 'text';
-		$input_id = 'wfa-connection-field-' . $field;
+		$input_id   = 'wfa-connection-field-' . $field;
 
 		echo '<tr><th scope="row"><label for="' . esc_attr( $input_id ) . '">' . esc_html( $label ) . '</label></th><td>';
 
@@ -371,9 +371,9 @@ class ConnectionFormPage implements AdminPage {
 			),
 			array(
 				'a' => array(
-					'href' => true,
+					'href'   => true,
 					'target' => true,
-					'rel' => true,
+					'rel'    => true,
 				),
 			)
 		);
@@ -425,7 +425,7 @@ class ConnectionFormPage implements AdminPage {
 		$url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action' => 'wfa_google_oauth_authorize',
+					'action'        => 'wfa_google_oauth_authorize',
 					'connection_id' => $connection->id(),
 				),
 				admin_url( 'admin-post.php' )
@@ -451,17 +451,17 @@ class ConnectionFormPage implements AdminPage {
 		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 
 		$notices = array(
-			'created_oauth' => array(
+			'created_oauth'   => array(
 				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
 			'oauth_connected' => array(
 				'message' => __( 'Google account connected successfully.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'error' => array(
+			'error'           => array(
 				'message' => __( 'That connection action could not be completed.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 

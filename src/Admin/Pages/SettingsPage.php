@@ -2,16 +2,16 @@
 /**
  * Settings admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -152,18 +152,18 @@ class SettingsPage implements AdminPage {
 	 */
 	private function renderTabs( string $current ): void {
 		$labels = array(
-			'general' => __( 'General', 'workflow-automate' ),
+			'general'   => __( 'General', 'workflow-automate' ),
 			'retention' => __( 'Logging & Retention', 'workflow-automate' ),
-			'advanced' => __( 'Advanced', 'workflow-automate' ),
+			'advanced'  => __( 'Advanced', 'workflow-automate' ),
 		);
 
 		echo '<h2 class="nav-tab-wrapper">';
 
 		foreach ( $labels as $tab => $label ) {
-			$url = add_query_arg(
+			$url   = add_query_arg(
 				array(
 					'page' => self::SLUG,
-					'tab' => $tab,
+					'tab'  => $tab,
 				),
 				admin_url( 'admin.php' )
 			);
@@ -179,7 +179,7 @@ class SettingsPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderGeneralTab(): void {
-		$on_failure = $this->settings->onNodeFailure();
+		$on_failure  = $this->settings->onNodeFailure();
 		$display_utc = $this->settings->displayTimestampsInUtc();
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
@@ -266,9 +266,9 @@ class SettingsPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderAdvancedTab(): void {
-		$background_enabled = $this->settings->backgroundExecutionEnabled();
+		$background_enabled      = $this->settings->backgroundExecutionEnabled();
 		$require_webhook_signing = $this->settings->requireWebhookSigning();
-		$remove_data = $this->settings->removeDataOnUninstall();
+		$remove_data             = $this->settings->removeDataOnUninstall();
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
 		echo '<input type="hidden" name="action" value="wfa_settings_action" />';
@@ -332,19 +332,19 @@ class SettingsPage implements AdminPage {
 	 */
 	private function notices(): array {
 		return array(
-			'saved' => array(
+			'saved'  => array(
 				'message' => __( 'Settings saved.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
 			// The generic message here is only a fallback; renderNotice()
 			// always replaces it with a count-specific one via _n().
 			'purged' => array(
 				'message' => __( 'Old runs purged.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'error' => array(
+			'error'  => array(
 				'message' => __( 'Your settings could not be saved.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 	}
@@ -354,7 +354,7 @@ class SettingsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {
@@ -365,7 +365,7 @@ class SettingsPage implements AdminPage {
 
 		if ( 'purged' === $key ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display count; not used for any decision, only appended to a message.
-			$count = isset( $_GET['count'] ) ? absint( wp_unslash( $_GET['count'] ) ) : 0;
+			$count   = isset( $_GET['count'] ) ? absint( wp_unslash( $_GET['count'] ) ) : 0;
 			$message = sprintf(
 				/* translators: %d: number of runs deleted. */
 				_n( 'Purged %d old run.', 'Purged %d old runs.', $count, 'workflow-automate' ),

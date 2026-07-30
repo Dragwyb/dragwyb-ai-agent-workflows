@@ -2,20 +2,20 @@
 /**
  * Registers persistence repositories against the container.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace AIAWAB\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
-use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Core\Container;
+use AIAWAB\Plugin\Persistence\ConnectionRepository;
+use AIAWAB\Plugin\Persistence\WebhookRepository;
+use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

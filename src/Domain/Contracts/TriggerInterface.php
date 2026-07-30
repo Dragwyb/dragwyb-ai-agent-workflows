@@ -2,12 +2,12 @@
 /**
  * Trigger node type contract.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain\Contracts;
+namespace AIAWAB\Plugin\Domain\Contracts;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

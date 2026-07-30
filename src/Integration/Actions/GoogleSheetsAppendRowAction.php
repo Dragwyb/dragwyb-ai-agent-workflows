@@ -2,14 +2,14 @@
 /**
  * Google Sheets append row action (legacy slug).
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace AIAWAB\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,14 +36,14 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'range' => array(
-				'type' => 'string',
-				'label' => __( 'Range / tab (e.g. Sheet1!A1)', 'workflow-automate' ),
+			'range'          => array(
+				'type'    => 'string',
+				'label'   => __( 'Range / tab (e.g. Sheet1!A1)', 'workflow-automate' ),
 				'default' => 'Sheet1!A1',
 			),
-			'values' => $this->valuesField(),
+			'values'         => $this->valuesField(),
 		);
 	}
 
@@ -67,7 +67,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'workflow-automate' ),
 			);
 		}
 

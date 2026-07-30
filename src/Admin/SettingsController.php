@@ -2,17 +2,17 @@
 /**
  * Handles state-changing Settings admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Admin\Pages\SettingsPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\RunRetentionService;
+use AIAWAB\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class SettingsController {
 	private RunRetentionService $retention;
 
 	public function __construct( SettingsService $settings, RunRetentionService $retention ) {
-		$this->settings = $settings;
+		$this->settings  = $settings;
 		$this->retention = $retention;
 	}
 
@@ -158,10 +158,10 @@ class SettingsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => SettingsPage::SLUG,
-					'tab' => 'retention',
+					'page'       => SettingsPage::SLUG,
+					'tab'        => 'retention',
 					'wfa_notice' => 'purged',
-					'count' => $count,
+					'count'      => $count,
 				),
 				admin_url( 'admin.php' )
 			)
@@ -181,8 +181,8 @@ class SettingsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => SettingsPage::SLUG,
-					'tab' => $tab,
+					'page'       => SettingsPage::SLUG,
+					'tab'        => $tab,
 					'wfa_notice' => $notice,
 				),
 				admin_url( 'admin.php' )

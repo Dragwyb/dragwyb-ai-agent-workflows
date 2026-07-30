@@ -2,12 +2,12 @@
 /**
  * Shared helpers for WordPress workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace AIAWAB\Plugin\Integration\WordPress;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ final class WordPressActionHelper {
 	public static function ok( $data = array(), array $extra = array() ): array {
 		$response = array(
 			'success' => true,
-			'data' => $data,
+			'data'    => $data,
 		);
 
 		return array() === $extra ? $response : array_merge( $response, $extra );
@@ -54,7 +54,7 @@ final class WordPressActionHelper {
 	public static function fail( string $error ): array {
 		return array(
 			'success' => false,
-			'error' => $error,
+			'error'   => $error,
 		);
 	}
 
@@ -104,11 +104,11 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * @param null|string             $postType Post type slug, or null for any.
-	 * @param null|array<int, mixed>  $metaQuery WP_Query meta_query clauses.
-	 * @param null|string             $search    Free-text search term.
-	 * @param string                  $status    Post status (default 'any').
-	 * @param int|null                $limit     Max posts (default DEFAULT_LIST_LIMIT).
+	 * @param null|string            $postType Post type slug, or null for any.
+	 * @param null|array<int, mixed> $metaQuery WP_Query meta_query clauses.
+	 * @param null|string            $search    Free-text search term.
+	 * @param string                 $status    Post status (default 'any').
+	 * @param int|null               $limit     Max posts (default DEFAULT_LIST_LIMIT).
 	 *
 	 * @return \WP_Post[]
 	 */
@@ -145,9 +145,9 @@ final class WordPressActionHelper {
 	 */
 	public static function getComments( ?int $postId = null, ?int $userId = null, ?string $email = null, ?int $limit = null ): array {
 		$args = array(
-			'order'   => 'ASC',
-			'number'  => self::resolveListLimit( $limit ),
-			'status'  => 'approve',
+			'order'  => 'ASC',
+			'number' => self::resolveListLimit( $limit ),
+			'status' => 'approve',
 		);
 
 		if ( ! empty( $postId ) ) {
@@ -291,8 +291,8 @@ final class WordPressActionHelper {
 	 */
 	public static function getTerms( ?string $taxonomy = null ): array {
 		$args = array(
-			'taxonomy' => empty( $taxonomy ) ? get_taxonomies( array( 'public' => true ) ) : $taxonomy,
-			'orderby' => 'term_id',
+			'taxonomy'   => empty( $taxonomy ) ? get_taxonomies( array( 'public' => true ) ) : $taxonomy,
+			'orderby'    => 'term_id',
 			'hide_empty' => false,
 		);
 
@@ -319,14 +319,14 @@ final class WordPressActionHelper {
 	 */
 	public static function mapUserFields( array $config ): array {
 		$fields = array(
-			'username' => 'user_login',
-			'email' => 'user_email',
-			'nickname' => 'nickname',
+			'username'     => 'user_login',
+			'email'        => 'user_email',
+			'nickname'     => 'nickname',
 			'display_name' => 'display_name',
-			'first_name' => 'first_name',
-			'last_name' => 'last_name',
-			'user_url' => 'user_url',
-			'description' => 'description',
+			'first_name'   => 'first_name',
+			'last_name'    => 'last_name',
+			'user_url'     => 'user_url',
+			'description'  => 'description',
 		);
 
 		$mapped = array();
@@ -349,18 +349,18 @@ final class WordPressActionHelper {
 	 */
 	public static function mapPostFields( array $config ): array {
 		$fields = array(
-			'post_id' => 'ID',
-			'title' => 'post_title',
-			'content' => 'post_content',
-			'excerpt' => 'post_excerpt',
-			'date' => 'post_date',
-			'date_gmt' => 'post_date_gmt',
-			'slug' => 'post_name',
-			'parent_id' => 'post_parent',
+			'post_id'       => 'ID',
+			'title'         => 'post_title',
+			'content'       => 'post_content',
+			'excerpt'       => 'post_excerpt',
+			'date'          => 'post_date',
+			'date_gmt'      => 'post_date_gmt',
+			'slug'          => 'post_name',
+			'parent_id'     => 'post_parent',
 			'post_password' => 'post_password',
-			'post_type' => 'post_type',
-			'post_status' => 'post_status',
-			'post_author' => 'post_author',
+			'post_type'     => 'post_type',
+			'post_status'   => 'post_status',
+			'post_author'   => 'post_author',
 		);
 
 		$mapped = array();
@@ -387,17 +387,17 @@ final class WordPressActionHelper {
 	 */
 	public static function mapCommentFields( array $config ): array {
 		return array(
-			'comment_post_ID' => isset( $config['post_id'] ) ? (int) $config['post_id'] : 0,
-			'comment_author' => $config['author_name'] ?? '',
+			'comment_post_ID'      => isset( $config['post_id'] ) ? (int) $config['post_id'] : 0,
+			'comment_author'       => $config['author_name'] ?? '',
 			'comment_author_email' => $config['author_email'] ?? '',
-			'comment_author_url' => $config['author_url'] ?? '',
-			'comment_content' => $config['comment'] ?? '',
-			'comment_type' => 'comment',
-			'comment_parent' => isset( $config['parent_id'] ) ? (int) $config['parent_id'] : 0,
-			'comment_author_IP' => '',
-			'comment_agent' => 'Workflow Automate',
-			'comment_date' => gmdate( 'Y-m-d H:i:s' ),
-			'comment_approved' => 1,
+			'comment_author_url'   => $config['author_url'] ?? '',
+			'comment_content'      => $config['comment'] ?? '',
+			'comment_type'         => 'comment',
+			'comment_parent'       => isset( $config['parent_id'] ) ? (int) $config['parent_id'] : 0,
+			'comment_author_IP'    => '',
+			'comment_agent'        => 'Workflow Automate',
+			'comment_date'         => gmdate( 'Y-m-d H:i:s' ),
+			'comment_approved'     => 1,
 		);
 	}
 
@@ -503,21 +503,21 @@ final class WordPressActionHelper {
 		}
 
 		$data = $user->data ?? $user;
-		$id = isset( $user->ID ) ? (int) $user->ID : 0;
+		$id   = isset( $user->ID ) ? (int) $user->ID : 0;
 
 		return array(
-			'id' => $id,
-			'username' => isset( $data->user_login ) ? (string) $data->user_login : '',
-			'email' => isset( $data->user_email ) ? (string) $data->user_email : '',
+			'id'           => $id,
+			'username'     => isset( $data->user_login ) ? (string) $data->user_login : '',
+			'email'        => isset( $data->user_email ) ? (string) $data->user_email : '',
 			'display_name' => isset( $data->display_name ) ? (string) $data->display_name : '',
-			'nickname' => isset( $user->nickname ) ? (string) $user->nickname : '',
-			'first_name' => isset( $user->first_name ) ? (string) $user->first_name : '',
-			'last_name' => isset( $user->last_name ) ? (string) $user->last_name : '',
-			'user_url' => isset( $data->user_url ) ? (string) $data->user_url : '',
-			'description' => isset( $user->description ) ? (string) $user->description : '',
-			'registered' => isset( $data->user_registered ) ? (string) $data->user_registered : '',
-			'roles' => isset( $user->roles ) && is_array( $user->roles ) ? array_values( $user->roles ) : array(),
-			'avatar_url' => $id > 0 ? (string) get_avatar_url( $id ) : '',
+			'nickname'     => isset( $user->nickname ) ? (string) $user->nickname : '',
+			'first_name'   => isset( $user->first_name ) ? (string) $user->first_name : '',
+			'last_name'    => isset( $user->last_name ) ? (string) $user->last_name : '',
+			'user_url'     => isset( $data->user_url ) ? (string) $data->user_url : '',
+			'description'  => isset( $user->description ) ? (string) $user->description : '',
+			'registered'   => isset( $data->user_registered ) ? (string) $data->user_registered : '',
+			'roles'        => isset( $user->roles ) && is_array( $user->roles ) ? array_values( $user->roles ) : array(),
+			'avatar_url'   => $id > 0 ? (string) get_avatar_url( $id ) : '',
 		);
 	}
 
@@ -528,7 +528,7 @@ final class WordPressActionHelper {
 	 * @return array<string, mixed>
 	 */
 	public static function serializePost( \WP_Post $post, bool $full_content = true ): array {
-		$content = (string) $post->post_content;
+		$content           = (string) $post->post_content;
 		$content_truncated = false;
 
 		if ( ! $full_content && strlen( $content ) > 800 ) {
@@ -539,23 +539,23 @@ final class WordPressActionHelper {
 		$thumb_id = (int) get_post_thumbnail_id( $post );
 
 		return array(
-			'id'                => (int) $post->ID,
-			'title'             => (string) $post->post_title,
-			'content'           => $content,
-			'content_truncated' => $content_truncated,
-			'excerpt'           => (string) $post->post_excerpt,
-			'status'            => (string) $post->post_status,
-			'type'              => (string) $post->post_type,
-			'slug'              => (string) $post->post_name,
-			'date'              => (string) $post->post_date,
-			'date_gmt'          => (string) $post->post_date_gmt,
-			'author'            => (int) $post->post_author,
-			'parent_id'         => (int) $post->post_parent,
-			'permalink'         => (string) get_permalink( $post ),
-			'featured_image_id' => $thumb_id,
-			'featured_image_url'=> $thumb_id > 0 ? (string) wp_get_attachment_url( $thumb_id ) : '',
-			'categories'        => wp_get_post_categories( (int) $post->ID ),
-			'tags'              => wp_get_post_tags( (int) $post->ID, array( 'fields' => 'names' ) ),
+			'id'                 => (int) $post->ID,
+			'title'              => (string) $post->post_title,
+			'content'            => $content,
+			'content_truncated'  => $content_truncated,
+			'excerpt'            => (string) $post->post_excerpt,
+			'status'             => (string) $post->post_status,
+			'type'               => (string) $post->post_type,
+			'slug'               => (string) $post->post_name,
+			'date'               => (string) $post->post_date,
+			'date_gmt'           => (string) $post->post_date_gmt,
+			'author'             => (int) $post->post_author,
+			'parent_id'          => (int) $post->post_parent,
+			'permalink'          => (string) get_permalink( $post ),
+			'featured_image_id'  => $thumb_id,
+			'featured_image_url' => $thumb_id > 0 ? (string) wp_get_attachment_url( $thumb_id ) : '',
+			'categories'         => wp_get_post_categories( (int) $post->ID ),
+			'tags'               => wp_get_post_tags( (int) $post->ID, array( 'fields' => 'names' ) ),
 		);
 	}
 

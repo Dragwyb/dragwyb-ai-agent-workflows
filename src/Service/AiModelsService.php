@@ -2,14 +2,14 @@
 /**
  * Lists AI models via WordPress AI Client provider registry.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\AiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {

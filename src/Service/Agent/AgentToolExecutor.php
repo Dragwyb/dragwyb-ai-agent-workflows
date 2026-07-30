@@ -2,16 +2,16 @@
 /**
  * Executes an AI Agent tool call against a workflow action node.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
-use WorkflowAutomate\Plugin\Service\ConfigInterpolator;
-use WorkflowAutomate\Plugin\Service\NodeExecutionService;
+use AIAWAB\Plugin\Domain\WorkflowNode;
+use AIAWAB\Plugin\Service\ConfigInterpolator;
+use AIAWAB\Plugin\Service\NodeExecutionService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

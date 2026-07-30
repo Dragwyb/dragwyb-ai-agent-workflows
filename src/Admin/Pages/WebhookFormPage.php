@@ -2,20 +2,20 @@
 /**
  * Webhook create/edit admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Webhook;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\Webhook;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,9 +38,9 @@ class WebhookFormPage implements AdminPage {
 	private SettingsService $settings;
 
 	public function __construct( WebhookService $webhooks, WorkflowService $workflows, SettingsService $settings ) {
-		$this->webhooks = $webhooks;
+		$this->webhooks  = $webhooks;
 		$this->workflows = $workflows;
-		$this->settings = $settings;
+		$this->settings  = $settings;
 	}
 
 	/**
@@ -163,7 +163,7 @@ class WebhookFormPage implements AdminPage {
 	 */
 	private function renderEditForm( Webhook $webhook ): void {
 		$require_signing = $this->settings->requireWebhookSigning();
-		$secret_display = $this->webhooks->displaySigningSecret( $webhook );
+		$secret_display  = $this->webhooks->displaySigningSecret( $webhook );
 
 		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'workflow-automate' ) . ' <code class="wfa-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
 
@@ -191,7 +191,7 @@ class WebhookFormPage implements AdminPage {
 	private function renderWorkflowRow( int $selected_id ): void {
 		$workflows = $this->workflows->list(
 			array(
-				'page' => 1,
+				'page'     => 1,
 				'per_page' => 100,
 			)
 		);

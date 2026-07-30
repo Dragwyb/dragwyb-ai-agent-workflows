@@ -2,18 +2,18 @@
 /**
  * Connection application service.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Encryption;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
+use AIAWAB\Plugin\Core\Encryption;
+use AIAWAB\Plugin\Domain\Connection;
+use AIAWAB\Plugin\Persistence\ConnectionRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,7 +57,7 @@ class ConnectionService {
 	 */
 	public function create( string $integration_slug, string $auth_type, string $label, array $field_values ): Connection {
 		$integration_slug = sanitize_key( $integration_slug );
-		$label = trim( sanitize_text_field( $label ) );
+		$label            = trim( sanitize_text_field( $label ) );
 
 		if ( ! in_array( $auth_type, ConnectionAuthTypes::VALID, true ) ) {
 			throw new InvalidArgumentException( esc_html__( 'Unrecognized authentication type.', 'workflow-automate' ) );
@@ -75,7 +75,7 @@ class ConnectionService {
 		$plaintext = array();
 
 		foreach ( ConnectionAuthTypes::fields( $auth_type ) as $field => $meta ) {
-			$value = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
+			$value    = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
 			$required = ConnectionAuthTypes::isRequiredOnCreate( $auth_type, $field );
 
 			if ( $required && '' === $value ) {
@@ -86,7 +86,7 @@ class ConnectionService {
 				continue;
 			}
 
-			$plaintext[ $field ]  = $value;
+			$plaintext[ $field ] = $value;
 			$encrypted[ $field ] = Encryption::encrypt( $value );
 		}
 
@@ -95,10 +95,10 @@ class ConnectionService {
 		$connection = $this->connections->insert(
 			array(
 				'integration_slug' => $integration_slug,
-				'auth_type' => $auth_type,
-				'label' => $label,
-				'credentials' => $encrypted,
-				'status' => $status,
+				'auth_type'        => $auth_type,
+				'label'            => $label,
+				'credentials'      => $encrypted,
+				'status'           => $status,
 			)
 		);
 
@@ -144,8 +144,8 @@ class ConnectionService {
 		}
 
 		$encrypted = $connection->encryptedCredentials();
-		$plaintext   = array();
-		$rotated     = false;
+		$plaintext = array();
+		$rotated   = false;
 
 		foreach ( ConnectionAuthTypes::fields( $connection->authType() ) as $field => $meta ) {
 			$value = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
@@ -153,16 +153,16 @@ class ConnectionService {
 			if ( '' !== $value ) {
 				$encrypted[ $field ] = Encryption::encrypt( $value );
 				$plaintext[ $field ] = $value;
-				$rotated               = true;
+				$rotated             = true;
 				continue;
 			}
 
-			$existing = isset( $encrypted[ $field ] ) ? Encryption::decrypt( (string) $encrypted[ $field ] ) : null;
+			$existing            = isset( $encrypted[ $field ] ) ? Encryption::decrypt( (string) $encrypted[ $field ] ) : null;
 			$plaintext[ $field ] = null === $existing ? '' : (string) $existing;
 		}
 
 		$attributes = array(
-			'label' => $label,
+			'label'       => $label,
 			'credentials' => $encrypted,
 		);
 
@@ -235,7 +235,7 @@ class ConnectionService {
 			throw new RuntimeException( esc_html__( 'OAuth tokens can only be stored on OAuth connections.', 'workflow-automate' ) );
 		}
 
-		$encrypted = $connection->encryptedCredentials();
+		$encrypted                  = $connection->encryptedCredentials();
 		$encrypted['access_token']  = Encryption::encrypt( $access_token );
 		$encrypted['refresh_token'] = '' !== $refresh_token ? Encryption::encrypt( $refresh_token ) : ( $encrypted['refresh_token'] ?? '' );
 		$encrypted['expires_at']    = Encryption::encrypt( (string) $expires_at );
@@ -251,7 +251,7 @@ class ConnectionService {
 			$id,
 			array(
 				'credentials' => $encrypted,
-				'status' => $status,
+				'status'      => $status,
 			)
 		);
 
@@ -294,12 +294,12 @@ class ConnectionService {
 	 */
 	public function displayCredentials( Connection $connection ): array {
 		$encrypted = $connection->encryptedCredentials();
-		$result = array();
+		$result    = array();
 
 		foreach ( ConnectionAuthTypes::fields( $connection->authType() ) as $field => $meta ) {
 			$ciphertext = isset( $encrypted[ $field ] ) ? (string) $encrypted[ $field ] : '';
 			$configured = '' !== $ciphertext;
-			$display = '';
+			$display    = '';
 
 			if ( $configured ) {
 				$plaintext = Encryption::decrypt( $ciphertext );
@@ -314,10 +314,10 @@ class ConnectionService {
 			}
 
 			$result[ $field ] = array(
-				'label' => $meta['label'],
-				'secret' => ! empty( $meta['secret'] ),
+				'label'      => $meta['label'],
+				'secret'     => ! empty( $meta['secret'] ),
 				'configured' => $configured,
-				'display' => $display,
+				'display'    => $display,
 			);
 		}
 
@@ -395,7 +395,7 @@ class ConnectionService {
 				continue;
 			}
 
-			$decrypted = Encryption::decrypt( (string) $ciphertext );
+			$decrypted       = Encryption::decrypt( (string) $ciphertext );
 			$plain[ $field ] = null === $decrypted ? '' : (string) $decrypted;
 		}
 

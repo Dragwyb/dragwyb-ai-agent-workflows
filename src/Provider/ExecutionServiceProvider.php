@@ -2,34 +2,34 @@
 /**
  * Registers workflow execution services against the container.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace AIAWAB\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
-use WorkflowAutomate\Plugin\Service\Agent\AgentService;
-use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
-use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use WorkflowAutomate\Plugin\Service\BackgroundRunner;
-use WorkflowAutomate\Plugin\Service\NodeExecutionService;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use AIAWAB\Plugin\Core\Container;
+use AIAWAB\Plugin\Service\NodeTypeRegistry;
+use AIAWAB\Plugin\Persistence\WebhookRepository;
+use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Service\Agent\AgentAiClient;
+use AIAWAB\Plugin\Service\Agent\AgentService;
+use AIAWAB\Plugin\Service\Agent\AgentToolExecutor;
+use AIAWAB\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use AIAWAB\Plugin\Service\BackgroundRunner;
+use AIAWAB\Plugin\Service\NodeExecutionService;
+use AIAWAB\Plugin\Service\RunRetentionService;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
+use AIAWAB\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Service\WorkflowNodeTestService;
+use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

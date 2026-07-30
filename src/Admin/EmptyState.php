@@ -2,12 +2,12 @@
 /**
  * Shared empty-state markup for admin list screens.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,9 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class EmptyState {
 
 	/**
-	 * @param string               $title       Heading.
-	 * @param string               $description Supporting paragraph.
-	 * @param array<int, string>   $steps       Optional numbered guidance steps.
+	 * @param string                                                        $title       Heading.
+	 * @param string                                                        $description Supporting paragraph.
+	 * @param array<int, string>                                            $steps       Optional numbered guidance steps.
 	 * @param array<int, array{url: string, label: string, primary?: bool}> $actions CTA buttons.
 	 *
 	 * @return void

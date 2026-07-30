@@ -2,21 +2,21 @@
 /**
  * Connections REST controller (list + create for the builder).
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\Connection;
+use AIAWAB\Plugin\Service\AiModelsService;
+use AIAWAB\Plugin\Service\ConnectionAuthTypes;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -48,9 +48,9 @@ class ConnectionsController {
 	private GoogleOAuthService $google_oauth;
 
 	public function __construct( ConnectionService $connections, AiModelsService $ai_models, GoogleOAuthService $google_oauth ) {
-		$this->connections   = $connections;
-		$this->ai_models     = $ai_models;
-		$this->google_oauth  = $google_oauth;
+		$this->connections  = $connections;
+		$this->ai_models    = $ai_models;
+		$this->google_oauth = $google_oauth;
 	}
 
 	/**
@@ -64,33 +64,33 @@ class ConnectionsController {
 			self::ROUTE,
 			array(
 				array(
-					'methods' => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'getItems' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'getItems' ),
 					'permission_callback' => array( $this, 'permissionsCheck' ),
-					'args' => array(),
+					'args'                => array(),
 				),
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'createItem' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'createItem' ),
 					'permission_callback' => array( $this, 'createPermissionsCheck' ),
-					'args' => array(
-						'label' => array(
-							'type' => 'string',
-							'required' => true,
+					'args'                => array(
+						'label'            => array(
+							'type'              => 'string',
+							'required'          => true,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 						'integration_slug' => array(
-							'type' => 'string',
-							'required' => true,
+							'type'              => 'string',
+							'required'          => true,
 							'sanitize_callback' => 'sanitize_key',
 						),
-						'auth_type' => array(
-							'type' => 'string',
+						'auth_type'        => array(
+							'type'     => 'string',
 							'required' => true,
-							'enum' => ConnectionAuthTypes::VALID,
+							'enum'     => ConnectionAuthTypes::VALID,
 						),
-						'credentials' => array(
-							'type' => 'object',
+						'credentials'      => array(
+							'type'     => 'object',
 							'required' => true,
 						),
 					),
@@ -102,22 +102,22 @@ class ConnectionsController {
 			self::API_NAMESPACE,
 			self::ROUTE . '/(?P<id>[\d]+)/oauth/authorize-url',
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getOAuthAuthorizeUrl' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'getOAuthAuthorizeUrl' ),
 				'permission_callback' => array( $this, 'createPermissionsCheck' ),
-				'args' => array(
-					'id' => array(
-						'type' => 'integer',
+				'args'                => array(
+					'id'         => array(
+						'type'     => 'integer',
 						'required' => true,
 					),
 					'return_url' => array(
-						'type' => 'string',
-						'required' => false,
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'esc_url_raw',
 					),
-					'node_id' => array(
-						'type' => 'string',
-						'required' => false,
+					'node_id'    => array(
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
@@ -128,17 +128,17 @@ class ConnectionsController {
 			self::API_NAMESPACE,
 			self::ROUTE . '/(?P<id>[\d]+)/models',
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getModels' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'getModels' ),
 				'permission_callback' => array( $this, 'permissionsCheck' ),
-				'args' => array(
-					'id' => array(
-						'type' => 'integer',
+				'args'                => array(
+					'id'        => array(
+						'type'     => 'integer',
 						'required' => true,
 					),
 					'node_type' => array(
-						'type' => 'string',
-						'required' => true,
+						'type'              => 'string',
+						'required'          => true,
 						'sanitize_callback' => 'sanitize_key',
 					),
 				),
@@ -191,7 +191,7 @@ class ConnectionsController {
 	public function getItems( $request ) {
 		$page = $this->connections->list(
 			array(
-				'page' => 1,
+				'page'     => 1,
 				'per_page' => self::MAX_ITEMS,
 			)
 		);
@@ -303,8 +303,8 @@ class ConnectionsController {
 
 		return rest_ensure_response(
 			array(
-				'authorize_url' => $authorize_url,
-				'callback_url' => $this->google_oauth->callbackUrl(),
+				'authorize_url'   => $authorize_url,
+				'callback_url'    => $this->google_oauth->callbackUrl(),
 				'credentials_url' => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
 			)
 		);
@@ -317,11 +317,11 @@ class ConnectionsController {
 	 */
 	private function serialize( Connection $connection ): array {
 		$data = array(
-			'id' => $connection->id(),
-			'label' => $connection->label(),
+			'id'               => $connection->id(),
+			'label'            => $connection->label(),
 			'integration_slug' => $connection->integrationSlug(),
-			'auth_type' => $connection->authType(),
-			'auth_type_label' => ConnectionAuthTypes::label( $connection->authType() ),
+			'auth_type'        => $connection->authType(),
+			'auth_type_label'  => ConnectionAuthTypes::label( $connection->authType() ),
 		);
 
 		if ( ConnectionAuthTypes::OAUTH2 === $connection->authType() ) {

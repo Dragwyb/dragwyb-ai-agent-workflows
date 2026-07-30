@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is deleted via the WordPress admin.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 // If this file is called directly and not by WordPress, abort.
@@ -25,4 +25,4 @@ if ( ! $wfa_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' 
 	require_once __DIR__ . '/src/autoload.php';
 }
 
-WorkflowAutomate\Plugin\Core\Uninstaller::uninstall();
+AIAWAB\Plugin\Core\Uninstaller::uninstall();

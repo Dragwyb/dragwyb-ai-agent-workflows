@@ -2,12 +2,12 @@
 /**
  * Shared list-table UI helpers.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -58,8 +58,8 @@ final class ListTableUi {
 				continue;
 			}
 
-			$name = (string) $filter['name'];
-			$type = (string) ( $filter['type'] ?? 'select' );
+			$name  = (string) $filter['name'];
+			$type  = (string) ( $filter['type'] ?? 'select' );
 			$label = (string) ( $filter['label'] ?? '' );
 			$value = $filter['value'] ?? '';
 

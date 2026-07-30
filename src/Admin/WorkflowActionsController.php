@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Workflow admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Service\WorkflowImportExport;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Admin\Pages\BuilderPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Service\WorkflowImportExport;
+use AIAWAB\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,7 +46,7 @@ class WorkflowActionsController {
 	 * @param string          $redirectSlug Menu slug (see AdminPage::slug()) to redirect back to after handling.
 	 */
 	public function __construct( WorkflowService $workflows, string $redirectSlug ) {
-		$this->workflows = $workflows;
+		$this->workflows    = $workflows;
 		$this->redirectSlug = $redirectSlug;
 	}
 

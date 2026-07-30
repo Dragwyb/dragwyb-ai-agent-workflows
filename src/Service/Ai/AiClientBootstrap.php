@@ -2,17 +2,17 @@
 /**
  * Boots WordPress AI Client and registers providers.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Ai;
+namespace AIAWAB\Plugin\Service\Ai;
 
-use WorkflowAutomate\AiProviders\DeepSeek\DeepSeekProvider;
-use WorkflowAutomate\AiProviders\Groq\GroqProvider;
-use WorkflowAutomate\AiProviders\OpenRouter\OpenRouterProvider;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
+use AIAWAB\AiProviders\DeepSeek\DeepSeekProvider;
+use AIAWAB\AiProviders\Groq\GroqProvider;
+use AIAWAB\AiProviders\OpenRouter\OpenRouterProvider;
+use AIAWAB\Plugin\Service\ConnectionService;
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
 use WordPress\AnthropicAiProvider\Provider\AnthropicProvider;
@@ -53,20 +53,20 @@ class AiClientBootstrap {
 	 * @var array<string, string>
 	 */
 	private const CONNECTION_SLUG_TO_PROVIDER = array(
-		'openai'              => 'openai',
-		'openai_chat_action'  => 'openai',
-		'anthropic'           => 'anthropic',
-		'claude'              => 'anthropic',
-		'claude_messages_action' => 'anthropic',
-		'google'              => 'google',
-		'gemini'              => 'google',
+		'openai'                         => 'openai',
+		'openai_chat_action'             => 'openai',
+		'anthropic'                      => 'anthropic',
+		'claude'                         => 'anthropic',
+		'claude_messages_action'         => 'anthropic',
+		'google'                         => 'google',
+		'gemini'                         => 'google',
 		'gemini_generate_content_action' => 'google',
-		'openrouter'          => 'openrouter',
-		'openrouter_chat_action' => 'openrouter',
-		'groq'                => 'groq',
-		'groq_chat_action'    => 'groq',
-		'deepseek'            => 'deepseek',
-		'deepseek_chat_action' => 'deepseek',
+		'openrouter'                     => 'openrouter',
+		'openrouter_chat_action'         => 'openrouter',
+		'groq'                           => 'groq',
+		'groq_chat_action'               => 'groq',
+		'deepseek'                       => 'deepseek',
+		'deepseek_chat_action'           => 'deepseek',
 	);
 
 	private static bool $booted = false;
@@ -602,14 +602,14 @@ class AiClientBootstrap {
 		}
 
 		try {
-			$plugin = \WorkflowAutomate\Plugin\Core\Plugin::instance();
+			$plugin = \AIAWAB\Plugin\Core\Plugin::instance();
 			/** @var ConnectionService $connections */
 			$connections = $plugin->container()->get( ConnectionService::class );
 		} catch ( \Throwable $e ) {
 			return;
 		}
 
-		$list = $connections->list(
+		$list  = $connections->list(
 			array(
 				'per_page' => 200,
 				'page'     => 1,

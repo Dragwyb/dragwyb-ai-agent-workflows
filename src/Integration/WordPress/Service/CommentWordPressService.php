@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Comment actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress\Service;
+namespace AIAWAB\Plugin\Integration\WordPress\Service;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -101,7 +101,7 @@ final class CommentWordPressService {
 
 	public function getCommentMetadataByMetaKey( array $config ): array {
 		$commentId = WordPressActionHelper::int( $config, 'comment_id' );
-		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
+		$metaKey   = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $commentId <= 0 ) {
 			return WordPressActionHelper::fail( __( 'Comment id is required.', 'workflow-automate' ) );
@@ -121,9 +121,9 @@ final class CommentWordPressService {
 	}
 
 	public function createNewComment( array $config ): array {
-		$postId = WordPressActionHelper::int( $config, 'post_id' );
+		$postId  = WordPressActionHelper::int( $config, 'post_id' );
 		$content = WordPressActionHelper::str( $config, 'comment' );
-		$author = WordPressActionHelper::str( $config, 'author_name' );
+		$author  = WordPressActionHelper::str( $config, 'author_name' );
 
 		if ( $postId <= 0 ) {
 			return WordPressActionHelper::fail( __( 'Post id is required.', 'workflow-automate' ) );
@@ -138,11 +138,11 @@ final class CommentWordPressService {
 		}
 
 		$commentData = array(
-			'comment_post_ID' => $postId,
-			'comment_content' => $content,
-			'comment_author' => $author,
+			'comment_post_ID'      => $postId,
+			'comment_content'      => $content,
+			'comment_author'       => $author,
 			'comment_author_email' => WordPressActionHelper::str( $config, 'author_email' ),
-			'comment_author_url' => WordPressActionHelper::str( $config, 'author_url' ),
+			'comment_author_url'   => WordPressActionHelper::str( $config, 'author_url' ),
 		);
 
 		$commentId = wp_insert_comment( $commentData );
@@ -156,16 +156,16 @@ final class CommentWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'comment_id' => $commentId,
-				'comment' => $comment ? WordPressActionHelper::serializeComment( $comment ) : array(),
+				'comment'    => $comment ? WordPressActionHelper::serializeComment( $comment ) : array(),
 			)
 		);
 	}
 
 	public function replyToComment( array $config ): array {
-		$postId = WordPressActionHelper::int( $config, 'post_id' );
+		$postId   = WordPressActionHelper::int( $config, 'post_id' );
 		$parentId = WordPressActionHelper::int( $config, 'parent_id' );
-		$content = WordPressActionHelper::str( $config, 'comment' );
-		$author = WordPressActionHelper::str( $config, 'author_name' );
+		$content  = WordPressActionHelper::str( $config, 'comment' );
+		$author   = WordPressActionHelper::str( $config, 'author_name' );
 
 		if ( $postId <= 0 ) {
 			return WordPressActionHelper::fail( __( 'Post id is required.', 'workflow-automate' ) );
@@ -184,12 +184,12 @@ final class CommentWordPressService {
 		}
 
 		$commentData = array(
-			'comment_post_ID' => $postId,
-			'comment_parent' => $parentId,
-			'comment_content' => $content,
-			'comment_author' => $author,
+			'comment_post_ID'      => $postId,
+			'comment_parent'       => $parentId,
+			'comment_content'      => $content,
+			'comment_author'       => $author,
 			'comment_author_email' => WordPressActionHelper::str( $config, 'author_email' ),
-			'comment_author_url' => WordPressActionHelper::str( $config, 'author_url' ),
+			'comment_author_url'   => WordPressActionHelper::str( $config, 'author_url' ),
 		);
 
 		$commentId = wp_insert_comment( $commentData );
@@ -203,7 +203,7 @@ final class CommentWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'comment_id' => $commentId,
-				'comment' => $comment ? WordPressActionHelper::serializeComment( $comment ) : array(),
+				'comment'    => $comment ? WordPressActionHelper::serializeComment( $comment ) : array(),
 			)
 		);
 	}
@@ -220,7 +220,7 @@ final class CommentWordPressService {
 		}
 
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );
-		$res = wp_delete_comment( $commentId, $force );
+		$res   = wp_delete_comment( $commentId, $force );
 
 		if ( ! $res ) {
 			return WordPressActionHelper::fail( __( 'Failed to delete comment.', 'workflow-automate' ) );

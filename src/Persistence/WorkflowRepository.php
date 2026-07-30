@@ -2,15 +2,15 @@
 /**
  * Workflow repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace AIAWAB\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Database\Table;
+use AIAWAB\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,14 +54,14 @@ class WorkflowRepository {
 		$now = current_time( 'mysql', true );
 
 		$data = array(
-			'title' => (string) $attributes['title'],
-			'status' => (int) ( $attributes['status'] ?? Workflow::STATUS_DRAFT ),
+			'title'              => (string) $attributes['title'],
+			'status'             => (int) ( $attributes['status'] ?? Workflow::STATUS_DRAFT ),
 			'definition_version' => (int) ( $attributes['definition_version'] ?? 1 ),
-			'graph_json' => wp_json_encode( $attributes['graph'] ?? array() ),
-			'settings_json' => isset( $attributes['settings'] ) ? wp_json_encode( $attributes['settings'] ) : null,
-			'run_count' => 0,
-			'created_at' => $now,
-			'updated_at' => $now,
+			'graph_json'         => wp_json_encode( $attributes['graph'] ?? array() ),
+			'settings_json'      => isset( $attributes['settings'] ) ? wp_json_encode( $attributes['settings'] ) : null,
+			'run_count'          => 0,
+			'created_at'         => $now,
+			'updated_at'         => $now,
 		);
 
 		$formats = array( '%s', '%d', '%d', '%s', '%s', '%d', '%s', '%s' );
@@ -78,40 +78,40 @@ class WorkflowRepository {
 	/**
 	 * Updates an existing workflow row. Only the provided keys are touched.
 	 *
-	 * @param int                   $id         Workflow id.
-	 * @param array<string, mixed>  $attributes Any of: title, status, definition_version, graph, settings.
+	 * @param int                  $id         Workflow id.
+	 * @param array<string, mixed> $attributes Any of: title, status, definition_version, graph, settings.
 	 *
 	 * @return Workflow|null Null if the workflow does not exist or the update failed.
 	 */
 	public function update( int $id, array $attributes ): ?Workflow {
 		global $wpdb;
 
-		$data = array();
+		$data    = array();
 		$formats = array();
 
 		if ( array_key_exists( 'title', $attributes ) ) {
 			$data['title'] = (string) $attributes['title'];
-			$formats[] = '%s';
+			$formats[]     = '%s';
 		}
 
 		if ( array_key_exists( 'status', $attributes ) ) {
 			$data['status'] = (int) $attributes['status'];
-			$formats[] = '%d';
+			$formats[]      = '%d';
 		}
 
 		if ( array_key_exists( 'definition_version', $attributes ) ) {
 			$data['definition_version'] = (int) $attributes['definition_version'];
-			$formats[] = '%d';
+			$formats[]                  = '%d';
 		}
 
 		if ( array_key_exists( 'graph', $attributes ) ) {
 			$data['graph_json'] = wp_json_encode( $attributes['graph'] );
-			$formats[] = '%s';
+			$formats[]          = '%s';
 		}
 
 		if ( array_key_exists( 'settings', $attributes ) ) {
 			$data['settings_json'] = null === $attributes['settings'] ? null : wp_json_encode( $attributes['settings'] );
-			$formats[] = '%s';
+			$formats[]             = '%s';
 		}
 
 		if ( array() === $data ) {
@@ -119,7 +119,7 @@ class WorkflowRepository {
 		}
 
 		$data['updated_at'] = current_time( 'mysql', true );
-		$formats[] = '%s';
+		$formats[]          = '%s';
 
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
@@ -205,8 +205,8 @@ class WorkflowRepository {
 	public function find( int $id, bool $include_trashed = false ): ?Workflow {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$table  = $this->table();
+		$sql    = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 		$params = array( $id );
 
 		if ( ! $include_trashed ) {
@@ -242,17 +242,17 @@ class WorkflowRepository {
 			return array();
 		}
 
-		$table = $this->table();
+		$table        = $this->table();
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
-		$sql = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
+		$sql  = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
 		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $ids ) );
 
 		$map = array();
 
 		foreach ( $rows as $row ) {
-			$workflow = Workflow::fromRow( $row );
+			$workflow               = Workflow::fromRow( $row );
 			$map[ $workflow->id() ] = $workflow;
 		}
 
@@ -272,7 +272,7 @@ class WorkflowRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql = "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$sql   = "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
 		$updated = $wpdb->query( $wpdb->prepare( $sql, current_time( 'mysql', true ), $id ) );
 
@@ -296,12 +296,12 @@ class WorkflowRepository {
 	public function paginate( array $args = array() ): array {
 		global $wpdb;
 
-		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
-		$offset = ( $page - 1 ) * $per_page;
+		$offset   = ( $page - 1 ) * $per_page;
 
-		$where = array();
+		$where  = array();
 		$params = array();
 
 		if ( ! empty( $args['only_trashed'] ) ) {
@@ -311,29 +311,29 @@ class WorkflowRepository {
 		}
 
 		if ( isset( $args['status'] ) ) {
-			$where[] = 'status = %d';
+			$where[]  = 'status = %d';
 			$params[] = (int) $args['status'];
 		}
 
 		if ( ! empty( $args['search'] ) ) {
-			$where[] = 'title LIKE %s';
+			$where[]  = 'title LIKE %s';
 			$params[] = '%' . $wpdb->esc_like( (string) $args['search'] ) . '%';
 		}
 
 		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
-		$table = $this->table();
+		$table     = $this->table();
 
 		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
 
-		$list_sql = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
+		$list_sql    = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		$rows        = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
 
 		return array(
-			'items' => array_map( array( Workflow::class, 'fromRow' ), $rows ),
-			'total' => $total,
-			'page' => $page,
+			'items'    => array_map( array( Workflow::class, 'fromRow' ), $rows ),
+			'total'    => $total,
+			'page'     => $page,
 			'per_page' => $per_page,
 		);
 	}

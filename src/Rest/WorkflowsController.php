@@ -2,23 +2,23 @@
 /**
  * Workflows REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Domain\WorkflowRun;
+use AIAWAB\Plugin\Domain\WorkflowRunLog;
+use AIAWAB\Plugin\Service\ChatMessageService;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -71,8 +71,8 @@ class WorkflowsController extends WP_REST_Controller {
 		$this->namespace = 'wfa/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
-		$this->executor = $executor;
-		$this->chat = $chat;
+		$this->executor  = $executor;
+		$this->chat      = $chat;
 	}
 
 	/**
@@ -86,16 +86,16 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base,
 			array(
 				array(
-					'methods' => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_items' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args' => $this->get_collection_params(),
+					'args'                => $this->get_collection_params(),
 				),
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'create_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
-					'args' => $this->getCreateArgs(),
+					'args'                => $this->getCreateArgs(),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -105,39 +105,39 @@ class WorkflowsController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
-				'args' => array(
+				'args'   => array(
 					'id' => array(
 						'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-						'type' => 'integer',
+						'type'        => 'integer',
 					),
 				),
 				array(
-					'methods' => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_item' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'include_trashed' => array(
 							'description' => __( 'Whether to also match a trashed workflow.', 'workflow-automate' ),
-							'type' => 'boolean',
-							'default' => false,
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 				),
 				array(
-					'methods' => WP_REST_Server::EDITABLE,
-					'callback' => array( $this, 'update_item' ),
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
 				array(
-					'methods' => WP_REST_Server::DELETABLE,
-					'callback' => array( $this, 'delete_item' ),
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
 					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'force' => array(
 							'description' => __( 'Whether to permanently delete the workflow (and its nodes) instead of moving it to the trash.', 'workflow-automate' ),
-							'type' => 'boolean',
-							'default' => false,
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 				),
@@ -150,13 +150,13 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/restore',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'restore_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'restore_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'id' => array(
 							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-							'type' => 'integer',
+							'type'        => 'integer',
 						),
 					),
 				),
@@ -168,13 +168,13 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/run',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'run_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'run_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'id' => array(
 							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-							'type' => 'integer',
+							'type'        => 'integer',
 						),
 					),
 				),
@@ -186,23 +186,23 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/chat',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'chat_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'chat_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => array(
-						'id' => array(
+					'args'                => array(
+						'id'        => array(
 							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-							'type' => 'integer',
+							'type'        => 'integer',
 						),
 						'chatInput' => array(
 							'description' => __( 'Chat message text (n8n chatInput).', 'workflow-automate' ),
-							'type' => 'string',
-							'required' => true,
+							'type'        => 'string',
+							'required'    => true,
 						),
 						'sessionId' => array(
 							'description' => __( 'Optional chat session id.', 'workflow-automate' ),
-							'type' => 'string',
-							'required' => false,
+							'type'        => 'string',
+							'required'    => false,
 						),
 					),
 				),
@@ -297,8 +297,8 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$args = array(
-			'page' => (int) $request->get_param( 'page' ),
-			'per_page' => (int) $request->get_param( 'per_page' ),
+			'page'            => (int) $request->get_param( 'page' ),
+			'per_page'        => (int) $request->get_param( 'per_page' ),
 			'include_trashed' => (bool) $request->get_param( 'include_trashed' ),
 		);
 
@@ -311,7 +311,7 @@ class WorkflowsController extends WP_REST_Controller {
 		$items = array();
 
 		foreach ( $result['items'] as $workflow ) {
-			$data = $this->prepare_item_for_response( $workflow, $request );
+			$data    = $this->prepare_item_for_response( $workflow, $request );
 			$items[] = $this->prepare_response_for_collection( $data );
 		}
 
@@ -350,8 +350,8 @@ class WorkflowsController extends WP_REST_Controller {
 		try {
 			$workflow = $this->workflows->create(
 				array(
-					'title' => $request->get_param( 'title' ),
-					'graph' => $request->get_param( 'graph' ) ?? array(),
+					'title'    => $request->get_param( 'title' ),
+					'graph'    => $request->get_param( 'graph' ) ?? array(),
 					'settings' => $request->get_param( 'settings' ),
 				)
 			);
@@ -411,7 +411,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function delete_item( $request ) {
-		$id = (int) $request['id'];
+		$id    = (int) $request['id'];
 		$force = (bool) $request->get_param( 'force' );
 
 		$workflow = $this->workflows->find( $id, true );
@@ -428,7 +428,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		return rest_ensure_response(
 			array(
-				'deleted' => true,
+				'deleted'  => true,
 				'previous' => $previous->get_data(),
 			)
 		);
@@ -491,7 +491,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function chat_item( $request ) {
-		$id = (int) $request['id'];
+		$id       = (int) $request['id'];
 		$workflow = $this->workflows->find( $id );
 
 		if ( null === $workflow ) {
@@ -499,7 +499,7 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		$has_chat_trigger = false;
-		$graph_nodes = $workflow->graph()['nodes'] ?? array();
+		$graph_nodes      = $workflow->graph()['nodes'] ?? array();
 
 		if ( is_array( $graph_nodes ) ) {
 			foreach ( $graph_nodes as $graph_node ) {
@@ -564,12 +564,12 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private function serializeRun( WorkflowRun $run ): array {
 		return array(
-			'id' => $run->id(),
+			'id'          => $run->id(),
 			'workflow_id' => $run->workflowId(),
-			'status' => $run->status(),
-			'started_at' => null === $run->startedAt() ? null : mysql_to_rfc3339( $run->startedAt() ),
+			'status'      => $run->status(),
+			'started_at'  => null === $run->startedAt() ? null : mysql_to_rfc3339( $run->startedAt() ),
 			'finished_at' => null === $run->finishedAt() ? null : mysql_to_rfc3339( $run->finishedAt() ),
-			'logs' => array_map( array( $this, 'serializeRunLog' ), $this->executor->logsFor( $run->id() ) ),
+			'logs'        => array_map( array( $this, 'serializeRunLog' ), $this->executor->logsFor( $run->id() ) ),
 		);
 	}
 
@@ -580,37 +580,37 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private function serializeRunLog( WorkflowRunLog $log ): array {
 		return array(
-			'node_id' => $log->nodeId(),
-			'status' => $log->status(),
-			'message' => $log->message(),
-			'output' => $log->output(),
+			'node_id'     => $log->nodeId(),
+			'status'      => $log->status(),
+			'message'     => $log->message(),
+			'output'      => $log->output(),
 			'duration_ms' => $log->durationMs(),
 		);
 	}
 
 	/**
-	 * @param Workflow         $item    Domain object to serialize.
-	 * @param WP_REST_Request  $request Full request.
+	 * @param Workflow        $item    Domain object to serialize.
+	 * @param WP_REST_Request $request Full request.
 	 *
 	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$data = array(
-			'id' => $item->id(),
-			'title' => $item->title(),
-			'status' => $item->status(),
+			'id'                 => $item->id(),
+			'title'              => $item->title(),
+			'status'             => $item->status(),
 			'definition_version' => $item->definitionVersion(),
-			'graph' => (object) $item->graph(),
-			'settings' => null === $item->settings() ? null : (object) $item->settings(),
-			'run_count' => $item->runCount(),
-			'is_trashed' => $item->isTrashed(),
-			'created_at' => mysql_to_rfc3339( $item->createdAt() ),
-			'updated_at' => mysql_to_rfc3339( $item->updatedAt() ),
+			'graph'              => (object) $item->graph(),
+			'settings'           => null === $item->settings() ? null : (object) $item->settings(),
+			'run_count'          => $item->runCount(),
+			'is_trashed'         => $item->isTrashed(),
+			'created_at'         => mysql_to_rfc3339( $item->createdAt() ),
+			'updated_at'         => mysql_to_rfc3339( $item->updatedAt() ),
 		);
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data = $this->add_additional_fields_to_object( $data, $request );
-		$data = $this->filter_response_by_context( $data, $context );
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
 
 		$response = rest_ensure_response( $data );
 		$response->add_links( $this->prepareLinks( $item ) );
@@ -625,7 +625,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private function prepareLinks( Workflow $item ): array {
 		return array(
-			'self' => array(
+			'self'       => array(
 				'href' => rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $item->id() ) ),
 			),
 			'collection' => array(
@@ -650,72 +650,72 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		$this->schema = array(
-			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => 'workflow',
-			'type' => 'object',
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'workflow',
+			'type'       => 'object',
 			'properties' => array(
-				'id' => array(
+				'id'                 => array(
 					'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-					'type' => 'integer',
-					'context' => array( 'view', 'edit' ),
-					'readonly' => true,
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
-				'title' => array(
+				'title'              => array(
 					'description' => __( 'The workflow title.', 'workflow-automate' ),
-					'type' => 'string',
-					'context' => array( 'view', 'edit' ),
-					'required' => true,
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'required'    => true,
 					'arg_options' => array(
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
-				'status' => array(
+				'status'             => array(
 					'description' => __( 'The workflow status (0 = draft, 1 = active, 2 = paused).', 'workflow-automate' ),
-					'type' => 'integer',
-					'enum' => Workflow::VALID_STATUSES,
-					'context' => array( 'view', 'edit' ),
+					'type'        => 'integer',
+					'enum'        => Workflow::VALID_STATUSES,
+					'context'     => array( 'view', 'edit' ),
 				),
 				'definition_version' => array(
 					'description' => __( 'Schema version of the stored graph.', 'workflow-automate' ),
-					'type' => 'integer',
-					'context' => array( 'view' ),
-					'readonly' => true,
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'graph' => array(
+				'graph'              => array(
 					'description' => __( 'The builder graph (nodes and connections) as a JSON object.', 'workflow-automate' ),
-					'type' => 'object',
-					'context' => array( 'view', 'edit' ),
+					'type'        => 'object',
+					'context'     => array( 'view', 'edit' ),
 				),
-				'settings' => array(
+				'settings'           => array(
 					'description' => __( 'Per-workflow settings.', 'workflow-automate' ),
-					'type' => array( 'object', 'null' ),
-					'context' => array( 'view', 'edit' ),
+					'type'        => array( 'object', 'null' ),
+					'context'     => array( 'view', 'edit' ),
 				),
-				'run_count' => array(
+				'run_count'          => array(
 					'description' => __( 'Number of times this workflow has run.', 'workflow-automate' ),
-					'type' => 'integer',
-					'context' => array( 'view' ),
-					'readonly' => true,
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'is_trashed' => array(
+				'is_trashed'         => array(
 					'description' => __( 'Whether the workflow is in the trash.', 'workflow-automate' ),
-					'type' => 'boolean',
-					'context' => array( 'view' ),
-					'readonly' => true,
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'created_at' => array(
+				'created_at'         => array(
 					'description' => __( "The workflow's creation date, in the site's timezone.", 'workflow-automate' ),
-					'type' => 'string',
-					'format' => 'date-time',
-					'context' => array( 'view' ),
-					'readonly' => true,
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'updated_at' => array(
+				'updated_at'         => array(
 					'description' => __( "The workflow's last modification date, in the site's timezone.", 'workflow-automate' ),
-					'type' => 'string',
-					'format' => 'date-time',
-					'context' => array( 'view' ),
-					'readonly' => true,
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
 			),
 		);
@@ -728,31 +728,31 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		return array(
-			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
-			'page' => array(
-				'description' => __( 'Current page of the collection.', 'workflow-automate' ),
-				'type' => 'integer',
-				'default' => 1,
-				'minimum' => 1,
+			'context'         => $this->get_context_param( array( 'default' => 'view' ) ),
+			'page'            => array(
+				'description'       => __( 'Current page of the collection.', 'workflow-automate' ),
+				'type'              => 'integer',
+				'default'           => 1,
+				'minimum'           => 1,
 				'sanitize_callback' => 'absint',
 			),
-			'per_page' => array(
-				'description' => __( 'Maximum number of items to be returned in the result set.', 'workflow-automate' ),
-				'type' => 'integer',
-				'default' => 20,
-				'minimum' => 1,
-				'maximum' => 100,
+			'per_page'        => array(
+				'description'       => __( 'Maximum number of items to be returned in the result set.', 'workflow-automate' ),
+				'type'              => 'integer',
+				'default'           => 20,
+				'minimum'           => 1,
+				'maximum'           => 100,
 				'sanitize_callback' => 'absint',
 			),
-			'status' => array(
+			'status'          => array(
 				'description' => __( 'Limit results to workflows with a specific status.', 'workflow-automate' ),
-				'type' => 'integer',
-				'enum' => Workflow::VALID_STATUSES,
+				'type'        => 'integer',
+				'enum'        => Workflow::VALID_STATUSES,
 			),
 			'include_trashed' => array(
 				'description' => __( 'Whether to include trashed workflows in the results.', 'workflow-automate' ),
-				'type' => 'boolean',
-				'default' => false,
+				'type'        => 'boolean',
+				'default'     => false,
 			),
 		);
 	}

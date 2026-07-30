@@ -2,23 +2,23 @@
 /**
  * Workflows admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
-use WorkflowAutomate\Plugin\Admin\WorkflowsListTable;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Admin\EmptyState;
+use AIAWAB\Plugin\Admin\ListTableUi;
+use AIAWAB\Plugin\Admin\WorkflowActionsController;
+use AIAWAB\Plugin\Admin\WorkflowsListTable;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\WorkflowService;
 
-// BuilderPage lives in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
+// BuilderPage lives in this same namespace (AIAWAB\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -48,8 +48,8 @@ class WorkflowsPage implements AdminPage {
 	private WorkflowActionsController $workflowActions;
 
 	public function __construct( WorkflowService $workflows, SettingsService $settings, WorkflowActionsController $workflowActions ) {
-		$this->workflows = $workflows;
-		$this->settings = $settings;
+		$this->workflows       = $workflows;
+		$this->settings        = $settings;
 		$this->workflowActions = $workflowActions;
 	}
 
@@ -137,8 +137,8 @@ class WorkflowsPage implements AdminPage {
 				),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . BuilderPage::SLUG ),
-						'label' => __( 'Create workflow', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . BuilderPage::SLUG ),
+						'label'   => __( 'Create workflow', 'workflow-automate' ),
 						'primary' => true,
 					),
 				)
@@ -204,37 +204,37 @@ class WorkflowsPage implements AdminPage {
 	 */
 	private function notices(): array {
 		return array(
-			'trashed' => array(
+			'trashed'      => array(
 				'message' => __( 'Workflow moved to Trash.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'restored' => array(
+			'restored'     => array(
 				'message' => __( 'Workflow restored.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'deleted' => array(
+			'deleted'      => array(
 				'message' => __( 'Workflow permanently deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'activated' => array(
+			'activated'    => array(
 				'message' => __( 'Workflow activated. It will run when its trigger fires.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'paused' => array(
+			'paused'       => array(
 				'message' => __( 'Workflow paused. Triggers will not start new runs until it is activated again.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'imported' => array(
+			'imported'     => array(
 				'message' => __( 'Workflow imported from JSON.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
 			'import_error' => array(
 				'message' => __( 'Could not import that JSON file. Use a Workflow Automate export (not an n8n file).', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
-			'error' => array(
+			'error'        => array(
 				'message' => __( 'That workflow action could not be completed.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 	}
@@ -270,7 +270,7 @@ class WorkflowsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

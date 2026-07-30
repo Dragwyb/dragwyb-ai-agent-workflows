@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\Groq;
+namespace AIAWAB\AiProviders\Groq;
 
-use WorkflowAutomate\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use AIAWAB\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * Groq AI provider (OpenAI-compatible).

@@ -2,17 +2,17 @@
 /**
  * Static catalog of every built-in WordPress workflow action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace AIAWAB\Plugin\Integration\WordPress;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
-use WorkflowAutomate\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
-use WorkflowAutomate\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
-use WorkflowAutomate\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
+use AIAWAB\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
+use AIAWAB\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
+use AIAWAB\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
+use AIAWAB\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,14 +35,23 @@ final class WordPressActionCatalog {
 	 * @return array<string, mixed>
 	 */
 	public static function field( string $type, string $label, array $extra = array() ): array {
-		return array_merge( array( 'type' => $type, 'label' => $label ), $extra );
+		return array_merge(
+			array(
+				'type'  => $type,
+				'label' => $label,
+			),
+			$extra
+		);
 	}
 
 	/**
 	 * @return array{value: string, label: string}
 	 */
 	public static function option( string $value, string $label ): array {
-		return array( 'value' => $value, 'label' => $label );
+		return array(
+			'value' => $value,
+			'label' => $label,
+		);
 	}
 
 	/**
@@ -50,23 +59,23 @@ final class WordPressActionCatalog {
 	 */
 	public static function definitions(): array {
 		$groups = array(
-			'user' => __( 'User Management', 'workflow-automate' ),
-			'user_retrieval' => __( 'User Retrieval', 'workflow-automate' ),
-			'user_metadata' => __( 'User Metadata', 'workflow-automate' ),
-			'role' => __( 'Role Management', 'workflow-automate' ),
-			'capabilities' => __( 'Capabilities Management', 'workflow-automate' ),
-			'post' => __( 'Post Management', 'workflow-automate' ),
-			'comment' => __( 'Comment Management', 'workflow-automate' ),
-			'post_type' => __( 'Post Type Management', 'workflow-automate' ),
-			'post_tag' => __( 'Post Tag Management', 'workflow-automate' ),
-			'media' => __( 'Media Management', 'workflow-automate' ),
-			'term' => __( 'Term Management', 'workflow-automate' ),
-			'taxonomy' => __( 'Taxonomy Management', 'workflow-automate' ),
-			'category' => __( 'Category Management', 'workflow-automate' ),
-			'product_tag' => __( 'Product Tag Management', 'workflow-automate' ),
+			'user'             => __( 'User Management', 'workflow-automate' ),
+			'user_retrieval'   => __( 'User Retrieval', 'workflow-automate' ),
+			'user_metadata'    => __( 'User Metadata', 'workflow-automate' ),
+			'role'             => __( 'Role Management', 'workflow-automate' ),
+			'capabilities'     => __( 'Capabilities Management', 'workflow-automate' ),
+			'post'             => __( 'Post Management', 'workflow-automate' ),
+			'comment'          => __( 'Comment Management', 'workflow-automate' ),
+			'post_type'        => __( 'Post Type Management', 'workflow-automate' ),
+			'post_tag'         => __( 'Post Tag Management', 'workflow-automate' ),
+			'media'            => __( 'Media Management', 'workflow-automate' ),
+			'term'             => __( 'Term Management', 'workflow-automate' ),
+			'taxonomy'         => __( 'Taxonomy Management', 'workflow-automate' ),
+			'category'         => __( 'Category Management', 'workflow-automate' ),
+			'product_tag'      => __( 'Product Tag Management', 'workflow-automate' ),
 			'product_category' => __( 'Product Category Management', 'workflow-automate' ),
-			'product_type' => __( 'Product Type Management', 'workflow-automate' ),
-			'plugin' => __( 'Plugin Management', 'workflow-automate' ),
+			'product_type'     => __( 'Product Type Management', 'workflow-automate' ),
+			'plugin'           => __( 'Plugin Management', 'workflow-automate' ),
 		);
 
 		$field_fn  = array( self::class, 'field' );

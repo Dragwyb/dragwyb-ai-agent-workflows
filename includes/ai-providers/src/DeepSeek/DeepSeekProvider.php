@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\DeepSeek;
+namespace AIAWAB\AiProviders\DeepSeek;
 
-use WorkflowAutomate\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use AIAWAB\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * DeepSeek AI provider (OpenAI-compatible).

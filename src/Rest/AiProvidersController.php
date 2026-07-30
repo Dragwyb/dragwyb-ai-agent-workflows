@@ -2,16 +2,16 @@
 /**
  * REST controller for AI provider models / credentials.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWAB\Plugin\Service\AiModelsService;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -48,7 +48,7 @@ class AiProvidersController extends WP_REST_Controller {
 					'callback'            => array( $this, 'getModels' ),
 					'permission_callback' => array( $this, 'permissionsCheck' ),
 					'args'                => array(
-						'provider' => array(
+						'provider'  => array(
 							'type'              => 'string',
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_key',
@@ -89,7 +89,7 @@ class AiProvidersController extends WP_REST_Controller {
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_key',
 						),
-						'api_key' => array(
+						'api_key'  => array(
 							'type'              => 'string',
 							'required'          => true,
 							'sanitize_callback' => static function ( $value ) {
@@ -185,8 +185,8 @@ class AiProvidersController extends WP_REST_Controller {
 
 		return rest_ensure_response(
 			array(
-				'success'   => true,
-				'provider'  => $provider_id,
+				'success'    => true,
+				'provider'   => $provider_id,
 				'configured' => true,
 			)
 		);

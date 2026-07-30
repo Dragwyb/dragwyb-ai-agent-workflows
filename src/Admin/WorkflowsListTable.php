@@ -2,18 +2,18 @@
 /**
  * Workflows admin list table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Admin\Pages\BuilderPage;
+use AIAWAB\Plugin\Admin\Pages\RunsPage;
+use AIAWAB\Plugin\Domain\Workflow;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -52,14 +52,14 @@ class WorkflowsListTable extends WP_List_Table {
 		parent::__construct(
 			array(
 				'singular' => 'workflow',
-				'plural' => 'workflows',
-				'ajax' => false,
+				'plural'   => 'workflows',
+				'ajax'     => false,
 			)
 		);
 
 		$this->workflows = $workflows;
-		$this->settings = $settings;
-		$this->rowForms = new RowActionForms();
+		$this->settings  = $settings;
+		$this->rowForms  = new RowActionForms();
 	}
 
 	/**
@@ -67,10 +67,10 @@ class WorkflowsListTable extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'cb' => '<input type="checkbox" />',
-			'title' => __( 'Title', 'workflow-automate' ),
-			'status' => __( 'Status', 'workflow-automate' ),
-			'run_count' => __( 'Runs', 'workflow-automate' ),
+			'cb'         => '<input type="checkbox" />',
+			'title'      => __( 'Title', 'workflow-automate' ),
+			'status'     => __( 'Status', 'workflow-automate' ),
+			'run_count'  => __( 'Runs', 'workflow-automate' ),
 			'updated_at' => __( 'Last Updated', 'workflow-automate' ),
 		);
 	}
@@ -82,7 +82,7 @@ class WorkflowsListTable extends WP_List_Table {
 		if ( 'trash' === $this->currentView() ) {
 			return array(
 				'restore' => __( 'Restore', 'workflow-automate' ),
-				'delete' => __( 'Delete Permanently', 'workflow-automate' ),
+				'delete'  => __( 'Delete Permanently', 'workflow-automate' ),
 			);
 		}
 
@@ -116,7 +116,7 @@ class WorkflowsListTable extends WP_List_Table {
 		$paged = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
 
 		$args = array(
-			'page' => $paged,
+			'page'     => $paged,
 			'per_page' => self::PER_PAGE,
 		);
 
@@ -138,7 +138,7 @@ class WorkflowsListTable extends WP_List_Table {
 		$this->set_pagination_args(
 			array(
 				'total_items' => $result['total'],
-				'per_page' => self::PER_PAGE,
+				'per_page'    => self::PER_PAGE,
 			)
 		);
 	}
@@ -169,7 +169,7 @@ class WorkflowsListTable extends WP_List_Table {
 	 */
 	protected function get_views() {
 		$current = $this->currentView();
-		$views = array();
+		$views   = array();
 
 		foreach ( self::VIEWS as $view ) {
 			$views[ $view ] = $this->viewLink( $view, $current );
@@ -185,21 +185,21 @@ class WorkflowsListTable extends WP_List_Table {
 	 */
 	protected function column_title( $item ) {
 		if ( $item->isTrashed() ) {
-			$title = '<strong>' . esc_html( $item->title() ) . '</strong>';
+			$title   = '<strong>' . esc_html( $item->title() ) . '</strong>';
 			$actions = array(
 				'restore' => $this->actionForm( 'restore', $item->id(), __( 'Restore', 'workflow-automate' ) ),
-				'delete' => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'workflow-automate' ) ),
+				'delete'  => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'workflow-automate' ) ),
 			);
 		} else {
 			$edit_url = $this->editUrl( $item->id() );
-			$title = sprintf(
+			$title    = sprintf(
 				'<strong><a href="%1$s">%2$s</a></strong>',
 				esc_url( $edit_url ),
 				esc_html( $item->title() )
 			);
-			$actions = array(
-				'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
-				'runs' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'workflow-automate' ) ),
+			$actions  = array(
+				'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
+				'runs'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'workflow-automate' ) ),
 				'export' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->exportUrl( $item->id() ) ), esc_html__( 'Export', 'workflow-automate' ) ),
 			);
 
@@ -223,11 +223,11 @@ class WorkflowsListTable extends WP_List_Table {
 	public function filterFields(): array {
 		return array(
 			array(
-				'name' => 's',
-				'type' => 'search',
-				'label' => __( 'Search workflows', 'workflow-automate' ),
+				'name'        => 's',
+				'type'        => 'search',
+				'label'       => __( 'Search workflows', 'workflow-automate' ),
 				'placeholder' => __( 'Search by title…', 'workflow-automate' ),
-				'value' => $this->currentSearch(),
+				'value'       => $this->currentSearch(),
 			),
 		);
 	}
@@ -240,7 +240,7 @@ class WorkflowsListTable extends WP_List_Table {
 
 		return array(
 			'status' => 'all' === $view ? '' : $view,
-			's' => $this->currentSearch(),
+			's'      => $this->currentSearch(),
 		);
 	}
 
@@ -259,7 +259,7 @@ class WorkflowsListTable extends WP_List_Table {
 	private function editUrl( int $id ): string {
 		return add_query_arg(
 			array(
-				'page' => BuilderPage::SLUG,
+				'page'     => BuilderPage::SLUG,
 				'workflow' => $id,
 			),
 			admin_url( 'admin.php' )
@@ -277,7 +277,7 @@ class WorkflowsListTable extends WP_List_Table {
 	private function runsUrl( int $id ): string {
 		return add_query_arg(
 			array(
-				'page' => RunsPage::SLUG,
+				'page'        => RunsPage::SLUG,
 				'workflow_id' => $id,
 			),
 			admin_url( 'admin.php' )
@@ -343,7 +343,7 @@ class WorkflowsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $id, string $label ): string {
-		$form_id = 'wfa-workflow-action-' . $op . '-' . $id;
+		$form_id     = 'wfa-workflow-action-' . $op . '-' . $id;
 		$nonce_field = wp_nonce_field( 'wfa_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(

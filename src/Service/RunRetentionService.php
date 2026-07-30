@@ -2,15 +2,15 @@
 /**
  * Prunes old, finished workflow runs and their logs.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,8 +42,8 @@ class RunRetentionService {
 	private SettingsService $settings;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRunLogRepository $runLogs, SettingsService $settings ) {
-		$this->runs = $runs;
-		$this->runLogs = $runLogs;
+		$this->runs     = $runs;
+		$this->runLogs  = $runLogs;
 		$this->settings = $settings;
 	}
 
@@ -71,7 +71,7 @@ class RunRetentionService {
 	 */
 	public function pruneOlderThan( int $days ): int {
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
-		$ids = $this->runs->idsFinishedBefore( $cutoff );
+		$ids    = $this->runs->idsFinishedBefore( $cutoff );
 
 		if ( array() === $ids ) {
 			return 0;

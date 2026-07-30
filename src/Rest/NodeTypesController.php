@@ -2,21 +2,21 @@
 /**
  * Node types REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionGroupInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
-use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\Contracts\ActionGroupInterface;
+use AIAWAB\Plugin\Domain\Contracts\NodeTypeInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerGroupInterface;
+use AIAWAB\Plugin\Integration\IntegrationTriggerCatalog;
+use AIAWAB\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use AIAWAB\Plugin\Service\ElementorFormsService;
+use AIAWAB\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -59,10 +59,10 @@ class NodeTypesController {
 			self::API_NAMESPACE,
 			self::ROUTE,
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getItems' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'getItems' ),
 				'permission_callback' => array( $this, 'permissionsCheck' ),
-				'args' => array(),
+				'args'                => array(),
 			)
 		);
 
@@ -70,18 +70,18 @@ class NodeTypesController {
 			self::API_NAMESPACE,
 			'/trigger-sample-schema',
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getTriggerSampleSchema' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'getTriggerSampleSchema' ),
 				'permission_callback' => array( $this, 'permissionsCheck' ),
-				'args' => array(
+				'args'                => array(
 					'trigger_type' => array(
-						'type' => 'string',
+						'type'     => 'string',
 						'required' => true,
 					),
-					'form_id' => array(
-						'type' => 'string',
+					'form_id'      => array(
+						'type'     => 'string',
 						'required' => false,
-						'default' => '',
+						'default'  => '',
 					),
 				),
 			)
@@ -140,7 +140,7 @@ class NodeTypesController {
 		return rest_ensure_response(
 			array(
 				'triggers' => $serialized_triggers,
-				'actions' => array_map( array( $this, 'serialize' ), $this->registry->actions() ),
+				'actions'  => array_map( array( $this, 'serialize' ), $this->registry->actions() ),
 			)
 		);
 	}
@@ -209,17 +209,17 @@ class NodeTypesController {
 	private function serialize( NodeTypeInterface $node_type ): array {
 		$schema = $node_type->configSchema();
 		$data   = array(
-			'slug' => $node_type->slug(),
-			'label' => $node_type->label(),
-			'description' => $node_type->description(),
-			'config_schema' => $schema,
+			'slug'           => $node_type->slug(),
+			'label'          => $node_type->label(),
+			'description'    => $node_type->description(),
+			'config_schema'  => $schema,
 			'default_config' => $this->defaultConfigFromSchema( $schema ),
-			'available' => true,
+			'available'      => true,
 		);
 
 		if ( $node_type instanceof TriggerGroupInterface || $node_type instanceof ActionGroupInterface ) {
-			$data['app'] = $node_type->app();
-			$data['group'] = $node_type->group();
+			$data['app']         = $node_type->app();
+			$data['group']       = $node_type->group();
 			$data['group_label'] = $node_type->groupLabel();
 		}
 
@@ -297,13 +297,13 @@ class NodeTypesController {
 		$schema = $node_type->configSchema();
 
 		$data = array(
-			'slug' => $node_type->slug(),
-			'label' => $node_type->label(),
-			'description' => $node_type->description(),
-			'config_schema' => $schema,
-			'default_config' => $this->defaultConfigFromSchema( $schema ),
-			'app' => $app,
-			'available' => false,
+			'slug'            => $node_type->slug(),
+			'label'           => $node_type->label(),
+			'description'     => $node_type->description(),
+			'config_schema'   => $schema,
+			'default_config'  => $this->defaultConfigFromSchema( $schema ),
+			'app'             => $app,
+			'available'       => false,
 			'requires_plugin' => $requires_plugin,
 		);
 
@@ -331,9 +331,9 @@ class NodeTypesController {
 	}
 
 	/**
-	 * @param array<string, mixed>                                              $data
+	 * @param array<string, mixed>                                                                $data
 	 * @param array{options: array<int, array{value: string, label: string}>, error: string|null} $form_result
-	 * @param array<int, array{value: string, label: string}>                   $options
+	 * @param array<int, array{value: string, label: string}>                                     $options
 	 *
 	 * @return void
 	 */

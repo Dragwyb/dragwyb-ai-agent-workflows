@@ -2,26 +2,26 @@
 /**
  * Run detail admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace AIAWAB\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\RunDuration;
-use WorkflowAutomate\Plugin\Admin\RunStatusBadge;
-use WorkflowAutomate\Plugin\Admin\RunTimestamp;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Admin\AdminPage;
+use AIAWAB\Plugin\Admin\RunDuration;
+use AIAWAB\Plugin\Admin\RunStatusBadge;
+use AIAWAB\Plugin\Admin\RunTimestamp;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Domain\WorkflowRun;
+use AIAWAB\Plugin\Domain\WorkflowRunLog;
+use AIAWAB\Plugin\Persistence\WorkflowRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
 
-// BuilderPage and RunsPage live in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
+// BuilderPage and RunsPage live in this same namespace (AIAWAB\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,10 +57,10 @@ class RunDetailPage implements AdminPage {
 	private SettingsService $settings;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, WorkflowExecutionService $executor, SettingsService $settings ) {
-		$this->runs = $runs;
+		$this->runs      = $runs;
 		$this->workflows = $workflows;
-		$this->executor = $executor;
-		$this->settings = $settings;
+		$this->executor  = $executor;
+		$this->settings  = $settings;
 	}
 
 	/**
@@ -120,7 +120,7 @@ class RunDetailPage implements AdminPage {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which run to view.
 		$run_id = isset( $_GET['run_id'] ) ? absint( wp_unslash( $_GET['run_id'] ) ) : 0;
-		$run = $run_id > 0 ? $this->runs->find( $run_id ) : null;
+		$run    = $run_id > 0 ? $this->runs->find( $run_id ) : null;
 
 		echo '<div class="wrap wfa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
@@ -149,7 +149,7 @@ class RunDetailPage implements AdminPage {
 	private function builderUrl( int $workflow_id ): string {
 		return add_query_arg(
 			array(
-				'page' => BuilderPage::SLUG,
+				'page'     => BuilderPage::SLUG,
 				'workflow' => $workflow_id,
 			),
 			admin_url( 'admin.php' )
@@ -164,7 +164,7 @@ class RunDetailPage implements AdminPage {
 	private function detailUrl( int $run_id ): string {
 		return add_query_arg(
 			array(
-				'page' => self::SLUG,
+				'page'   => self::SLUG,
 				'run_id' => $run_id,
 			),
 			admin_url( 'admin.php' )
@@ -346,12 +346,12 @@ class RunDetailPage implements AdminPage {
 	private function logStatusBadge( string $status ): string {
 		$labels = array(
 			WorkflowRunLog::STATUS_SUCCESS => __( 'Success', 'workflow-automate' ),
-			WorkflowRunLog::STATUS_ERROR => __( 'Error', 'workflow-automate' ),
+			WorkflowRunLog::STATUS_ERROR   => __( 'Error', 'workflow-automate' ),
 			WorkflowRunLog::STATUS_SKIPPED => __( 'Skipped', 'workflow-automate' ),
 		);
 
 		$label = $labels[ $status ] ?? __( 'Unknown', 'workflow-automate' );
-		$slug = array_key_exists( $status, $labels ) ? $status : 'unknown';
+		$slug  = array_key_exists( $status, $labels ) ? $status : 'unknown';
 
 		return sprintf(
 			'<span class="wfa-status-badge wfa-status-badge--%1$s">%2$s</span>',
@@ -435,7 +435,7 @@ class RunDetailPage implements AdminPage {
 	 * @return string
 	 */
 	private function runActionForm( string $op, int $run_id, string $label, string $button_class, bool $confirm = false ): string {
-		$nonce_field = wp_nonce_field( 'wfa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$nonce_field  = wp_nonce_field( 'wfa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 		$confirm_attr = '';
 
 		if ( $confirm ) {
@@ -473,11 +473,11 @@ class RunDetailPage implements AdminPage {
 		return array(
 			'rerun_started' => array(
 				'message' => __( 'Re-run started below.', 'workflow-automate' ),
-				'type' => 'success',
+				'type'    => 'success',
 			),
-			'rerun_failed' => array(
+			'rerun_failed'  => array(
 				'message' => __( 'That run could not be re-run.', 'workflow-automate' ),
-				'type' => 'error',
+				'type'    => 'error',
 			),
 		);
 	}
@@ -487,7 +487,7 @@ class RunDetailPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

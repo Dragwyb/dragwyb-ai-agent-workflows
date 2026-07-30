@@ -2,14 +2,14 @@
 /**
  * Live credential verification for stored connections.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
+use AIAWAB\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,11 +43,11 @@ class ConnectionVerifier {
 	 * @var array<string, string>
 	 */
 	private const ALIASES = array(
-		'telegram' => 'telegram_send_message_action',
-		'whatsapp' => 'whatsapp_cloud_send_message_action',
+		'telegram'       => 'telegram_send_message_action',
+		'whatsapp'       => 'whatsapp_cloud_send_message_action',
 		'whatsapp_cloud' => 'whatsapp_cloud_send_message_action',
-		'google_sheets' => 'google_sheets_append_row_action',
-		'sheets' => 'google_sheets_append_row_action',
+		'google_sheets'  => 'google_sheets_append_row_action',
+		'sheets'         => 'google_sheets_append_row_action',
 	);
 
 	/**
@@ -92,7 +92,7 @@ class ConnectionVerifier {
 
 			return array(
 				'success' => false,
-				'error' => __( 'Credentials are incomplete — cannot verify this connection.', 'workflow-automate' ),
+				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'workflow-automate' ),
 			);
 		}
 
@@ -225,7 +225,7 @@ class ConnectionVerifier {
 
 		return array(
 			'success' => false,
-			'error' => isset( $result['error'] )
+			'error'   => isset( $result['error'] )
 				? (string) $result['error']
 				: sprintf(
 					/* translators: %s: third-party service name */

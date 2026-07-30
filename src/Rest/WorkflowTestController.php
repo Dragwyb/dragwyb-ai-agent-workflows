@@ -2,17 +2,17 @@
 /**
  * REST endpoints for builder test-flow listen / status.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Service\WorkflowNodeTestService;
+use AIAWAB\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -37,9 +37,9 @@ class WorkflowTestController {
 		WorkflowTestListenerService $listener,
 		WorkflowNodeTestService $node_tester
 	) {
-		$this->workflows    = $workflows;
-		$this->listener     = $listener;
-		$this->node_tester  = $node_tester;
+		$this->workflows   = $workflows;
+		$this->listener    = $listener;
+		$this->node_tester = $node_tester;
 	}
 
 	/**
@@ -51,16 +51,16 @@ class WorkflowTestController {
 			'/workflows/(?P<id>[\d]+)/test/listen',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'start_listen' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'start_listen' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'args' => $this->idArgs(),
+					'args'                => $this->idArgs(),
 				),
 				array(
-					'methods' => WP_REST_Server::DELETABLE,
-					'callback' => array( $this, 'stop_listen' ),
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'stop_listen' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'args' => $this->idArgs(),
+					'args'                => $this->idArgs(),
 				),
 			)
 		);
@@ -69,10 +69,10 @@ class WorkflowTestController {
 			self::API_NAMESPACE,
 			'/workflows/(?P<id>[\d]+)/test/status',
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'get_status' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_status' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
-				'args' => $this->idArgs(),
+				'args'                => $this->idArgs(),
 			)
 		);
 
@@ -80,10 +80,10 @@ class WorkflowTestController {
 			self::API_NAMESPACE,
 			'/workflows/(?P<id>[\d]+)/test/sample',
 			array(
-				'methods' => WP_REST_Server::DELETABLE,
-				'callback' => array( $this, 'clear_sample' ),
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => array( $this, 'clear_sample' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
-				'args' => $this->idArgs(),
+				'args'                => $this->idArgs(),
 			)
 		);
 
@@ -91,21 +91,21 @@ class WorkflowTestController {
 			self::API_NAMESPACE,
 			'/workflows/(?P<id>[\d]+)/test/node',
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'test_node' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'test_node' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
-				'args' => array_merge(
+				'args'                => array_merge(
 					$this->idArgs(),
 					array(
 						'node_id' => array(
 							'description' => __( 'Client-side node id from the workflow graph.', 'workflow-automate' ),
-							'type' => 'string',
-							'required' => true,
+							'type'        => 'string',
+							'required'    => true,
 						),
-						'graph' => array(
+						'graph'   => array(
 							'description' => __( 'Optional unsaved workflow graph (nodes + connections).', 'workflow-automate' ),
-							'type' => 'object',
-							'required' => false,
+							'type'        => 'object',
+							'required'    => false,
 						),
 					)
 				),
@@ -120,8 +120,8 @@ class WorkflowTestController {
 		return array(
 			'id' => array(
 				'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-				'type' => 'integer',
-				'required' => true,
+				'type'        => 'integer',
+				'required'    => true,
 			),
 		);
 	}

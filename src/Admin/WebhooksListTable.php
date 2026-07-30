@@ -2,18 +2,18 @@
 /**
  * Webhooks admin list table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\WebhookFormPage;
-use WorkflowAutomate\Plugin\Domain\Webhook;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Admin\Pages\WebhookFormPage;
+use AIAWAB\Plugin\Domain\Webhook;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -57,25 +57,25 @@ class WebhooksListTable extends WP_List_Table {
 		parent::__construct(
 			array(
 				'singular' => 'webhook',
-				'plural' => 'webhooks',
-				'ajax' => false,
+				'plural'   => 'webhooks',
+				'ajax'     => false,
 			)
 		);
 
-		$this->webhooks = $webhooks;
+		$this->webhooks  = $webhooks;
 		$this->workflows = $workflows;
-		$this->settings = $settings;
-		$this->rowForms = new RowActionForms();
+		$this->settings  = $settings;
+		$this->rowForms  = new RowActionForms();
 	}
 
 	public function get_columns() {
 		return array(
-			'cb' => '<input type="checkbox" />',
-			'public_url' => __( 'Public URL', 'workflow-automate' ),
-			'workflow' => __( 'Workflow', 'workflow-automate' ),
-			'signing' => __( 'Signing', 'workflow-automate' ),
+			'cb'            => '<input type="checkbox" />',
+			'public_url'    => __( 'Public URL', 'workflow-automate' ),
+			'workflow'      => __( 'Workflow', 'workflow-automate' ),
+			'signing'       => __( 'Signing', 'workflow-automate' ),
 			'ip_allow_list' => __( 'IP allow-list', 'workflow-automate' ),
-			'created_at' => __( 'Created', 'workflow-automate' ),
+			'created_at'    => __( 'Created', 'workflow-automate' ),
 		);
 	}
 
@@ -100,20 +100,20 @@ class WebhooksListTable extends WP_List_Table {
 
 		$result = $this->webhooks->list(
 			array(
-				'page' => $paged,
-				'per_page' => self::PER_PAGE,
+				'page'        => $paged,
+				'per_page'    => self::PER_PAGE,
 				'workflow_id' => $this->currentWorkflowFilter(),
 			)
 		);
 
-		$this->items = $result['items'];
-		$this->workflowTitles = $this->loadWorkflowTitles( $result['items'] );
+		$this->items                 = $result['items'];
+		$this->workflowTitles        = $this->loadWorkflowTitles( $result['items'] );
 		$this->workflowFilterOptions = $this->loadWorkflowFilterOptions();
 
 		$this->set_pagination_args(
 			array(
 				'total_items' => $result['total'],
-				'per_page' => $result['per_page'],
+				'per_page'    => $result['per_page'],
 				'total_pages' => (int) ceil( $result['total'] / max( 1, $result['per_page'] ) ),
 			)
 		);
@@ -141,7 +141,7 @@ class WebhooksListTable extends WP_List_Table {
 				continue;
 			}
 
-			$workflow = $this->workflows->find( $workflow_id, true );
+			$workflow               = $this->workflows->find( $workflow_id, true );
 			$titles[ $workflow_id ] = $workflow
 				? $workflow->title()
 				: __( '(deleted workflow)', 'workflow-automate' );
@@ -153,7 +153,7 @@ class WebhooksListTable extends WP_List_Table {
 	private function loadWorkflowFilterOptions(): array {
 		$result = $this->workflows->list(
 			array(
-				'page' => 1,
+				'page'     => 1,
 				'per_page' => 100,
 			)
 		);
@@ -178,9 +178,9 @@ class WebhooksListTable extends WP_List_Table {
 
 		return array(
 			array(
-				'name' => 'workflow_id',
-				'label' => __( 'Filter by workflow', 'workflow-automate' ),
-				'value' => (string) $this->currentWorkflowFilter(),
+				'name'    => 'workflow_id',
+				'label'   => __( 'Filter by workflow', 'workflow-automate' ),
+				'value'   => (string) $this->currentWorkflowFilter(),
 				'options' => $options,
 			),
 		);
@@ -202,7 +202,7 @@ class WebhooksListTable extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_public_url( $item ) {
-		$url = $this->webhooks->publicUrl( $item );
+		$url      = $this->webhooks->publicUrl( $item );
 		$edit_url = $this->editUrl( $item->id() );
 
 		$title = sprintf(
@@ -212,7 +212,7 @@ class WebhooksListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -245,11 +245,13 @@ class WebhooksListTable extends WP_List_Table {
 				$count = count( $item->ipAllowList() );
 
 				return $count > 0
-					? esc_html( sprintf(
+					? esc_html(
+						sprintf(
 						/* translators: %d: number of allowed IPs/CIDRs. */
-						_n( '%d entry', '%d entries', $count, 'workflow-automate' ),
-						$count
-					) )
+							_n( '%d entry', '%d entries', $count, 'workflow-automate' ),
+							$count
+						)
+					)
 					: esc_html__( 'Any IP', 'workflow-automate' );
 
 			case 'created_at':
@@ -282,7 +284,7 @@ class WebhooksListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id = 'wfa-webhook-delete-' . $id;
+		$form_id     = 'wfa-webhook-delete-' . $id;
 		$nonce_field = wp_nonce_field( 'wfa_webhook_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(

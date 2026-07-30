@@ -2,15 +2,15 @@
 /**
  * Workflow node repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace AIAWAB\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
+use AIAWAB\Plugin\Database\Table;
+use AIAWAB\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -55,13 +55,13 @@ class WorkflowNodeRepository {
 		$now = current_time( 'mysql', true );
 
 		$data = array(
-			'workflow_id' => (int) $attributes['workflow_id'],
+			'workflow_id'    => (int) $attributes['workflow_id'],
 			'client_node_id' => (string) $attributes['client_node_id'],
-			'node_type' => (string) $attributes['node_type'],
-			'label' => isset( $attributes['label'] ) ? (string) $attributes['label'] : null,
-			'config_json' => isset( $attributes['config'] ) ? wp_json_encode( $attributes['config'] ) : null,
-			'created_at' => $now,
-			'updated_at' => $now,
+			'node_type'      => (string) $attributes['node_type'],
+			'label'          => isset( $attributes['label'] ) ? (string) $attributes['label'] : null,
+			'config_json'    => isset( $attributes['config'] ) ? wp_json_encode( $attributes['config'] ) : null,
+			'created_at'     => $now,
+			'updated_at'     => $now,
 		);
 
 		$formats = array( '%d', '%s', '%s', '%s', '%s', '%s', '%s' );
@@ -78,30 +78,30 @@ class WorkflowNodeRepository {
 	/**
 	 * Updates an existing node row. Only the provided keys are touched.
 	 *
-	 * @param int                   $id         Node id.
-	 * @param array<string, mixed>  $attributes Any of: label, config, node_type.
+	 * @param int                  $id         Node id.
+	 * @param array<string, mixed> $attributes Any of: label, config, node_type.
 	 *
 	 * @return WorkflowNode|null Null if the node does not exist or the update failed.
 	 */
 	public function update( int $id, array $attributes ): ?WorkflowNode {
 		global $wpdb;
 
-		$data = array();
+		$data    = array();
 		$formats = array();
 
 		if ( array_key_exists( 'node_type', $attributes ) ) {
 			$data['node_type'] = (string) $attributes['node_type'];
-			$formats[] = '%s';
+			$formats[]         = '%s';
 		}
 
 		if ( array_key_exists( 'label', $attributes ) ) {
 			$data['label'] = null === $attributes['label'] ? null : (string) $attributes['label'];
-			$formats[] = '%s';
+			$formats[]     = '%s';
 		}
 
 		if ( array_key_exists( 'config', $attributes ) ) {
 			$data['config_json'] = null === $attributes['config'] ? null : wp_json_encode( $attributes['config'] );
-			$formats[] = '%s';
+			$formats[]           = '%s';
 		}
 
 		if ( array() === $data ) {
@@ -109,7 +109,7 @@ class WorkflowNodeRepository {
 		}
 
 		$data['updated_at'] = current_time( 'mysql', true );
-		$formats[] = '%s';
+		$formats[]          = '%s';
 
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
@@ -131,7 +131,7 @@ class WorkflowNodeRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
 		return $row ? WorkflowNode::fromRow( $row ) : null;
 	}
@@ -147,8 +147,8 @@ class WorkflowNodeRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $workflow_id, self::MAX_NODES_PER_WORKFLOW ) );
+		$sql   = "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$rows  = $wpdb->get_results( $wpdb->prepare( $sql, $workflow_id, self::MAX_NODES_PER_WORKFLOW ) );
 
 		return array_map( array( WorkflowNode::class, 'fromRow' ), $rows );
 	}

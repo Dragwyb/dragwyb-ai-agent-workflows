@@ -2,12 +2,12 @@
 /**
  * Transient-backed conversation memory for AI Agent nodes.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -83,9 +83,9 @@ class AgentMemoryStore {
 				}
 			}
 
-			$keep = $this->max_messages - ( null !== $system_message ? 1 : 0 );
+			$keep           = $this->max_messages - ( null !== $system_message ? 1 : 0 );
 			$other_messages = array_slice( $other_messages, -1 * max( 1, $keep ) );
-			$messages = null !== $system_message ? array_merge( array( $system_message ), $other_messages ) : $other_messages;
+			$messages       = null !== $system_message ? array_merge( array( $system_message ), $other_messages ) : $other_messages;
 		}
 
 		return set_transient( $this->storage_key, $messages, self::EXPIRATION );

@@ -2,14 +2,14 @@
 /**
  * Shared Google Sheet helper utilities.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet\Helpers;
+namespace AIAWAB\Plugin\Integration\GoogleSheet\Helpers;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsHttpClient;
+use AIAWAB\Plugin\Integration\GoogleSheet\GoogleSheetsHttpClient;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -92,7 +92,7 @@ final class GoogleSheetCommons {
 
 		while ( $column_index > 0 ) {
 			--$column_index;
-			$letter = chr( $column_index % 26 + 65 ) . $letter;
+			$letter       = chr( $column_index % 26 + 65 ) . $letter;
 			$column_index = (int) ( $column_index / 26 );
 		}
 

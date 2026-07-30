@@ -2,14 +2,14 @@
 /**
  * Worksheet/tab-level Google Sheets operations.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace AIAWAB\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use AIAWAB\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,7 +45,7 @@ final class GoogleSheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the sheet payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the sheet payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -78,7 +78,7 @@ final class GoogleSheetService {
 		}
 
 		$response['response'] = array(
-			'found' => count( $matched ) > 0,
+			'found'      => count( $matched ) > 0,
 			'worksheets' => $matched,
 		);
 
@@ -94,7 +94,7 @@ final class GoogleSheetService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Source worksheet was not found.', 'workflow-automate' ),
+				'error'   => __( 'Source worksheet was not found.', 'workflow-automate' ),
 			);
 		}
 
@@ -107,7 +107,7 @@ final class GoogleSheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the copy payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the copy payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -127,7 +127,7 @@ final class GoogleSheetService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Worksheet was not found.', 'workflow-automate' ),
+				'error'   => __( 'Worksheet was not found.', 'workflow-automate' ),
 			);
 		}
 
@@ -146,7 +146,7 @@ final class GoogleSheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the delete payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the delete payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -177,16 +177,16 @@ final class GoogleSheetService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Worksheet was not found.', 'workflow-automate' ),
+				'error'   => __( 'Worksheet was not found.', 'workflow-automate' ),
 			);
 		}
 
 		$format = in_array( $format, array( 'csv', 'pdf', 'xlsx' ), true ) ? $format : 'csv';
 
 		return array(
-			'success' => true,
+			'success'     => true,
 			'status_code' => 200,
-			'response' => array(
+			'response'    => array(
 				'file_url' => sprintf(
 					'https://docs.google.com/spreadsheets/d/%s/export?format=%s&id=%s&gid=%d',
 					rawurlencode( $spreadsheet_id ),

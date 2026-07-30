@@ -2,14 +2,14 @@
 /**
  * Row and column Google Sheets operations.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace AIAWAB\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use AIAWAB\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,7 +33,7 @@ final class GoogleRowService {
 		if ( empty( $values ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'workflow-automate' ),
 			);
 		}
 
@@ -51,14 +51,14 @@ final class GoogleRowService {
 		$payload = wp_json_encode(
 			array(
 				'majorDimension' => 'ROWS',
-				'values' => array( $row ),
+				'values'         => array( $row ),
 			)
 		);
 
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the row payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the row payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -112,14 +112,14 @@ final class GoogleRowService {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
 			);
 		}
 
 		if ( '' === $target_range ) {
-			$keys        = array_keys( $values );
-			$min_index   = min( $keys );
-			$max_index   = max( $keys );
+			$keys         = array_keys( $values );
+			$min_index    = min( $keys );
+			$max_index    = max( $keys );
 			$target_range = $this->commons->columnIndexToLetter( $min_index ) . $row_number . ':' . $this->commons->columnIndexToLetter( $max_index ) . $row_number;
 		}
 
@@ -129,7 +129,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the update payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the update payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -145,7 +145,7 @@ final class GoogleRowService {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
 			);
 		}
 
@@ -162,7 +162,7 @@ final class GoogleRowService {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
 			);
 		}
 
@@ -175,7 +175,7 @@ final class GoogleRowService {
 
 		$response['response'] = array(
 			'row_number' => $row_number,
-			'values' => $response['response']['values'][0] ?? array(),
+			'values'     => $response['response']['values'][0] ?? array(),
 		);
 
 		return $response;
@@ -207,7 +207,7 @@ final class GoogleRowService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Worksheet was not found.', 'workflow-automate' ),
+				'error'   => __( 'Worksheet was not found.', 'workflow-automate' ),
 			);
 		}
 
@@ -228,10 +228,10 @@ final class GoogleRowService {
 					array(
 						'insertDimension' => array(
 							'range' => array(
-								'sheetId' => $sheet_id,
-								'dimension' => 'COLUMNS',
+								'sheetId'    => $sheet_id,
+								'dimension'  => 'COLUMNS',
 								'startIndex' => $column_index - 1,
-								'endIndex' => $column_index,
+								'endIndex'   => $column_index,
 							),
 						),
 					),
@@ -242,7 +242,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the column payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the column payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -264,7 +264,7 @@ final class GoogleRowService {
 		if ( ! is_string( $header_body ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the column header payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the column header payload.', 'workflow-automate' ),
 			);
 		}
 
@@ -287,7 +287,7 @@ final class GoogleRowService {
 
 			if ( $old_val !== $new_val ) {
 				$updates[] = array(
-					'range' => $sheet_title . '!' . $this->commons->columnIndexToLetter( $col ) . ( $row_id + 1 ),
+					'range'  => $sheet_title . '!' . $this->commons->columnIndexToLetter( $col ) . ( $row_id + 1 ),
 					'values' => array( array( $new_val ) ),
 				);
 			}
@@ -295,9 +295,9 @@ final class GoogleRowService {
 
 		if ( empty( $updates ) ) {
 			return array(
-				'success' => true,
+				'success'     => true,
 				'status_code' => 200,
-				'response' => array(
+				'response'    => array(
 					'updatedCells' => 0,
 				),
 			);
@@ -305,7 +305,7 @@ final class GoogleRowService {
 
 		$payload = wp_json_encode(
 			array(
-				'data' => $updates,
+				'data'             => $updates,
 				'valueInputOption' => 'USER_ENTERED',
 			)
 		);
@@ -313,7 +313,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the batch update payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the batch update payload.', 'workflow-automate' ),
 			);
 		}
 

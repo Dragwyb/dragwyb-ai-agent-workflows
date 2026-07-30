@@ -2,12 +2,12 @@
 /**
  * Branch-aware execution order for workflow graphs.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -67,10 +67,10 @@ class GraphExecutionPlanner {
 	 * @return string[] Main-path client node ids in canvas order.
 	 */
 	private function getMainPathNodeIdsByPosition( array $graph_nodes ): array {
-		$main_nodes      = $this->mainCanvasNodes( $graph_nodes );
-		$sorted_main     = $this->sortByPosition( $main_nodes );
-		$branch_targets  = $this->collectBranchTargetIds( $graph_nodes );
-		$main_path_ids   = array();
+		$main_nodes     = $this->mainCanvasNodes( $graph_nodes );
+		$sorted_main    = $this->sortByPosition( $main_nodes );
+		$branch_targets = $this->collectBranchTargetIds( $graph_nodes );
+		$main_path_ids  = array();
 
 		foreach ( $sorted_main as $graph_node ) {
 			$id = (string) ( $graph_node['id'] ?? '' );
@@ -238,8 +238,8 @@ class GraphExecutionPlanner {
 	}
 
 	/**
-	 * @param string            $current_id     Current branch node id.
-	 * @param array<int, mixed> $graph_nodes    Raw graph nodes.
+	 * @param string             $current_id     Current branch node id.
+	 * @param array<int, mixed>  $graph_nodes    Raw graph nodes.
 	 * @param array<string,true> $branch_targets Branch entry ids.
 	 *
 	 * @return string|null
@@ -251,8 +251,8 @@ class GraphExecutionPlanner {
 			return null;
 		}
 
-		$current_x = isset( $current['x'] ) ? (int) $current['x'] : 0;
-		$current_y = isset( $current['y'] ) ? (int) $current['y'] : 0;
+		$current_x  = isset( $current['x'] ) ? (int) $current['x'] : 0;
+		$current_y  = isset( $current['y'] ) ? (int) $current['y'] : 0;
 		$candidates = array();
 
 		foreach ( $this->mainCanvasNodes( $graph_nodes ) as $graph_node ) {

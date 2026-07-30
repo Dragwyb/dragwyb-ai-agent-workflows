@@ -2,12 +2,12 @@
 /**
  * Resolves {{nodes.id.path}} and literal values from execution context.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

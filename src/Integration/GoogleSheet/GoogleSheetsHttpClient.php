@@ -2,14 +2,14 @@
 /**
  * Authenticated HTTP client for Google Sheets and Drive APIs.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace AIAWAB\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
+use AIAWAB\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -51,9 +51,9 @@ final class GoogleSheetsHttpClient {
 		);
 
 		if ( null !== $body ) {
-			$headers['Content-Type']     = 'application/json';
-			$args['headers']             = $headers;
-			$args['body']                = $body;
+			$headers['Content-Type'] = 'application/json';
+			$args['headers']         = $headers;
+			$args['body']            = $body;
 		}
 
 		switch ( strtoupper( $method ) ) {

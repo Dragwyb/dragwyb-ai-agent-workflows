@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress User, Role, and Capability actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress\Service;
+namespace AIAWAB\Plugin\Integration\WordPress\Service;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -52,7 +52,7 @@ final class UserWordPressService {
 	}
 
 	public function createUser( array $config ): array {
-		$email = WordPressActionHelper::str( $config, 'email' );
+		$email    = WordPressActionHelper::str( $config, 'email' );
 		$username = WordPressActionHelper::str( $config, 'username' );
 
 		if ( '' === $email ) {
@@ -68,7 +68,7 @@ final class UserWordPressService {
 		}
 
 		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
-		$password = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
+		$password     = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
 
 		if ( '' === $password ) {
 			return WordPressActionHelper::fail( __( 'Password is required.', 'workflow-automate' ) );
@@ -80,11 +80,11 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
 		}
 
-		$userData = WordPressActionHelper::mapUserFields( $config );
+		$userData               = WordPressActionHelper::mapUserFields( $config );
 		$userData['user_login'] = $username;
 		$userData['user_email'] = $email;
-		$userData['user_pass'] = $password;
-		$userData['role'] = $userRole;
+		$userData['user_pass']  = $password;
+		$userData['role']       = $userRole;
 
 		$marker = static function ( int $id ): void {
 			WordPressActionHelper::markAutomatedUser( $id );
@@ -114,7 +114,7 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'user_id' => $userId,
-				'user' => $this->fetchUserInfo( $userId ),
+				'user'    => $this->fetchUserInfo( $userId ),
 			)
 		);
 	}
@@ -130,7 +130,7 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
 		}
 
-		$userData = WordPressActionHelper::mapUserFields( $config );
+		$userData       = WordPressActionHelper::mapUserFields( $config );
 		$userData['ID'] = $userId;
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
@@ -158,15 +158,15 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'user_id' => $userId,
-				'user' => $this->fetchUserInfo( $userId ),
+				'user'    => $this->fetchUserInfo( $userId ),
 			)
 		);
 	}
 
 	public function deleteUser( array $config ): array {
-		$useEmail = WordPressActionHelper::bool( $config, 'use_email' );
-		$userId = WordPressActionHelper::int( $config, 'user_id' );
-		$userEmail = WordPressActionHelper::str( $config, 'user_email' );
+		$useEmail       = WordPressActionHelper::bool( $config, 'use_email' );
+		$userId         = WordPressActionHelper::int( $config, 'user_id' );
+		$userEmail      = WordPressActionHelper::str( $config, 'user_email' );
 		$reassignUserId = WordPressActionHelper::int( $config, 'reassign_user_id' );
 
 		if ( $useEmail ) {
@@ -222,7 +222,7 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			$this->fetchUsers(
 				array(
-					'role' => $role,
+					'role'    => $role,
 					'orderby' => 'ID',
 				)
 			)
@@ -262,7 +262,7 @@ final class UserWordPressService {
 	}
 
 	public function getUserByField( array $config ): array {
-		$fieldKey = WordPressActionHelper::str( $config, 'field_key' );
+		$fieldKey   = WordPressActionHelper::str( $config, 'field_key' );
 		$fieldValue = WordPressActionHelper::str( $config, 'field_value' );
 
 		if ( '' === $fieldKey ) {
@@ -299,7 +299,7 @@ final class UserWordPressService {
 	}
 
 	public function getUserMetadataByMetaKey( array $config ): array {
-		$userId = WordPressActionHelper::int( $config, 'user_id' );
+		$userId  = WordPressActionHelper::int( $config, 'user_id' );
 		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $userId <= 0 ) {
@@ -348,16 +348,16 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'user_id' => $userId,
+				'user_id'  => $userId,
 				'metadata' => $this->fetchUserMeta( $userId ),
 			)
 		);
 	}
 
 	public function createRole( array $config ): array {
-		$roleName = WordPressActionHelper::str( $config, 'role_name' );
+		$roleName        = WordPressActionHelper::str( $config, 'role_name' );
 		$roleDisplayName = WordPressActionHelper::str( $config, 'role_display_name' );
-		$capabilities = WordPressActionHelper::parseCapabilities( $config['role_capabilities'] ?? array() );
+		$capabilities    = WordPressActionHelper::parseCapabilities( $config['role_capabilities'] ?? array() );
 
 		if ( '' === $roleName ) {
 			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
@@ -375,9 +375,9 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'role_name' => $roleName,
+				'role_name'         => $roleName,
 				'role_display_name' => $roleDisplayName,
-				'capabilities' => $role->capabilities,
+				'capabilities'      => $role->capabilities,
 			)
 		);
 	}
@@ -432,7 +432,7 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'user_id' => $userId,
-				'roles' => array_values( $user->roles ),
+				'roles'   => array_values( $user->roles ),
 			)
 		);
 	}
@@ -444,7 +444,7 @@ final class UserWordPressService {
 	}
 
 	public function getAllCapabilities(): array {
-		$wpRoles = wp_roles();
+		$wpRoles      = wp_roles();
 		$capabilities = array();
 
 		if ( $wpRoles ) {
@@ -511,7 +511,7 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'role_name' => $roleName,
+				'role_name'    => $roleName,
 				'capabilities' => $role->capabilities,
 			)
 		);
@@ -562,7 +562,7 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'user_id' => $userId,
+				'user_id'      => $userId,
 				'capabilities' => $user->allcaps,
 			)
 		);

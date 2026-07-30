@@ -2,14 +2,14 @@
 /**
  * Validates AI Agent configuration before execution.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,12 +2,12 @@
 /**
  * Normalizes raw WordPress hook arguments into JSON-friendly trigger payloads.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,8 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class TriggerPayloadNormalizer {
 
 	/**
-	 * @param string               $hook_name WordPress action hook name.
-	 * @param array<int, mixed>    $args      Variadic hook arguments.
+	 * @param string            $hook_name WordPress action hook name.
+	 * @param array<int, mixed> $args      Variadic hook arguments.
 	 *
 	 * @return array<string, mixed>
 	 */
@@ -115,8 +115,8 @@ class TriggerPayloadNormalizer {
 
 		$payload = array_merge(
 			array(
-				'source' => 'wordpress',
-				'event' => $hook_name,
+				'source'  => 'wordpress',
+				'event'   => $hook_name,
 				'post_id' => $post_id,
 			),
 			$extra
@@ -125,7 +125,7 @@ class TriggerPayloadNormalizer {
 		if ( $post instanceof \WP_Post ) {
 			$payload = array_merge( $payload, self::postFields( $post ) );
 		} elseif ( $post_id > 0 ) {
-			$content = self::loadPostContent( $post_id );
+			$content                      = self::loadPostContent( $post_id );
 			$payload['post_content']      = $content;
 			$payload['post_content_text'] = self::humanReadablePostContent( $content );
 		}
@@ -143,18 +143,18 @@ class TriggerPayloadNormalizer {
 		$content = self::loadPostContent( $post_id );
 
 		return array(
-			'post_title' => (string) $post->post_title,
-			'post_content' => $content,
+			'post_title'        => (string) $post->post_title,
+			'post_content'      => $content,
 			'post_content_text' => self::humanReadablePostContent( $content ),
-			'post_excerpt' => (string) $post->post_excerpt,
-			'post_status' => (string) $post->post_status,
-			'post_type' => (string) $post->post_type,
-			'post_name' => (string) $post->post_name,
-			'post_author' => (int) $post->post_author,
-			'post_date' => (string) $post->post_date,
-			'post_modified' => (string) $post->post_modified,
-			'post_parent' => (int) $post->post_parent,
-			'guid' => (string) $post->guid,
+			'post_excerpt'      => (string) $post->post_excerpt,
+			'post_status'       => (string) $post->post_status,
+			'post_type'         => (string) $post->post_type,
+			'post_name'         => (string) $post->post_name,
+			'post_author'       => (int) $post->post_author,
+			'post_date'         => (string) $post->post_date,
+			'post_modified'     => (string) $post->post_modified,
+			'post_parent'       => (int) $post->post_parent,
+			'guid'              => (string) $post->guid,
 		);
 	}
 
@@ -198,7 +198,7 @@ class TriggerPayloadNormalizer {
 		}
 
 		if ( $post_id > 0 ) {
-			$content = self::loadPostContent( $post_id );
+			$content                      = self::loadPostContent( $post_id );
 			$payload['post_content']      = $content;
 			$payload['post_content_text'] = self::humanReadablePostContent( $content );
 		}
@@ -243,8 +243,8 @@ class TriggerPayloadNormalizer {
 	private static function wrapRaw( string $hook_name, array $args ): array {
 		return array(
 			'source' => 'wordpress',
-			'event' => $hook_name,
-			'args' => self::jsonSafe( $args ),
+			'event'  => $hook_name,
+			'args'   => self::jsonSafe( $args ),
 		);
 	}
 
@@ -260,9 +260,9 @@ class TriggerPayloadNormalizer {
 
 		if ( $value instanceof \WP_User ) {
 			return array(
-				'ID' => (int) $value->ID,
-				'user_login' => (string) $value->user_login,
-				'user_email' => (string) $value->user_email,
+				'ID'           => (int) $value->ID,
+				'user_login'   => (string) $value->user_login,
+				'user_email'   => (string) $value->user_email,
 				'display_name' => (string) $value->display_name,
 			);
 		}
@@ -291,18 +291,18 @@ class TriggerPayloadNormalizer {
 	 */
 	private static function isPostHook( string $hook_name ): bool {
 		static $hooks = array(
-			'save_post' => true,
-			'wp_insert_post' => true,
-			'post_updated' => true,
-			'wp_after_insert_post' => true,
+			'save_post'              => true,
+			'wp_insert_post'         => true,
+			'post_updated'           => true,
+			'wp_after_insert_post'   => true,
 			'transition_post_status' => true,
-			'before_delete_post' => true,
-			'add_meta_boxes' => true,
-			'wp_trash_post' => true,
-			'untrash_post' => true,
-			'deleted_post' => true,
-			'delete_post' => true,
-			'wp_save_post_revision' => true,
+			'before_delete_post'     => true,
+			'add_meta_boxes'         => true,
+			'wp_trash_post'          => true,
+			'untrash_post'           => true,
+			'deleted_post'           => true,
+			'delete_post'            => true,
+			'wp_save_post_revision'  => true,
 		);
 
 		return isset( $hooks[ $hook_name ] );

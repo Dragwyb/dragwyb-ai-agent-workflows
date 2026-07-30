@@ -2,12 +2,12 @@
 /**
  * Request-scoped workflow trigger reentrancy guard.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

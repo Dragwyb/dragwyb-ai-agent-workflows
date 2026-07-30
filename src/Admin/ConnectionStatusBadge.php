@@ -2,14 +2,14 @@
 /**
  * Renders a Connection status as a small colored badge.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Domain\Connection;
+use AIAWAB\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

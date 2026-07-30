@@ -2,16 +2,16 @@
 /**
  * Base class for Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace AIAWAB\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,10 +31,10 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	 */
 	protected function connectionField(): array {
 		return array(
-			'type' => 'connection',
-			'label' => __( 'Google connection', 'workflow-automate' ),
+			'type'     => 'connection',
+			'label'    => __( 'Google connection', 'workflow-automate' ),
 			'required' => true,
-			'default' => 0,
+			'default'  => 0,
 		);
 	}
 
@@ -43,8 +43,8 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	 */
 	protected function spreadsheetIdField(): array {
 		return array(
-			'type' => 'string',
-			'label' => __( 'Spreadsheet ID (from the sheet URL)', 'workflow-automate' ),
+			'type'     => 'string',
+			'label'    => __( 'Spreadsheet ID (from the sheet URL)', 'workflow-automate' ),
 			'required' => true,
 		);
 	}
@@ -54,9 +54,9 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	 */
 	protected function sheetTitleField(): array {
 		return array(
-			'type' => 'string',
-			'label' => __( 'Sheet tab name', 'workflow-automate' ),
-			'default' => 'Sheet1',
+			'type'     => 'string',
+			'label'    => __( 'Sheet tab name', 'workflow-automate' ),
+			'default'  => 'Sheet1',
 			'required' => true,
 		);
 	}
@@ -66,8 +66,8 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	 */
 	protected function valuesField(): array {
 		return array(
-			'type' => 'string',
-			'label' => __( 'Row values, comma-separated (supports {{trigger.fields.*}})', 'workflow-automate' ),
+			'type'     => 'string',
+			'label'    => __( 'Row values, comma-separated (supports {{trigger.fields.*}})', 'workflow-automate' ),
 			'required' => true,
 		);
 	}
@@ -79,9 +79,9 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	 */
 	protected function optionalValuesField(): array {
 		return array(
-			'type' => 'string',
-			'label' => __( 'Row values', 'workflow-automate' ),
-			'description' => __( 'Comma-separated cell values for a data row (map fields from trigger/post data). Optional.', 'workflow-automate' ),
+			'type'           => 'string',
+			'label'          => __( 'Row values', 'workflow-automate' ),
+			'description'    => __( 'Comma-separated cell values for a data row (map fields from trigger/post data). Optional.', 'workflow-automate' ),
 			'agent_fillable' => true,
 		);
 	}
@@ -152,14 +152,14 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'Google Sheets request failed.', 'workflow-automate' ),
+				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Google Sheets request failed.', 'workflow-automate' ),
 			);
 		}
 
 		return array(
-			'success' => true,
+			'success'     => true,
 			'status_code' => $result['status_code'] ?? 200,
-			'response' => $result['response'] ?? array(),
+			'response'    => $result['response'] ?? array(),
 		);
 	}
 
@@ -199,7 +199,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 		if ( '' === $spreadsheet_id ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No spreadsheet ID configured.', 'workflow-automate' ),
+				'error'   => __( 'No spreadsheet ID configured.', 'workflow-automate' ),
 			);
 		}
 

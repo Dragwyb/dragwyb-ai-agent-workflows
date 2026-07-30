@@ -2,16 +2,16 @@
 /**
  * Generic action node type driven by a `WordPressActionCatalog` entry.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace AIAWAB\Plugin\Integration\WordPress;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionGroupInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
+use AIAWAB\Plugin\Domain\Contracts\ActionGroupInterface;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 	 */
 	public function __construct( array $definition, WordPressServices $services ) {
 		$this->definition = $definition;
-		$this->services = $services;
+		$this->services   = $services;
 	}
 
 	public function slug(): string {
@@ -58,7 +58,7 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 	}
 
 	public function app(): string {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	/**
@@ -79,7 +79,7 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 		$config = $this->applyDynamicPostTypeFromTrigger( $config, $context );
 
 		$method = $this->definition['method'];
-		$args = $this->definition['method_args'] ?? array();
+		$args   = $this->definition['method_args'] ?? array();
 
 		$guard = TriggerReentrancyGuard::instance();
 
@@ -112,7 +112,7 @@ final class WordPressCatalogAction implements ActionInterface, ActionGroupInterf
 			return $config;
 		}
 
-		$configured = isset( $config['post_type'] ) ? trim( (string) $config['post_type'] ) : '';
+		$configured   = isset( $config['post_type'] ) ? trim( (string) $config['post_type'] ) : '';
 		$trigger_type = '';
 
 		if ( isset( $context['trigger'] ) && is_array( $context['trigger'] ) ) {

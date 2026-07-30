@@ -2,18 +2,18 @@
 /**
  * Connections admin list table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWAB\Plugin\Domain\Connection;
+use AIAWAB\Plugin\Service\ConnectionAuthTypes;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -47,24 +47,24 @@ class ConnectionsListTable extends WP_List_Table {
 		parent::__construct(
 			array(
 				'singular' => 'connection',
-				'plural' => 'connections',
-				'ajax' => false,
+				'plural'   => 'connections',
+				'ajax'     => false,
 			)
 		);
 
 		$this->connections = $connections;
-		$this->settings = $settings;
-		$this->rowForms = new RowActionForms();
+		$this->settings    = $settings;
+		$this->rowForms    = new RowActionForms();
 	}
 
 	public function get_columns() {
 		return array(
-			'cb' => '<input type="checkbox" />',
-			'label' => __( 'Label', 'workflow-automate' ),
+			'cb'               => '<input type="checkbox" />',
+			'label'            => __( 'Label', 'workflow-automate' ),
 			'integration_slug' => __( 'Integration', 'workflow-automate' ),
-			'auth_type' => __( 'Authentication', 'workflow-automate' ),
-			'status' => __( 'Status', 'workflow-automate' ),
-			'created_at' => __( 'Created', 'workflow-automate' ),
+			'auth_type'        => __( 'Authentication', 'workflow-automate' ),
+			'status'           => __( 'Status', 'workflow-automate' ),
+			'created_at'       => __( 'Created', 'workflow-automate' ),
 		);
 	}
 
@@ -89,8 +89,8 @@ class ConnectionsListTable extends WP_List_Table {
 
 		$result = $this->connections->list(
 			array(
-				'page' => $paged,
-				'per_page' => self::PER_PAGE,
+				'page'             => $paged,
+				'per_page'         => self::PER_PAGE,
 				'integration_slug' => $this->currentIntegrationFilter(),
 			)
 		);
@@ -100,7 +100,7 @@ class ConnectionsListTable extends WP_List_Table {
 		$this->set_pagination_args(
 			array(
 				'total_items' => $result['total'],
-				'per_page' => self::PER_PAGE,
+				'per_page'    => self::PER_PAGE,
 			)
 		);
 	}
@@ -127,7 +127,7 @@ class ConnectionsListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -137,11 +137,11 @@ class ConnectionsListTable extends WP_List_Table {
 	public function filterFields(): array {
 		return array(
 			array(
-				'name' => 'integration_slug',
-				'type' => 'search',
-				'label' => __( 'Filter by integration', 'workflow-automate' ),
+				'name'        => 'integration_slug',
+				'type'        => 'search',
+				'label'       => __( 'Filter by integration', 'workflow-automate' ),
 				'placeholder' => __( 'e.g. gemini, openai', 'workflow-automate' ),
-				'value' => $this->currentIntegrationFilter(),
+				'value'       => $this->currentIntegrationFilter(),
 			),
 		);
 	}
@@ -164,7 +164,7 @@ class ConnectionsListTable extends WP_List_Table {
 	private function editUrl( int $id ): string {
 		return add_query_arg(
 			array(
-				'page' => ConnectionFormPage::SLUG,
+				'page'       => ConnectionFormPage::SLUG,
 				'connection' => $id,
 			),
 			admin_url( 'admin.php' )
@@ -215,7 +215,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id = 'wfa-connection-delete-' . $id;
+		$form_id     = 'wfa-connection-delete-' . $id;
 		$nonce_field = wp_nonce_field( 'wfa_connection_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(

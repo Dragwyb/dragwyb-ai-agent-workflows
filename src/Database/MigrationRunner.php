@@ -2,14 +2,14 @@
 /**
  * Migration runner.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database;
+namespace AIAWAB\Plugin\Database;
 
-use WorkflowAutomate\Plugin\Core\Options;
+use AIAWAB\Plugin\Core\Options;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

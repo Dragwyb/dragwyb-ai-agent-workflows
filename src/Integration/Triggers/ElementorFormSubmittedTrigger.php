@@ -2,14 +2,14 @@
 /**
  * Elementor Pro form submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace AIAWAB\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -60,8 +60,8 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'select',
-				'label' => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'select',
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
 				'default' => '',
 				'options' => array(
 					array(
@@ -163,12 +163,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'elementor',
-			'event' => 'form_submitted',
-			'form_name' => $form_name,
-			'form_id' => $form_id,
+			'source'       => 'elementor',
+			'event'        => 'form_submitted',
+			'form_name'    => $form_name,
+			'form_id'      => $form_id,
 			'form_post_id' => $form_post_id,
-			'fields' => $fields,
+			'fields'       => $fields,
 		);
 	}
 }

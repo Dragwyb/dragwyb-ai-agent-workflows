@@ -6,7 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WorkflowAutomate\\Plugin\\' => array($baseDir . '/src'),
+    'AIAWAB\\Plugin\\' => array($baseDir . '/src'),
     'WordPress\\AiClient\\' => array($vendorDir . '/wordpress/php-ai-client/src'),
     'WordPress\\AI_Client\\' => array($vendorDir . '/wordpress/wp-ai-client/includes'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),

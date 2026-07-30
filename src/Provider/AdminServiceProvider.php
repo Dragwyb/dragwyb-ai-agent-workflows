@@ -2,19 +2,19 @@
 /**
  * Registers admin domain services against the container.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace AIAWAB\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
-use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
+use AIAWAB\Plugin\Core\Container;
+use AIAWAB\Plugin\Persistence\ConnectionRepository;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Service\SettingsService;
+use AIAWAB\Plugin\Service\ConnectionVerifier;
 
 
 // Prevent direct file access.

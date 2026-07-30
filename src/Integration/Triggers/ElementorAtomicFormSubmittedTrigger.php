@@ -2,14 +2,14 @@
 /**
  * Elementor Pro atomic form submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace AIAWAB\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,8 +57,8 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'select',
-				'label' => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'select',
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
 				'default' => '',
 				'options' => array(
 					array(
@@ -135,9 +135,9 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			return null;
 		}
 
-		$fields           = array();
-		$fields_by_label  = array();
-		$field_metadata   = array();
+		$fields          = array();
+		$fields_by_label = array();
+		$field_metadata  = array();
 
 		foreach ( $form_fields as $field ) {
 			if ( ! is_array( $field ) ) {
@@ -154,7 +154,7 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			$type  = sanitize_text_field( $field['type'] ?? 'text' );
 
 			if ( is_array( $value ) ) {
-				$sanitized = array_map( 'sanitize_text_field', $value );
+				$sanitized     = array_map( 'sanitize_text_field', $value );
 				$fields[ $id ] = implode( ', ', $sanitized );
 			} elseif ( 'textarea' === $type ) {
 				$fields[ $id ] = sanitize_textarea_field( (string) $value );
@@ -173,8 +173,8 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 				: null;
 
 			$field_metadata[ $id ] = array(
-				'label' => $label,
-				'type' => $type,
+				'label'   => $label,
+				'type'    => $type,
 				'options' => is_array( $options ) ? $options : null,
 			);
 		}
@@ -194,16 +194,16 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'elementor-atomic',
-			'event' => 'atomic_form_submitted',
-			'form_name' => $form_name,
-			'form_id' => $form_id,
-			'form_post_id' => (string) $post_id,
-			'fields' => $fields,
+			'source'          => 'elementor-atomic',
+			'event'           => 'atomic_form_submitted',
+			'form_name'       => $form_name,
+			'form_id'         => $form_id,
+			'form_post_id'    => (string) $post_id,
+			'fields'          => $fields,
 			'fields_by_label' => $fields_by_label,
-			'field_metadata' => $field_metadata,
-			'referer_title' => $referer_title,
-			'referrer' => $referrer,
+			'field_metadata'  => $field_metadata,
+			'referer_title'   => $referer_title,
+			'referrer'        => $referrer,
 		);
 	}
 

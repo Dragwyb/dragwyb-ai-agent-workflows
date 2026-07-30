@@ -2,12 +2,12 @@
 /**
  * Builds Gutenberg block markup from structured design sections.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace AIAWAB\Plugin\Integration\WordPress;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -221,7 +221,7 @@ class GutenbergBlockBuilder {
 			. implode( "\n", $column_blocks )
 			. "\n</div>\n<!-- /wp:columns -->";
 
-		return "<!-- wp:group -->\n<div class=\"" . esc_attr( $wrapper_class ) . "\"" . $wrapper_style . ">\n"
+		return "<!-- wp:group -->\n<div class=\"" . esc_attr( $wrapper_class ) . '"' . $wrapper_style . ">\n"
 			. $inner
 			. "\n</div>\n<!-- /wp:group -->";
 	}

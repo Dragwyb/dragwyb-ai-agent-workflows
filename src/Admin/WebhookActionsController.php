@@ -2,18 +2,18 @@
 /**
  * Handles state-changing Webhook admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\WebhooksPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Admin\Pages\WebhooksPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\WebhookService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -214,7 +214,7 @@ class WebhookActionsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => WebhooksPage::SLUG,
+					'page'       => WebhooksPage::SLUG,
 					'wfa_notice' => $notice,
 				),
 				admin_url( 'admin.php' )

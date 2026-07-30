@@ -2,14 +2,14 @@
 /**
  * LLM client backed by WordPress AI Client (prompt + tools).
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\Messages\DTO\Message;
 use WordPress\AiClient\Messages\DTO\MessagePart;
 use WordPress\AiClient\Messages\Enums\MessageRoleEnum;
@@ -300,7 +300,7 @@ class AgentAiClient {
 			}
 
 			$description = (string) ( $fn['description'] ?? '' );
-			$parameters   = isset( $fn['parameters'] ) && is_array( $fn['parameters'] ) ? $fn['parameters'] : null;
+			$parameters  = isset( $fn['parameters'] ) && is_array( $fn['parameters'] ) ? $fn['parameters'] : null;
 
 			$decls[] = new FunctionDeclaration( $name, $description, $parameters );
 		}
@@ -337,7 +337,7 @@ class AgentAiClient {
 					if ( null === $call ) {
 						continue;
 					}
-					$args = $call->getArgs();
+					$args         = $call->getArgs();
 					$tool_calls[] = array(
 						'id'       => (string) ( $call->getId() ?? wp_generate_uuid4() ),
 						'type'     => 'function',

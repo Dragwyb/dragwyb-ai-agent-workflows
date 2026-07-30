@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Post and Post Type actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress\Service;
+namespace AIAWAB\Plugin\Integration\WordPress\Service;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ final class PostWordPressService {
 
 	private function applyPostTaxonomies( int $postId, array $config, bool $append ): void {
 		$taxonomy = WordPressActionHelper::str( $config, 'taxonomy' );
-		$terms = WordPressActionHelper::parseList( $config['terms'] ?? array() );
+		$terms    = WordPressActionHelper::parseList( $config['terms'] ?? array() );
 
 		if ( '' !== $taxonomy && array() !== $terms ) {
 			wp_set_object_terms( $postId, $terms, $taxonomy, $append );
@@ -44,9 +44,9 @@ final class PostWordPressService {
 
 	public function getAllPosts( array $config ): array {
 		$limit = WordPressActionHelper::int( $config, 'limit' );
-		$args = array(
+		$args  = array(
 			'numberposts' => WordPressActionHelper::resolveListLimit( $limit > 0 ? $limit : null ),
-			'post_type' => WordPressActionHelper::str( $config, 'post_type', 'any' ),
+			'post_type'   => WordPressActionHelper::str( $config, 'post_type', 'any' ),
 			'post_status' => WordPressActionHelper::str( $config, 'post_status', 'any' ),
 		);
 
@@ -91,7 +91,7 @@ final class PostWordPressService {
 		$limit = WordPressActionHelper::int( $config, 'limit' );
 		$posts = get_posts(
 			array(
-				'post_type' => $postType,
+				'post_type'   => $postType,
 				'numberposts' => WordPressActionHelper::resolveListLimit( $limit > 0 ? $limit : null ),
 			)
 		);
@@ -105,8 +105,8 @@ final class PostWordPressService {
 	}
 
 	public function getPostsByMetadata( array $config ): array {
-		$postType = WordPressActionHelper::str( $config, 'post_type' );
-		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
+		$postType  = WordPressActionHelper::str( $config, 'post_type' );
+		$metaKey   = WordPressActionHelper::str( $config, 'meta_key' );
 		$metaValue = WordPressActionHelper::str( $config, 'meta_value' );
 
 		if ( '' === $postType ) {
@@ -124,9 +124,9 @@ final class PostWordPressService {
 		$limit = WordPressActionHelper::int( $config, 'limit' );
 		$posts = get_posts(
 			array(
-				'post_type' => $postType,
-				'meta_key' => $metaKey,
-				'meta_value' => $metaValue,
+				'post_type'   => $postType,
+				'meta_key'    => $metaKey,
+				'meta_value'  => $metaValue,
 				'numberposts' => WordPressActionHelper::resolveListLimit( $limit > 0 ? $limit : null ),
 			)
 		);
@@ -156,7 +156,7 @@ final class PostWordPressService {
 	}
 
 	public function getPostMetadataByMetaKey( array $config ): array {
-		$postId = WordPressActionHelper::int( $config, 'post_id' );
+		$postId  = WordPressActionHelper::int( $config, 'post_id' );
 		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $postId <= 0 ) {
@@ -248,7 +248,7 @@ final class PostWordPressService {
 		}
 
 		$postType = WordPressActionHelper::str( $config, 'post_type', 'post' );
-		$rawType = trim( (string) ( $config['post_type'] ?? '' ) );
+		$rawType  = trim( (string) ( $config['post_type'] ?? '' ) );
 		if ( str_contains( $rawType, '{{' ) ) {
 			$postType = 'post';
 		}
@@ -256,11 +256,11 @@ final class PostWordPressService {
 		$content = WordPressActionHelper::resolvePostContent( $config );
 
 		$postData = array(
-			'post_title' => $title,
+			'post_title'   => $title,
 			'post_content' => $content,
 			'post_excerpt' => WordPressActionHelper::str( $config, 'excerpt' ),
-			'post_type' => $postType,
-			'post_status' => WordPressActionHelper::str( $config, 'post_status', 'draft' ),
+			'post_type'    => $postType,
+			'post_status'  => WordPressActionHelper::str( $config, 'post_status', 'draft' ),
 		);
 
 		$slug = WordPressActionHelper::str( $config, 'slug' );
@@ -314,7 +314,7 @@ final class PostWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'post_id' => $postId,
-				'post' => $post ? WordPressActionHelper::serializePost( $post, true ) : array(),
+				'post'    => $post ? WordPressActionHelper::serializePost( $post, true ) : array(),
 			)
 		);
 	}
@@ -340,7 +340,7 @@ final class PostWordPressService {
 		}
 
 		$hasDesignSections = isset( $config['design_sections'] ) && '' !== trim( (string) $config['design_sections'] );
-		$hasContent = isset( $config['content'] ) && '' !== (string) $config['content'];
+		$hasContent        = isset( $config['content'] ) && '' !== (string) $config['content'];
 
 		if ( $hasDesignSections || $hasContent ) {
 			$postData['post_content'] = WordPressActionHelper::resolvePostContent( $config );
@@ -411,7 +411,7 @@ final class PostWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'post_id' => $postId,
-				'post' => $updatedPost ? WordPressActionHelper::serializePost( $updatedPost, true ) : array(),
+				'post'    => $updatedPost ? WordPressActionHelper::serializePost( $updatedPost, true ) : array(),
 			)
 		);
 	}
@@ -434,7 +434,7 @@ final class PostWordPressService {
 
 		$res = wp_update_post(
 			array(
-				'ID' => $postId,
+				'ID'          => $postId,
 				'post_status' => $status,
 			),
 			true
@@ -446,7 +446,7 @@ final class PostWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'post_id' => $postId,
+				'post_id'     => $postId,
 				'post_status' => $status,
 			)
 		);
@@ -464,7 +464,7 @@ final class PostWordPressService {
 		}
 
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );
-		$res = wp_delete_post( $postId, $force );
+		$res   = wp_delete_post( $postId, $force );
 
 		if ( ! $res ) {
 			return WordPressActionHelper::fail( __( 'Failed to delete post.', 'workflow-automate' ) );
@@ -475,15 +475,15 @@ final class PostWordPressService {
 
 	public function getAllPostTypes(): array {
 		$types = get_post_types( array(), 'objects' );
-		$data = array();
+		$data  = array();
 
 		foreach ( $types as $slug => $obj ) {
 			$data[] = array(
-				'slug' => $slug,
-				'label' => $obj->label,
+				'slug'           => $slug,
+				'label'          => $obj->label,
 				'singular_label' => $obj->labels->singular_name ?? $obj->label,
-				'public' => $obj->public,
-				'hierarchical' => $obj->hierarchical,
+				'public'         => $obj->public,
+				'hierarchical'   => $obj->hierarchical,
 			);
 		}
 
@@ -507,7 +507,7 @@ final class PostWordPressService {
 	}
 
 	public function registerPostType( array $config ): array {
-		$key = WordPressActionHelper::str( $config, 'key' );
+		$key   = WordPressActionHelper::str( $config, 'key' );
 		$label = WordPressActionHelper::str( $config, 'label' );
 
 		if ( '' === $key ) {
@@ -521,15 +521,15 @@ final class PostWordPressService {
 		$supports = WordPressActionHelper::parseList( $config['supports'] ?? array( 'title', 'editor' ) );
 
 		$args = array(
-			'label' => $label,
-			'public' => WordPressActionHelper::bool( $config, 'public', true ),
-			'hierarchical' => WordPressActionHelper::bool( $config, 'hierarchy', false ),
-			'show_ui' => WordPressActionHelper::bool( $config, 'show_ui', true ),
-			'show_in_menu' => WordPressActionHelper::bool( $config, 'show_in_menu', true ),
+			'label'             => $label,
+			'public'            => WordPressActionHelper::bool( $config, 'public', true ),
+			'hierarchical'      => WordPressActionHelper::bool( $config, 'hierarchy', false ),
+			'show_ui'           => WordPressActionHelper::bool( $config, 'show_ui', true ),
+			'show_in_menu'      => WordPressActionHelper::bool( $config, 'show_in_menu', true ),
 			'show_in_nav_menus' => WordPressActionHelper::bool( $config, 'show_in_nav_menu', true ),
 			'show_in_admin_bar' => WordPressActionHelper::bool( $config, 'show_in_admin_bar', true ),
-			'supports' => $supports,
-			'description' => WordPressActionHelper::str( $config, 'description' ),
+			'supports'          => $supports,
+			'description'       => WordPressActionHelper::str( $config, 'description' ),
 		);
 
 		$pos = WordPressActionHelper::int( $config, 'menu_position' );
@@ -548,7 +548,12 @@ final class PostWordPressService {
 			return WordPressActionHelper::fail( $res->get_error_message() );
 		}
 
-		return WordPressActionHelper::ok( array( 'key' => $key, 'label' => $label ) );
+		return WordPressActionHelper::ok(
+			array(
+				'key'   => $key,
+				'label' => $label,
+			)
+		);
 	}
 
 	public function unregisterPostType( array $config ): array {
@@ -592,6 +597,11 @@ final class PostWordPressService {
 			add_post_type_support( $key, $feature );
 		}
 
-		return WordPressActionHelper::ok( array( 'key' => $key, 'supports' => $supports ) );
+		return WordPressActionHelper::ok(
+			array(
+				'key'      => $key,
+				'supports' => $supports,
+			)
+		);
 	}
 }

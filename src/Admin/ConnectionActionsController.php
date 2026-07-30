@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Connection admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWAB\Plugin\Admin\Pages\ConnectionsPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Service\ConnectionAuthTypes;
+use AIAWAB\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -142,7 +142,7 @@ class ConnectionActionsController {
 			wp_safe_redirect(
 				add_query_arg(
 					array(
-						'page' => ConnectionFormPage::SLUG,
+						'page'       => ConnectionFormPage::SLUG,
 						'connection' => $connection->id(),
 						'wfa_notice' => 'created_oauth',
 					),
@@ -257,7 +257,7 @@ class ConnectionActionsController {
 	 */
 	private function redirect( string $notice, string $detail = '' ): void {
 		$args = array(
-			'page' => ConnectionsPage::SLUG,
+			'page'       => ConnectionsPage::SLUG,
 			'wfa_notice' => $notice,
 		);
 

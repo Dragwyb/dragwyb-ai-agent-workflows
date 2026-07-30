@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Plugin management actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress\Service;
+namespace AIAWAB\Plugin\Integration\WordPress\Service;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ final class PluginWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'plugin_file' => $file,
-				'is_active' => $active,
+				'is_active'   => $active,
 			)
 		);
 	}
@@ -52,7 +52,7 @@ final class PluginWordPressService {
 		if ( is_plugin_active( $file ) ) {
 			return WordPressActionHelper::ok(
 				array(
-					'plugin_file' => $file,
+					'plugin_file'    => $file,
 					'already_active' => true,
 				)
 			);
@@ -67,7 +67,7 @@ final class PluginWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'plugin_file' => $file,
-				'activated' => true,
+				'activated'   => true,
 			)
 		);
 	}

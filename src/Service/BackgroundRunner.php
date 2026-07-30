@@ -2,14 +2,14 @@
 /**
  * WP-Cron-driven background execution worker.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,7 +67,7 @@ class BackgroundRunner {
 	private WorkflowExecutionService $executor;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowExecutionService $executor ) {
-		$this->runs = $runs;
+		$this->runs     = $runs;
 		$this->executor = $executor;
 	}
 
@@ -83,7 +83,7 @@ class BackgroundRunner {
 	public static function registerCronSchedule( array $schedules ): array {
 		$schedules[ self::CRON_SCHEDULE ] = array(
 			'interval' => MINUTE_IN_SECONDS,
-			'display' => __( 'Every minute (Workflow Automate queue)', 'workflow-automate' ),
+			'display'  => __( 'Every minute (Workflow Automate queue)', 'workflow-automate' ),
 		);
 
 		return $schedules;
@@ -97,7 +97,7 @@ class BackgroundRunner {
 	 */
 	public function processBatch(): void {
 		$started_at = microtime( true );
-		$claimed = $this->runs->claimBatch( self::BATCH_SIZE, self::STALE_CLAIM_MINUTES );
+		$claimed    = $this->runs->claimBatch( self::BATCH_SIZE, self::STALE_CLAIM_MINUTES );
 
 		foreach ( $claimed as $index => $run ) {
 			if ( ( microtime( true ) - $started_at ) > self::TIME_BUDGET_SECONDS ) {

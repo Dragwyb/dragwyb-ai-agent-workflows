@@ -2,19 +2,19 @@
 /**
  * Registers REST endpoints & feature integrations against the container.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace AIAWAB\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use AIAWAB\Plugin\Core\Container;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Service\AiModelsService;
+use AIAWAB\Plugin\Service\ChatMessageService;
+use AIAWAB\Plugin\Service\ElementorFormsService;
+use AIAWAB\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

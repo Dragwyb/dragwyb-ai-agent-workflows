@@ -2,22 +2,22 @@
 /**
  * Handles state-changing Run admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace AIAWAB\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
+use AIAWAB\Plugin\Admin\Pages\RunDetailPage;
+use AIAWAB\Plugin\Admin\Pages\RunsPage;
+use AIAWAB\Plugin\Core\Capabilities;
+use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWAB\Plugin\Domain\WorkflowRun;
+use AIAWAB\Plugin\Service\WorkflowExecutionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,8 +45,8 @@ class RunActionsController {
 
 	public function __construct( WorkflowExecutionService $executor, WorkflowRunRepository $runs, WorkflowRunLogRepository $runLogs ) {
 		$this->executor = $executor;
-		$this->runs = $runs;
-		$this->runLogs = $runLogs;
+		$this->runs     = $runs;
+		$this->runLogs  = $runLogs;
 	}
 
 	/**
@@ -216,8 +216,8 @@ class RunActionsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => RunDetailPage::SLUG,
-					'run_id' => $run_id,
+					'page'       => RunDetailPage::SLUG,
+					'run_id'     => $run_id,
 					'wfa_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
@@ -253,7 +253,7 @@ class RunActionsController {
 	 * the request itself is malformed (no specific run to go back to),
 	 * or after a successful delete.
 	 *
-	 * @param string               $notice One of the keys understood by RunsPage::notices().
+	 * @param string                $notice One of the keys understood by RunsPage::notices().
 	 * @param array<string, scalar> $extra  Optional query args to preserve (filters).
 	 *
 	 * @return void
@@ -263,7 +263,7 @@ class RunActionsController {
 			add_query_arg(
 				array_merge(
 					array(
-						'page' => RunsPage::SLUG,
+						'page'       => RunsPage::SLUG,
 						'wfa_notice' => $notice,
 					),
 					$extra

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\Compatible;
+namespace AIAWAB\AiProviders\Compatible;
 
 use WordPress\AiClient\Providers\DTO\ProviderMetadata;
 use WordPress\AiClient\Providers\Http\DTO\Request;

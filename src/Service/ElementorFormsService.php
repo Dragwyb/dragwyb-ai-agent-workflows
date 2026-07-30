@@ -2,14 +2,14 @@
 /**
  * Lists Elementor Pro forms for builder config fields.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace AIAWAB\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
+use AIAWAB\Plugin\Integration\IntegrationTriggerCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,7 +68,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorAtomicFormsActive() ) {
 			return array(
 				'options' => array(),
-				'error' => __( 'Elementor Pro atomic forms are not available.', 'workflow-automate' ),
+				'error'   => __( 'Elementor Pro atomic forms are not available.', 'workflow-automate' ),
 			);
 		}
 
@@ -91,7 +91,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorProActive() ) {
 			return array(
 				'options' => array(),
-				'error' => __( 'Elementor Pro is not active.', 'workflow-automate' ),
+				'error'   => __( 'Elementor Pro is not active.', 'workflow-automate' ),
 			);
 		}
 
@@ -252,12 +252,12 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param array<int|string, mixed>             $elements
-	 * @param int                                  $post_id
-	 * @param string                               $preferred_form_id
-	 * @param callable(array<string, mixed>): bool $matches_element
+	 * @param array<int|string, mixed>               $elements
+	 * @param int                                    $post_id
+	 * @param string                                 $preferred_form_id
+	 * @param callable(array<string, mixed>): bool   $matches_element
 	 * @param callable(array<string, mixed>): string $resolve_form_name
-	 * @param bool                                 $atomic
+	 * @param bool                                   $atomic
 	 *
 	 * @return array{form_id: string, form_name: string, post_id: int, field_ids: array<int, string>, field_labels: array<string, string>}|null
 	 */
@@ -466,7 +466,7 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param callable(array<string, mixed>): bool $matches_element
+	 * @param callable(array<string, mixed>): bool   $matches_element
 	 * @param callable(array<string, mixed>): string $resolve_form_name
 	 *
 	 * @return array{options: array<int, array{value: string, label: string, url?: string, pages?: array<int, array{label: string, url: string}>}>, error: string|null}
@@ -576,7 +576,7 @@ final class ElementorFormsService {
 			);
 
 			if ( array() !== $page_links ) {
-				$option['url']  = $page_links[0]['url'];
+				$option['url']   = $page_links[0]['url'];
 				$option['pages'] = $page_links;
 			}
 
@@ -592,7 +592,7 @@ final class ElementorFormsService {
 
 		return array(
 			'options' => $options,
-			'error' => null,
+			'error'   => null,
 		);
 	}
 
@@ -687,7 +687,7 @@ final class ElementorFormsService {
 			return array();
 		}
 
-		$settings = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
+		$settings     = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
 		$component_id = 0;
 
 		if ( isset( $settings['component_instance']['value']['component_id']['value'] ) ) {
@@ -790,12 +790,12 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param array<int|string, mixed> $elements
-	 * @param int                      $post_id
-	 * @param string                   $post_title
+	 * @param array<int|string, mixed>                                                                                                   $elements
+	 * @param int                                                                                                                        $post_id
+	 * @param string                                                                                                                     $post_title
 	 * @param array<string, array{form_name: string, label: string, pages: array<int, array{title: string, url: string, post_id: int}>}> $forms_by_id
-	 * @param callable(array<string, mixed>): bool   $matches_element
-	 * @param callable(array<string, mixed>): string $resolve_form_name
+	 * @param callable(array<string, mixed>): bool                                                                                       $matches_element
+	 * @param callable(array<string, mixed>): string                                                                                     $resolve_form_name
 	 *
 	 * @return void
 	 */
@@ -829,8 +829,8 @@ final class ElementorFormsService {
 				if ( ! isset( $forms_by_id[ $form_id ] ) ) {
 					$forms_by_id[ $form_id ] = array(
 						'form_name' => $form_name,
-						'label' => $form_name,
-						'pages' => array(),
+						'label'     => $form_name,
+						'pages'     => array(),
 					);
 				}
 
@@ -844,7 +844,7 @@ final class ElementorFormsService {
 				}
 
 				if ( ! $already_listed ) {
-					$page_url = get_permalink( $post_id );
+					$page_url                           = get_permalink( $post_id );
 					$forms_by_id[ $form_id ]['pages'][] = array(
 						'title'   => $post_title,
 						'url'     => is_string( $page_url ) ? $page_url : '',

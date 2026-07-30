@@ -2,14 +2,14 @@
 /**
  * Public inbound-webhook ingress REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace AIAWAB\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Service\WebhookService;
+use AIAWAB\Plugin\Service\WebhookService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -58,13 +58,13 @@ class WebhookIngressController {
 			self::API_NAMESPACE,
 			self::ROUTE,
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'receive' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'receive' ),
 				'permission_callback' => '__return_true',
-				'args' => array(
+				'args'                => array(
 					'public_id' => array(
-						'type' => 'string',
-						'required' => true,
+						'type'              => 'string',
+						'required'          => true,
 						'validate_callback' => static function ( $value ): bool {
 							return is_string( $value ) && (bool) preg_match( '/^[0-9a-fA-F-]{36}$/', $value );
 						},
@@ -81,7 +81,7 @@ class WebhookIngressController {
 	 */
 	public function receive( $request ) {
 		$public_id = (string) $request->get_param( 'public_id' );
-		$raw_body = (string) $request->get_body();
+		$raw_body  = (string) $request->get_body();
 		$client_ip = $this->clientIp( $request );
 		$signature = (string) $request->get_header( 'x-wfa-signature' );
 

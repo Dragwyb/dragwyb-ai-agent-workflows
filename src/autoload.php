@@ -3,10 +3,10 @@
  * Dependency-free PSR-4 autoloader fallback.
  *
  * Used only when no Composer-generated `vendor/autoload.php` is present.
- * Maps the `WorkflowAutomate\Plugin\` namespace prefix to this directory,
+ * Maps the `AIAWAB\Plugin\` namespace prefix to this directory,
  * following the standard PSR-4 file resolution algorithm.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 // Prevent direct file access.
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 spl_autoload_register(
 	function ( $class ) {
-		$prefix = 'WorkflowAutomate\\Plugin\\';
+		$prefix = 'AIAWAB\\Plugin\\';
 
 		if ( strncmp( $prefix, $class, strlen( $prefix ) ) !== 0 ) {
 			return;

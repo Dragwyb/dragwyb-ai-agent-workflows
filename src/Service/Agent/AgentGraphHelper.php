@@ -2,12 +2,12 @@
 /**
  * Resolves AI Agent attachments from the workflow builder graph.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace AIAWAB\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -36,12 +36,12 @@ class AgentGraphHelper {
 	 * @var array<string, string>
 	 */
 	private const CHAT_MODEL_TYPES = array(
-		self::CHAT_MODEL_OPENAI => 'openai',
-		self::CHAT_MODEL_CLAUDE => 'claude',
-		self::CHAT_MODEL_GEMINI => 'gemini',
+		self::CHAT_MODEL_OPENAI     => 'openai',
+		self::CHAT_MODEL_CLAUDE     => 'claude',
+		self::CHAT_MODEL_GEMINI     => 'gemini',
 		self::CHAT_MODEL_OPENROUTER => 'openrouter',
-		self::CHAT_MODEL_GROQ => 'groq',
-		self::CHAT_MODEL_DEEPSEEK => 'deepseek',
+		self::CHAT_MODEL_GROQ       => 'groq',
+		self::CHAT_MODEL_DEEPSEEK   => 'deepseek',
 	);
 
 	/**

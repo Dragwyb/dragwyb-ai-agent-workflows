@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\Compatible;
+namespace AIAWAB\AiProviders\Compatible;
 
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;

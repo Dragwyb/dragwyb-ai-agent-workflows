@@ -2,33 +2,33 @@
 /**
  * Registers all Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package AIAWAB\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace AIAWAB\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateColumnAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSpreadsheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSpreadsheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAddRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAppendOrUpdateRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsClearSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCopySheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsExportSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSpreadsheetsAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetAllRowsAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsUpdateRowAction;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWAB\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateColumnAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSpreadsheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteRowAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSpreadsheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAddRowAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAppendOrUpdateRowAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsClearSheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCopySheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsExportSheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSheetAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSpreadsheetsAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetAllRowsAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetRowAction;
+use AIAWAB\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsUpdateRowAction;
+use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWAB\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
