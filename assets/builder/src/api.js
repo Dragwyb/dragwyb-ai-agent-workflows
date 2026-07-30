@@ -190,15 +190,6 @@ export function clearAiProviderCredentials(provider) {
 	});
 }
 
-/**
- * @deprecated Use fetchAiProviderModels — kept for temporary compatibility.
- * @param {number} connectionId
- * @param {string} nodeType
- * @return {Promise<{options: Array<{value: string, label: string}>, error: string|null}>}
- */
-export function fetchConnectionModels(connectionId, nodeType) {
-	return fetchAiProviderModels(nodeType || 'openai', nodeType);
-}
 
 /**
  * @param {number} id Workflow id.

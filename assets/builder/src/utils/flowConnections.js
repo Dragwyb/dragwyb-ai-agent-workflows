@@ -248,35 +248,7 @@ export function insertNodeBetweenFlow(
 	];
 }
 
-/**
- * @param {Array<Object>} connections
- * @param {string}        fromNodeId
- * @param {string}        toNodeId
- * @return {Object|null}
- */
-export function findFlowConnection(connections, fromNodeId, toNodeId) {
-	return (
-		(connections || []).find(
-			(connection) =>
-				connection.from === fromNodeId && connection.to === toNodeId
-		) || null
-	);
-}
 
-/**
- * @param {Array<Object>} connections
- * @param {string}        connectionId
- * @return {Object|null}
- */
-export function getFlowConnectionById(connections, connectionId) {
-	return (
-		(connections || []).find((connection) => {
-			const id = connection.id || `${connection.from}-${connection.to}`;
-
-			return id === connectionId;
-		}) || null
-	);
-}
 
 /**
  * @param {Array<Object>} mainNodes

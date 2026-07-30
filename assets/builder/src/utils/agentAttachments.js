@@ -315,16 +315,6 @@ export function agentToolPortPosition(agentNode) {
 	};
 }
 
-/**
- * @param {Object} agentNode
- * @return {{ x: number, y: number }}
- */
-export function agentFallbackModelPortPosition(agentNode) {
-	return {
-		x: agentNode.x + NODE_WIDTH / 4,
-		y: agentNode.y + AGENT_BODY_HEIGHT + AGENT_PORTS_HEIGHT - 4,
-	};
-}
 
 /**
  * @param {Object} agentNode
@@ -467,79 +457,7 @@ export function toolInputPortPosition(toolNode) {
 	};
 }
 
-/**
- * Repositions an agent and every node attached via parent_agent_id.
- *
- * @param {Array<Object>} nodes   Full graph nodes.
- * @param {string}        agentId Agent client node id.
- * @param {number}        agentX  New agent x.
- * @param {number}        agentY  New agent y.
- * @return {Array<Object>}
- */
-export function syncAgentGroupPositions(nodes, agentId, agentX, agentY) {
-	const agentPoint = { x: agentX, y: agentY };
-	const tools = toolsForAgent(nodes, agentId);
 
-	const next = nodes.map((node) => {
-		if (node.id === agentId) {
-			return { ...node, x: agentX, y: agentY };
-		}
-
-		if (node.parent_agent_id !== agentId) {
-			return node;
-		}
-
-		if (isChatModelAttachment(node)) {
-			const position = chatModelAttachmentPosition(agentPoint);
-			return { ...node, x: position.x, y: position.y };
-		}
-
-		if (isFallbackChatModelAttachment(node)) {
-			const position = fallbackChatModelAttachmentPosition(agentPoint);
-			return { ...node, x: position.x, y: position.y };
-		}
-
-		if (isOutputParserAttachment(node)) {
-			const position = outputParserAttachmentPosition(agentPoint);
-			return { ...node, x: position.x, y: position.y };
-		}
-
-		if (isMemoryAttachment(node)) {
-			const position = memoryAttachmentPosition(agentPoint);
-			return { ...node, x: position.x, y: position.y };
-		}
-
-		if (isToolAttachment(node)) {
-			const index = tools.findIndex((tool) => tool.id === node.id);
-			const position = toolAttachmentPosition(
-				agentPoint,
-				index >= 0 ? index : 0
-			);
-			return { ...node, x: position.x, y: position.y };
-		}
-
-		return node;
-	});
-
-	return next.map((node) => {
-		if (!isParserChatModelAttachment(node)) {
-			return node;
-		}
-
-		const parser = next.find(
-			(entry) =>
-				entry.id === node.parent_agent_id &&
-				isOutputParserAttachment(entry)
-		);
-
-		if (!parser || parser.parent_agent_id !== agentId) {
-			return node;
-		}
-
-		const position = parserChatModelAttachmentPosition(parser);
-		return { ...node, x: position.x, y: position.y };
-	});
-}
 
 /**
  * @param {Array<Object>} nodes

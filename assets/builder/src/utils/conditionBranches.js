@@ -127,27 +127,6 @@ export function conditionOperatorNeedsValue(operator) {
 	return !UNARY_CONDITION_OPERATORS.has(operator);
 }
 
-/**
- * @param {string} operator
- * @return {string}
- */
-export function getConditionOperatorLabel(operator) {
-	const match = CONDITION_OPERATORS.find((entry) => entry.value === operator);
-
-	if (match) {
-		return match.label;
-	}
-
-	if (operator === 'is_empty') {
-		return 'Is empty';
-	}
-
-	if (operator === 'is_not_empty') {
-		return 'Is not empty';
-	}
-
-	return operator || 'Equal to';
-}
 
 /**
  * @return {string}
@@ -256,16 +235,6 @@ export function canvasNodeHeight(node) {
 	return NODE_HEIGHT;
 }
 
-/**
- * @param {Object} node Condition node.
- * @return {{ x: number, y: number }}
- */
-export function conditionInputPortPosition(node) {
-	return {
-		x: node.x + CONDITION_NODE_WIDTH / 2,
-		y: node.y,
-	};
-}
 
 /**
  * @param {Object} node       Condition node.
@@ -352,26 +321,6 @@ export function getConnectableCanvasNodes(graphNodes, excludeNodeId) {
 		});
 }
 
-/**
- * @param {Object} conditionNode
- * @param {string} branchId
- * @return {string}
- */
-export function getBranchTargetId(conditionNode, branchId) {
-	if (!conditionNode) {
-		return '';
-	}
-
-	if (branchId === 'default') {
-		return conditionNode.config?.default_branch_node_id || '';
-	}
-
-	const row = getConditionRows(conditionNode.config || {}).find(
-		(entry) => entry.id === branchId
-	);
-
-	return row?.node_id || '';
-}
 
 /**
  * @param {Array<Object>} graphNodes All graph nodes.
