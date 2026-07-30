@@ -58,6 +58,10 @@ use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
 use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
 use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use WorkflowAutomate\Plugin\Provider\PersistenceServiceProvider;
+use WorkflowAutomate\Plugin\Provider\AdminServiceProvider;
+use WorkflowAutomate\Plugin\Provider\RestServiceProvider;
+use WorkflowAutomate\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -210,235 +214,16 @@ class Plugin {
 	 * @return void
 	 */
 	private function registerServices(): void {
-		$this->container->singleton(
-			WorkflowRepository::class,
-			static function (): WorkflowRepository {
-				return new WorkflowRepository();
-			}
+		$providers = array(
+			new PersistenceServiceProvider(),
+			new AdminServiceProvider(),
+			new RestServiceProvider(),
+			new ExecutionServiceProvider(),
 		);
 
-		$this->container->singleton(
-			WorkflowNodeRepository::class,
-			static function (): WorkflowNodeRepository {
-				return new WorkflowNodeRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowRunRepository::class,
-			static function (): WorkflowRunRepository {
-				return new WorkflowRunRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowRunLogRepository::class,
-			static function (): WorkflowRunLogRepository {
-				return new WorkflowRunLogRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WebhookRepository::class,
-			static function (): WebhookRepository {
-				return new WebhookRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowService::class,
-			static function ( Container $container ): WorkflowService {
-				return new WorkflowService(
-					$container->get( WorkflowRepository::class ),
-					$container->get( WorkflowNodeRepository::class ),
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( WebhookRepository::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			NodeExecutionService::class,
-			static function ( Container $container ): NodeExecutionService {
-				return new NodeExecutionService( $container->get( NodeTypeRegistry::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			AgentAiClient::class,
-			static function (): AgentAiClient {
-				return new AgentAiClient();
-			}
-		);
-
-		$this->container->singleton(
-			AgentToolSchemaBuilder::class,
-			static function ( Container $container ): AgentToolSchemaBuilder {
-				return new AgentToolSchemaBuilder( $container->get( NodeTypeRegistry::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			AgentToolExecutor::class,
-			static function ( Container $container ): AgentToolExecutor {
-				return new AgentToolExecutor( $container->get( NodeExecutionService::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			AgentService::class,
-			static function ( Container $container ): AgentService {
-				return new AgentService(
-					$container->get( AgentToolSchemaBuilder::class ),
-					$container->get( AgentToolExecutor::class ),
-					$container->get( AgentAiClient::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			SettingsService::class,
-			static function (): SettingsService {
-				return new SettingsService();
-			}
-		);
-
-		$this->container->singleton(
-			TriggerReentrancyGuard::class,
-			static function (): TriggerReentrancyGuard {
-				$guard = new TriggerReentrancyGuard();
-				TriggerReentrancyGuard::bindInstance( $guard );
-
-				return $guard;
-			}
-		);
-
-		// Resolve immediately so WordPress action writes can suppress triggers
-		// even before the execution engine is first pulled from the container.
-		$this->container->get( TriggerReentrancyGuard::class );
-
-		$this->container->singleton(
-			WorkflowTestListenerService::class,
-			static function ( Container $container ): WorkflowTestListenerService {
-				return new WorkflowTestListenerService( $container->get( WorkflowService::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowNodeTestService::class,
-			static function ( Container $container ): WorkflowNodeTestService {
-				return new WorkflowNodeTestService(
-					$container->get( WorkflowService::class ),
-					$container->get( NodeExecutionService::class ),
-					$container->get( NodeTypeRegistry::class ),
-					$container->get( WorkflowTestListenerService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowExecutionService::class,
-			static function ( Container $container ): WorkflowExecutionService {
-				return new WorkflowExecutionService(
-					$container->get( WorkflowService::class ),
-					$container->get( NodeTypeRegistry::class ),
-					$container->get( NodeExecutionService::class ),
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( SettingsService::class ),
-					$container->get( TriggerReentrancyGuard::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			BackgroundRunner::class,
-			static function ( Container $container ): BackgroundRunner {
-				return new BackgroundRunner(
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowExecutionService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			RunRetentionService::class,
-			static function ( Container $container ): RunRetentionService {
-				return new RunRetentionService(
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( SettingsService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			ConnectionRepository::class,
-			static function (): ConnectionRepository {
-				return new ConnectionRepository();
-			}
-		);
-
-		$this->container->singleton(
-			ConnectionVerifier::class,
-			static function (): ConnectionVerifier {
-				return new ConnectionVerifier();
-			}
-		);
-
-		$this->container->singleton(
-			ConnectionService::class,
-			static function ( Container $container ): ConnectionService {
-				return new ConnectionService(
-					$container->get( ConnectionRepository::class ),
-					$container->get( ConnectionVerifier::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			GoogleOAuthService::class,
-			static function ( Container $container ): GoogleOAuthService {
-				return new GoogleOAuthService( $container->get( ConnectionService::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			AiModelsService::class,
-			static function (): AiModelsService {
-				return new AiModelsService();
-			}
-		);
-
-		$this->container->singleton(
-			ElementorFormsService::class,
-			static function (): ElementorFormsService {
-				return new ElementorFormsService();
-			}
-		);
-
-		$this->container->singleton(
-			WebhookService::class,
-			static function ( Container $container ): WebhookService {
-				return new WebhookService(
-					$container->get( WebhookRepository::class ),
-					$container->get( WorkflowService::class ),
-					$container->get( WorkflowExecutionService::class ),
-					$container->get( SettingsService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			ChatMessageService::class,
-			static function ( Container $container ): ChatMessageService {
-				return new ChatMessageService(
-					$container->get( WorkflowService::class ),
-					$container->get( WorkflowRunLogRepository::class )
-				);
-			}
-		);
+		foreach ( $providers as $provider ) {
+			$provider->register( $this->container );
+		}
 	}
 
 	/**
@@ -594,29 +379,29 @@ class Plugin {
 	 * @return void
 	 */
 	private function registerAdmin(): void {
-		$workflows = $this->container->get( WorkflowService::class );
-		$runs = $this->container->get( WorkflowRunRepository::class );
+		$workflows           = $this->container->get( WorkflowService::class );
+		$runs                = $this->container->get( WorkflowRunRepository::class );
 		$workflow_repository = $this->container->get( WorkflowRepository::class );
-		$executor = $this->container->get( WorkflowExecutionService::class );
-		$settings = $this->container->get( SettingsService::class );
-		$retention = $this->container->get( RunRetentionService::class );
-		$connections = $this->container->get( ConnectionService::class );
-		$google_oauth = $this->container->get( GoogleOAuthService::class );
-		$webhooks = $this->container->get( WebhookService::class );
+		$executor            = $this->container->get( WorkflowExecutionService::class );
+		$settings            = $this->container->get( SettingsService::class );
+		$retention           = $this->container->get( RunRetentionService::class );
+		$connections         = $this->container->get( ConnectionService::class );
+		$google_oauth        = $this->container->get( GoogleOAuthService::class );
+		$webhooks            = $this->container->get( WebhookService::class );
 
-		$workflow_actions = new WorkflowActionsController( $workflows, WorkflowsPage::SLUG );
-		$workflows_page = new WorkflowsPage( $workflows, $settings, $workflow_actions );
-		$run_actions = new RunActionsController( $executor, $runs, $this->container->get( WorkflowRunLogRepository::class ) );
-		$runs_page = new RunsPage( $runs, $workflow_repository, $settings, $run_actions );
-		$builder_page = new BuilderPage();
-		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
-		$settings_page = new SettingsPage( $settings );
-		$connection_actions = new ConnectionActionsController( $connections );
-		$connections_page = new ConnectionsPage( $connections, $settings, $connection_actions );
+		$workflow_actions     = new WorkflowActionsController( $workflows, WorkflowsPage::SLUG );
+		$workflows_page       = new WorkflowsPage( $workflows, $settings, $workflow_actions );
+		$run_actions          = new RunActionsController( $executor, $runs, $this->container->get( WorkflowRunLogRepository::class ) );
+		$runs_page            = new RunsPage( $runs, $workflow_repository, $settings, $run_actions );
+		$builder_page         = new BuilderPage();
+		$run_detail_page      = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
+		$settings_page        = new SettingsPage( $settings );
+		$connection_actions   = new ConnectionActionsController( $connections );
+		$connections_page     = new ConnectionsPage( $connections, $settings, $connection_actions );
 		$connection_form_page = new ConnectionFormPage( $connections, $google_oauth );
-		$webhook_actions = new WebhookActionsController( $webhooks );
-		$webhooks_page = new WebhooksPage( $webhooks, $workflows, $settings, $webhook_actions );
-		$webhook_form_page = new WebhookFormPage( $webhooks, $workflows, $settings );
+		$webhook_actions      = new WebhookActionsController( $webhooks );
+		$webhooks_page        = new WebhooksPage( $webhooks, $workflows, $settings, $webhook_actions );
+		$webhook_form_page    = new WebhookFormPage( $webhooks, $workflows, $settings );
 
 		( new Menu(
 			array(

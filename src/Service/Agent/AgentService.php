@@ -153,40 +153,98 @@ class AgentService {
 		);
 
 		if ( empty( $loop['success'] ) && ! empty( $config['fallback_enabled'] ) && is_array( $attachments['fallback_chat_model'] ) ) {
-			$fallback = AgentGraphHelper::resolveChatModelConfig( $attachments['fallback_chat_model'], $config );
-
-			if ( AiClientBootstrap::isProviderConfigured( $fallback['provider'] ) ) {
-				$fallback_model = trim( $fallback['model'] );
-
-				if ( '' === $fallback_model ) {
-					$fallback_model = $this->defaultModelForProvider( $fallback['provider'] );
-				}
-
-				$fallback_loop = $this->runAgentLoop(
-					$fallback['provider'],
-					$fallback_model,
-					$messages,
-					$tool_schemas,
-					$system_for_call,
-					$max_iterations,
-					$graph_nodes,
-					$workflow_id,
-					$context
-				);
-
-				if ( ! empty( $fallback_loop['success'] ) ) {
-					$fallback_loop['used_fallback_model'] = true;
-					$fallback_loop['provider']            = $fallback['provider'];
-					$fallback_loop['model']               = $fallback_model;
-					$loop                                 = $fallback_loop;
-				}
-			}
+			$loop = $this->tryFallbackModel(
+				$config,
+				$attachments,
+				$messages,
+				$tool_schemas,
+				$system_for_call,
+				$max_iterations,
+				$graph_nodes,
+				$workflow_id,
+				$context,
+				$loop
+			);
 		}
 
 		if ( empty( $loop['success'] ) ) {
 			return $loop;
 		}
 
+		return $this->formatAgentOutput(
+			$loop,
+			$config,
+			$attachments,
+			$graph_nodes,
+			$chat,
+			$model,
+			$agent_node_id,
+			$context
+		);
+	}
+
+	/**
+	 * Tries executing agent loop with fallback model when primary model fails.
+	 */
+	private function tryFallbackModel(
+		array $config,
+		array $attachments,
+		array $messages,
+		array $tool_schemas,
+		string $system_for_call,
+		int $max_iterations,
+		array $graph_nodes,
+		int $workflow_id,
+		array $context,
+		array $original_loop
+	): array {
+		$fallback = AgentGraphHelper::resolveChatModelConfig( $attachments['fallback_chat_model'], $config );
+
+		if ( ! AiClientBootstrap::isProviderConfigured( $fallback['provider'] ) ) {
+			return $original_loop;
+		}
+
+		$fallback_model = trim( $fallback['model'] );
+
+		if ( '' === $fallback_model ) {
+			$fallback_model = $this->defaultModelForProvider( $fallback['provider'] );
+		}
+
+		$fallback_loop = $this->runAgentLoop(
+			$fallback['provider'],
+			$fallback_model,
+			$messages,
+			$tool_schemas,
+			$system_for_call,
+			$max_iterations,
+			$graph_nodes,
+			$workflow_id,
+			$context
+		);
+
+		if ( ! empty( $fallback_loop['success'] ) ) {
+			$fallback_loop['used_fallback_model'] = true;
+			$fallback_loop['provider']            = $fallback['provider'];
+			$fallback_loop['model']               = $fallback_model;
+			return $fallback_loop;
+		}
+
+		return $original_loop;
+	}
+
+	/**
+	 * Formats and parses agent loop outputs for downstream consumption and memory storage.
+	 */
+	private function formatAgentOutput(
+		array $loop,
+		array $config,
+		array $attachments,
+		array $graph_nodes,
+		array $chat,
+		string $model,
+		string $agent_node_id,
+		array $context
+	): array {
 		$response = (string) ( $loop['response'] ?? '' );
 
 		if ( is_array( $attachments['output_parser'] ) ) {
@@ -247,17 +305,13 @@ class AgentService {
 			}
 
 			$loop['response'] = $response;
-			// n8n-compatible fields for downstream nodes (HTTP Request, etc.).
 			$clean_output   = $this->buildCleanOutput( $response, $config );
 			$loop['output'] = $clean_output;
 
 			if ( is_array( $parsed ) ) {
-				// Valid JSON replies are directly addressable downstream:
-				// {{nodes.X.json.title}} / {{nodes.X.parsed.title}}.
 				$loop['parsed'] = $parsed;
 				$loop['json']   = $parsed;
 			} else {
-				// Plain text remains available through the n8n-style wrapper.
 				$loop['json'] = array(
 					'output' => $clean_output,
 				);
@@ -709,65 +763,15 @@ class AgentService {
 					continue;
 				}
 
-				$tool_call_id = (string) ( $tool_call['id'] ?? wp_generate_uuid4() );
-				$function     = is_array( $tool_call['function'] ?? null ) ? $tool_call['function'] : array();
-				$function_name = (string) ( $function['name'] ?? '' );
-				$raw_args      = $function['arguments'] ?? '{}';
-				$args          = $this->parseToolArguments( $raw_args );
-
-				$signature = md5( $function_name . wp_json_encode( $args ) );
-
-				if ( isset( $seen_calls[ $signature ] ) && is_array( $seen_calls[ $signature ] ) ) {
-					// Same tool+args again: reuse cached result instead of aborting the run.
-					$tool_result = $seen_calls[ $signature ];
-					if ( ! isset( $tool_result['note'] ) ) {
-						$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'workflow-automate' );
-					}
-				} elseif ( $created_post_id > 0 && $this->isCreatePostToolName( $function_name ) ) {
-					// One create per agent run — further creates burn API and duplicate content.
-					$tool_result = array(
-						'error'   => sprintf(
-							/* translators: %d: existing post id */
-							__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'workflow-automate' ),
-							$created_post_id
-						),
-						'post_id' => $created_post_id,
-					);
-					$seen_calls[ $signature ] = $tool_result;
-				} else {
-					$tool_result = $this->tool_executor->execute(
-						$function_name,
-						$args,
-						$graph_nodes,
-						$workflow_id,
-						$context
-					);
-					$seen_calls[ $signature ] = $tool_result;
-
-					if ( $this->isCreatePostToolName( $function_name ) ) {
-						$new_id = $this->extractCreatedPostId( $tool_result );
-						if ( $new_id > 0 ) {
-							$created_post_id = $new_id;
-						}
-					}
-				}
-
-				$all_tool_calls[] = array(
-					'id'        => $tool_call_id,
-					'name'      => $function_name,
-					'arguments' => $args,
-					'result'    => $tool_result,
-				);
-
-				$tool_payload = array_merge(
-					array( 'name' => $function_name ),
-					$tool_result
-				);
-
-				$messages[] = array(
-					'role'         => 'tool',
-					'tool_call_id' => $tool_call_id,
-					'content'      => wp_json_encode( $tool_payload ) ?: '{}',
+				$this->executeSingleToolCall(
+					$tool_call,
+					$graph_nodes,
+					$workflow_id,
+					$context,
+					$seen_calls,
+					$created_post_id,
+					$all_tool_calls,
+					$messages
 				);
 			}
 		}
@@ -777,6 +781,79 @@ class AgentService {
 			'error'      => __( 'Max iterations reached.', 'workflow-automate' ),
 			'iterations' => $iteration,
 			'tool_calls' => $this->formatToolCalls( $all_tool_calls ),
+		);
+	}
+
+	/**
+	 * Executes a single tool call requested by the LLM, managing duplicate caches and post creation limits.
+	 */
+	private function executeSingleToolCall(
+		array $tool_call,
+		array $graph_nodes,
+		int $workflow_id,
+		array $context,
+		array &$seen_calls,
+		int &$created_post_id,
+		array &$all_tool_calls,
+		array &$messages
+	): void {
+		$tool_call_id  = (string) ( $tool_call['id'] ?? wp_generate_uuid4() );
+		$function      = is_array( $tool_call['function'] ?? null ) ? $tool_call['function'] : array();
+		$function_name = (string) ( $function['name'] ?? '' );
+		$raw_args      = $function['arguments'] ?? '{}';
+		$args          = $this->parseToolArguments( $raw_args );
+
+		$signature = md5( $function_name . wp_json_encode( $args ) );
+
+		if ( isset( $seen_calls[ $signature ] ) && is_array( $seen_calls[ $signature ] ) ) {
+			$tool_result = $seen_calls[ $signature ];
+			if ( ! isset( $tool_result['note'] ) ) {
+				$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'workflow-automate' );
+			}
+		} elseif ( $created_post_id > 0 && $this->isCreatePostToolName( $function_name ) ) {
+			$tool_result = array(
+				'error'   => sprintf(
+					/* translators: %d: existing post id */
+					__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'workflow-automate' ),
+					$created_post_id
+				),
+				'post_id' => $created_post_id,
+			);
+			$seen_calls[ $signature ] = $tool_result;
+		} else {
+			$tool_result = $this->tool_executor->execute(
+				$function_name,
+				$args,
+				$graph_nodes,
+				$workflow_id,
+				$context
+			);
+			$seen_calls[ $signature ] = $tool_result;
+
+			if ( $this->isCreatePostToolName( $function_name ) ) {
+				$new_id = $this->extractCreatedPostId( $tool_result );
+				if ( $new_id > 0 ) {
+					$created_post_id = $new_id;
+				}
+			}
+		}
+
+		$all_tool_calls[] = array(
+			'id'        => $tool_call_id,
+			'name'      => $function_name,
+			'arguments' => $args,
+			'result'    => $tool_result,
+		);
+
+		$tool_payload = array_merge(
+			array( 'name' => $function_name ),
+			$tool_result
+		);
+
+		$messages[] = array(
+			'role'         => 'tool',
+			'tool_call_id' => $tool_call_id,
+			'content'      => wp_json_encode( $tool_payload ) ?: '{}',
 		);
 	}
 

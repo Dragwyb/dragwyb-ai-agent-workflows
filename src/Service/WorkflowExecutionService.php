@@ -341,9 +341,6 @@ class WorkflowExecutionService {
 
 		$workflow = $this->workflows->find( $workflow_id );
 		$graph    = null !== $workflow ? $workflow->graph() : array();
-		$graph_nodes = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
-		$graph_connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
-		$has_connections_key = array_key_exists( 'connections', $graph ) && is_array( $graph['connections'] );
 
 		$context = array(
 			'trigger' => $trigger_payload,
@@ -351,6 +348,26 @@ class WorkflowExecutionService {
 			'workflow_id' => $workflow_id,
 			'graph' => $graph,
 		);
+
+		$stats = $this->traverseAndExecuteNodes( $run, $nodes, $graph, $context );
+
+		return $this->finalizeExecution( $run, $workflow_id, $trigger_payload, $stats['executed'], $stats['succeeded'] );
+	}
+
+	/**
+	 * Traverses the graph and executes active nodes in flow order.
+	 *
+	 * @param WorkflowRun          $run     Current run.
+	 * @param array<WorkflowNode>  $nodes   Synchronized graph nodes.
+	 * @param array<string, mixed> $graph   Workflow graph payload.
+	 * @param array<string, mixed> $context Execution context reference.
+	 *
+	 * @return array{executed: int, succeeded: int}
+	 */
+	private function traverseAndExecuteNodes( WorkflowRun $run, array $nodes, array $graph, array &$context ): array {
+		$graph_nodes = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
+		$graph_connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
+		$has_connections_key = array_key_exists( 'connections', $graph ) && is_array( $graph['connections'] );
 
 		$executed = 0;
 		$succeeded = 0;
@@ -422,19 +439,7 @@ class WorkflowExecutionService {
 
 			$context['nodes'][ $client_id ] = $result;
 
-			$this->runLogs->insert(
-				array(
-					'run_id' => $run->id(),
-					'node_id' => $node->id(),
-					'node_type' => $node->nodeType(),
-					'node_label' => $node->label(),
-					'status' => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
-					'input' => $node->config(),
-					'output' => $result,
-					'message' => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
-					'duration_ms' => $duration_ms,
-				)
-			);
+			$this->recordNodeLog( $run, $node, $result, $success, $duration_ms );
 
 			if ( ! $success && ! $this->settings->shouldContinueOnFailure() ) {
 				$on_error = $this->resolveAgentOnError( $node, $graph_nodes );
@@ -463,7 +468,6 @@ class WorkflowExecutionService {
 			}
 
 			if ( $use_fan_out ) {
-				// n8n-style: enqueue every node connected from this node's output.
 				foreach ( array_reverse( $planner->getOutgoingTargets( $outgoing_map, $client_id ) ) as $next_id ) {
 					if ( ! isset( $visited[ $next_id ] ) ) {
 						array_unshift( $pending_ids, $next_id );
@@ -482,6 +486,35 @@ class WorkflowExecutionService {
 			}
 		}
 
+		return array(
+			'executed' => $executed,
+			'succeeded' => $succeeded,
+		);
+	}
+
+	/**
+	 * Inserts a execution log record for a completed node.
+	 */
+	private function recordNodeLog( WorkflowRun $run, WorkflowNode $node, array $result, bool $success, int $duration_ms ): void {
+		$this->runLogs->insert(
+			array(
+				'run_id' => $run->id(),
+				'node_id' => $node->id(),
+				'node_type' => $node->nodeType(),
+				'node_label' => $node->label(),
+				'status' => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
+				'input' => $node->config(),
+				'output' => $result,
+				'message' => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
+				'duration_ms' => $duration_ms,
+			)
+		);
+	}
+
+	/**
+	 * Finalizes the workflow run status and dispatches the after_run hook.
+	 */
+	private function finalizeExecution( WorkflowRun $run, int $workflow_id, array $trigger_payload, int $executed, int $succeeded ): WorkflowRun {
 		$finished = $this->runs->finish( $run->id(), $this->finalStatus( $executed, $succeeded ) );
 
 		$this->workflows->incrementRunCount( $workflow_id );
@@ -490,15 +523,6 @@ class WorkflowExecutionService {
 			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'workflow-automate' ) );
 		}
 
-		/**
-		 * Fires immediately after a workflow run finishes, whatever its
-		 * final status.
-		 *
-		 * @since 0.1.0
-		 *
-		 * @param WorkflowRun           $run             The completed run.
-		 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
-		 */
 		do_action( 'wfa/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
