@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
+use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
 use WorkflowAutomate\Plugin\Admin\ConnectionsListTable;
 use WorkflowAutomate\Plugin\Admin\EmptyState;
+use WorkflowAutomate\Plugin\Admin\ListTableUi;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -39,9 +41,12 @@ class ConnectionsPage implements AdminPage {
 
 	private SettingsService $settings;
 
-	public function __construct( ConnectionService $connections, SettingsService $settings ) {
+	private ConnectionActionsController $connectionActions;
+
+	public function __construct( ConnectionService $connections, SettingsService $settings, ConnectionActionsController $connectionActions ) {
 		$this->connections = $connections;
 		$this->settings = $settings;
+		$this->connectionActions = $connectionActions;
 	}
 
 	/**
@@ -133,10 +138,17 @@ class ConnectionsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get">';
+		echo '<form method="get" class="wfa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
-		$table->display();
+		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
+
+		ListTableUi::openBulkForm( $this->slug(), 'wfa_connection_bulk_action', 'wfa_connection_bulk' );
+		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
+		$table->display();
+		ListTableUi::closeBulkForm();
+
+		$table->renderRowActionForms();
 
 		echo '</div>';
 	}
@@ -161,6 +173,10 @@ class ConnectionsPage implements AdminPage {
 				'message' => __( 'Connection deleted.', 'workflow-automate' ),
 				'type' => 'success',
 			),
+			'bulk_deleted' => array(
+				'message' => __( 'Selected connections deleted.', 'workflow-automate' ),
+				'type' => 'success',
+			),
 			'error' => array(
 				'message' => __( 'That connection action could not be completed. Double-check the required fields and try again.', 'workflow-automate' ),
 				'type' => 'error',
@@ -181,9 +197,24 @@ class ConnectionsPage implements AdminPage {
 		}
 
 		printf(
-			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',
 			esc_attr( $notices[ $key ]['type'] ),
-			esc_html( $notices[ $key ]['message'] )
+			esc_html( $notices[ $key ]['message'] ),
+			$this->noticeDetailHtml()
 		);
+	}
+
+	/**
+	 * @return string
+	 */
+	private function noticeDetailHtml(): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail from a prior redirect.
+		$detail = isset( $_GET['wfa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['wfa_error'] ) ) : '';
+
+		if ( '' === $detail ) {
+			return '';
+		}
+
+		return sprintf( '<p>%s</p>', esc_html( $detail ) );
 	}
 }

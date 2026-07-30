@@ -11,8 +11,10 @@ namespace WorkflowAutomate\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
+use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
 use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
 use WorkflowAutomate\Plugin\Core\Capabilities;
+use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
@@ -54,6 +56,27 @@ class ConnectionActionsController {
 	 */
 	public function register(): void {
 		add_action( 'admin_post_wfa_connection_action', array( $this, 'handle' ) );
+		add_action( 'admin_init', array( $this, 'maybeHandleConnectionsBulkFromList' ), 5 );
+	}
+
+	/**
+	 * Early router so bulk POST is handled before any admin output.
+	 *
+	 * @return void
+	 */
+	public function maybeHandleConnectionsBulkFromList(): void {
+		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- page routing only.
+		$page = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
+
+		if ( ConnectionsPage::SLUG !== $page ) {
+			return;
+		}
+
+		$this->handleConnectionsBulkFromList();
 	}
 
 	/**
@@ -108,9 +131,25 @@ class ConnectionActionsController {
 		$label = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : '';
 
 		try {
-			$this->connections->create( $integration_slug, $auth_type, $label, $this->extractCredentialValues() );
-		} catch ( InvalidArgumentException | RuntimeException $e ) {
+			$connection = $this->connections->create( $integration_slug, $auth_type, $label, $this->extractCredentialValues() );
+		} catch ( InvalidArgumentException $exception ) {
+			$this->redirect( 'error', $exception->getMessage() );
+		} catch ( RuntimeException $e ) {
 			$this->redirect( 'error' );
+		}
+
+		if ( ConnectionAuthTypes::OAUTH2 === $auth_type ) {
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page' => ConnectionFormPage::SLUG,
+						'connection' => $connection->id(),
+						'wfa_notice' => 'created_oauth',
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+			exit;
 		}
 
 		$this->redirect( 'created' );
@@ -127,7 +166,9 @@ class ConnectionActionsController {
 
 		try {
 			$this->connections->update( $id, $label, $this->extractCredentialValues() );
-		} catch ( InvalidArgumentException | RuntimeException $e ) {
+		} catch ( InvalidArgumentException $exception ) {
+			$this->redirect( 'error', $exception->getMessage() );
+		} catch ( RuntimeException $e ) {
 			$this->redirect( 'error' );
 		}
 
@@ -143,6 +184,44 @@ class ConnectionActionsController {
 		$this->connections->delete( $id );
 
 		$this->redirect( 'deleted' );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function handleConnectionsBulkFromList(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
+		if ( empty( $_POST['wfa_connection_bulk'] ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+		}
+
+		if ( ! ListTableUi::verifyBulkNonce( 'wfa_connection_bulk_action' ) ) {
+			$this->redirect( 'error' );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
+			? sanitize_key( wp_unslash( $_POST['action2'] ) )
+			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+
+		if ( 'delete' !== $bulk_action ) {
+			$this->redirect( 'error' );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
+		$ids = isset( $_POST['connections'] ) && is_array( $_POST['connections'] )
+			? array_map( 'absint', wp_unslash( $_POST['connections'] ) )
+			: array();
+
+		foreach ( array_filter( $ids ) as $id ) {
+			$this->connections->delete( $id );
+		}
+
+		$this->redirect( 'bulk_deleted' );
 	}
 
 	/**
@@ -172,18 +251,22 @@ class ConnectionActionsController {
 	 * Redirects to the Connections list with a notice, then exits.
 	 *
 	 * @param string $notice One of the keys understood by ConnectionsPage::notices().
+	 * @param string $detail Optional extra detail (e.g. verification error).
 	 *
 	 * @return void
 	 */
-	private function redirect( string $notice ): void {
+	private function redirect( string $notice, string $detail = '' ): void {
+		$args = array(
+			'page' => ConnectionsPage::SLUG,
+			'wfa_notice' => $notice,
+		);
+
+		if ( '' !== $detail ) {
+			$args['wfa_error'] = $detail;
+		}
+
 		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page' => ConnectionsPage::SLUG,
-					'wfa_notice' => $notice,
-				),
-				admin_url( 'admin.php' )
-			)
+			add_query_arg( $args, admin_url( 'admin.php' ) )
 		);
 		exit;
 	}

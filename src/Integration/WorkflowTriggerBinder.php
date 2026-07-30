@@ -10,10 +10,13 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Integration;
 
 use WorkflowAutomate\Plugin\Domain\Workflow;
+use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\SettingsService;
+use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,11 +79,17 @@ class WorkflowTriggerBinder {
 
 	private SettingsService $settings;
 
-	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings ) {
+	private WorkflowTestListenerService $test_listener;
+
+	private TriggerReentrancyGuard $trigger_guard;
+
+	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings, WorkflowTestListenerService $test_listener, TriggerReentrancyGuard $trigger_guard ) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
 		$this->executor = $executor;
 		$this->settings = $settings;
+		$this->test_listener = $test_listener;
+		$this->trigger_guard = $trigger_guard;
 	}
 
 	/**
@@ -89,6 +98,8 @@ class WorkflowTriggerBinder {
 	 * @return void
 	 */
 	public function bindActiveWorkflows(): void {
+		$listening_ids = array_fill_keys( $this->test_listener->listeningWorkflowIds(), true );
+
 		$active = $this->workflows->list(
 			array(
 				'status' => Workflow::STATUS_ACTIVE,
@@ -96,17 +107,35 @@ class WorkflowTriggerBinder {
 			)
 		);
 
+		$bound_ids = array();
+
 		foreach ( $active['items'] as $workflow ) {
-			$this->bindWorkflow( $workflow );
+			$workflow_id = $workflow->id();
+			$test_listen = isset( $listening_ids[ $workflow_id ] );
+			$this->bindWorkflow( $workflow, $test_listen );
+			$bound_ids[ $workflow_id ] = true;
+		}
+
+		foreach ( array_keys( $listening_ids ) as $workflow_id ) {
+			if ( isset( $bound_ids[ $workflow_id ] ) ) {
+				continue;
+			}
+
+			$workflow = $this->workflows->find( $workflow_id );
+
+			if ( null !== $workflow ) {
+				$this->bindWorkflow( $workflow, true );
+			}
 		}
 	}
 
 	/**
-	 * @param Workflow $workflow An active workflow.
+	 * @param Workflow $workflow      Workflow to bind.
+	 * @param bool     $test_listen   True when binding for builder test-listen capture.
 	 *
 	 * @return void
 	 */
-	private function bindWorkflow( Workflow $workflow ): void {
+	private function bindWorkflow( Workflow $workflow, bool $test_listen ): void {
 		$graph_nodes = $workflow->graph()['nodes'] ?? array();
 
 		if ( ! is_array( $graph_nodes ) ) {
@@ -114,6 +143,7 @@ class WorkflowTriggerBinder {
 		}
 
 		$workflow_id = $workflow->id();
+		$trigger_bound = false;
 
 		foreach ( $graph_nodes as $graph_node ) {
 			if ( ! is_array( $graph_node ) || empty( $graph_node['type'] ) ) {
@@ -126,20 +156,82 @@ class WorkflowTriggerBinder {
 				continue;
 			}
 
+			// One trigger per workflow — ignore extra trigger nodes in legacy graphs.
+			if ( $trigger_bound ) {
+				continue;
+			}
+
+			$trigger_bound = true;
+
 			$config = isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : array();
 
 			$trigger->bind(
 				$config,
-				function ( array $payload, array $bound_config ) use ( $workflow_id ): void {
-					unset( $bound_config ); // Required by the TriggerInterface::bind() callback signature; unused here.
+				function ( array $payload, array $bound_config ) use ( $workflow_id, $test_listen, $graph_node ): void {
+					unset( $bound_config );
+
+					if ( $test_listen ) {
+						$trigger_type = isset( $graph_node['type'] ) ? (string) $graph_node['type'] : null;
+						$this->test_listener->capturePayload( $workflow_id, $payload, $trigger_type );
+						return;
+					}
+
+					// Mid-write: any WFA create/update/delete is still on the stack.
+					if ( $this->trigger_guard->isWriting() ) {
+						return;
+					}
+
+					// Same workflow already executing this request.
+					if ( $this->trigger_guard->isActive( $workflow_id ) ) {
+						return;
+					}
+
+					// Entity was created by a previous WFA action (translated post,
+					// auto-user, auto-comment, etc.) — do not start another loop.
+					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
+						return;
+					}
+
+					$dedupe_key = $this->triggerDedupeKey( $payload );
+
+					if ( '' !== $dedupe_key && ! $this->trigger_guard->claim( $workflow_id, $dedupe_key ) ) {
+						return;
+					}
 
 					if ( $this->settings->backgroundExecutionEnabled() ) {
-						$this->executor->queue( $workflow_id, $payload );
+						$this->executor->queueUnlessPending( $workflow_id, $payload, $dedupe_key );
 					} else {
 						$this->executor->run( $workflow_id, $payload );
 					}
 				}
 			);
 		}
+	}
+
+	/**
+	 * Builds a dedupe key identifying the event behind a trigger payload.
+	 *
+	 * Formatted as the JSON fragment the payload is persisted with, so the same
+	 * key works both for the in-request claim and for matching already-queued
+	 * runs in `WorkflowExecutionService::queueUnlessPending()`.
+	 *
+	 * @param array<string, mixed> $payload Trigger payload.
+	 *
+	 * @return string Empty when no useful key exists.
+	 */
+	private function triggerDedupeKey( array $payload ): string {
+		foreach ( array( 'post_id', 'product_id', 'user_id', 'customer_id', 'comment_id', 'term_id', 'order_id', 'ID' ) as $field ) {
+			if ( ! isset( $payload[ $field ] ) ) {
+				continue;
+			}
+
+			$id = (int) $payload[ $field ];
+
+			if ( $id > 0 ) {
+				return '"' . $field . '":' . $id;
+			}
+		}
+
+		return '';
 	}
 }

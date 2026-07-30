@@ -11,6 +11,8 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\EmptyState;
+use WorkflowAutomate\Plugin\Admin\ListTableUi;
+use WorkflowAutomate\Plugin\Admin\RunActionsController;
 use WorkflowAutomate\Plugin\Admin\RunsListTable;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
@@ -41,10 +43,13 @@ class RunsPage implements AdminPage {
 
 	private SettingsService $settings;
 
-	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings ) {
+	private RunActionsController $runActions;
+
+	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings, RunActionsController $runActions ) {
 		$this->runs = $runs;
 		$this->workflows = $workflows;
 		$this->settings = $settings;
+		$this->runActions = $runActions;
 	}
 
 	/**
@@ -111,6 +116,7 @@ class RunsPage implements AdminPage {
 
 		$this->renderWorkflowFilterNotice();
 		$this->renderNotice();
+		$this->renderFilters( $table );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filters.
 		$has_filters = ( isset( $_GET['workflow_id'] ) && absint( wp_unslash( $_GET['workflow_id'] ) ) > 0 )
@@ -134,13 +140,39 @@ class RunsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get">';
-		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		$table->views();
+
+		ListTableUi::openBulkForm( $this->slug(), 'wfa_run_bulk_action', 'wfa_run_bulk' );
+		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
-		echo '</form>';
+		ListTableUi::closeBulkForm();
+
+		$table->renderRowActionForms();
 
 		echo '</div>';
+	}
+
+	/**
+	 * @param RunsListTable $table Prepared list table.
+	 *
+	 * @return void
+	 */
+	private function renderFilters( RunsListTable $table ): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter form.
+		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
+
+		echo '<form method="get" class="wfa-list-table-filters-form">';
+		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
+
+		if ( '' !== $status ) {
+			printf( '<input type="hidden" name="status" value="%s" />', esc_attr( $status ) );
+		}
+
+		ListTableUi::renderFilterBar(
+			'top',
+			$table->filterFields()
+		);
+		echo '</form>';
 	}
 
 	/**
@@ -181,6 +213,22 @@ class RunsPage implements AdminPage {
 	 */
 	private function notices(): array {
 		return array(
+			'deleted' => array(
+				'message' => __( 'Run deleted.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'bulk_deleted' => array(
+				'message' => __( 'Selected runs deleted.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'delete_failed' => array(
+				'message' => __( 'That run could not be deleted.', 'workflow-automate' ),
+				'type' => 'error',
+			),
+			'action_failed' => array(
+				'message' => __( 'That run action could not be completed.', 'workflow-automate' ),
+				'type' => 'error',
+			),
 			'rerun_failed' => array(
 				'message' => __( 'That run could not be re-run.', 'workflow-automate' ),
 				'type' => 'error',

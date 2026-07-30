@@ -1,5 +1,5 @@
-# Dependencies
-/vendor/
+# Dependencies — PHP vendor is committed so sites can run without Composer.
+# Keep node_modules out of the repo (builder build output is committed separately).
 /node_modules/
 
 # Environment and secrets

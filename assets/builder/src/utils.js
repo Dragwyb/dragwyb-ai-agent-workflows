@@ -2,6 +2,12 @@
  * Small, dependency-free helpers shared across the builder app.
  */
 
+export const NODE_WIDTH = 240;
+export const NODE_HEIGHT = 96;
+const NODE_GAP_Y = 48;
+const NODE_START_X = 80;
+const NODE_START_Y = 48;
+
 /**
  * Generates a client-side id for a node. Never persisted as a database
  * primary key — the graph is stored as opaque JSON on the workflow, so
@@ -37,19 +43,39 @@ export function emptyGraph() {
 }
 
 /**
- * Computes a staggered default position for a newly added node so a chain
- * of additions doesn't stack every card at the same coordinates.
+ * Sorts nodes in visual flow order (top-to-bottom, then left-to-right).
  *
- * @param {number} index Zero-based index of the node being placed.
+ * @param {Array<Object>} nodes
+ * @return {Array<Object>}
+ */
+export function sortNodesForFlow(nodes) {
+	return [...nodes].sort((a, b) => {
+		if (a.y !== b.y) {
+			return a.y - b.y;
+		}
+
+		return a.x - b.x;
+	});
+}
+
+/**
+ * Places new nodes at the bottom of the vertical chain.
+ *
+ * @param {Array<Object>} existingNodes Nodes already on the canvas.
  * @return {{x: number, y: number}} Canvas coordinates.
  */
-export function defaultNodePosition(index) {
-	const columns = 4;
-	const columnWidth = 220;
-	const rowHeight = 140;
+export function defaultNodePosition(existingNodes) {
+	const sorted = sortNodesForFlow(existingNodes);
+
+	if (sorted.length === 0) {
+		return { x: NODE_START_X, y: NODE_START_Y };
+	}
+
+	const last = sorted[sorted.length - 1];
 
 	return {
-		x: 40 + (index % columns) * columnWidth,
-		y: 40 + Math.floor(index / columns) * rowHeight,
+		x: NODE_START_X,
+		y: last.y + NODE_HEIGHT + NODE_GAP_Y,
 	};
 }
+

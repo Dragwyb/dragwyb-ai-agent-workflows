@@ -1,6 +1,8 @@
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { getNodeMeta } from '../nodeMeta';
+
 const DRAG_THRESHOLD_PX = 3;
 const NUDGE_STEP = 10;
 const NUDGE_STEP_LARGE = 40;
@@ -30,12 +32,20 @@ const ARROW_DELTAS = {
 export default function NodeCard({
 	node,
 	selected,
+	isLinkTarget = false,
 	hasUnknownType,
+	canStartFlowConnection = false,
 	onSelect,
 	onMove,
+	onStartFlowConnectionDrag,
 	registerRef,
 }) {
 	const draggingRef = useRef(null);
+	const meta = getNodeMeta(node.type, node.category);
+
+	const stopPointer = (event) => {
+		event.stopPropagation();
+	};
 
 	const handlePointerDown = (event) => {
 		if (event.button !== undefined && event.button !== 0) {
@@ -119,6 +129,9 @@ export default function NodeCard({
 	if (hasUnknownType) {
 		classNames.push('wfa-builder-node--unknown');
 	}
+	if (isLinkTarget) {
+		classNames.push('wfa-builder-node--link-target');
+	}
 
 	const ariaLabel = [
 		node.label || node.type,
@@ -147,12 +160,52 @@ export default function NodeCard({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-builder-node__label" aria-hidden="true">
-				{node.label}
-			</span>
-			<span className="wfa-builder-node__type" aria-hidden="true">
-				{node.type}
-			</span>
+			<span
+				className="wfa-builder-node__handle wfa-builder-node__handle--top"
+				aria-hidden="true"
+			/>
+			<div className="wfa-builder-node__body">
+				<span
+					className="wfa-builder-node__icon"
+					style={{
+						backgroundColor: meta.bg,
+						color: meta.accent,
+					}}
+					aria-hidden="true"
+				>
+					{meta.icon}
+				</span>
+				<div className="wfa-builder-node__text">
+					<span className="wfa-builder-node__label" aria-hidden="true">
+						{node.label}
+					</span>
+					<span className="wfa-builder-node__subtitle" aria-hidden="true">
+						{meta.categoryLabel}
+					</span>
+				</div>
+			</div>
+			<span
+				className="wfa-builder-node__handle wfa-builder-node__handle--bottom"
+				aria-hidden="true"
+			/>
+			{canStartFlowConnection && onStartFlowConnectionDrag && (
+				<button
+					type="button"
+					className="wfa-builder-node__output-port"
+					title={__(
+						'Drag to the next step to connect',
+						'workflow-automate'
+					)}
+					aria-label={__(
+						'Drag to the next step to connect',
+						'workflow-automate'
+					)}
+					onPointerDown={(event) => {
+						stopPointer(event);
+						onStartFlowConnectionDrag(node.id, event);
+					}}
+				/>
+			)}
 		</div>
 	);
 }

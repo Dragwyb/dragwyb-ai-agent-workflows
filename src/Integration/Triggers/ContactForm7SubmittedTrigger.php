@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Starts a workflow when Contact Form 7 successfully sends mail
- * (`wpcf7_mail_sent`). Registered only when CF7 is active.
+ * Starts a workflow when Contact Form 7 sends mail (`wpcf7_mail_sent`).
+ * Registered only when Contact Form 7 is active.
  */
 class ContactForm7SubmittedTrigger implements TriggerInterface {
 
@@ -26,7 +26,7 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function slug(): string {
-		return 'contact_form_7_submitted_trigger';
+		return 'contact_form7_submitted_trigger';
 	}
 
 	/**
@@ -40,7 +40,7 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when a Contact Form 7 form is submitted successfully.', 'workflow-automate' );
+		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'workflow-automate' );
 	}
 
 	/**
@@ -83,7 +83,7 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	}
 
 	/**
-	 * @param mixed $contact_form CF7 form object.
+	 * @param mixed $contact_form WPCF7_ContactForm instance.
 	 *
 	 * @return array<string, mixed>|null
 	 */
@@ -92,10 +92,9 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 			return null;
 		}
 
-		$form_id = (int) $contact_form->id();
-		$title   = method_exists( $contact_form, 'title' ) ? (string) $contact_form->title() : '';
-
-		$fields = array();
+		$form_id    = (int) $contact_form->id();
+		$form_title = method_exists( $contact_form, 'title' ) ? (string) $contact_form->title() : '';
+		$fields     = array();
 
 		if ( class_exists( '\WPCF7_Submission', false ) ) {
 			$submission = \WPCF7_Submission::get_instance();
@@ -105,30 +104,27 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 
 				if ( is_array( $posted ) ) {
 					foreach ( $posted as $key => $value ) {
-						if ( ! is_string( $key ) && ! is_int( $key ) ) {
-							continue;
-						}
-
-						// CF7 internal keys.
-						if ( is_string( $key ) && 0 === strpos( $key, '_wpcf7' ) ) {
+						if ( ! is_string( $key ) || '' === $key ) {
 							continue;
 						}
 
 						if ( is_array( $value ) ) {
 							$value = implode( ', ', array_map( 'strval', $value ) );
+						} else {
+							$value = (string) $value;
 						}
 
-						$fields[ (string) $key ] = (string) $value;
+						$fields[ $key ] = $value;
 					}
 				}
 			}
 		}
 
 		return array(
-			'source' => 'contact_form_7',
+			'source' => 'contact-form-7',
 			'event' => 'form_submitted',
 			'form_id' => $form_id,
-			'form_title' => $title,
+			'form_title' => $form_title,
 			'fields' => $fields,
 		);
 	}

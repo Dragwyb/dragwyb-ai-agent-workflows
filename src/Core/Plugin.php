@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Core;
 
 use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
+use WorkflowAutomate\Plugin\Admin\GoogleOAuthStartController;
 use WorkflowAutomate\Plugin\Admin\Menu;
 use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
 use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
@@ -35,15 +36,32 @@ use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
 use WorkflowAutomate\Plugin\Rest\RestApi;
+use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
+use WorkflowAutomate\Plugin\Service\Agent\AgentService;
+use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
+use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
+use WorkflowAutomate\Plugin\Service\AiModelsService;
 use WorkflowAutomate\Plugin\Service\BackgroundRunner;
+use WorkflowAutomate\Plugin\Service\ChatMessageService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
+use WorkflowAutomate\Plugin\Service\ElementorFormsService;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeExecutionService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\RunRetentionService;
 use WorkflowAutomate\Plugin\Service\SettingsService;
+use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
+use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use WorkflowAutomate\Plugin\Provider\PersistenceServiceProvider;
+use WorkflowAutomate\Plugin\Provider\AdminServiceProvider;
+use WorkflowAutomate\Plugin\Provider\RestServiceProvider;
+use WorkflowAutomate\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -144,6 +162,8 @@ class Plugin {
 
 		Capabilities::register();
 
+		AiClientBootstrap::register();
+
 		// Defensive re-grant for already-active installs that predate
 		// roadmap item 14 (or whose administrator role lost the caps).
 		// Idempotent; cheap when caps are already present.
@@ -194,128 +214,16 @@ class Plugin {
 	 * @return void
 	 */
 	private function registerServices(): void {
-		$this->container->singleton(
-			WorkflowRepository::class,
-			static function (): WorkflowRepository {
-				return new WorkflowRepository();
-			}
+		$providers = array(
+			new PersistenceServiceProvider(),
+			new AdminServiceProvider(),
+			new RestServiceProvider(),
+			new ExecutionServiceProvider(),
 		);
 
-		$this->container->singleton(
-			WorkflowNodeRepository::class,
-			static function (): WorkflowNodeRepository {
-				return new WorkflowNodeRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowRunRepository::class,
-			static function (): WorkflowRunRepository {
-				return new WorkflowRunRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowRunLogRepository::class,
-			static function (): WorkflowRunLogRepository {
-				return new WorkflowRunLogRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WebhookRepository::class,
-			static function (): WebhookRepository {
-				return new WebhookRepository();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowService::class,
-			static function ( Container $container ): WorkflowService {
-				return new WorkflowService(
-					$container->get( WorkflowRepository::class ),
-					$container->get( WorkflowNodeRepository::class ),
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( WebhookRepository::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			NodeExecutionService::class,
-			static function ( Container $container ): NodeExecutionService {
-				return new NodeExecutionService( $container->get( NodeTypeRegistry::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			SettingsService::class,
-			static function (): SettingsService {
-				return new SettingsService();
-			}
-		);
-
-		$this->container->singleton(
-			WorkflowExecutionService::class,
-			static function ( Container $container ): WorkflowExecutionService {
-				return new WorkflowExecutionService(
-					$container->get( WorkflowService::class ),
-					$container->get( NodeTypeRegistry::class ),
-					$container->get( NodeExecutionService::class ),
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( SettingsService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			BackgroundRunner::class,
-			static function ( Container $container ): BackgroundRunner {
-				return new BackgroundRunner(
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowExecutionService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			RunRetentionService::class,
-			static function ( Container $container ): RunRetentionService {
-				return new RunRetentionService(
-					$container->get( WorkflowRunRepository::class ),
-					$container->get( WorkflowRunLogRepository::class ),
-					$container->get( SettingsService::class )
-				);
-			}
-		);
-
-		$this->container->singleton(
-			ConnectionRepository::class,
-			static function (): ConnectionRepository {
-				return new ConnectionRepository();
-			}
-		);
-
-		$this->container->singleton(
-			ConnectionService::class,
-			static function ( Container $container ): ConnectionService {
-				return new ConnectionService( $container->get( ConnectionRepository::class ) );
-			}
-		);
-
-		$this->container->singleton(
-			WebhookService::class,
-			static function ( Container $container ): WebhookService {
-				return new WebhookService(
-					$container->get( WebhookRepository::class ),
-					$container->get( WorkflowService::class ),
-					$container->get( WorkflowExecutionService::class ),
-					$container->get( SettingsService::class )
-				);
-			}
-		);
+		foreach ( $providers as $provider ) {
+			$provider->register( $this->container );
+		}
 	}
 
 	/**
@@ -340,7 +248,12 @@ class Plugin {
 			}
 		);
 
-		$built_in_node_types = new BuiltInNodeTypes( $this->container->get( ConnectionService::class ) );
+		$built_in_node_types = new BuiltInNodeTypes(
+			$this->container->get( ConnectionService::class ),
+			$this->container->get( GoogleOAuthService::class ),
+			$this->container->get( AgentService::class ),
+			$this->container->get( AgentAiClient::class )
+		);
 
 		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );
 
@@ -379,7 +292,9 @@ class Plugin {
 					$this->container->get( WorkflowService::class ),
 					$this->container->get( NodeTypeRegistry::class ),
 					$this->container->get( WorkflowExecutionService::class ),
-					$this->container->get( SettingsService::class )
+					$this->container->get( SettingsService::class ),
+					$this->container->get( WorkflowTestListenerService::class ),
+					$this->container->get( TriggerReentrancyGuard::class )
 				);
 
 				$binder->bindActiveWorkflows();
@@ -464,24 +379,29 @@ class Plugin {
 	 * @return void
 	 */
 	private function registerAdmin(): void {
-		$workflows = $this->container->get( WorkflowService::class );
-		$runs = $this->container->get( WorkflowRunRepository::class );
+		$workflows           = $this->container->get( WorkflowService::class );
+		$runs                = $this->container->get( WorkflowRunRepository::class );
 		$workflow_repository = $this->container->get( WorkflowRepository::class );
-		$executor = $this->container->get( WorkflowExecutionService::class );
-		$settings = $this->container->get( SettingsService::class );
-		$retention = $this->container->get( RunRetentionService::class );
-		$connections = $this->container->get( ConnectionService::class );
-		$webhooks = $this->container->get( WebhookService::class );
+		$executor            = $this->container->get( WorkflowExecutionService::class );
+		$settings            = $this->container->get( SettingsService::class );
+		$retention           = $this->container->get( RunRetentionService::class );
+		$connections         = $this->container->get( ConnectionService::class );
+		$google_oauth        = $this->container->get( GoogleOAuthService::class );
+		$webhooks            = $this->container->get( WebhookService::class );
 
-		$workflows_page = new WorkflowsPage( $workflows, $settings );
-		$runs_page = new RunsPage( $runs, $workflow_repository, $settings );
-		$builder_page = new BuilderPage();
-		$run_detail_page = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
-		$settings_page = new SettingsPage( $settings );
-		$connections_page = new ConnectionsPage( $connections, $settings );
-		$connection_form_page = new ConnectionFormPage( $connections );
-		$webhooks_page = new WebhooksPage( $webhooks, $workflows, $settings );
-		$webhook_form_page = new WebhookFormPage( $webhooks, $workflows, $settings );
+		$workflow_actions     = new WorkflowActionsController( $workflows, WorkflowsPage::SLUG );
+		$workflows_page       = new WorkflowsPage( $workflows, $settings, $workflow_actions );
+		$run_actions          = new RunActionsController( $executor, $runs, $this->container->get( WorkflowRunLogRepository::class ) );
+		$runs_page            = new RunsPage( $runs, $workflow_repository, $settings, $run_actions );
+		$builder_page         = new BuilderPage();
+		$run_detail_page      = new RunDetailPage( $runs, $workflow_repository, $executor, $settings );
+		$settings_page        = new SettingsPage( $settings );
+		$connection_actions   = new ConnectionActionsController( $connections );
+		$connections_page     = new ConnectionsPage( $connections, $settings, $connection_actions );
+		$connection_form_page = new ConnectionFormPage( $connections, $google_oauth );
+		$webhook_actions      = new WebhookActionsController( $webhooks );
+		$webhooks_page        = new WebhooksPage( $webhooks, $workflows, $settings, $webhook_actions );
+		$webhook_form_page    = new WebhookFormPage( $webhooks, $workflows, $settings );
 
 		( new Menu(
 			array(
@@ -496,10 +416,11 @@ class Plugin {
 				$webhook_form_page,
 			)
 		) )->register();
-		( new WorkflowActionsController( $workflows, $workflows_page->slug() ) )->register();
-		( new RunActionsController( $executor ) )->register();
+		( $workflow_actions )->register();
+		$run_actions->register();
 		( new SettingsController( $settings, $retention ) )->register();
-		( new ConnectionActionsController( $connections ) )->register();
-		( new WebhookActionsController( $webhooks ) )->register();
+		$connection_actions->register();
+		( new GoogleOAuthStartController( $connections, $google_oauth ) )->register();
+		$webhook_actions->register();
 	}
 }

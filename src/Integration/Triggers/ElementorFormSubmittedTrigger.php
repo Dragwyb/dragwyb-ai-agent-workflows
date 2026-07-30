@@ -28,8 +28,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * hook and builds a plain array payload (form name/id + field values). No
  * third-party plugin code is reused.
  *
- * Optional `form_name` config limits the trigger to one form; leave empty
- * to run for every Elementor Pro form on the site.
+ * Optional `form_id` config limits the trigger to one form widget; leave
+ * empty to run for every Elementor Pro form on the site.
  */
 class ElementorFormSubmittedTrigger implements TriggerInterface {
 
@@ -59,10 +59,16 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	 */
 	public function configSchema(): array {
 		return array(
-			'form_name' => array(
-				'type' => 'string',
-				'label' => __( 'Form name (optional — leave empty for all forms)', 'workflow-automate' ),
+			'form_id' => array(
+				'type' => 'select',
+				'label' => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
 				'default' => '',
+				'options' => array(
+					array(
+						'value' => '',
+						'label' => __( 'All forms', 'workflow-automate' ),
+					),
+				),
 			),
 		);
 	}
@@ -71,11 +77,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function bind( array $config, callable $on_fire ): void {
+		$expected_form_id   = isset( $config['form_id'] ) ? trim( (string) $config['form_id'] ) : '';
 		$expected_form_name = isset( $config['form_name'] ) ? trim( (string) $config['form_name'] ) : '';
 
 		add_action(
 			'elementor_pro/forms/new_record',
-			static function ( $record, $handler = null ) use ( $on_fire, $config, $expected_form_name ): void {
+			static function ( $record, $handler = null ) use ( $on_fire, $config, $expected_form_id, $expected_form_name ): void {
 				unset( $handler );
 
 				$payload = self::buildPayload( $record );
@@ -84,7 +91,7 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 					return;
 				}
 
-				if ( '' !== $expected_form_name && $expected_form_name !== $payload['form_name'] ) {
+				if ( ! self::payloadMatchesConfiguredForm( $payload, $expected_form_id, $expected_form_name ) ) {
 					return;
 				}
 
@@ -93,6 +100,28 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 			10,
 			2
 		);
+	}
+
+	/**
+	 * @param array<string, mixed> $payload
+	 * @param string               $expected_form_id
+	 * @param string               $expected_form_name Legacy config key.
+	 *
+	 * @return bool
+	 */
+	private static function payloadMatchesConfiguredForm( array $payload, string $expected_form_id, string $expected_form_name ): bool {
+		$payload_form_id   = trim( (string) ( $payload['form_id'] ?? '' ) );
+		$payload_form_name = trim( (string) ( $payload['form_name'] ?? '' ) );
+
+		if ( '' !== $expected_form_id ) {
+			return $expected_form_id === $payload_form_id;
+		}
+
+		if ( '' !== $expected_form_name ) {
+			return 0 === strcasecmp( $expected_form_name, $payload_form_name );
+		}
+
+		return true;
 	}
 
 	/**
@@ -105,12 +134,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 			return null;
 		}
 
-		$form_name = (string) $record->get_form_settings( 'form_name' );
-		$form_id   = (string) $record->get_form_settings( 'id' );
-		$raw_fields = $record->get( 'fields' );
+		$form_name    = trim( (string) $record->get_form_settings( 'form_name' ) );
+		$form_id      = trim( (string) $record->get_form_settings( 'id' ) );
+		$form_post_id = (string) $record->get_form_settings( 'form_post_id' );
+		$raw_fields   = $record->get( 'fields' );
 
-		$fields       = array();
-		$fields_by_label = array();
+		$fields = array();
 
 		if ( is_array( $raw_fields ) ) {
 			foreach ( $raw_fields as $field_id => $field ) {
@@ -130,12 +159,6 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 				if ( '' !== $id ) {
 					$fields[ $id ] = $value;
 				}
-
-				$label = isset( $field['title'] ) ? trim( (string) $field['title'] ) : '';
-
-				if ( '' !== $label ) {
-					$fields_by_label[ $label ] = $value;
-				}
 			}
 		}
 
@@ -144,8 +167,8 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 			'event' => 'form_submitted',
 			'form_name' => $form_name,
 			'form_id' => $form_id,
+			'form_post_id' => $form_post_id,
 			'fields' => $fields,
-			'fields_by_label' => $fields_by_label,
 		);
 	}
 }

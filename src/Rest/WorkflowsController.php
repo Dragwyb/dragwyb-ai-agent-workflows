@@ -15,8 +15,10 @@ use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Domain\Workflow;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
+use WorkflowAutomate\Plugin\Service\ChatMessageService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -49,6 +51,8 @@ class WorkflowsController extends WP_REST_Controller {
 
 	private WorkflowExecutionService $executor;
 
+	private ChatMessageService $chat;
+
 	/**
 	 * Cached item schema. See get_item_schema().
 	 *
@@ -59,11 +63,16 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	protected $schema = null;
 
-	public function __construct( WorkflowService $workflows, WorkflowExecutionService $executor ) {
+	public function __construct(
+		WorkflowService $workflows,
+		WorkflowExecutionService $executor,
+		ChatMessageService $chat
+	) {
 		$this->namespace = 'wfa/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
 		$this->executor = $executor;
+		$this->chat = $chat;
 	}
 
 	/**
@@ -166,6 +175,34 @@ class WorkflowsController extends WP_REST_Controller {
 						'id' => array(
 							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
 							'type' => 'integer',
+						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/chat',
+			array(
+				array(
+					'methods' => WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'chat_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args' => array(
+						'id' => array(
+							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
+							'type' => 'integer',
+						),
+						'chatInput' => array(
+							'description' => __( 'Chat message text (n8n chatInput).', 'workflow-automate' ),
+							'type' => 'string',
+							'required' => true,
+						),
+						'sessionId' => array(
+							'description' => __( 'Optional chat session id.', 'workflow-automate' ),
+							'type' => 'string',
+							'required' => false,
 						),
 					),
 				),
@@ -443,6 +480,81 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		return rest_ensure_response( $this->serializeRun( $run ) );
+	}
+
+	/**
+	 * Builder Chat panel: run the workflow with a chat message payload
+	 * (same shape as n8n's Chat Trigger). Works on draft workflows.
+	 *
+	 * @param WP_REST_Request $request Full request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function chat_item( $request ) {
+		$id = (int) $request['id'];
+		$workflow = $this->workflows->find( $id );
+
+		if ( null === $workflow ) {
+			return $this->notFoundError();
+		}
+
+		$has_chat_trigger = false;
+		$graph_nodes = $workflow->graph()['nodes'] ?? array();
+
+		if ( is_array( $graph_nodes ) ) {
+			foreach ( $graph_nodes as $graph_node ) {
+				if ( is_array( $graph_node ) && ChatMessageReceivedTrigger::SLUG === (string) ( $graph_node['type'] ?? '' ) ) {
+					$has_chat_trigger = true;
+					break;
+				}
+			}
+		}
+
+		if ( ! $has_chat_trigger ) {
+			return new WP_Error(
+				'wfa_chat_trigger_required',
+				__( 'Add a “When chat message received” trigger to use Chat.', 'workflow-automate' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$chat_input = trim( (string) $request->get_param( 'chatInput' ) );
+
+		if ( '' === $chat_input ) {
+			return new WP_Error(
+				'wfa_chat_empty',
+				__( 'chatInput is required.', 'workflow-automate' ),
+				array( 'status' => 422 )
+			);
+		}
+
+		$session_id = trim( (string) $request->get_param( 'sessionId' ) );
+
+		$payload = ChatMessageReceivedTrigger::normalizePayload(
+			array(
+				'chatInput' => $chat_input,
+				'sessionId' => $session_id,
+				'action'    => 'sendMessage',
+			)
+		);
+
+		try {
+			$run = $this->executor->run( $id, $payload );
+		} catch ( InvalidArgumentException $exception ) {
+			return $this->notFoundError();
+		} catch ( RuntimeException $exception ) {
+			return new WP_Error( 'wfa_rest_run_failed', $exception->getMessage(), array( 'status' => 500 ) );
+		}
+
+		return rest_ensure_response(
+			array(
+				'output'    => $this->chat->extractReply( $run ),
+				'sessionId' => $payload['sessionId'],
+				'run_id'    => $run->id(),
+				'status'    => $run->status(),
+				'run'       => $this->serializeRun( $run ),
+			)
+		);
 	}
 
 	/**

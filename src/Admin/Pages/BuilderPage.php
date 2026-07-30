@@ -11,6 +11,7 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Core\Capabilities;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,12 +91,25 @@ class BuilderPage implements AdminPage {
 		}
 
 		$asset = require $asset_file;
+		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
+		// Bust browser caches when the built bundle changes on disk.
+		$built_js = WFA_PLUGIN_DIR . 'assets/builder/build/index.js';
+		if ( file_exists( $built_js ) ) {
+			$version = (string) filemtime( $built_js );
+		}
+
+		wp_enqueue_style(
+			'wfa-builder-font',
+			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
+			array(),
+			null
+		);
 
 		wp_enqueue_script(
 			'wfa-builder',
 			WFA_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
-			$asset['version'],
+			$version,
 			true
 		);
 
@@ -106,8 +120,8 @@ class BuilderPage implements AdminPage {
 			wp_enqueue_style(
 				'wfa-builder',
 				WFA_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components' ),
-				$asset['version']
+				array( 'wp-components', 'wfa-builder-font' ),
+				$version
 			);
 			wp_style_add_data( 'wfa-builder', 'rtl', 'replace' );
 		}
@@ -120,7 +134,7 @@ class BuilderPage implements AdminPage {
 	}
 
 	/**
-	 * @return array{workflowId: int, listUrl: string}
+	 * @return array{workflowId: int, listUrl: string, connectionsUrl: string, aiCredentialsUrl: string, googleCredentialsUrl: string, googleOAuthCallbackUrl: string}
 	 */
 	private function bootstrapSettings(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which workflow to load; the REST API this feeds still re-checks capability on every request.
@@ -130,6 +144,10 @@ class BuilderPage implements AdminPage {
 			'workflowId' => $workflow_id,
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+			'connectionsUrl' => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
+			'aiCredentialsUrl' => \WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'googleCredentialsUrl' => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
+			'googleOAuthCallbackUrl' => rest_url( 'wfa/v1/oauth/google/callback' ),
 		);
 	}
 
@@ -154,8 +172,28 @@ class BuilderPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
 		}
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap wfa-admin-page wfa-builder-page">';
+		$this->renderImportNotice();
 		echo '<div id="wfa-builder-root"></div>';
 		echo '</div>';
+	}
+
+	/**
+	 * Shows a one-shot notice after list-page JSON import redirects here.
+	 *
+	 * @return void
+	 */
+	private function renderImportNotice(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
+		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+
+		if ( 'imported' !== $key ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+			esc_html__( 'Workflow imported from JSON.', 'workflow-automate' )
+		);
 	}
 }

@@ -11,6 +11,8 @@ namespace WorkflowAutomate\Plugin\Admin\Pages;
 
 use WorkflowAutomate\Plugin\Admin\AdminPage;
 use WorkflowAutomate\Plugin\Admin\EmptyState;
+use WorkflowAutomate\Plugin\Admin\ListTableUi;
+use WorkflowAutomate\Plugin\Admin\WebhookActionsController;
 use WorkflowAutomate\Plugin\Admin\WebhooksListTable;
 use WorkflowAutomate\Plugin\Core\Capabilities;
 use WorkflowAutomate\Plugin\Service\SettingsService;
@@ -37,10 +39,13 @@ class WebhooksPage implements AdminPage {
 
 	private SettingsService $settings;
 
-	public function __construct( WebhookService $webhooks, WorkflowService $workflows, SettingsService $settings ) {
+	private WebhookActionsController $webhookActions;
+
+	public function __construct( WebhookService $webhooks, WorkflowService $workflows, SettingsService $settings, WebhookActionsController $webhookActions ) {
 		$this->webhooks = $webhooks;
 		$this->workflows = $workflows;
 		$this->settings = $settings;
+		$this->webhookActions = $webhookActions;
 	}
 
 	/**
@@ -136,10 +141,17 @@ class WebhooksPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get">';
+		echo '<form method="get" class="wfa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
-		$table->display();
+		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
+
+		ListTableUi::openBulkForm( $this->slug(), 'wfa_webhook_bulk_action', 'wfa_webhook_bulk' );
+		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
+		$table->display();
+		ListTableUi::closeBulkForm();
+
+		$table->renderRowActionForms();
 
 		echo '</div>';
 	}
@@ -159,6 +171,10 @@ class WebhooksPage implements AdminPage {
 			),
 			'deleted' => array(
 				'message' => __( 'Webhook deleted.', 'workflow-automate' ),
+				'type' => 'success',
+			),
+			'bulk_deleted' => array(
+				'message' => __( 'Selected webhooks deleted.', 'workflow-automate' ),
 				'type' => 'success',
 			),
 			'error' => array(

@@ -16,15 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Shared helper for actions that authenticate with a Connections entry
- * (API Key or Bearer Token). Returns either the secret string or a
- * standard action-error array so callers can `return` it directly.
+ * (API Key, Bearer Token, or OAuth 2). Returns either the secret string
+ * or a standard action-error array so callers can `return` it directly.
  */
 class ConnectionSecretResolver {
 
 	private ConnectionService $connections;
 
-	public function __construct( ConnectionService $connections ) {
-		$this->connections = $connections;
+	private ?GoogleOAuthService $google_oauth;
+
+	public function __construct( ConnectionService $connections, ?GoogleOAuthService $google_oauth = null ) {
+		$this->connections  = $connections;
+		$this->google_oauth = $google_oauth;
 	}
 
 	/**
@@ -47,6 +50,23 @@ class ConnectionSecretResolver {
 				'success' => false,
 				'error' => __( 'The connection configured for this action no longer exists.', 'workflow-automate' ),
 			);
+		}
+
+		if ( ConnectionAuthTypes::OAUTH2 === $connection->authType() ) {
+			if ( null === $this->google_oauth ) {
+				return array(
+					'success' => false,
+					'error' => __( 'Google OAuth is not available.', 'workflow-automate' ),
+				);
+			}
+
+			$token = $this->google_oauth->getAccessToken( $connection );
+
+			if ( is_array( $token ) ) {
+				return $token;
+			}
+
+			return (string) $token;
 		}
 
 		$credentials = $this->connections->credentials( $connection );

@@ -347,7 +347,46 @@ class WorkflowService {
 			}
 		}
 
-		return $synced;
+		return $this->sortNodesByGraphPosition( $synced, $graph_nodes );
+	}
+
+	/**
+	 * Orders synced nodes top-to-bottom (then left-to-right) to match the builder canvas.
+	 *
+	 * @param WorkflowNode[]       $nodes       Synced node rows.
+	 * @param array<int, mixed>    $graph_nodes Raw graph node entries.
+	 *
+	 * @return WorkflowNode[]
+	 */
+	private function sortNodesByGraphPosition( array $nodes, array $graph_nodes ): array {
+		$positions = array();
+
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) ) {
+				continue;
+			}
+
+			$positions[ (string) $graph_node['id'] ] = array(
+				'y' => isset( $graph_node['y'] ) ? (int) $graph_node['y'] : 0,
+				'x' => isset( $graph_node['x'] ) ? (int) $graph_node['x'] : 0,
+			);
+		}
+
+		usort(
+			$nodes,
+			static function ( WorkflowNode $a, WorkflowNode $b ) use ( $positions ): int {
+				$pos_a = $positions[ $a->clientNodeId() ] ?? array( 'y' => 0, 'x' => 0 );
+				$pos_b = $positions[ $b->clientNodeId() ] ?? array( 'y' => 0, 'x' => 0 );
+
+				if ( $pos_a['y'] !== $pos_b['y'] ) {
+					return $pos_a['y'] <=> $pos_b['y'];
+				}
+
+				return $pos_a['x'] <=> $pos_b['x'];
+			}
+		);
+
+		return $nodes;
 	}
 
 	/**

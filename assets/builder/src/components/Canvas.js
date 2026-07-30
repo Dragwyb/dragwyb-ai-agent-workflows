@@ -1,90 +1,766 @@
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import NodeCard from './NodeCard';
 
+import AgentNodeCard from './AgentNodeCard';
+
+import ToolNodeCard from './ToolNodeCard';
+
+import ChatModelSubNode from './ChatModelSubNode';
+
+import MemorySubNode from './MemorySubNode';
+
+import OutputParserSubNode from './OutputParserSubNode';
+
+import ConditionNodeCard from './ConditionNodeCard';
+
+import FlowEdgeControls from './FlowEdgeControls';
+
+import {
+	conditionOutputPortPosition,
+	getConditionRows,
+	branchTargetInputPosition,
+} from '../utils/conditionBranches';
+import {
+	nodeInputPortPosition,
+	nodeOutputPortPosition,
+	canStartFlowConnection,
+	flowPathMidpoint,
+} from '../utils/flowConnections';
+
+import {
+	isAgentNode,
+	mainCanvasNodes,
+	toolsForAgent,
+	chatModelForAgent,
+	memoryForAgent,
+	outputParserForAgent,
+	chatModelForOutputParser,
+	agentToolPortPosition,
+	agentChatModelPortPosition,
+	agentMemoryPortPosition,
+	agentOutputParserPortPosition,
+	toolInputPortPosition,
+	chatModelInputPortPosition,
+	memoryInputPortPosition,
+	outputParserInputPortPosition,
+	outputParserModelPortPosition,
+	AGENT_TOTAL_HEIGHT,
+	isToolAttachment,
+	isChatModelAttachment,
+	isMemoryAttachment,
+	isOutputParserAttachment,
+	isParserChatModelAttachment,
+	isFallbackChatModelAttachment,
+} from '../utils/agentAttachments';
+
 /**
- * Renders the graph's nodes as absolutely-positioned cards. Connection
- * drawing between nodes is intentionally out of scope for this shell (see
- * roadmap item 6 notes) — `graph.connections` is preserved untouched so
- * adding that interaction later doesn't require a data migration.
- *
- * @param {Object}   props
- * @param {Array}    props.nodes
- * @param {Array}    props.knownTypeSlugs
- * @param {string}   props.selectedNodeId
- * @param {Function} props.onSelectNode
- * @param {Function} props.onMoveNode
- * @param {Function} props.onCanvasClick
- * @param {Function} props.registerNodeRef Optional (nodeId, element) => void for focus management.
+ 
+ * @param {{ x: number, y: number }} from
+ 
+ * @param {{ x: number, y: number }} to
+ 
+ * @return {string}
+ 
  */
+
+function dashedPath(from, to) {
+	const midY = from.y + (to.y - from.y) / 2;
+
+	return `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`;
+}
+
+function branchPath(from, to) {
+	const midX = from.x + (to.x - from.x) * 0.5;
+
+	return `M ${from.x} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x} ${to.y}`;
+}
+
+function flowPath(from, to) {
+	const midY = from.y + (to.y - from.y) / 2;
+
+	return `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`;
+}
+
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 1.5;
+const ZOOM_STEP = 0.1;
+
+/**
+ * @param {number} zoom
+ * @return {number}
+ */
+function clampZoom(zoom) {
+	return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(zoom * 10) / 10));
+}
+
+/**
+ * @param {Array<Object>} nodes
+ * @return {{ w: number, h: number }}
+ */
+function contentBounds(nodes) {
+	let maxX = 1200;
+	let maxY = 800;
+
+	for (const node of nodes) {
+		maxX = Math.max(maxX, (node.x || 0) + 320);
+		maxY = Math.max(maxY, (node.y || 0) + 220);
+	}
+
+	return { w: maxX, h: maxY };
+}
+
 export default function Canvas({
 	nodes,
+
+	connections = [],
+
 	knownTypeSlugs,
+
 	selectedNodeId,
+
+	connectionDrag,
+
+	isValidBranchDropTarget,
+
+	isValidFlowDropTarget,
+
+	onRegisterCanvas,
+
 	onSelectNode,
+
 	onMoveNode,
+
+	onAddAgentChatModel,
+
+	onAddAgentMemory,
+
+	onAddAgentTool,
+
+	onAddParserChatModel,
+
+	onAddCondition,
+
+	onRemoveCondition,
+
+	onStartBranchConnectionDrag,
+
+	onStartFlowConnectionDrag,
+
+	onDisconnectBranch,
+
+	selectedConnection,
+
+	onSelectConnection,
+
+	onDeleteConnection,
+
+	onInsertOnConnection,
+
 	onCanvasClick,
+
 	registerNodeRef,
 }) {
+	const [zoom, setZoom] = useState(1);
+	const canvasElRef = useRef(null);
+	const canvasNodes = mainCanvasNodes(nodes);
+	const bounds = contentBounds(nodes);
+
+	const setCanvasRef = useCallback(
+		(element) => {
+			canvasElRef.current = element;
+			if (onRegisterCanvas) {
+				onRegisterCanvas(element);
+			}
+		},
+		[onRegisterCanvas]
+	);
+
+	const bumpZoom = useCallback((delta) => {
+		setZoom((current) => clampZoom(current + delta));
+	}, []);
+
+	useEffect(() => {
+		const element = canvasElRef.current;
+		if (!element) {
+			return undefined;
+		}
+
+		const onWheel = (event) => {
+			if (!event.ctrlKey && !event.metaKey) {
+				return;
+			}
+
+			event.preventDefault();
+			const direction = event.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+			setZoom((current) => clampZoom(current + direction));
+		};
+
+		element.addEventListener('wheel', onWheel, { passive: false });
+		return () => element.removeEventListener('wheel', onWheel);
+	}, []);
+
+	const nodesById = Object.fromEntries(canvasNodes.map((node) => [node.id, node]));
+
+	const isDropTarget = (node) => {
+		if (!connectionDrag || !connectionDrag.hoverTargetNodeId) {
+			return false;
+		}
+
+		if (node.id !== connectionDrag.hoverTargetNodeId) {
+			return false;
+		}
+
+		if (connectionDrag.kind === 'branch') {
+			return isValidBranchDropTarget(
+				node.id,
+				connectionDrag.conditionNodeId
+			);
+		}
+
+		return isValidFlowDropTarget(node.id, connectionDrag.fromNodeId);
+	};
+
+	const flowEdges = (connections || [])
+		.map((connection) => {
+			const fromNode = nodesById[connection.from];
+			const toNode = nodesById[connection.to];
+
+			if (!fromNode || !toNode) {
+				return null;
+			}
+
+			return {
+				id: connection.id || `${connection.from}-${connection.to}`,
+				kind: 'flow',
+				from: nodeOutputPortPosition(fromNode),
+				to: nodeInputPortPosition(toNode),
+				path: flowPath(
+					nodeOutputPortPosition(fromNode),
+					nodeInputPortPosition(toNode)
+				),
+				midpoint: flowPathMidpoint(
+					nodeOutputPortPosition(fromNode),
+					nodeInputPortPosition(toNode)
+				),
+				sourceId: fromNode.id,
+				targetId: toNode.id,
+				fromNodeId: connection.from,
+				toNodeId: connection.to,
+			};
+		})
+		.filter(Boolean);
+
+	const attachmentEdges = [];
+	const branchEdges = [];
+
+	canvasNodes.forEach((node) => {
+		if (node.type !== 'condition_action') {
+			return;
+		}
+
+		const rows = getConditionRows(node.config || {});
+
+		rows.forEach((row) => {
+			if (!row.node_id || !nodesById[row.node_id]) {
+				return;
+			}
+
+			branchEdges.push({
+				id: `branch-${node.id}-${row.id}`,
+				kind: 'branch',
+				conditionNodeId: node.id,
+				branchId: row.id,
+				targetNodeId: row.node_id,
+				from: conditionOutputPortPosition(node, row.id, rows),
+				to: branchTargetInputPosition(nodesById[row.node_id]),
+				path: branchPath(
+					conditionOutputPortPosition(node, row.id, rows),
+					branchTargetInputPosition(nodesById[row.node_id])
+				),
+				midpoint: {
+					x:
+						(conditionOutputPortPosition(node, row.id, rows).x +
+							branchTargetInputPosition(nodesById[row.node_id]).x) /
+						2,
+					y:
+						(conditionOutputPortPosition(node, row.id, rows).y +
+							branchTargetInputPosition(nodesById[row.node_id]).y) /
+						2,
+				},
+			});
+		});
+
+		const defaultId = node.config?.default_branch_node_id;
+
+		if (defaultId && nodesById[defaultId]) {
+			branchEdges.push({
+				id: `branch-${node.id}-default`,
+				kind: 'branch',
+				conditionNodeId: node.id,
+				branchId: 'default',
+				targetNodeId: defaultId,
+				from: conditionOutputPortPosition(node, 'default', rows),
+				to: branchTargetInputPosition(nodesById[defaultId]),
+				path: branchPath(
+					conditionOutputPortPosition(node, 'default', rows),
+					branchTargetInputPosition(nodesById[defaultId])
+				),
+				midpoint: {
+					x:
+						(conditionOutputPortPosition(node, 'default', rows).x +
+							branchTargetInputPosition(nodesById[defaultId]).x) /
+						2,
+					y:
+						(conditionOutputPortPosition(node, 'default', rows).y +
+							branchTargetInputPosition(nodesById[defaultId]).y) /
+						2,
+				},
+			});
+		}
+	});
+
+	canvasNodes.forEach((node) => {
+		if (!isAgentNode(node)) {
+			return;
+		}
+
+		const chatModel = chatModelForAgent(nodes, node.id);
+
+		if (chatModel) {
+			attachmentEdges.push({
+				id: `attach-model-${node.id}-${chatModel.id}`,
+
+				from: agentChatModelPortPosition(node),
+
+				to: chatModelInputPortPosition(chatModel),
+			});
+		}
+
+		const memory = memoryForAgent(nodes, node.id);
+
+		if (memory) {
+			attachmentEdges.push({
+				id: `attach-memory-${node.id}-${memory.id}`,
+
+				from: agentMemoryPortPosition(node),
+
+				to: memoryInputPortPosition(memory),
+			});
+		}
+
+		const outputParser = outputParserForAgent(nodes, node.id);
+
+		if (outputParser) {
+			attachmentEdges.push({
+				id: `attach-parser-${node.id}-${outputParser.id}`,
+
+				from: agentOutputParserPortPosition(node),
+
+				to: outputParserInputPortPosition(outputParser),
+			});
+
+			const parserModel = chatModelForOutputParser(nodes, outputParser.id);
+
+			if (parserModel) {
+				attachmentEdges.push({
+					id: `attach-parser-model-${outputParser.id}-${parserModel.id}`,
+
+					from: outputParserModelPortPosition(outputParser),
+
+					to: chatModelInputPortPosition(parserModel),
+				});
+			}
+		}
+
+		const tools = toolsForAgent(nodes, node.id);
+
+		const from = agentToolPortPosition(node);
+
+		tools.forEach((tool) => {
+			attachmentEdges.push({
+				id: `attach-tool-${node.id}-${tool.id}`,
+
+				from,
+
+				to: toolInputPortPosition(tool),
+			});
+		});
+	});
+
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- deselect-on-background-click is a supplementary mouse affordance; keyboard users deselect via Escape or the config panel's close control.
+		<div className="wfa-builder-canvas-host">
 		<div
-			className="wfa-builder-canvas"
+			ref={setCanvasRef}
+			className={
+				connectionDrag
+					? 'wfa-builder-canvas wfa-builder-canvas--connecting'
+					: 'wfa-builder-canvas'
+			}
+			style={{ '--wfa-canvas-zoom': String(zoom) }}
 			role="region"
 			aria-label={__('Workflow canvas', 'workflow-automate')}
 			onClick={onCanvasClick}
 		>
+			<div
+				className="wfa-builder-canvas__scaler"
+				style={{
+					width: bounds.w * zoom,
+					height: bounds.h * zoom,
+				}}
+			>
+				<div
+					className="wfa-builder-canvas__world"
+					style={{
+						width: bounds.w,
+						height: bounds.h,
+						transform: `scale(${zoom})`,
+					}}
+				>
+			{(flowEdges.length > 0 ||
+				attachmentEdges.length > 0 ||
+				branchEdges.length > 0 ||
+				connectionDrag) && (
+				<svg
+					className="wfa-builder-canvas__edges"
+
+					aria-hidden="true"
+
+					focusable="false"
+				>
+					{flowEdges.map((edge) => {
+						const isSelected =
+							edge.sourceId === selectedNodeId ||
+							edge.targetId === selectedNodeId ||
+							(selectedConnection?.id === edge.id &&
+								selectedConnection?.kind === 'flow');
+
+						return (
+							<path
+								key={edge.id}
+								className={
+									isSelected
+										? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--selected'
+										: 'wfa-builder-canvas__edge'
+								}
+								d={edge.path}
+								fill="none"
+							/>
+						);
+					})}
+
+					{branchEdges.map((edge) => {
+						const isSelected =
+							selectedConnection?.id === edge.id &&
+							selectedConnection?.kind === 'branch';
+
+						return (
+							<path
+								key={edge.id}
+								className={
+									isSelected
+										? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--branch wfa-builder-canvas__edge--selected'
+										: 'wfa-builder-canvas__edge wfa-builder-canvas__edge--branch'
+								}
+								d={edge.path}
+								fill="none"
+							/>
+						);
+					})}
+
+					{connectionDrag && (
+						<path
+							className={
+								connectionDrag.kind === 'branch'
+									? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--branch wfa-builder-canvas__edge--preview'
+									: 'wfa-builder-canvas__edge wfa-builder-canvas__edge--preview'
+							}
+							d={
+								connectionDrag.kind === 'branch'
+									? branchPath(
+											connectionDrag.from,
+											connectionDrag.pointer
+										)
+									: flowPath(
+											connectionDrag.from,
+											connectionDrag.pointer
+										)
+							}
+							fill="none"
+						/>
+					)}
+
+					{attachmentEdges.map((edge) => (
+						<path
+							key={edge.id}
+
+							className="wfa-builder-canvas__edge wfa-builder-canvas__edge--attachment"
+
+							d={dashedPath(edge.from, edge.to)}
+
+							fill="none"
+						/>
+					))}
+				</svg>
+			)}
+
+			<FlowEdgeControls
+				flowEdges={flowEdges}
+				branchEdges={branchEdges}
+				selectedConnection={selectedConnection}
+				onSelectConnection={onSelectConnection}
+				onDeleteConnection={onDeleteConnection}
+				onInsertOnConnection={onInsertOnConnection}
+			/>
+
 			{nodes.length === 0 && <EmptyCanvasGuide />}
-			{nodes.map((node) => (
-				<NodeCard
-					key={node.id}
-					node={node}
-					selected={node.id === selectedNodeId}
-					hasUnknownType={!knownTypeSlugs.includes(node.type)}
-					onSelect={onSelectNode}
-					onMove={onMoveNode}
-					registerRef={registerNodeRef}
-				/>
-			))}
+
+			{canvasNodes.map((node) => {
+				if (isAgentNode(node)) {
+					const chatModel = chatModelForAgent(nodes, node.id);
+
+					const memory = memoryForAgent(nodes, node.id);
+
+					return (
+						<AgentNodeCard
+							key={node.id}
+							node={node}
+							selected={node.id === selectedNodeId}
+							isLinkTarget={isDropTarget(node)}
+							hasUnknownType={!knownTypeSlugs.includes(node.type)}
+							hasChatModel={Boolean(chatModel)}
+							hasMemory={Boolean(memory)}
+							chatModelId={chatModel?.id || null}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+							onAddChatModel={onAddAgentChatModel}
+							onAddMemory={onAddAgentMemory}
+							onAddTool={onAddAgentTool}
+							canStartFlowConnection={canStartFlowConnection(node)}
+							onStartFlowConnectionDrag={onStartFlowConnectionDrag}
+							registerRef={registerNodeRef}
+						/>
+					);
+				}
+
+				if (node.type === 'condition_action') {
+					return (
+						<ConditionNodeCard
+							key={node.id}
+							node={node}
+							selected={node.id === selectedNodeId}
+							hasUnknownType={!knownTypeSlugs.includes(node.type)}
+							nodesById={nodesById}
+							activeBranchDrag={
+								connectionDrag?.kind === 'branch'
+									? connectionDrag
+									: null
+							}
+							hoverTargetNodeId={connectionDrag?.hoverTargetNodeId}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+							onAddCondition={onAddCondition}
+							onRemoveCondition={onRemoveCondition}
+							onStartBranchConnectionDrag={onStartBranchConnectionDrag}
+							onDisconnectBranch={onDisconnectBranch}
+							registerRef={registerNodeRef}
+						/>
+					);
+				}
+
+				return (
+					<NodeCard
+						key={node.id}
+
+						node={node}
+
+						selected={node.id === selectedNodeId}
+
+						isLinkTarget={isDropTarget(node)}
+
+						hasUnknownType={!knownTypeSlugs.includes(node.type)}
+
+						canStartFlowConnection={canStartFlowConnection(node)}
+
+						onSelect={onSelectNode}
+
+						onMove={onMoveNode}
+
+						onStartFlowConnectionDrag={onStartFlowConnectionDrag}
+
+						registerRef={registerNodeRef}
+					/>
+				);
+			})}
+
+			{nodes
+
+				.filter(
+					(node) =>
+						(isChatModelAttachment(node) ||
+							isFallbackChatModelAttachment(node) ||
+							isParserChatModelAttachment(node)) &&
+						node.parent_agent_id
+				)
+
+				.map((chatModel) => (
+					<div
+						key={chatModel.id}
+						className="wfa-chat-model-node-wrap"
+						style={{
+							transform: `translate(${chatModel.x}px, ${chatModel.y}px)`,
+						}}
+					>
+						<ChatModelSubNode
+							node={chatModel}
+							selected={chatModel.id === selectedNodeId}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+						/>
+					</div>
+				))}
+
+			{nodes
+
+				.filter(
+					(node) => isMemoryAttachment(node) && node.parent_agent_id
+				)
+
+				.map((memory) => (
+					<div
+						key={memory.id}
+						className="wfa-memory-node-wrap"
+						style={{
+							transform: `translate(${memory.x}px, ${memory.y}px)`,
+						}}
+					>
+						<MemorySubNode
+							node={memory}
+							selected={memory.id === selectedNodeId}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+						/>
+					</div>
+				))}
+
+			{nodes
+
+				.filter(
+					(node) =>
+						isOutputParserAttachment(node) && node.parent_agent_id
+				)
+
+				.map((parser) => (
+					<div
+						key={parser.id}
+						className="wfa-output-parser-node-wrap"
+						style={{
+							transform: `translate(${parser.x}px, ${parser.y}px)`,
+						}}
+					>
+						<OutputParserSubNode
+							node={parser}
+							selected={parser.id === selectedNodeId}
+							hasChatModel={Boolean(
+								chatModelForOutputParser(nodes, parser.id)
+							)}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+							onAddChatModel={onAddParserChatModel}
+						/>
+					</div>
+				))}
+
+			{nodes
+
+				.filter(
+					(node) => isToolAttachment(node) && node.parent_agent_id
+				)
+
+				.map((tool) => (
+					<div
+						key={tool.id}
+						className="wfa-tool-node-wrap"
+						style={{
+							transform: `translate(${tool.x}px, ${tool.y}px)`,
+						}}
+					>
+						<ToolNodeCard
+							node={tool}
+							selected={tool.id === selectedNodeId}
+							onSelect={onSelectNode}
+							onMove={onMoveNode}
+						/>
+					</div>
+				))}
+				</div>
+			</div>
+		</div>
+			<div className="wfa-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'workflow-automate')}>
+				<button
+					type="button"
+					className="wfa-builder-canvas__zoom-btn"
+					aria-label={__('Zoom out', 'workflow-automate')}
+					disabled={zoom <= ZOOM_MIN}
+					onClick={(event) => {
+						event.stopPropagation();
+						bumpZoom(-ZOOM_STEP);
+					}}
+				>
+					−
+				</button>
+				<span className="wfa-builder-canvas__zoom-label">
+					{Math.round(zoom * 100)}%
+				</span>
+				<button
+					type="button"
+					className="wfa-builder-canvas__zoom-btn"
+					aria-label={__('Zoom in', 'workflow-automate')}
+					disabled={zoom >= ZOOM_MAX}
+					onClick={(event) => {
+						event.stopPropagation();
+						bumpZoom(ZOOM_STEP);
+					}}
+				>
+					+
+				</button>
+			</div>
 		</div>
 	);
 }
 
-/**
- * Guided empty state for a brand-new workflow (roadmap item 16).
- */
 function EmptyCanvasGuide() {
 	return (
 		<div className="wfa-builder-canvas__guide" role="status">
 			<h2 className="wfa-builder-canvas__guide-title">
 				{__('Build your workflow', 'workflow-automate')}
 			</h2>
+
 			<ol className="wfa-builder-canvas__guide-steps">
 				<li>
 					{__(
-						'Add a trigger from the palette on the left (what starts the run).',
+						'Add a trigger, then add an AI Agent from the Agents section.',
+
 						'workflow-automate'
 					)}
 				</li>
+
 				<li>
 					{__(
-						'Add one or more actions (what the workflow should do).',
+						'Click + under Chat Model to pick OpenAI, Gemini, or Claude.',
+
 						'workflow-automate'
 					)}
 				</li>
+
 				<li>
 					{__(
-						'Select each node to configure it, then save. Activate the workflow from the Workflows list when you are ready.',
+						'Add Condition from Tools, then use + on each branch to connect different flows.',
 						'workflow-automate'
 					)}
 				</li>
 			</ol>
-			<p className="wfa-builder-canvas__guide-hint">
-				{__(
-					'Tip: use Tab to move between nodes, Enter to select, and arrow keys to nudge a selected node.',
-					'workflow-automate'
-				)}
-			</p>
 		</div>
 	);
 }

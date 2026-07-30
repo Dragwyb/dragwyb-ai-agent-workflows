@@ -10,11 +10,17 @@ declare(strict_types=1);
 namespace WorkflowAutomate\Plugin\Rest;
 
 use WorkflowAutomate\Plugin\Core\Container;
+use WorkflowAutomate\Plugin\Service\AiModelsService;
+use WorkflowAutomate\Plugin\Service\ChatMessageService;
 use WorkflowAutomate\Plugin\Service\ConnectionService;
+use WorkflowAutomate\Plugin\Service\ElementorFormsService;
+use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
 use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
 use WorkflowAutomate\Plugin\Service\WebhookService;
 use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
 use WorkflowAutomate\Plugin\Service\WorkflowService;
+use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
+use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,17 +60,50 @@ class RestApi {
 	public function registerRoutes(): void {
 		$workflows_controller = new WorkflowsController(
 			$this->container->get( WorkflowService::class ),
-			$this->container->get( WorkflowExecutionService::class )
+			$this->container->get( WorkflowExecutionService::class ),
+			$this->container->get( ChatMessageService::class )
 		);
 		$workflows_controller->register_routes();
 
-		$node_types_controller = new NodeTypesController( $this->container->get( NodeTypeRegistry::class ) );
+		$node_types_controller = new NodeTypesController(
+			$this->container->get( NodeTypeRegistry::class ),
+			$this->container->get( ElementorFormsService::class )
+		);
 		$node_types_controller->register_routes();
 
-		$connections_controller = new ConnectionsController( $this->container->get( ConnectionService::class ) );
+		$connections_controller = new ConnectionsController(
+			$this->container->get( ConnectionService::class ),
+			$this->container->get( AiModelsService::class ),
+			$this->container->get( GoogleOAuthService::class )
+		);
 		$connections_controller->register_routes();
+
+		$ai_providers_controller = new AiProvidersController(
+			$this->container->get( AiModelsService::class )
+		);
+		$ai_providers_controller->register_routes();
 
 		$webhook_ingress_controller = new WebhookIngressController( $this->container->get( WebhookService::class ) );
 		$webhook_ingress_controller->register_routes();
+
+		$chat_ingress_controller = new ChatMessageIngressController(
+			$this->container->get( ChatMessageService::class ),
+			$this->container->get( WorkflowExecutionService::class ),
+			$this->container->get( WorkflowTestListenerService::class )
+		);
+		$chat_ingress_controller->register_routes();
+
+		$test_controller = new WorkflowTestController(
+			$this->container->get( WorkflowService::class ),
+			$this->container->get( WorkflowTestListenerService::class ),
+			$this->container->get( WorkflowNodeTestService::class )
+		);
+		$test_controller->register_routes();
+
+		$google_oauth_callback = new GoogleOAuthCallbackController(
+			$this->container->get( ConnectionService::class ),
+			$this->container->get( GoogleOAuthService::class )
+		);
+		$google_oauth_callback->register_routes();
 	}
 }

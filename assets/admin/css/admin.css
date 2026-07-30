@@ -120,11 +120,7 @@
 }
 
 .wfa-status-badge--queued,
-.wfa-status-badge--skipped {
-	background: #f0f0f1;
-	color: #50575e;
-}
-
+.wfa-status-badge--skipped,
 .wfa-status-badge--unknown {
 	background: #f0f0f1;
 	color: #50575e;
@@ -186,32 +182,72 @@
 	width: 200px;
 }
 
-.wfa-connection-current-value code {
+.wfa-connection-current-value code,
+.wfa-webhook-current-value code {
 	background: #f0f0f1;
 	padding: 2px 6px;
 	border-radius: 3px;
 }
 
 /*
- * Webhooks (roadmap item 13). Public URLs are long; keep them readable
- * in the list table and on the edit form without blowing out the layout.
+ * List-table filters and bulk actions (standard wp-admin pattern).
  */
-.wfa-webhooks-table .column-created_at {
-	width: 160px;
+.wfa-list-table-filters-form {
+	margin: 8px 0 12px;
 }
 
-.wfa-webhooks-table .column-signing,
-.wfa-webhooks-table .column-ip_allow_list {
-	width: 120px;
+.wfa-list-table-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
 }
 
-.wfa-webhook-url {
-	word-break: break-all;
-	font-size: 12px;
+.wfa-list-table-filters input[type="search"],
+.wfa-list-table-filters select {
+	max-width: 240px;
 }
 
-.wfa-webhook-current-value code {
-	background: #f0f0f1;
-	padding: 2px 6px;
-	border-radius: 3px;
+.wfa-list-table-bulk-form {
+	margin-top: 8px;
+}
+
+.wfa-admin-page .check-column {
+	width: 2.2em;
+}
+
+.wfa-detached-row-action-forms {
+	display: none;
+}
+
+/*
+ * Import control next to "Add New" — looks like a page-title-action but
+ * wraps a hidden file input that auto-submits on change.
+ */
+.wfa-workflow-import-form.page-title-action {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 4px;
+	padding: 0;
+	cursor: pointer;
+	overflow: hidden;
+	position: relative;
+}
+
+.wfa-workflow-import-form__label {
+	display: inline-flex;
+	align-items: center;
+	margin: 0;
+	padding: 4px 8px;
+	cursor: pointer;
+	line-height: 2;
+}
+
+.wfa-workflow-import-form__input {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
 }

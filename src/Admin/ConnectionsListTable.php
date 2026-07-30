@@ -41,6 +41,8 @@ class ConnectionsListTable extends WP_List_Table {
 
 	private SettingsService $settings;
 
+	private RowActionForms $rowForms;
+
 	public function __construct( ConnectionService $connections, SettingsService $settings ) {
 		parent::__construct(
 			array(
@@ -52,13 +54,12 @@ class ConnectionsListTable extends WP_List_Table {
 
 		$this->connections = $connections;
 		$this->settings = $settings;
+		$this->rowForms = new RowActionForms();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function get_columns() {
 		return array(
+			'cb' => '<input type="checkbox" />',
 			'label' => __( 'Label', 'workflow-automate' ),
 			'integration_slug' => __( 'Integration', 'workflow-automate' ),
 			'auth_type' => __( 'Authentication', 'workflow-automate' ),
@@ -67,9 +68,19 @@ class ConnectionsListTable extends WP_List_Table {
 		);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	protected function get_bulk_actions() {
+		return array(
+			'delete' => __( 'Delete', 'workflow-automate' ),
+		);
+	}
+
+	protected function column_cb( $item ) {
+		return sprintf(
+			'<input type="checkbox" name="connections[]" value="%d" />',
+			$item->id()
+		);
+	}
+
 	public function prepare_items() {
 		$this->_column_headers = array( $this->get_columns(), array(), array() );
 
@@ -80,6 +91,7 @@ class ConnectionsListTable extends WP_List_Table {
 			array(
 				'page' => $paged,
 				'per_page' => self::PER_PAGE,
+				'integration_slug' => $this->currentIntegrationFilter(),
 			)
 		);
 
@@ -120,6 +132,28 @@ class ConnectionsListTable extends WP_List_Table {
 		);
 
 		return $title . $this->row_actions( $actions );
+	}
+
+	public function filterFields(): array {
+		return array(
+			array(
+				'name' => 'integration_slug',
+				'type' => 'search',
+				'label' => __( 'Filter by integration', 'workflow-automate' ),
+				'placeholder' => __( 'e.g. gemini, openai', 'workflow-automate' ),
+				'value' => $this->currentIntegrationFilter(),
+			),
+		);
+	}
+
+	public function preservedFilters(): array {
+		return array(
+			'integration_slug' => $this->currentIntegrationFilter(),
+		);
+	}
+
+	public function renderRowActionForms(): void {
+		$this->rowForms->render();
 	}
 
 	/**
@@ -181,20 +215,27 @@ class ConnectionsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
+		$form_id = 'wfa-connection-delete-' . $id;
 		$nonce_field = wp_nonce_field( 'wfa_connection_action_delete_' . $id, '_wpnonce', true, false );
 
-		return sprintf(
-			'<form method="post" action="%1$s" class="wfa-row-action-form">'
+		$form_markup = sprintf(
+			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
 				. '<input type="hidden" name="action" value="wfa_connection_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
-				. '<input type="hidden" name="connection_id" value="%2$d" />'
-				. '%3$s'
-				. '<button type="submit" class="wfa-row-action-button">%4$s</button>'
+				. '<input type="hidden" name="connection_id" value="%3$d" />'
+				. '%4$s'
 				. '</form>',
+			esc_attr( $form_id ),
 			esc_url( admin_url( 'admin-post.php' ) ),
 			$id,
-			$nonce_field,
-			esc_html__( 'Delete', 'workflow-automate' )
+			$nonce_field
 		);
+
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'workflow-automate' ) );
+	}
+
+	private function currentIntegrationFilter(): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter.
+		return isset( $_GET['integration_slug'] ) ? sanitize_key( wp_unslash( $_GET['integration_slug'] ) ) : '';
 	}
 }

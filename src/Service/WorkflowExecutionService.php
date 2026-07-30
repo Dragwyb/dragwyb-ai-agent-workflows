@@ -11,10 +11,12 @@ namespace WorkflowAutomate\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
+use WorkflowAutomate\Plugin\Domain\WorkflowNode;
 use WorkflowAutomate\Plugin\Domain\WorkflowRun;
 use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
 use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use WorkflowAutomate\Plugin\Service\Agent\AgentGraphHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -69,10 +71,12 @@ class WorkflowExecutionService {
 
 	/**
 	 * A background run is retried up to this many times in total (i.e. up
-	 * to 4 retries after the original attempt) before being left in its
-	 * final failed/partial state.
+	 * to 2 retries after the original attempt) before being left in its
+	 * final failed/partial state. Kept low because a retry re-executes every
+	 * node from the start, repeating any paid third-party call the earlier
+	 * attempt already made.
 	 */
-	private const MAX_ATTEMPTS = 5;
+	private const MAX_ATTEMPTS = 3;
 
 	/**
 	 * Backoff base, in seconds: attempt 2 waits ~1 minute, attempt 3 ~2
@@ -95,13 +99,16 @@ class WorkflowExecutionService {
 
 	private SettingsService $settings;
 
+	private TriggerReentrancyGuard $trigger_guard;
+
 	public function __construct(
 		WorkflowService $workflows,
 		NodeTypeRegistry $registry,
 		NodeExecutionService $nodeExecutor,
 		WorkflowRunRepository $runs,
 		WorkflowRunLogRepository $runLogs,
-		SettingsService $settings
+		SettingsService $settings,
+		TriggerReentrancyGuard $trigger_guard
 	) {
 		$this->workflows = $workflows;
 		$this->registry = $registry;
@@ -109,6 +116,7 @@ class WorkflowExecutionService {
 		$this->runs = $runs;
 		$this->runLogs = $runLogs;
 		$this->settings = $settings;
+		$this->trigger_guard = $trigger_guard;
 	}
 
 	/**
@@ -224,6 +232,30 @@ class WorkflowExecutionService {
 	}
 
 	/**
+	 * Queues a run unless an equivalent one is already waiting or in flight.
+	 *
+	 * A single real-world event can reach the trigger binder several times
+	 * (WordPress fires `save_post` more than once per editor "Update"), and
+	 * each queued twin would repeat every node — including paid API calls.
+	 *
+	 * @param int                  $workflow_id     Workflow id.
+	 * @param array<string, mixed> $trigger_payload Data the triggering event provided.
+	 * @param string               $dedupe_key      JSON fragment identifying the event, e.g. `"post_id":70`.
+	 *
+	 * @throws InvalidArgumentException When the workflow does not exist.
+	 * @throws RuntimeException         When the run could not be recorded.
+	 *
+	 * @return WorkflowRun|null Null when an equivalent run is already pending.
+	 */
+	public function queueUnlessPending( int $workflow_id, array $trigger_payload, string $dedupe_key ): ?WorkflowRun {
+		if ( '' !== $dedupe_key && $this->runs->hasPendingRunMatchingPayload( $workflow_id, $dedupe_key ) ) {
+			return null;
+		}
+
+		return $this->queue( $workflow_id, $trigger_payload );
+	}
+
+	/**
 	 * Executes a run that BackgroundRunner has already claimed (its status
 	 * is `running` and it owns a `claim_token` — see
 	 * WorkflowRunRepository::claimBatch()). Not meant to be called with any
@@ -270,6 +302,27 @@ class WorkflowExecutionService {
 	 */
 	private function executeNodes( WorkflowRun $run ): WorkflowRun {
 		$workflow_id = $run->workflowId();
+
+		$this->trigger_guard->enter( $workflow_id );
+
+		try {
+			return $this->executeNodesGuarded( $run );
+		} finally {
+			$this->trigger_guard->leave( $workflow_id );
+		}
+	}
+
+	/**
+	 * Executes nodes while the workflow is marked active by the trigger guard.
+	 *
+	 * @param WorkflowRun $run A running workflow run.
+	 *
+	 * @throws RuntimeException When the run could not be finalized.
+	 *
+	 * @return WorkflowRun The finished run.
+	 */
+	private function executeNodesGuarded( WorkflowRun $run ): WorkflowRun {
+		$workflow_id = $run->workflowId();
 		$trigger_payload = $run->triggerPayload();
 
 		/**
@@ -286,23 +339,96 @@ class WorkflowExecutionService {
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
 
+		$workflow = $this->workflows->find( $workflow_id );
+		$graph    = null !== $workflow ? $workflow->graph() : array();
+
 		$context = array(
 			'trigger' => $trigger_payload,
 			'nodes' => array(),
+			'workflow_id' => $workflow_id,
+			'graph' => $graph,
 		);
+
+		$stats = $this->traverseAndExecuteNodes( $run, $nodes, $graph, $context );
+
+		return $this->finalizeExecution( $run, $workflow_id, $trigger_payload, $stats['executed'], $stats['succeeded'] );
+	}
+
+	/**
+	 * Traverses the graph and executes active nodes in flow order.
+	 *
+	 * @param WorkflowRun          $run     Current run.
+	 * @param array<WorkflowNode>  $nodes   Synchronized graph nodes.
+	 * @param array<string, mixed> $graph   Workflow graph payload.
+	 * @param array<string, mixed> $context Execution context reference.
+	 *
+	 * @return array{executed: int, succeeded: int}
+	 */
+	private function traverseAndExecuteNodes( WorkflowRun $run, array $nodes, array $graph, array &$context ): array {
+		$graph_nodes = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? $graph['nodes'] : array();
+		$graph_connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? $graph['connections'] : array();
+		$has_connections_key = array_key_exists( 'connections', $graph ) && is_array( $graph['connections'] );
 
 		$executed = 0;
 		$succeeded = 0;
 
+		$planner         = new GraphExecutionPlanner();
+		$main_path_ids   = $planner->getMainPathNodeIds( $graph_nodes, $graph_connections, $has_connections_key );
+		$branch_targets  = $planner->collectBranchTargetIds( $graph_nodes );
+		$outgoing_map    = $has_connections_key ? $planner->buildOutgoingMap( $graph_connections ) : array();
+		$use_fan_out     = $has_connections_key && array() !== $graph_connections;
+		$trigger_id      = $planner->findTriggerId( $graph_nodes );
+		$pending_ids     = $use_fan_out && null !== $trigger_id && '' !== $trigger_id
+			? array( $trigger_id )
+			: $main_path_ids;
+		$visited         = array();
+		$nodes_by_client = array();
+
 		foreach ( $nodes as $node ) {
+			$nodes_by_client[ $node->clientNodeId() ] = $node;
+		}
+
+		while ( array() !== $pending_ids ) {
+			$client_id = (string) array_shift( $pending_ids );
+
+			if ( '' === $client_id || isset( $visited[ $client_id ] ) ) {
+				continue;
+			}
+
+			if ( ! isset( $nodes_by_client[ $client_id ] ) ) {
+				continue;
+			}
+
+			$node = $nodes_by_client[ $client_id ];
+
 			if ( null !== $this->registry->trigger( $node->nodeType() ) ) {
+				$visited[ $client_id ] = true;
+
+				if ( $use_fan_out ) {
+					foreach ( array_reverse( $planner->getOutgoingTargets( $outgoing_map, $client_id ) ) as $next_id ) {
+						if ( ! isset( $visited[ $next_id ] ) ) {
+							array_unshift( $pending_ids, $next_id );
+						}
+					}
+				}
+
+				continue;
+			}
+
+			if ( AgentGraphHelper::isAgentAttachment( $graph_nodes, $client_id ) ) {
+				$visited[ $client_id ] = true;
 				continue;
 			}
 
 			++$executed;
+			$visited[ $client_id ] = true;
 
 			$started_at = microtime( true );
-			$result = $this->nodeExecutor->execute( $node, $context );
+			$node_context = array_merge(
+				$context,
+				array( 'current_node_id' => $client_id )
+			);
+			$result = $this->nodeExecutor->execute( $node, $node_context );
 			$duration_ms = (int) round( ( microtime( true ) - $started_at ) * 1000 );
 
 			$success = ! empty( $result['success'] );
@@ -311,27 +437,84 @@ class WorkflowExecutionService {
 				++$succeeded;
 			}
 
-			$context['nodes'][ $node->clientNodeId() ] = $result;
+			$context['nodes'][ $client_id ] = $result;
 
-			$this->runLogs->insert(
-				array(
-					'run_id' => $run->id(),
-					'node_id' => $node->id(),
-					'node_type' => $node->nodeType(),
-					'node_label' => $node->label(),
-					'status' => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
-					'input' => $node->config(),
-					'output' => $result,
-					'message' => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
-					'duration_ms' => $duration_ms,
-				)
-			);
+			$this->recordNodeLog( $run, $node, $result, $success, $duration_ms );
 
 			if ( ! $success && ! $this->settings->shouldContinueOnFailure() ) {
-				break;
+				$on_error = $this->resolveAgentOnError( $node, $graph_nodes );
+
+				if ( in_array( $on_error, array( 'continue', 'continue_error_output' ), true ) ) {
+					$context['nodes'][ $client_id ] = $this->buildAgentContinueOutput( $result, $on_error );
+					++$succeeded;
+				} else {
+					break;
+				}
+			}
+
+			$node_type = $node->nodeType();
+
+			if ( in_array( $node_type, GraphExecutionPlanner::BRANCHING_TYPES, true ) ) {
+				$branch_ids = $planner->resolveBranchTargets( $result );
+				$pending_ids = $planner->stripMainPathAfterBranch( $pending_ids, $client_id, $main_path_ids );
+
+				foreach ( array_reverse( $branch_ids ) as $branch_id ) {
+					if ( ! isset( $visited[ $branch_id ] ) ) {
+						array_unshift( $pending_ids, $branch_id );
+					}
+				}
+
+				continue;
+			}
+
+			if ( $use_fan_out ) {
+				foreach ( array_reverse( $planner->getOutgoingTargets( $outgoing_map, $client_id ) ) as $next_id ) {
+					if ( ! isset( $visited[ $next_id ] ) ) {
+						array_unshift( $pending_ids, $next_id );
+					}
+				}
+
+				continue;
+			}
+
+			if ( isset( $branch_targets[ $client_id ] ) ) {
+				$next_branch = $planner->nextInBranchColumn( $client_id, $graph_nodes, $branch_targets );
+
+				if ( null !== $next_branch && ! isset( $visited[ $next_branch ] ) ) {
+					array_unshift( $pending_ids, $next_branch );
+				}
 			}
 		}
 
+		return array(
+			'executed' => $executed,
+			'succeeded' => $succeeded,
+		);
+	}
+
+	/**
+	 * Inserts a execution log record for a completed node.
+	 */
+	private function recordNodeLog( WorkflowRun $run, WorkflowNode $node, array $result, bool $success, int $duration_ms ): void {
+		$this->runLogs->insert(
+			array(
+				'run_id' => $run->id(),
+				'node_id' => $node->id(),
+				'node_type' => $node->nodeType(),
+				'node_label' => $node->label(),
+				'status' => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
+				'input' => $node->config(),
+				'output' => $result,
+				'message' => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
+				'duration_ms' => $duration_ms,
+			)
+		);
+	}
+
+	/**
+	 * Finalizes the workflow run status and dispatches the after_run hook.
+	 */
+	private function finalizeExecution( WorkflowRun $run, int $workflow_id, array $trigger_payload, int $executed, int $succeeded ): WorkflowRun {
 		$finished = $this->runs->finish( $run->id(), $this->finalStatus( $executed, $succeeded ) );
 
 		$this->workflows->incrementRunCount( $workflow_id );
@@ -340,15 +523,6 @@ class WorkflowExecutionService {
 			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'workflow-automate' ) );
 		}
 
-		/**
-		 * Fires immediately after a workflow run finishes, whatever its
-		 * final status.
-		 *
-		 * @since 0.1.0
-		 *
-		 * @param WorkflowRun           $run             The completed run.
-		 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
-		 */
 		do_action( 'wfa/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
@@ -378,6 +552,10 @@ class WorkflowExecutionService {
 			return;
 		}
 
+		if ( ! $this->isTransientFailure( $run ) ) {
+			return;
+		}
+
 		$delay = min( self::MAX_BACKOFF_SECONDS, self::BASE_BACKOFF_SECONDS * ( 2 ** ( $run->attempts() - 1 ) ) );
 
 		$this->runs->insert(
@@ -393,6 +571,57 @@ class WorkflowExecutionService {
 	}
 
 	/**
+	 * Decides whether a failed run is worth attempting again.
+	 *
+	 * Only failures that plausibly resolve on their own — timeouts, rate
+	 * limits, upstream 5xx, dropped connections — qualify. A rejected request
+	 * or a misconfigured node fails identically every attempt, so retrying it
+	 * only multiplies third-party API usage without ever succeeding.
+	 *
+	 * @param WorkflowRun $run The just-finished run.
+	 *
+	 * @return bool
+	 */
+	private function isTransientFailure( WorkflowRun $run ): bool {
+		static $signals = array(
+			'timed out',
+			'timeout',
+			'rate limit',
+			'too many requests',
+			'429',
+			'500',
+			'502',
+			'503',
+			'504',
+			'temporarily unavailable',
+			'try again',
+			'overloaded',
+			'connection',
+			'could not resolve host',
+		);
+
+		foreach ( $this->runLogs->findByRun( $run->id() ) as $log ) {
+			if ( WorkflowRunLog::STATUS_ERROR !== $log->status() ) {
+				continue;
+			}
+
+			$message = strtolower( (string) $log->message() );
+
+			if ( '' === $message ) {
+				continue;
+			}
+
+			foreach ( $signals as $signal ) {
+				if ( false !== strpos( $message, $signal ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns every log entry for a run, in execution order.
 	 *
 	 * @param int $run_id Run id.
@@ -401,6 +630,51 @@ class WorkflowExecutionService {
 	 */
 	public function logsFor( int $run_id ): array {
 		return $this->runLogs->findByRun( $run_id );
+	}
+
+	/**
+	 * @param WorkflowNode         $node
+	 * @param array<int, mixed>    $graph_nodes
+	 *
+	 * @return string
+	 */
+	private function resolveAgentOnError( WorkflowNode $node, array $graph_nodes ): string {
+		if ( 'ai_agent_action' !== $node->nodeType() ) {
+			return 'stop_workflow';
+		}
+
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || (string) ( $graph_node['id'] ?? '' ) !== $node->clientNodeId() ) {
+				continue;
+			}
+
+			$config   = isset( $graph_node['config'] ) && is_array( $graph_node['config'] ) ? $graph_node['config'] : array();
+			$settings = isset( $config['settings'] ) && is_array( $config['settings'] ) ? $config['settings'] : array();
+
+			return (string) ( $settings['on_error'] ?? 'stop_workflow' );
+		}
+
+		return 'stop_workflow';
+	}
+
+	/**
+	 * @param array<string, mixed> $result
+	 * @param string               $on_error
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function buildAgentContinueOutput( array $result, string $on_error ): array {
+		$output = array(
+			'success'  => true,
+			'response' => '',
+			'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ) ),
+		);
+
+		if ( 'continue_error_output' === $on_error ) {
+			$output['error_output'] = $output['error'];
+		}
+
+		return $output;
 	}
 
 	/**

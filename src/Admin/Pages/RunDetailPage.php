@@ -229,7 +229,12 @@ class RunDetailPage implements AdminPage {
 		$this->renderMetaRow( __( 'Duration', 'workflow-automate' ), esc_html( RunDuration::forRun( $run ) ) );
 
 		if ( in_array( $run->status(), self::RERUNNABLE_STATUSES, true ) ) {
-			$this->renderMetaRow( __( 'Actions', 'workflow-automate' ), $this->rerunForm( $run->id() ) );
+			$this->renderMetaRow(
+				__( 'Actions', 'workflow-automate' ),
+				$this->rerunForm( $run->id() ) . ' ' . $this->deleteForm( $run->id() )
+			);
+		} else {
+			$this->renderMetaRow( __( 'Actions', 'workflow-automate' ), $this->deleteForm( $run->id() ) );
 		}
 
 		echo '</tbody></table>';
@@ -397,20 +402,64 @@ class RunDetailPage implements AdminPage {
 	 * @return string
 	 */
 	private function rerunForm( int $run_id ): string {
-		$nonce_field = wp_nonce_field( 'wfa_run_action_rerun_' . $run_id, '_wpnonce', true, false );
+		return $this->runActionForm(
+			'rerun',
+			$run_id,
+			__( 'Re-run this workflow', 'workflow-automate' ),
+			'button button-secondary'
+		);
+	}
+
+	/**
+	 * @param int $run_id Run id.
+	 *
+	 * @return string
+	 */
+	private function deleteForm( int $run_id ): string {
+		return $this->runActionForm(
+			'delete',
+			$run_id,
+			__( 'Delete this run', 'workflow-automate' ),
+			'button button-link-delete',
+			true
+		);
+	}
+
+	/**
+	 * @param string $op            One of 'rerun', 'delete'.
+	 * @param int    $run_id        Run id.
+	 * @param string $label         Button label.
+	 * @param string $button_class  CSS classes for the submit button.
+	 * @param bool   $confirm       Whether to ask for browser confirmation.
+	 *
+	 * @return string
+	 */
+	private function runActionForm( string $op, int $run_id, string $label, string $button_class, bool $confirm = false ): string {
+		$nonce_field = wp_nonce_field( 'wfa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$confirm_attr = '';
+
+		if ( $confirm ) {
+			$confirm_attr = sprintf(
+				' onclick="return confirm(%s);"',
+				wp_json_encode( __( 'Delete this run permanently? This cannot be undone.', 'workflow-automate' ) )
+			);
+		}
 
 		return sprintf(
-			'<form method="post" action="%1$s">'
+			'<form method="post" action="%1$s" style="display:inline-block;margin-right:8px;">'
 				. '<input type="hidden" name="action" value="wfa_run_action" />'
-				. '<input type="hidden" name="op" value="rerun" />'
-				. '<input type="hidden" name="run_id" value="%2$d" />'
-				. '%3$s'
-				. '<button type="submit" class="button button-secondary">%4$s</button>'
+				. '<input type="hidden" name="op" value="%2$s" />'
+				. '<input type="hidden" name="run_id" value="%3$d" />'
+				. '%4$s'
+				. '<button type="submit" class="%5$s"%6$s>%7$s</button>'
 				. '</form>',
 			esc_url( admin_url( 'admin-post.php' ) ),
+			esc_attr( $op ),
 			$run_id,
 			$nonce_field,
-			esc_html__( 'Re-run this workflow', 'workflow-automate' )
+			esc_attr( $button_class ),
+			$confirm_attr,
+			esc_html( $label )
 		);
 	}
 

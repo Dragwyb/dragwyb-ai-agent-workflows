@@ -41,10 +41,17 @@ class WebhooksListTable extends WP_List_Table {
 
 	private SettingsService $settings;
 
+	private RowActionForms $rowForms;
+
 	/**
 	 * @var array<int, string> workflow id => title, filled in prepare_items().
 	 */
 	private array $workflowTitles = array();
+
+	/**
+	 * @var array<int, string> workflow id => title for the filter dropdown.
+	 */
+	private array $workflowFilterOptions = array();
 
 	public function __construct( WebhookService $webhooks, WorkflowService $workflows, SettingsService $settings ) {
 		parent::__construct(
@@ -58,13 +65,12 @@ class WebhooksListTable extends WP_List_Table {
 		$this->webhooks = $webhooks;
 		$this->workflows = $workflows;
 		$this->settings = $settings;
+		$this->rowForms = new RowActionForms();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function get_columns() {
 		return array(
+			'cb' => '<input type="checkbox" />',
 			'public_url' => __( 'Public URL', 'workflow-automate' ),
 			'workflow' => __( 'Workflow', 'workflow-automate' ),
 			'signing' => __( 'Signing', 'workflow-automate' ),
@@ -73,9 +79,19 @@ class WebhooksListTable extends WP_List_Table {
 		);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	protected function get_bulk_actions() {
+		return array(
+			'delete' => __( 'Delete', 'workflow-automate' ),
+		);
+	}
+
+	protected function column_cb( $item ) {
+		return sprintf(
+			'<input type="checkbox" name="webhooks[]" value="%d" />',
+			$item->id()
+		);
+	}
+
 	public function prepare_items() {
 		$this->_column_headers = array( $this->get_columns(), array(), array() );
 
@@ -86,11 +102,13 @@ class WebhooksListTable extends WP_List_Table {
 			array(
 				'page' => $paged,
 				'per_page' => self::PER_PAGE,
+				'workflow_id' => $this->currentWorkflowFilter(),
 			)
 		);
 
 		$this->items = $result['items'];
 		$this->workflowTitles = $this->loadWorkflowTitles( $result['items'] );
+		$this->workflowFilterOptions = $this->loadWorkflowFilterOptions();
 
 		$this->set_pagination_args(
 			array(
@@ -130,6 +148,52 @@ class WebhooksListTable extends WP_List_Table {
 		}
 
 		return $titles;
+	}
+
+	private function loadWorkflowFilterOptions(): array {
+		$result = $this->workflows->list(
+			array(
+				'page' => 1,
+				'per_page' => 100,
+			)
+		);
+
+		$options = array();
+
+		foreach ( $result['items'] as $workflow ) {
+			$options[ $workflow->id() ] = $workflow->title();
+		}
+
+		return $options;
+	}
+
+	public function filterFields(): array {
+		$options = array(
+			'0' => __( 'All workflows', 'workflow-automate' ),
+		);
+
+		foreach ( $this->workflowFilterOptions as $id => $title ) {
+			$options[ (string) $id ] = $title;
+		}
+
+		return array(
+			array(
+				'name' => 'workflow_id',
+				'label' => __( 'Filter by workflow', 'workflow-automate' ),
+				'value' => (string) $this->currentWorkflowFilter(),
+				'options' => $options,
+			),
+		);
+	}
+
+	public function preservedFilters(): array {
+		return array(
+			'workflow_id' => $this->currentWorkflowFilter(),
+		);
+	}
+
+	public function renderRowActionForms(): void {
+		$this->rowForms->render();
 	}
 
 	/**
@@ -218,20 +282,27 @@ class WebhooksListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
+		$form_id = 'wfa-webhook-delete-' . $id;
 		$nonce_field = wp_nonce_field( 'wfa_webhook_action_delete_' . $id, '_wpnonce', true, false );
 
-		return sprintf(
-			'<form method="post" action="%1$s" class="wfa-row-action-form">'
+		$form_markup = sprintf(
+			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
 				. '<input type="hidden" name="action" value="wfa_webhook_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
-				. '<input type="hidden" name="webhook_id" value="%2$d" />'
-				. '%3$s'
-				. '<button type="submit" class="wfa-row-action-button">%4$s</button>'
+				. '<input type="hidden" name="webhook_id" value="%3$d" />'
+				. '%4$s'
 				. '</form>',
+			esc_attr( $form_id ),
 			esc_url( admin_url( 'admin-post.php' ) ),
 			$id,
-			$nonce_field,
-			esc_html__( 'Delete', 'workflow-automate' )
+			$nonce_field
 		);
+
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'workflow-automate' ) );
+	}
+
+	private function currentWorkflowFilter(): int {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter.
+		return isset( $_GET['workflow_id'] ) ? absint( wp_unslash( $_GET['workflow_id'] ) ) : 0;
 	}
 }
