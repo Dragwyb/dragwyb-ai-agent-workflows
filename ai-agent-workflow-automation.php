@@ -1,12 +1,13 @@
 <?php
 /**
- * Plugin Name:       Workflow Automate
- * Plugin URI:        https://example.com/workflow-automate
+ * Plugin Name:       AI Agent & Workflow Automation Builder
+ * Plugin URI:        https://dragwyb.com/ai-agent-workflow-automation
  * Description:       Build and run visual, multi-step automation workflows in WordPress.
- * Version:           0.1.0
+ * Version:           0.0.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
- * Author:            Workflow Automate
+ * Author:            Dragwyb
+ * Author URI:        https://dragwyb.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       workflow-automate
