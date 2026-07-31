@@ -26,7 +26,9 @@ final class CommentWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $c ): array => WordPressActionHelper::serializeComment( $c ),
+				function( $c ): array {
+					return WordPressActionHelper::serializeComment( $c );
+				},
 				$comments
 			)
 		);
@@ -43,7 +45,9 @@ final class CommentWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $c ): array => WordPressActionHelper::serializeComment( $c ),
+				function( $c ): array {
+					return WordPressActionHelper::serializeComment( $c );
+				},
 				$comments
 			)
 		);
@@ -60,7 +64,9 @@ final class CommentWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $c ): array => WordPressActionHelper::serializeComment( $c ),
+				function( $c ): array {
+					return WordPressActionHelper::serializeComment( $c );
+				},
 				$comments
 			)
 		);
@@ -77,7 +83,9 @@ final class CommentWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $c ): array => WordPressActionHelper::serializeComment( $c ),
+				function( $c ): array {
+					return WordPressActionHelper::serializeComment( $c );
+				},
 				$comments
 			)
 		);

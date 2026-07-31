@@ -30,7 +30,9 @@ final class UserWordPressService {
 		}
 
 		return array_map(
-			static fn( $user ): array => WordPressActionHelper::serializeUser( $user ),
+			function( $user ): array {
+				return WordPressActionHelper::serializeUser( $user );
+			},
 			get_users( $args )
 		);
 	}
