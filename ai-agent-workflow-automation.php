@@ -69,6 +69,8 @@ define( 'WFA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WFA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WFA_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
+require_once WFA_PLUGIN_DIR . 'src/Core/WordPressCompat.php';
+
 /*
  * Autoloading.
  *
@@ -86,8 +88,7 @@ define( 'WFA_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
  * this point our vendored SDK has NOT been loaded yet, so this check reliably
  * reflects core capabilities and cannot be tripped by our own polyfills.
  */
-$wfa_has_core_ai_client = function_exists( 'wp_ai_client_prompt' )
-	|| ( function_exists( 'wp_get_wp_version' ) && version_compare( wp_get_wp_version(), '7.0-alpha', '>=' ) );
+$wfa_has_core_ai_client = wfa_has_core_ai_client();
 
 if ( $wfa_has_core_ai_client ) {
 	/*

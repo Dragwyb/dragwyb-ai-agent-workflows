@@ -233,9 +233,9 @@ class SettingsPage implements AdminPage {
 		echo '<tr><th scope="row"><label for="wfa-retention-days">' . esc_html__( 'Keep finished run history for', 'workflow-automate' ) . '</label></th><td>';
 		printf(
 			'<input type="number" id="wfa-retention-days" name="retention_days" min="%1$d" max="%2$d" value="%3$d" class="small-text" /> %4$s',
-			SettingsService::MIN_RETENTION_DAYS,
-			SettingsService::MAX_RETENTION_DAYS,
-			$days,
+			(int) SettingsService::MIN_RETENTION_DAYS,
+			(int) SettingsService::MAX_RETENTION_DAYS,
+			(int) $days,
 			esc_html__( 'days', 'workflow-automate' )
 		);
 		echo '<p class="description">' . esc_html__( 'A daily background job automatically removes finished runs (and their logs) older than this. Set to 0 to keep history forever.', 'workflow-automate' ) . '</p>';

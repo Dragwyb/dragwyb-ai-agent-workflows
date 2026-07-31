@@ -80,7 +80,13 @@ class AgentAiClient {
 			$system_instr = $converted['system'];
 			$decls        = $this->toFunctionDeclarations( $tools );
 
-			$builder = wp_ai_client_prompt( $ai_messages );
+			$builder = AiClientBootstrap::createPromptBuilder( $ai_messages );
+			if ( null === $builder ) {
+				return array(
+					'success' => false,
+					'error'   => __( 'The WordPress AI Client is not available on this site.', 'workflow-automate' ),
+				);
+			}
 			$builder->using_provider( $provider_id );
 			$builder->using_model_preference( array( $provider_id, $model ) );
 

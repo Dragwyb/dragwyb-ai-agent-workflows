@@ -56,7 +56,7 @@ abstract class AbstractCompatibleApiProvider extends AbstractApiProvider {
 		}
 
 		throw new RuntimeException(
-			'Unsupported model capabilities: ' . implode( ', ', $capabilities )
+			'Unsupported model capabilities: ' . implode( ', ', esc_html( $capabilities ) )
 		);
 	}
 

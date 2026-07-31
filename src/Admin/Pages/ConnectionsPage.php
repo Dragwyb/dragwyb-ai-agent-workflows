@@ -200,7 +200,7 @@ class ConnectionsPage implements AdminPage {
 			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',
 			esc_attr( $notices[ $key ]['type'] ),
 			esc_html( $notices[ $key ]['message'] ),
-			$this->noticeDetailHtml()
+			wp_kses_post( $this->noticeDetailHtml() )
 		);
 	}
 

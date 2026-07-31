@@ -247,7 +247,7 @@ class RunDetailPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderMetaRow( string $label, string $value ): void {
-		printf( '<tr><th scope="row">%1$s</th><td>%2$s</td></tr>', esc_html( $label ), $value );
+		printf( '<tr><th scope="row">%1$s</th><td>%2$s</td></tr>', esc_html( $label ), wp_kses_post( $value ) );
 	}
 
 	/**
@@ -308,7 +308,7 @@ class RunDetailPage implements AdminPage {
 	private function renderLogRow( WorkflowRunLog $log ): void {
 		echo '<tr>';
 		printf( '<td>%s</td>', esc_html( $this->nodeLabel( $log ) ) );
-		printf( '<td>%s</td>', $this->logStatusBadge( $log->status() ) );
+		printf( '<td>%s</td>', wp_kses_post( $this->logStatusBadge( $log->status() ) ) );
 		printf( '<td>%s</td>', esc_html( RunDuration::forNode( $log->durationMs() ) ) );
 		printf( '<td>%s</td>', esc_html( $log->message() ?? '' ) );
 		echo '<td>';

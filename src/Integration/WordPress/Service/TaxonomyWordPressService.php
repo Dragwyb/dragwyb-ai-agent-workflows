@@ -492,7 +492,7 @@ final class TaxonomyWordPressService {
 		);
 
 		$id = media_handle_sideload( $fileArray, 0, null, $postData );
-		@unlink( $tmp );
+		wp_delete_file( $tmp );
 
 		if ( is_wp_error( $id ) ) {
 			return WordPressActionHelper::fail( $id->get_error_message() );

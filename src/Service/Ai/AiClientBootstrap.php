@@ -92,10 +92,7 @@ class AiClientBootstrap {
 		// Use the official version gate, not function_exists().
 		$is_wp70 = function_exists( 'wp_has_ai_client' )
 			? wp_has_ai_client()
-			: (
-				function_exists( 'wp_get_wp_version' )
-				&& version_compare( wp_get_wp_version(), '7.0-alpha', '>=' )
-			);
+			: version_compare( wfa_wp_version(), '7.0-alpha', '>=' );
 
 		if ( ! $is_wp70 ) {
 			$sdk_autoload = WFA_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
@@ -143,6 +140,22 @@ class AiClientBootstrap {
 		self::boot();
 
 		return class_exists( AiClient::class ) && function_exists( 'wp_ai_client_prompt' );
+	}
+
+	/**
+	 * Creates a prompt builder when the WP AI Client API is available.
+	 *
+	 * @param array<int, mixed> $messages AI Client messages.
+	 *
+	 * @return object|null
+	 */
+	public static function createPromptBuilder( array $messages ) {
+		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+			return null;
+		}
+
+		// phpcs:ignore PluginCheck.WPCompatibility.FunctionAvailability -- only called after isAvailable() succeeds; polyfilled on older core via vendored SDK.
+		return wp_ai_client_prompt( $messages );
 	}
 
 	/**
@@ -196,8 +209,7 @@ class AiClientBootstrap {
 			return wp_has_ai_client();
 		}
 
-		return function_exists( 'wp_get_wp_version' )
-			&& version_compare( wp_get_wp_version(), '7.0-alpha', '>=' );
+		return version_compare( wfa_wp_version(), '7.0-alpha', '>=' );
 	}
 
 	/**

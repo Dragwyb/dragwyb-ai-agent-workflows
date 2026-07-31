@@ -55,7 +55,7 @@ class CompatibleModelMetadataDirectory extends AbstractOpenAiCompatibleModelMeta
 		$response_data = $response->getData();
 		if ( ! isset( $response_data['data'] ) || ! $response_data['data'] ) {
 			$provider_class = $this->provider_class;
-			throw ResponseException::fromMissingData( $provider_class::metadata()->getName(), 'data' );
+			throw ResponseException::fromMissingData( esc_html( $provider_class::metadata()->getName() ), 'data' );
 		}
 
 		$capabilities = array(

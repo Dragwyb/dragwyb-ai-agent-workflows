@@ -164,14 +164,15 @@ class WebhookFormPage implements AdminPage {
 	private function renderEditForm( Webhook $webhook ): void {
 		$require_signing = $this->settings->requireWebhookSigning();
 		$secret_display  = $this->webhooks->displaySigningSecret( $webhook );
+		$webhook_id      = (int) $webhook->id();
 
 		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'workflow-automate' ) . ' <code class="wfa-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-webhook-form">';
 		echo '<input type="hidden" name="action" value="wfa_webhook_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
-		printf( '<input type="hidden" name="webhook_id" value="%d" />', $webhook->id() );
-		wp_nonce_field( 'wfa_webhook_action_update_' . $webhook->id() );
+		printf( '<input type="hidden" name="webhook_id" value="%d" />', $webhook_id );
+		wp_nonce_field( 'wfa_webhook_action_update_' . $webhook_id );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 		$this->renderWorkflowRow( (int) ( $webhook->workflowId() ?? 0 ) );
@@ -201,10 +202,11 @@ class WebhookFormPage implements AdminPage {
 		echo '<option value="">' . esc_html__( 'Select a workflow…', 'workflow-automate' ) . '</option>';
 
 		foreach ( $workflows['items'] as $workflow ) {
+			$workflow_id = (int) $workflow->id();
 			printf(
 				'<option value="%1$d" %2$s>%3$s%4$s</option>',
-				$workflow->id(),
-				selected( $selected_id, $workflow->id(), false ),
+				$workflow_id,
+				esc_attr( selected( $selected_id, $workflow_id, false ) ),
 				esc_html( $workflow->title() ),
 				Workflow::STATUS_ACTIVE === $workflow->status()
 					? ''

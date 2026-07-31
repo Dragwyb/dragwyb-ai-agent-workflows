@@ -375,7 +375,7 @@ class ConnectionService {
 				? (string) $result['error']
 				: __( 'Credential verification failed. Check the API key or token and try again.', 'workflow-automate' );
 
-			throw new InvalidArgumentException( $message );
+			throw new InvalidArgumentException( esc_html( $message ) );
 		}
 
 		return Connection::STATUS_VERIFIED;

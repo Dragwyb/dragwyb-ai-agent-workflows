@@ -546,7 +546,9 @@ final class TaxonomyActionCatalog {
 
 			$definitions[] = array(
 				'slug'          => $slugPrefix . '_update_action',
+				/* translators: %s: e.g. "Product Tag". */
 				'label'         => sprintf( __( 'Update %s', 'workflow-automate' ), $noun ),
+				/* translators: %s: e.g. "product tag". */
 				'description'   => sprintf( __( 'Updates an existing %s term.', 'workflow-automate' ), strtolower( $noun ) ),
 				'group'         => $group,
 				'group_label'   => $groups[ $group ],
@@ -557,7 +559,9 @@ final class TaxonomyActionCatalog {
 
 			$definitions[] = array(
 				'slug'          => $slugPrefix . '_delete_action',
+				/* translators: %s: e.g. "Product Tag". */
 				'label'         => sprintf( __( 'Delete %s', 'workflow-automate' ), $noun ),
+				/* translators: %s: e.g. "product tag". */
 				'description'   => sprintf( __( 'Deletes an existing %s term.', 'workflow-automate' ), strtolower( $noun ) ),
 				'group'         => $group,
 				'group_label'   => $groups[ $group ],
@@ -570,6 +574,7 @@ final class TaxonomyActionCatalog {
 				'slug'          => $slugPrefix . '_get_all_action',
 				/* translators: %s: e.g. "Product Tag". */
 				'label'         => sprintf( __( 'Get %s (All)', 'workflow-automate' ), $noun ),
+				/* translators: %s: e.g. "product tag". */
 				'description'   => sprintf( __( 'Retrieves every %s term.', 'workflow-automate' ), strtolower( $noun ) ),
 				'group'         => $group,
 				'group_label'   => $groups[ $group ],
@@ -582,6 +587,7 @@ final class TaxonomyActionCatalog {
 				'slug'          => $slugPrefix . '_get_single_action',
 				/* translators: %s: e.g. "Product Tag". */
 				'label'         => sprintf( __( 'Get %s (Single)', 'workflow-automate' ), $noun ),
+				/* translators: %s: e.g. "product tag". */
 				'description'   => sprintf( __( 'Retrieves a single %s term by ID.', 'workflow-automate' ), strtolower( $noun ) ),
 				'group'         => $group,
 				'group_label'   => $groups[ $group ],
