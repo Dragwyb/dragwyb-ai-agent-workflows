@@ -81,8 +81,17 @@ class WebhookIngressController {
 	 */
 	public function receive( $request ) {
 		$public_id = (string) $request->get_param( 'public_id' );
-		$raw_body = (string) $request->get_body();
 		$client_ip = $this->clientIp( $request );
+
+		if ( ! $this->checkRateLimit( $public_id, $client_ip ) ) {
+			return new WP_Error(
+				'wfa_webhook_rate_limit_exceeded',
+				__( 'Rate limit exceeded. Please try again later.', 'workflow-automate' ),
+				array( 'status' => 429 )
+			);
+		}
+
+		$raw_body  = (string) $request->get_body();
 		$signature = (string) $request->get_header( 'x-wfa-signature' );
 
 		$result = $this->webhooks->ingest( $public_id, $raw_body, $client_ip, $signature );
@@ -94,6 +103,26 @@ class WebhookIngressController {
 		$status = ! empty( $result['queued'] ) ? 202 : 200;
 
 		return new WP_REST_Response( $result, $status );
+	}
+
+	/**
+	 * Rate limiting helper for webhooks using transients.
+	 *
+	 * @param string $public_id Webhook public ID.
+	 * @param string $client_ip Client IP.
+	 *
+	 * @return bool True if allowed, false if exceeded.
+	 */
+	private function checkRateLimit( string $public_id, string $client_ip ): bool {
+		$transient_key = 'wfa_wh_rl_' . md5( $client_ip . '|' . $public_id );
+		$count         = (int) get_transient( $transient_key );
+
+		if ( $count >= 60 ) {
+			return false;
+		}
+
+		set_transient( $transient_key, $count + 1, 60 );
+		return true;
 	}
 
 	/**

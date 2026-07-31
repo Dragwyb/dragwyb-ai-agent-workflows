@@ -82,6 +82,11 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
 		}
 
+		$editableRoles = get_editable_roles();
+		if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
+			return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+		}
+
 		$userData = WordPressActionHelper::mapUserFields( $config );
 		$userData['user_login'] = $username;
 		$userData['user_email'] = $email;
@@ -138,6 +143,10 @@ final class UserWordPressService {
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' !== $userRole ) {
+			$editableRoles = get_editable_roles();
+			if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
+				return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+			}
 			$userData['role'] = $userRole;
 		}
 

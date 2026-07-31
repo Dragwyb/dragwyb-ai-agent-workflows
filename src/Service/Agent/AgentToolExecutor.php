@@ -85,6 +85,22 @@ class AgentToolExecutor {
 	}
 
 	/**
+	 * Config fields that must never be overwritten by LLM tool arguments.
+	 *
+	 * @var array<string, true>
+	 */
+	private const RESTRICTED_KEYS = array(
+		'connection_id'     => true,
+		'allow_unsafe_urls' => true,
+		'user_role'         => true,
+		'password'          => true,
+		'role_capabilities' => true,
+		'role_name'         => true,
+		'headers'           => true,
+		'metadata'          => true,
+	);
+
+	/**
 	 * Non-empty LLM arguments always win over saved node config defaults.
 	 *
 	 * @param array<string, mixed> $config    Saved node config.
@@ -97,7 +113,7 @@ class AgentToolExecutor {
 		unset( $node_type );
 
 		foreach ( $arguments as $key => $value ) {
-			if ( ! is_string( $key ) ) {
+			if ( ! is_string( $key ) || isset( self::RESTRICTED_KEYS[ $key ] ) ) {
 				continue;
 			}
 

@@ -81,7 +81,7 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 				'type'        => 'boolean',
 				'label'       => __( 'Make chat publicly available', 'workflow-automate' ),
 				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'workflow-automate' ),
-				'default'     => true,
+				'default'     => false,
 			),
 			'title' => array(
 				'type'    => 'string',

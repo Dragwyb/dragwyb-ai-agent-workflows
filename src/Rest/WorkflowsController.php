@@ -475,8 +475,9 @@ class WorkflowsController extends WP_REST_Controller {
 			$run = $this->executor->run( $id );
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
-		} catch ( RuntimeException $exception ) {
-			return new WP_Error( 'wfa_rest_run_failed', $exception->getMessage(), array( 'status' => 500 ) );
+		} catch ( \Throwable $exception ) {
+			error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
+			return new WP_Error( 'wfa_rest_run_failed', __( 'Workflow execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response( $this->serializeRun( $run ) );
@@ -542,8 +543,9 @@ class WorkflowsController extends WP_REST_Controller {
 			$run = $this->executor->run( $id, $payload );
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
-		} catch ( RuntimeException $exception ) {
-			return new WP_Error( 'wfa_rest_run_failed', $exception->getMessage(), array( 'status' => 500 ) );
+		} catch ( \Throwable $exception ) {
+			error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
+			return new WP_Error( 'wfa_rest_run_failed', __( 'Chat execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(

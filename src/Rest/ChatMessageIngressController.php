@@ -79,8 +79,11 @@ class ChatMessageIngressController {
 					'permission_callback' => array( $this, 'permission' ),
 					'args'                => array(
 						'endpoint_id' => array(
-							'type'     => 'string',
-							'required' => true,
+							'type'              => 'string',
+							'required'          => true,
+							'validate_callback' => static function ( $value ): bool {
+								return is_string( $value ) && (bool) preg_match( '/^[0-9a-fA-F-]{36}$/', $value );
+							},
 						),
 					),
 				),
@@ -168,7 +171,7 @@ class ChatMessageIngressController {
 				'subtitle'          => (string) ( $config['subtitle'] ?? '' ),
 				'input_placeholder' => (string) ( $config['input_placeholder'] ?? '' ),
 				'initial_messages'  => $messages,
-				'public'            => ! isset( $config['public'] ) || filter_var( $config['public'], FILTER_VALIDATE_BOOLEAN ),
+				'public'            => isset( $config['public'] ) && filter_var( $config['public'], FILTER_VALIDATE_BOOLEAN ),
 				'workflow_status'   => $match['workflow']->status(),
 			)
 		);
@@ -181,6 +184,15 @@ class ChatMessageIngressController {
 	 */
 	public function receive( $request ) {
 		$endpoint_id = (string) $request->get_param( 'endpoint_id' );
+
+		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
+			return new WP_Error(
+				'wfa_chat_rate_limit_exceeded',
+				__( 'Rate limit exceeded. Please try again in a minute.', 'workflow-automate' ),
+				array( 'status' => 429 )
+			);
+		}
+
 		$match       = $this->chat->findByEndpointId( $endpoint_id );
 
 		if ( null === $match ) {
@@ -254,9 +266,10 @@ class ChatMessageIngressController {
 		try {
 			$run = $this->executor->run( $workflow_id, $payload );
 		} catch ( \Throwable $exception ) {
+			error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
 			return new WP_Error(
 				'wfa_chat_run_failed',
-				$exception->getMessage(),
+				__( 'Chat execution failed.', 'workflow-automate' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -269,5 +282,25 @@ class ChatMessageIngressController {
 				'status'    => $run->status(),
 			)
 		);
+	}
+
+	/**
+	 * Rate limiting helper using WordPress transients.
+	 *
+	 * @param string $endpoint_id Endpoint UUID.
+	 *
+	 * @return bool True if allowed, false if limit exceeded.
+	 */
+	private function checkRateLimit( string $endpoint_id ): bool {
+		$ip            = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+		$transient_key = 'wfa_chat_rl_' . md5( $ip . '|' . $endpoint_id );
+		$count         = (int) get_transient( $transient_key );
+
+		if ( $count >= 30 ) {
+			return false;
+		}
+
+		set_transient( $transient_key, $count + 1, 60 );
+		return true;
 	}
 }
