@@ -59,6 +59,113 @@ final class WordPressActionHelper {
 	}
 
 	/**
+	 * Safely extracts a trimmed string from an array.
+	 *
+	 * @param array<string, mixed> $array   Input array.
+	 * @param string               $key     Key name.
+	 * @param string               $default Default string if missing or invalid.
+	 *
+	 * @return string
+	 */
+	public static function str( array $array, string $key, string $default = '' ): string {
+		if ( ! isset( $array[ $key ] ) || null === $array[ $key ] ) {
+			return $default;
+		}
+
+		if ( is_string( $array[ $key ] ) ) {
+			return trim( $array[ $key ] );
+		}
+
+		if ( is_scalar( $array[ $key ] ) ) {
+			return trim( (string) $array[ $key ] );
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Safely extracts an integer from an array.
+	 *
+	 * @param array<string, mixed> $array   Input array.
+	 * @param string               $key     Key name.
+	 * @param int                  $default Default integer if missing or invalid.
+	 *
+	 * @return int
+	 */
+	public static function int( array $array, string $key, int $default = 0 ): int {
+		if ( ! isset( $array[ $key ] ) || null === $array[ $key ] || '' === $array[ $key ] ) {
+			return $default;
+		}
+
+		if ( is_numeric( $array[ $key ] ) ) {
+			return (int) $array[ $key ];
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Safely extracts a boolean from an array.
+	 *
+	 * @param array<string, mixed> $array   Input array.
+	 * @param string               $key     Key name.
+	 * @param bool                 $default Default boolean if missing or invalid.
+	 *
+	 * @return bool
+	 */
+	public static function bool( array $array, string $key, bool $default = false ): bool {
+		if ( ! isset( $array[ $key ] ) || null === $array[ $key ] ) {
+			return $default;
+		}
+
+		$val = $array[ $key ];
+
+		if ( is_bool( $val ) ) {
+			return $val;
+		}
+
+		if ( is_numeric( $val ) ) {
+			return (int) $val !== 0;
+		}
+
+		if ( is_string( $val ) ) {
+			$lower = strtolower( trim( $val ) );
+			return in_array( $lower, array( '1', 'true', 'yes', 'on' ), true );
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Safely extracts key-value pairs from an array or JSON string.
+	 *
+	 * @param array<string, mixed> $array Input array.
+	 * @param string               $key   Key name.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function keyValue( array $array, string $key ): array {
+		if ( ! isset( $array[ $key ] ) ) {
+			return array();
+		}
+
+		$val = $array[ $key ];
+
+		if ( is_array( $val ) ) {
+			return $val;
+		}
+
+		if ( is_string( $val ) && '' !== trim( $val ) ) {
+			$decoded = json_decode( $val, true );
+			if ( is_array( $decoded ) ) {
+				return $decoded;
+			}
+		}
+
+		return array();
+	}
+
+	/**
 	 * @return array<string, array<string, mixed>> Role slug => role data.
 	 */
 	public static function getWpRoles(): array {
@@ -168,7 +275,9 @@ final class WordPressActionHelper {
 		}
 
 		return array_map(
-			static fn( $comment ): array => self::serializeComment( $comment ),
+			function( $comment ): array {
+				return self::serializeComment( $comment );
+			},
 			$comments
 		);
 	}
