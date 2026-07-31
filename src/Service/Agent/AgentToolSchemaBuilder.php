@@ -57,6 +57,13 @@ class AgentToolSchemaBuilder {
 		'conditions'             => true,
 		'default_branch_node_id' => true,
 		'routes'                 => true,
+		'allow_unsafe_urls'      => true,
+		'user_role'              => true,
+		'password'               => true,
+		'role_capabilities'      => true,
+		'role_name'              => true,
+		'headers'                => true,
+		'metadata'               => true,
 	);
 
 	public function __construct( NodeTypeRegistry $registry ) {
@@ -169,14 +176,16 @@ class AgentToolSchemaBuilder {
 
 		if ( array() === $properties ) {
 			return array(
-				'type'       => 'object',
-				'properties' => array(),
+				'type'                 => 'object',
+				'properties'           => array(),
+				'additionalProperties' => false,
 			);
 		}
 
 		$result = array(
-			'type'       => 'object',
-			'properties' => $properties,
+			'type'                 => 'object',
+			'properties'           => $properties,
+			'additionalProperties' => false,
 		);
 
 		if ( array() !== $required ) {

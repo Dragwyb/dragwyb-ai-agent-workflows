@@ -59,6 +59,113 @@ final class WordPressActionHelper {
 	}
 
 	/**
+	 * Safely extracts a trimmed string from an array.
+	 *
+	 * @param array<string, mixed> $array   Input array.
+	 * @param string               $key     Key name.
+	 * @param string               $default Default string if missing or invalid.
+	 *
+	 * @return string
+	 */
+	public static function str( array $array, string $key, string $default = '' ): string {
+		if ( ! isset( $array[ $key ] ) || null === $array[ $key ] ) {
+			return $default;
+		}
+
+		if ( is_string( $array[ $key ] ) ) {
+			return trim( $array[ $key ] );
+		}
+
+		if ( is_scalar( $array[ $key ] ) ) {
+			return trim( (string) $array[ $key ] );
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Safely extracts an integer from an array.
+	 *
+	 * @param array<string, mixed> $array   Input array.
+	 * @param string               $key     Key name.
+	 * @param int                  $default Default integer if missing or invalid.
+	 *
+	 * @return int
+	 */
+	public static function int( array $array, string $key, int $default = 0 ): int {
+		if ( ! isset( $array[ $key ] ) || null === $array[ $key ] || '' === $array[ $key ] ) {
+			return $default;
+		}
+
+		if ( is_numeric( $array[ $key ] ) ) {
+			return (int) $array[ $key ];
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Safely extracts a boolean from an array.
+	 *
+	 * @param array<string, mixed> $array   Input array.
+	 * @param string               $key     Key name.
+	 * @param bool                 $default Default boolean if missing or invalid.
+	 *
+	 * @return bool
+	 */
+	public static function bool( array $array, string $key, bool $default = false ): bool {
+		if ( ! isset( $array[ $key ] ) || null === $array[ $key ] ) {
+			return $default;
+		}
+
+		$val = $array[ $key ];
+
+		if ( is_bool( $val ) ) {
+			return $val;
+		}
+
+		if ( is_numeric( $val ) ) {
+			return (int) $val !== 0;
+		}
+
+		if ( is_string( $val ) ) {
+			$lower = strtolower( trim( $val ) );
+			return in_array( $lower, array( '1', 'true', 'yes', 'on' ), true );
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Safely extracts key-value pairs from an array or JSON string.
+	 *
+	 * @param array<string, mixed> $array Input array.
+	 * @param string               $key   Key name.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function keyValue( array $array, string $key ): array {
+		if ( ! isset( $array[ $key ] ) ) {
+			return array();
+		}
+
+		$val = $array[ $key ];
+
+		if ( is_array( $val ) ) {
+			return $val;
+		}
+
+		if ( is_string( $val ) && '' !== trim( $val ) ) {
+			$decoded = json_decode( $val, true );
+			if ( is_array( $decoded ) ) {
+				return $decoded;
+			}
+		}
+
+		return array();
+	}
+
+	/**
 	 * @return array<string, array<string, mixed>> Role slug => role data.
 	 */
 	public static function getWpRoles(): array {
@@ -168,7 +275,9 @@ final class WordPressActionHelper {
 		}
 
 		return array_map(
-			static fn( $comment ): array => self::serializeComment( $comment ),
+			function( $comment ): array {
+				return self::serializeComment( $comment );
+			},
 			$comments
 		);
 	}
@@ -187,7 +296,7 @@ final class WordPressActionHelper {
 			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
 		}
 
-		$term = wp_insert_term( $name, $taxonomy, array_filter( $args, static fn( $value ) => null !== $value && '' !== $value ) );
+		$term = wp_insert_term( $name, $taxonomy, array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } ) );
 
 		if ( is_wp_error( $term ) ) {
 			return self::fail( $term->get_error_message() );
@@ -217,7 +326,7 @@ final class WordPressActionHelper {
 			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
 		}
 
-		$args = array_filter( $args, static fn( $value ) => null !== $value && '' !== $value );
+		$args = array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } );
 
 		if ( array() === $args ) {
 			return self::fail( __( 'Nothing to update.', 'workflow-automate' ) );
@@ -304,7 +413,9 @@ final class WordPressActionHelper {
 
 		return self::ok(
 			array_map(
-				static fn( $term ) => (array) $term,
+				function( $term ) {
+					return (array) $term;
+				},
 				$terms
 			)
 		);
@@ -476,13 +587,17 @@ final class WordPressActionHelper {
 		$items = is_array( $value ) ? $value : explode( ',', (string) $value );
 
 		$items = array_map(
-			static fn( $item ): string => trim( (string) $item ),
+			function( $item ): string {
+				return trim( (string) $item );
+			},
 			$items
 		);
 
 		$items = array_filter(
 			$items,
-			static fn( string $item ): bool => '' !== $item
+			function( string $item ): bool {
+				return '' !== $item;
+			}
 		);
 
 		return array_values( array_unique( $items ) );
@@ -800,5 +915,160 @@ final class WordPressActionHelper {
 		if ( ! function_exists( 'wp_delete_user' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/user.php';
 		}
+	}
+
+	/**
+	 * Resolves post content from config keys (content, design_sections, html).
+	 *
+	 * @param array<string, mixed> $config Action config.
+	 *
+	 * @return string
+	 */
+	public static function resolvePostContent( array $config ): string {
+		if ( isset( $config['content'] ) && '' !== trim( (string) $config['content'] ) ) {
+			return (string) $config['content'];
+		}
+
+		if ( isset( $config['design_sections'] ) && '' !== trim( (string) $config['design_sections'] ) ) {
+			return (string) $config['design_sections'];
+		}
+
+		if ( isset( $config['html'] ) && '' !== trim( (string) $config['html'] ) ) {
+			return (string) $config['html'];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Sets/attaches featured image to post from id or URL.
+	 *
+	 * @param int                  $postId Target post id.
+	 * @param array<string, mixed> $config Action config.
+	 *
+	 * @return null|array{warning: string}
+	 */
+	public static function attachFeaturedImage( int $postId, array $config ): ?array {
+		return self::setPostFeaturedImage( $postId, $config );
+	}
+
+	/**
+	 * Loads wp-admin/includes/plugin.php if needed.
+	 *
+	 * @return void
+	 */
+	public static function ensurePluginIncludes(): void {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+	}
+
+	/**
+	 * Parses capabilities from config into [cap_name => bool].
+	 *
+	 * @param mixed $input Input capabilities.
+	 *
+	 * @return array<string, bool>
+	 */
+	public static function parseCapabilities( $input ): array {
+		if ( empty( $input ) ) {
+			return array( 'read' => true );
+		}
+
+		if ( is_string( $input ) ) {
+			$input = self::parseList( $input );
+		}
+
+		if ( ! is_array( $input ) ) {
+			return array( 'read' => true );
+		}
+
+		$capabilities = array();
+
+		foreach ( $input as $key => $val ) {
+			if ( is_int( $key ) && is_string( $val ) ) {
+				$cap = trim( $val );
+				if ( '' !== $cap ) {
+					$capabilities[ $cap ] = true;
+				}
+			} elseif ( is_string( $key ) ) {
+				$cap = trim( $key );
+				if ( '' !== $cap ) {
+					$capabilities[ $cap ] = (bool) $val;
+				}
+			}
+		}
+
+		if ( empty( $capabilities ) ) {
+			$capabilities = array( 'read' => true );
+		}
+
+		return $capabilities;
+	}
+
+	/**
+	 * Serializes an attachment object into a standard media array.
+	 *
+	 * @param \WP_Post|object|array<string, mixed> $attachment Attachment.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function serializeMedia( $attachment ): array {
+		if ( is_array( $attachment ) ) {
+			return $attachment;
+		}
+
+		if ( ! is_object( $attachment ) ) {
+			return array();
+		}
+
+		$id = isset( $attachment->ID ) ? (int) $attachment->ID : 0;
+		if ( $id <= 0 ) {
+			return array();
+		}
+
+		$url      = (string) wp_get_attachment_url( $id );
+		$mimeType = isset( $attachment->post_mime_type ) ? (string) $attachment->post_mime_type : '';
+		$meta     = wp_get_attachment_metadata( $id );
+
+		return array(
+			'id'          => $id,
+			'title'       => isset( $attachment->post_title ) ? (string) $attachment->post_title : '',
+			'caption'     => isset( $attachment->post_excerpt ) ? (string) $attachment->post_excerpt : '',
+			'description' => isset( $attachment->post_content ) ? (string) $attachment->post_content : '',
+			'alt_text'    => (string) get_post_meta( $id, '_wp_attachment_image_alt', true ),
+			'mime_type'   => $mimeType,
+			'url'         => $url,
+			'date'        => isset( $attachment->post_date ) ? (string) $attachment->post_date : '',
+			'metadata'    => is_array( $meta ) ? $meta : array(),
+		);
+	}
+
+	/**
+	 * Serializes a term object into a standard taxonomy term array.
+	 *
+	 * @param \WP_Term|object|array<string, mixed> $term Term object.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function serializeTerm( $term ): array {
+		if ( is_array( $term ) ) {
+			return $term;
+		}
+
+		if ( ! is_object( $term ) ) {
+			return array();
+		}
+
+		return array(
+			'term_id'          => isset( $term->term_id ) ? (int) $term->term_id : 0,
+			'name'             => isset( $term->name ) ? (string) $term->name : '',
+			'slug'             => isset( $term->slug ) ? (string) $term->slug : '',
+			'taxonomy'         => isset( $term->taxonomy ) ? (string) $term->taxonomy : '',
+			'description'      => isset( $term->description ) ? (string) $term->description : '',
+			'parent'           => isset( $term->parent ) ? (int) $term->parent : 0,
+			'count'            => isset( $term->count ) ? (int) $term->count : 0,
+			'term_taxonomy_id' => isset( $term->term_taxonomy_id ) ? (int) $term->term_taxonomy_id : 0,
+		);
 	}
 }

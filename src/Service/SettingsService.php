@@ -66,7 +66,7 @@ class SettingsService {
 			'display_timestamps_in_utc'    => false,
 			'retention_days'               => self::DEFAULT_RETENTION_DAYS,
 			'background_execution_enabled' => true,
-			'require_webhook_signing'      => false,
+			'require_webhook_signing' => true,
 		);
 	}
 

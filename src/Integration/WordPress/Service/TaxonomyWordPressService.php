@@ -122,7 +122,9 @@ final class TaxonomyWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $t ): array => WordPressActionHelper::serializeTerm( $t ),
+				function( $t ): array {
+					return WordPressActionHelper::serializeTerm( $t );
+				},
 				$terms
 			)
 		);
@@ -582,7 +584,9 @@ final class TaxonomyWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $m ): array => WordPressActionHelper::serializeMedia( $m ),
+				function( $m ): array {
+					return WordPressActionHelper::serializeMedia( $m );
+				},
 				$attachments
 			)
 		);

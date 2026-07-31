@@ -394,8 +394,13 @@ class GoogleTextGenerationModel extends AbstractApiBasedModel implements TextGen
             if ($args !== null) {
                 $functionCallData['args'] = $args;
             }
+            $thoughtSignature = 'skip_thought_signature_validator';
+            if (method_exists($functionCall, 'getThoughtSignature') && $functionCall->getThoughtSignature()) {
+                $thoughtSignature = (string) $functionCall->getThoughtSignature();
+            }
             return [
-                'functionCall' => $functionCallData,
+                'functionCall'      => $functionCallData,
+                'thought_signature' => $thoughtSignature,
             ];
         }
         if ($type->isFunctionResponse()) {

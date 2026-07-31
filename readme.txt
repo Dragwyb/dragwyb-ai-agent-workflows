@@ -2,7 +2,7 @@
 Contributors: 
 Tags: automation, workflow, ai, webhooks, woocommerce
 Requires at least: 5.8
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 0.0.0
 License: GPL-2.0-or-later
@@ -54,4 +54,4 @@ The plugin utilizes and uses WordPress connectors AI to provide a unified AI cli
 == Changelog ==
 
 = 0.0.0 =
-* Initial scaffolding: plugin bootstrap, activation/deactivation, opt-in uninstall data removal.
+* Initial Release

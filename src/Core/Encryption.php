@@ -77,20 +77,18 @@ class Encryption {
 			return '';
 		}
 
-		$iv_length = openssl_cipher_iv_length( self::CIPHER );
-		// random_bytes() (PHP's own CSPRNG, available since the plugin's
-		// PHP 7.4 floor) is used over openssl_random_pseudo_bytes() so IV
-		// generation does not depend on OpenSSL's own randomness source
-		// being strong on every build — only the cipher itself does.
-		$iv = random_bytes( $iv_length );
-
-		$ciphertext = openssl_encrypt( $plaintext, self::CIPHER, self::key(), OPENSSL_RAW_DATA, $iv );
+		$iv_length  = openssl_cipher_iv_length( self::CIPHER );
+		$iv         = random_bytes( $iv_length );
+		$key        = self::key();
+		$ciphertext = openssl_encrypt( $plaintext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv );
 
 		if ( false === $ciphertext ) {
 			return '';
 		}
 
-		return base64_encode( $iv . $ciphertext ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- encoding binary ciphertext for TEXT column storage, not obfuscating code.
+		$mac = hash_hmac( 'sha256', $iv . $ciphertext, $key, true );
+
+		return base64_encode( $mac . $iv . $ciphertext ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- encoding binary ciphertext for TEXT column storage, not obfuscating code.
 	}
 
 	/**
@@ -116,7 +114,23 @@ class Encryption {
 		}
 
 		$iv_length = openssl_cipher_iv_length( self::CIPHER );
+		$key       = self::key();
 
+		// Authenticated cipher format: MAC (32 bytes) + IV + ciphertext.
+		if ( strlen( $raw ) > 32 + $iv_length ) {
+			$mac     = substr( $raw, 0, 32 );
+			$payload = substr( $raw, 32 );
+
+			if ( hash_equals( $mac, hash_hmac( 'sha256', $payload, $key, true ) ) ) {
+				$iv         = substr( $payload, 0, $iv_length );
+				$ciphertext = substr( $payload, $iv_length );
+
+				$plaintext = openssl_decrypt( $ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv );
+				return false === $plaintext ? null : $plaintext;
+			}
+		}
+
+		// Legacy unauthenticated format fallback.
 		if ( strlen( $raw ) <= $iv_length ) {
 			return null;
 		}
@@ -124,7 +138,7 @@ class Encryption {
 		$iv         = substr( $raw, 0, $iv_length );
 		$ciphertext = substr( $raw, $iv_length );
 
-		$plaintext = openssl_decrypt( $ciphertext, self::CIPHER, self::key(), OPENSSL_RAW_DATA, $iv );
+		$plaintext = openssl_decrypt( $ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv );
 
 		return false === $plaintext ? null : $plaintext;
 	}

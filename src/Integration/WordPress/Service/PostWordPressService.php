@@ -59,7 +59,9 @@ final class PostWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $p ): array => WordPressActionHelper::serializePost( $p ),
+				function( $p ): array {
+					return WordPressActionHelper::serializePost( $p );
+				},
 				$posts
 			)
 		);
@@ -98,7 +100,7 @@ final class PostWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $p ): array => WordPressActionHelper::serializePost( $p ),
+				function( $p ): array { return WordPressActionHelper::serializePost( $p ); },
 				$posts
 			)
 		);
@@ -133,7 +135,7 @@ final class PostWordPressService {
 
 		return WordPressActionHelper::ok(
 			array_map(
-				static fn( $p ): array => WordPressActionHelper::serializePost( $p ),
+				function( $p ): array { return WordPressActionHelper::serializePost( $p ); },
 				$posts
 			)
 		);

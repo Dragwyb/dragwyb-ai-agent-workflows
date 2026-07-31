@@ -227,7 +227,8 @@ class ConnectionsController {
 
 		foreach ( $allowed as $field ) {
 			if ( isset( $credentials[ $field ] ) ) {
-				$filtered[ $field ] = (string) $credentials[ $field ];
+				$val                = wp_unslash( (string) $credentials[ $field ] );
+				$filtered[ $field ] = trim( sanitize_text_field( $val ) );
 			}
 		}
 

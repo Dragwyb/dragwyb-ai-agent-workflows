@@ -30,7 +30,9 @@ final class UserWordPressService {
 		}
 
 		return array_map(
-			static fn( $user ): array => WordPressActionHelper::serializeUser( $user ),
+			function( $user ): array {
+				return WordPressActionHelper::serializeUser( $user );
+			},
 			get_users( $args )
 		);
 	}
@@ -80,7 +82,12 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
 		}
 
-		$userData               = WordPressActionHelper::mapUserFields( $config );
+		$editableRoles = get_editable_roles();
+		if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
+			return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+		}
+
+		$userData = WordPressActionHelper::mapUserFields( $config );
 		$userData['user_login'] = $username;
 		$userData['user_email'] = $email;
 		$userData['user_pass']  = $password;
@@ -136,6 +143,10 @@ final class UserWordPressService {
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' !== $userRole ) {
+			$editableRoles = get_editable_roles();
+			if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
+				return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+			}
 			$userData['role'] = $userRole;
 		}
 
