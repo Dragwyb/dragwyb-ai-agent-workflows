@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace AIAWAB\Plugin\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use AIAWAB\Plugin\Admin\ConnectionActionsController;
 use AIAWAB\Plugin\Admin\GoogleOAuthStartController;
 use AIAWAB\Plugin\Admin\Menu;

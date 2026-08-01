@@ -81,7 +81,7 @@ class IntegrationTriggerCatalog {
 
 		return array_map(
 			static function ( array $entry ): array {
-				$entry['requires_plugin'] = __( $entry['requires_plugin'], 'workflow-automate' );
+				$entry['requires_plugin'] = $entry['requires_plugin'];
 
 				return $entry;
 			},

@@ -70,7 +70,11 @@ class WorkflowActionsController {
 	 * @return void
 	 */
 	public function maybeHandleWorkflowsBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -247,7 +251,6 @@ class WorkflowActionsController {
 			$this->redirect( 'error', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
 		$ids = isset( $_POST['workflows'] ) && is_array( $_POST['workflows'] )
 			? array_map( 'absint', wp_unslash( $_POST['workflows'] ) )
 			: array();

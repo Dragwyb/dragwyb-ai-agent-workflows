@@ -476,7 +476,10 @@ class WorkflowsController extends WP_REST_Controller {
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
 		} catch ( \Throwable $exception ) {
-			error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST runs.
+				error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
+			}
 			return new WP_Error( 'wfa_rest_run_failed', __( 'Workflow execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
@@ -544,7 +547,10 @@ class WorkflowsController extends WP_REST_Controller {
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
 		} catch ( \Throwable $exception ) {
-			error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST chat runs.
+				error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
+			}
 			return new WP_Error( 'wfa_rest_run_failed', __( 'Chat execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 

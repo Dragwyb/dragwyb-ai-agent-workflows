@@ -66,7 +66,11 @@ class RunActionsController {
 	 * @return void
 	 */
 	public function maybeHandleRunsBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -111,7 +115,6 @@ class RunActionsController {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
 		$ids = isset( $_POST['runs'] ) && is_array( $_POST['runs'] )
 			? array_map( 'absint', wp_unslash( $_POST['runs'] ) )
 			: array();

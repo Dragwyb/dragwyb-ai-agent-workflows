@@ -50,7 +50,11 @@ class WebhookActionsController {
 	 * @return void
 	 */
 	public function maybeHandleWebhooksBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -179,7 +183,6 @@ class WebhookActionsController {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
 		$ids = isset( $_POST['webhooks'] ) && is_array( $_POST['webhooks'] )
 			? array_map( 'absint', wp_unslash( $_POST['webhooks'] ) )
 			: array();

@@ -102,7 +102,7 @@ class BuilderPage implements AdminPage {
 			'wfa-builder-font',
 			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
 			array(),
-			null
+			WFA_VERSION
 		);
 
 		wp_enqueue_script(

@@ -118,8 +118,17 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			return \Elementor\Utils::get_super_global_value( $_POST, $key );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return $_POST[ $key ] ?? null;
+		$value = $_POST[ sanitize_text_field( $key ) ] ?? null;
+
+		if ( is_string( $value ) ) {
+			return sanitize_text_field( wp_unslash( $value ) );
+		}
+
+		if ( is_array( $value ) ) {
+			return array_map( 'sanitize_text_field', wp_unslash( $value ) );
+		}
+
+		return $value;
 	}
 
 	/**

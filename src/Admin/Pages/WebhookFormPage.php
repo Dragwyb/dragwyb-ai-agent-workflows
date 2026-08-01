@@ -171,7 +171,7 @@ class WebhookFormPage implements AdminPage {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-webhook-form">';
 		echo '<input type="hidden" name="action" value="wfa_webhook_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
-		printf( '<input type="hidden" name="webhook_id" value="%d" />', $webhook_id );
+		printf( '<input type="hidden" name="webhook_id" value="%s" />', esc_attr( $webhook_id ) );
 		wp_nonce_field( 'wfa_webhook_action_update_' . $webhook_id );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
@@ -205,7 +205,7 @@ class WebhookFormPage implements AdminPage {
 			$workflow_id = (int) $workflow->id();
 			printf(
 				'<option value="%1$d" %2$s>%3$s%4$s</option>',
-				$workflow_id,
+				esc_attr( $workflow_id ),
 				esc_attr( selected( $selected_id, $workflow_id, false ) ),
 				esc_html( $workflow->title() ),
 				Workflow::STATUS_ACTIVE === $workflow->status()

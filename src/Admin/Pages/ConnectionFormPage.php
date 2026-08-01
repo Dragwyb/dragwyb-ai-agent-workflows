@@ -268,7 +268,7 @@ class ConnectionFormPage implements AdminPage {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
 		echo '<input type="hidden" name="action" value="wfa_connection_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
-		printf( '<input type="hidden" name="connection_id" value="%d" />', $connection_id );
+		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
 		wp_nonce_field( 'wfa_connection_action_update_' . $connection->id() );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
@@ -310,7 +310,7 @@ class ConnectionFormPage implements AdminPage {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form wfa-settings-danger-zone">';
 		echo '<input type="hidden" name="action" value="wfa_connection_action" />';
 		echo '<input type="hidden" name="op" value="delete" />';
-		printf( '<input type="hidden" name="connection_id" value="%d" />', $connection_id );
+		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
 		wp_nonce_field( 'wfa_connection_action_delete_' . $connection->id() );
 		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'workflow-automate' ) . '</p>';
 		submit_button( __( 'Delete Connection', 'workflow-automate' ), 'delete' );

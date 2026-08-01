@@ -65,7 +65,11 @@ class ConnectionActionsController {
 	 * @return void
 	 */
 	public function maybeHandleConnectionsBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -212,7 +216,6 @@ class ConnectionActionsController {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
 		$ids = isset( $_POST['connections'] ) && is_array( $_POST['connections'] )
 			? array_map( 'absint', wp_unslash( $_POST['connections'] ) )
 			: array();

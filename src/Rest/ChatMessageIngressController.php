@@ -266,7 +266,10 @@ class ChatMessageIngressController {
 		try {
 			$run = $this->executor->run( $workflow_id, $payload );
 		} catch ( \Throwable $exception ) {
-			error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed chat ingress runs.
+				error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
+			}
 			return new WP_Error(
 				'wfa_chat_run_failed',
 				__( 'Chat execution failed.', 'workflow-automate' ),
@@ -292,7 +295,9 @@ class ChatMessageIngressController {
 	 * @return bool True if allowed, false if limit exceeded.
 	 */
 	private function checkRateLimit( string $endpoint_id ): bool {
-		$ip            = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+		$ip = isset( $_SERVER['REMOTE_ADDR'] )
+			? sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) )
+			: '127.0.0.1';
 		$transient_key = 'wfa_chat_rl_' . md5( $ip . '|' . $endpoint_id );
 		$count         = (int) get_transient( $transient_key );
 
