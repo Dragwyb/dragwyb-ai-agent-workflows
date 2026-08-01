@@ -2,12 +2,12 @@
 /**
  * Builds / validates structured JSON for AI Agent output parsers.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,12 +2,12 @@
 /**
  * Built-in WordPress core hook trigger catalog.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration;
+namespace AIAWA\Plugin\Integration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

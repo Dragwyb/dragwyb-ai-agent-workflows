@@ -2,15 +2,15 @@
 /**
  * Creates the workflow run logs table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database\Migrations;
+namespace AIAWA\Plugin\Database\Migrations;
 
-use AIAWAB\Plugin\Database\Migration;
-use AIAWAB\Plugin\Database\Table;
+use AIAWA\Plugin\Database\Migration;
+use AIAWA\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_workflow_run_logs` holds one row per node outcome within a workflow
+ * `aiawa_workflow_run_logs` holds one row per node outcome within a workflow
  * run. `node_id` intentionally has no `NOT NULL` constraint: it references
- * `wfa_workflow_nodes.id`, but a node can later be removed from the builder
+ * `aiawa_workflow_nodes.id`, but a node can later be removed from the builder
  * graph (which deletes its row) while its historical run logs are kept, so
  * `node_id` on an old log entry may point to a node that no longer exists.
  * A future "Runs" UI (roadmap item 9) is expected to resolve `node_id`

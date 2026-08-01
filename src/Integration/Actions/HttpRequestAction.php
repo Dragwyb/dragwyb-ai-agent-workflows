@@ -2,16 +2,16 @@
 /**
  * Built-in "HTTP Request" action.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\ConnectionAuthTypes;
-use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\ConnectionAuthTypes;
+use AIAWA\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

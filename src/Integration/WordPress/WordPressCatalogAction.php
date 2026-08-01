@@ -2,16 +2,16 @@
 /**
  * Generic action node type driven by a `WordPressActionCatalog` entry.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\WordPress;
+namespace AIAWA\Plugin\Integration\WordPress;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionGroupInterface;
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
+use AIAWA\Plugin\Domain\Contracts\ActionGroupInterface;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\TriggerReentrancyGuard;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

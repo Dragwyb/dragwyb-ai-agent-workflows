@@ -2,15 +2,15 @@
 /**
  * Workflow run repository.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Persistence;
+namespace AIAWA\Plugin\Persistence;
 
-use AIAWAB\Plugin\Database\Table;
-use AIAWAB\Plugin\Domain\WorkflowRun;
+use AIAWA\Plugin\Database\Table;
+use AIAWA\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflow_runs` access goes through this class.
+ * All `aiawa_workflow_runs` access goes through this class.
  */
 class WorkflowRunRepository {
 
@@ -368,7 +368,7 @@ class WorkflowRunRepository {
 
 	/**
 	 * Returns every run id belonging to a workflow, so callers can cascade
-	 * into `wfa_workflow_run_logs` (which is keyed by run id, not workflow
+	 * into `aiawa_workflow_run_logs` (which is keyed by run id, not workflow
 	 * id) before removing the runs themselves.
 	 *
 	 * @param int $workflow_id Workflow id.
@@ -408,7 +408,7 @@ class WorkflowRunRepository {
 
 	/**
 	 * Permanently removes the given runs. Callers must remove dependent
-	 * `wfa_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
+	 * `aiawa_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
 	 * same cascade-ordering requirement as `deleteByWorkflow()`.
 	 *
 	 * @param int[] $ids Run ids.
@@ -436,7 +436,7 @@ class WorkflowRunRepository {
 	/**
 	 * Permanently removes every run belonging to a workflow. Used by
 	 * WorkflowService::delete() when hard-deleting a workflow. Callers must
-	 * remove dependent `wfa_workflow_run_logs` rows first (see
+	 * remove dependent `aiawa_workflow_run_logs` rows first (see
 	 * idsForWorkflow()).
 	 *
 	 * @param int $workflow_id Workflow id.

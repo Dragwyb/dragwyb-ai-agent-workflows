@@ -2,14 +2,14 @@
 /**
  * LLM client backed by WordPress AI Client (prompt + tools).
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
-use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\Messages\DTO\Message;
 use WordPress\AiClient\Messages\DTO\MessagePart;
 use WordPress\AiClient\Messages\Enums\MessageRoleEnum;
@@ -31,7 +31,7 @@ class AgentAiClient {
 	/**
 	 * Run a chat completion (optionally with tools) via the WP AI Client.
 	 *
-	 * @param string            $provider      WFA provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * @param string            $provider      aiawa provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 * @param string            $model         Model id.
 	 * @param array<int, mixed> $messages      OpenAI-style messages.
 	 * @param array<int, mixed> $tools         OpenAI-style tool schemas.
@@ -126,7 +126,7 @@ class AgentAiClient {
 	/**
 	 * Simple text completion helper for chat actions.
 	 *
-	 * @param string $provider      WFA provider slug.
+	 * @param string $provider      aiawa provider slug.
 	 * @param string $model         Model id.
 	 * @param string $prompt        User prompt.
 	 * @param string $system_prompt Optional system prompt.

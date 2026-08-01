@@ -2,25 +2,25 @@
 /**
  * REST API bootstrap.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Rest;
+namespace AIAWA\Plugin\Rest;
 
-use AIAWAB\Plugin\Core\Container;
-use AIAWAB\Plugin\Service\AiModelsService;
-use AIAWAB\Plugin\Service\ChatMessageService;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\ElementorFormsService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
-use AIAWAB\Plugin\Service\NodeTypeRegistry;
-use AIAWAB\Plugin\Service\WebhookService;
-use AIAWAB\Plugin\Service\WorkflowExecutionService;
-use AIAWAB\Plugin\Service\WorkflowService;
-use AIAWAB\Plugin\Service\WorkflowNodeTestService;
-use AIAWAB\Plugin\Service\WorkflowTestListenerService;
+use AIAWA\Plugin\Core\Container;
+use AIAWA\Plugin\Service\AiModelsService;
+use AIAWA\Plugin\Service\ChatMessageService;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\ElementorFormsService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Service\NodeTypeRegistry;
+use AIAWA\Plugin\Service\WebhookService;
+use AIAWA\Plugin\Service\WorkflowExecutionService;
+use AIAWA\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Service\WorkflowNodeTestService;
+use AIAWA\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

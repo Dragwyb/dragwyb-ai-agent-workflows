@@ -48,22 +48,22 @@ export default function BranchConnectSidebar({
 
 	return (
 		<aside
-			className="wfa-builder-picker wfa-builder-picker--branch-connect"
+			className="aiawa-builder-picker aiawa-builder-picker--branch-connect"
 			aria-label={__('Connect branch to node', 'workflow-automate')}
 		>
-			<div className="wfa-builder-picker__header">
-				<h2 className="wfa-builder-picker__title">
+			<div className="aiawa-builder-picker__header">
+				<h2 className="aiawa-builder-picker__title">
 					{__('Connect branch', 'workflow-automate')}
 				</h2>
 				<Button
-					className="wfa-builder-picker__close"
+					className="aiawa-builder-picker__close"
 					icon="no-alt"
 					label={__('Close', 'workflow-automate')}
 					onClick={onClose}
 				/>
 			</div>
 
-			<p className="wfa-builder-picker__hint">
+			<p className="aiawa-builder-picker__hint">
 				{__(
 					'Choose any step on the canvas for',
 					'workflow-automate'
@@ -71,7 +71,7 @@ export default function BranchConnectSidebar({
 				<strong>{branchLabel}</strong>
 			</p>
 
-			<div className="wfa-builder-picker__search">
+			<div className="aiawa-builder-picker__search">
 				<TextControl
 					label={__('Search nodes', 'workflow-automate')}
 					hideLabelFromVision
@@ -82,14 +82,14 @@ export default function BranchConnectSidebar({
 			</div>
 
 			{filtered.length === 0 ? (
-				<p className="wfa-builder-picker__empty">
+				<p className="aiawa-builder-picker__empty">
 					{__(
 						'No steps on the canvas yet. Add an AI Agent or action first.',
 						'workflow-automate'
 					)}
 				</p>
 			) : (
-				<ul className="wfa-builder-picker__list">
+				<ul className="aiawa-builder-picker__list">
 					{filtered.map((node) => {
 						const meta = getNodeMeta(node.type, node.category);
 						const isCurrent = node.id === currentTargetId;
@@ -100,13 +100,13 @@ export default function BranchConnectSidebar({
 									type="button"
 									className={
 										isCurrent
-											? 'wfa-builder-picker__item wfa-builder-picker__item--selected'
-											: 'wfa-builder-picker__item'
+											? 'aiawa-builder-picker__item aiawa-builder-picker__item--selected'
+											: 'aiawa-builder-picker__item'
 									}
 									onClick={() => onSelect(node.id)}
 								>
 									<span
-										className="wfa-builder-picker__item-icon"
+										className="aiawa-builder-picker__item-icon"
 										style={{
 											backgroundColor: meta.bg,
 											color: meta.accent,
@@ -115,11 +115,11 @@ export default function BranchConnectSidebar({
 									>
 										{meta.icon}
 									</span>
-									<span className="wfa-builder-picker__item-content">
-										<span className="wfa-builder-picker__item-label">
+									<span className="aiawa-builder-picker__item-content">
+										<span className="aiawa-builder-picker__item-label">
 											{node.label || node.type}
 										</span>
-										<span className="wfa-builder-picker__item-hint">
+										<span className="aiawa-builder-picker__item-hint">
 											{node.type === 'ai_agent_action'
 												? __('AI Agent', 'workflow-automate')
 												: node.type === 'condition_action'
@@ -130,7 +130,7 @@ export default function BranchConnectSidebar({
 										</span>
 									</span>
 									{isCurrent && (
-										<span className="wfa-builder-picker__item-badge">
+										<span className="aiawa-builder-picker__item-badge">
 											{__('Connected', 'workflow-automate')}
 										</span>
 									)}

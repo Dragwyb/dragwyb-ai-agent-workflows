@@ -2,20 +2,20 @@
 
 /**
 
- * ConditionAIAWABanch filtering.
+ * ConditionAIAWAanch filtering.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
 
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
 
-use AIAWAB\Plugin\Service\ContextPathResolver;
+use AIAWA\Plugin\Service\ContextPathResolver;
 
 
 

@@ -2,15 +2,15 @@
 /**
  * Workflow run log repository.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Persistence;
+namespace AIAWA\Plugin\Persistence;
 
-use AIAWAB\Plugin\Database\Table;
-use AIAWAB\Plugin\Domain\WorkflowRunLog;
+use AIAWA\Plugin\Database\Table;
+use AIAWA\Plugin\Domain\WorkflowRunLog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflow_run_logs` access goes through this class.
+ * All `aiawa_workflow_run_logs` access goes through this class.
  */
 class WorkflowRunLogRepository {
 

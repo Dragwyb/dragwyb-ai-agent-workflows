@@ -2,12 +2,12 @@
 /**
  * Normalizes raw WordPress hook arguments into JSON-friendly trigger payloads.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

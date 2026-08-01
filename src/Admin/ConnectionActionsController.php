@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Connection admin actions.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWAB\Plugin\Admin\Pages\ConnectionsPage;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\ConnectionAuthTypes;
-use AIAWAB\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWA\Plugin\Admin\Pages\ConnectionsPage;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\ConnectionAuthTypes;
+use AIAWA\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=wfa_connection_action` POST
+ * Receives the `admin-post.php?action=aiawa_connection_action` POST
  * submitted by ConnectionFormPage's create/edit forms and
  * ConnectionsListTable's/ConnectionFormPage's delete forms.
  *
@@ -55,7 +55,7 @@ class ConnectionActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_connection_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_aiawa_connection_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleConnectionsBulkFromList' ), 5 );
 	}
 
@@ -101,7 +101,7 @@ class ConnectionActionsController {
 		}
 
 		if ( 'create' === $op ) {
-			check_admin_referer( 'wfa_connection_action_create' );
+			check_admin_referer( 'aiawa_connection_action_create' );
 			$this->handleCreate();
 
 			return;
@@ -114,7 +114,7 @@ class ConnectionActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'wfa_connection_action_' . $op . '_' . $id );
+		check_admin_referer( 'aiawa_connection_action_' . $op . '_' . $id );
 
 		if ( 'update' === $op ) {
 			$this->handleUpdate( $id );
@@ -148,7 +148,7 @@ class ConnectionActionsController {
 					array(
 						'page'       => ConnectionFormPage::SLUG,
 						'connection' => $connection->id(),
-						'wfa_notice' => 'created_oauth',
+						'aiawa_notice' => 'created_oauth',
 					),
 					admin_url( 'admin.php' )
 				)
@@ -195,7 +195,7 @@ class ConnectionActionsController {
 	 */
 	public function handleConnectionsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['wfa_connection_bulk'] ) ) {
+		if ( empty( $_POST['aiawa_connection_bulk'] ) ) {
 			return;
 		}
 
@@ -203,7 +203,7 @@ class ConnectionActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'wfa_connection_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'aiawa_connection_bulk_action' ) ) {
 			$this->redirect( 'error' );
 		}
 
@@ -261,11 +261,11 @@ class ConnectionActionsController {
 	private function redirect( string $notice, string $detail = '' ): void {
 		$args = array(
 			'page'       => ConnectionsPage::SLUG,
-			'wfa_notice' => $notice,
+			'aiawa_notice' => $notice,
 		);
 
 		if ( '' !== $detail ) {
-			$args['wfa_error'] = $detail;
+			$args['aiawa_error'] = $detail;
 		}
 
 		wp_safe_redirect(

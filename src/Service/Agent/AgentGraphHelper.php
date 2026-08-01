@@ -2,12 +2,12 @@
 /**
  * Resolves AI Agent attachments from the workflow builder graph.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -40,10 +40,10 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 	return (
 		<nav
-			className="wfa-builder-palette"
+			className="aiawa-builder-palette"
 			aria-label={__('Node palette', 'workflow-automate')}
 		>
-			<div className="wfa-builder-palette__search">
+			<div className="aiawa-builder-palette__search">
 				<TextControl
 					label={__('Search nodes', 'workflow-automate')}
 					hideLabelFromVision
@@ -102,12 +102,12 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 	return (
-		<div className="wfa-builder-palette__section">
-			<h2 className="wfa-builder-palette__heading">{title}</h2>
+		<div className="aiawa-builder-palette__section">
+			<h2 className="aiawa-builder-palette__heading">{title}</h2>
 			{apps.length === 0 && (
-				<p className="wfa-builder-palette__empty">{emptyMessage}</p>
+				<p className="aiawa-builder-palette__empty">{emptyMessage}</p>
 			)}
-			<ul className="wfa-builder-palette__list">
+			<ul className="aiawa-builder-palette__list">
 				{apps.map((app) => {
 					const meta = getNodeMeta(app.id, kind === 'trigger' ? 'trigger' : 'action');
 					const isDisabled = app.available === false;
@@ -128,15 +128,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								type="button"
 								className={
 									isDisabled
-										? 'wfa-builder-palette__item wfa-builder-palette__item--disabled'
-										: 'wfa-builder-palette__item'
+										? 'aiawa-builder-palette__item aiawa-builder-palette__item--disabled'
+										: 'aiawa-builder-palette__item'
 								}
 								onClick={() => onOpenPicker(kind, app.id)}
 								aria-label={app.label}
 								title={isDisabled ? disabledMessage : app.label}
 							>
 								<span
-									className="wfa-builder-palette__item-icon"
+									className="aiawa-builder-palette__item-icon"
 									style={{
 										backgroundColor: meta.bg,
 										color: meta.accent,
@@ -145,15 +145,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								>
 									{meta.icon}
 								</span>
-								<span className="wfa-builder-palette__item-content">
+								<span className="aiawa-builder-palette__item-content">
 									<span
-										className="wfa-builder-palette__item-label"
+										className="aiawa-builder-palette__item-label"
 										aria-hidden="true"
 									>
 										{app.label}
 									</span>
 									{isDisabled && (
-										<span className="wfa-builder-palette__item-hint">
+										<span className="aiawa-builder-palette__item-hint">
 											{disabledMessage}
 										</span>
 									)}

@@ -2,12 +2,12 @@
 /**
  * Prefixed options helper.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Options {
 
-	public const PREFIX = 'wfa_option_';
+	public const PREFIX = 'aiawa_option_';
 
 	/**
 	 * Retrieves a plugin option.

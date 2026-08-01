@@ -2,14 +2,14 @@
 /**
  * Test-flow listener: capture trigger payloads while building a workflow.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
-use AIAWAB\Plugin\Domain\Workflow;
+use AIAWA\Plugin\Domain\Workflow;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

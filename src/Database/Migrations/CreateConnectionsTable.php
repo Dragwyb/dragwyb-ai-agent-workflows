@@ -2,15 +2,15 @@
 /**
  * Creates the connections table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database\Migrations;
+namespace AIAWA\Plugin\Database\Migrations;
 
-use AIAWAB\Plugin\Database\Migration;
-use AIAWAB\Plugin\Database\Table;
+use AIAWA\Plugin\Database\Migration;
+use AIAWA\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_connections` holds one row per stored third-party credential
+ * `aiawa_connections` holds one row per stored third-party credential
  * (roadmap item 11). `credentials_json` is a JSON object of
  * `{field: ciphertext}` pairs — each *value* individually encrypted (see
  * `Core\Encryption`) before the object is ever serialized, not the whole

@@ -2,15 +2,15 @@
 /**
  * Adds background-queue columns to the workflow runs table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database\Migrations;
+namespace AIAWA\Plugin\Database\Migrations;
 
-use AIAWAB\Plugin\Database\Migration;
-use AIAWAB\Plugin\Database\Table;
+use AIAWA\Plugin\Database\Migration;
+use AIAWA\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `wfa_workflow_runs` (created in roadmap item 7) for background/
+ * Extends `aiawa_workflow_runs` (created in roadmap item 7) for background/
  * queued execution (roadmap item 8), rather than editing
  * `CreateWorkflowRunsTable` in place — that migration already shipped and
  * may have run against a live site, so schema evolution happens through a

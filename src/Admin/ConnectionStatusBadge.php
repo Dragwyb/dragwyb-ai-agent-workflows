@@ -2,14 +2,14 @@
 /**
  * Renders a Connection status as a small colored badge.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
-use AIAWAB\Plugin\Domain\Connection;
+use AIAWA\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Shared between ConnectionsListTable and a future connection detail view.
- * Reuses the same `.wfa-status-badge` CSS classes RunStatusBadge already
+ * Reuses the same `.aiawa-status-badge` CSS classes RunStatusBadge already
  * introduced (roadmap item 9) rather than a second color palette.
  */
 class ConnectionStatusBadge {
@@ -32,7 +32,7 @@ class ConnectionStatusBadge {
 	 */
 	public static function render( int $status ): string {
 		return sprintf(
-			'<span class="wfa-status-badge wfa-status-badge--%1$s">%2$s</span>',
+			'<span class="aiawa-status-badge aiawa-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);

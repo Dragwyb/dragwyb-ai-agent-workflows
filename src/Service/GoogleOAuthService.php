@@ -2,16 +2,16 @@
 /**
  * Google OAuth 2.0 authorization and token lifecycle.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 use RuntimeException;
-use AIAWAB\Plugin\Domain\Connection;
-use AIAWAB\Plugin\Integration\Actions\TelegramSendMessageAction;
+use AIAWA\Plugin\Domain\Connection;
+use AIAWA\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +56,7 @@ class GoogleOAuthService {
 	 * OAuth redirect URI registered in Google Cloud Console.
 	 */
 	public function callbackUrl(): string {
-		return rest_url( 'wfa/v1/oauth/google/callback' );
+		return rest_url( 'aiawa/v1/oauth/google/callback' );
 	}
 
 	/**
@@ -334,7 +334,7 @@ class GoogleOAuthService {
 	}
 
 	private function stateTransientKey( string $state ): string {
-		return 'wfa_google_oauth_' . md5( $state );
+		return 'aiawa_google_oauth_' . md5( $state );
 	}
 
 	private function sanitizeReturnUrl( string $return_url ): string {

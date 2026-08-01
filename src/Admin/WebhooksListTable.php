@@ -2,18 +2,18 @@
 /**
  * Webhooks admin list table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
-use AIAWAB\Plugin\Admin\Pages\WebhookFormPage;
-use AIAWAB\Plugin\Domain\Webhook;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\WebhookService;
-use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Admin\Pages\WebhookFormPage;
+use AIAWA\Plugin\Domain\Webhook;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\WebhookService;
+use AIAWA\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -206,7 +206,7 @@ class WebhooksListTable extends WP_List_Table {
 		$edit_url = $this->editUrl( $item->id() );
 
 		$title = sprintf(
-			'<strong><a href="%1$s"><code class="wfa-webhook-url">%2$s</code></a></strong>',
+			'<strong><a href="%1$s"><code class="aiawa-webhook-url">%2$s</code></a></strong>',
 			esc_url( $edit_url ),
 			esc_html( $url )
 		);
@@ -266,7 +266,7 @@ class WebhooksListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'table-view-list', 'wfa-webhooks-table' );
+		return array( 'widefat', 'fixed', 'striped', 'table-view-list', 'aiawa-webhooks-table' );
 	}
 
 	/**
@@ -284,12 +284,12 @@ class WebhooksListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id     = 'wfa-webhook-delete-' . $id;
-		$nonce_field = wp_nonce_field( 'wfa_webhook_action_delete_' . $id, '_wpnonce', true, false );
+		$form_id     = 'aiawa-webhook-delete-' . $id;
+		$nonce_field = wp_nonce_field( 'aiawa_webhook_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="wfa_webhook_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="aiawa-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="aiawa_webhook_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
 				. '<input type="hidden" name="webhook_id" value="%3$d" />'
 				. '%4$s'

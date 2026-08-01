@@ -2,12 +2,12 @@
 /**
  * Structured WooCommerce trigger payloads for the builder variable picker.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\WooCommerce;
+namespace AIAWA\Plugin\Integration\WooCommerce;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,15 +2,15 @@
 /**
  * Chat Message Received trigger (n8n-style Chat Trigger).
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Triggers;
+namespace AIAWA\Plugin\Integration\Triggers;
 
-use AIAWAB\Plugin\Domain\Contracts\TriggerGroupInterface;
-use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWA\Plugin\Domain\Contracts\TriggerGroupInterface;
+use AIAWA\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ingress URL. Payload mirrors n8n's Chat Trigger (`chatInput`, `sessionId`)
  * so AI Agent "Connected Chat Trigger Node" prompt source works out of the box.
  *
- * Fired via {@see do_action( 'wfa_chat_message_received', $payload )} from
- * {@see \AIAWAB\Plugin\Rest\ChatMessageIngressController}.
+ * Fired via {@see do_action( 'aiawa_chat_message_received', $payload )} from
+ * {@see \AIAWA\Plugin\Rest\ChatMessageIngressController}.
  */
 class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterface {
 
-	public const HOOK = 'wfa_chat_message_received';
+	public const HOOK = 'aiawa_chat_message_received';
 
 	public const SLUG = 'chat_message_received_trigger';
 

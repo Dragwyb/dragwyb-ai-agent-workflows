@@ -2,19 +2,19 @@
 /**
  * Webhook application service.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWAB\Plugin\Core\Encryption;
-use AIAWAB\Plugin\Domain\Webhook;
-use AIAWAB\Plugin\Domain\Workflow;
-use AIAWAB\Plugin\Persistence\WebhookRepository;
+use AIAWA\Plugin\Core\Encryption;
+use AIAWA\Plugin\Domain\Webhook;
+use AIAWA\Plugin\Domain\Workflow;
+use AIAWA\Plugin\Persistence\WebhookRepository;
 use WP_Error;
 
 // Prevent direct file access.
@@ -31,12 +31,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * established for connection credentials.
  *
  * Signature scheme (documented in `docs/integrations.md`): callers send
- * `X-WFA-Signature: sha256=<hex>` where `<hex>` is
+ * `X-aiawa-Signature: sha256=<hex>` where `<hex>` is
  * `hash_hmac( 'sha256', <raw request body>, <signing secret> )`.
  */
 class WebhookService {
 
-	public const SIGNATURE_HEADER = 'X-WFA-Signature';
+	public const SIGNATURE_HEADER = 'X-aiawa-Signature';
 
 	private WebhookRepository $webhooks;
 
@@ -212,7 +212,7 @@ class WebhookService {
 	 * @return string
 	 */
 	public function publicUrl( Webhook $webhook ): string {
-		return rest_url( 'wfa/v1/webhooks/' . $webhook->publicId() );
+		return rest_url( 'aiawa/v1/webhooks/' . $webhook->publicId() );
 	}
 
 	/**
@@ -254,7 +254,7 @@ class WebhookService {
 	 * @param string $public_id         UUID from the URL.
 	 * @param string $raw_body          Exact request body bytes (needed for HMAC).
 	 * @param string $client_ip         Caller IP (typically REMOTE_ADDR).
-	 * @param string $signature_header  Value of the X-WFA-Signature header, or ''.
+	 * @param string $signature_header  Value of the X-aiawa-Signature header, or ''.
 	 *
 	 * @return array{run_id: int, status: string, queued: bool}|WP_Error
 	 */
@@ -263,7 +263,7 @@ class WebhookService {
 
 		if ( null === $webhook ) {
 			return new WP_Error(
-				'wfa_webhook_not_found',
+				'aiawa_webhook_not_found',
 				__( 'Webhook not found.', 'workflow-automate' ),
 				array( 'status' => 404 )
 			);
@@ -271,7 +271,7 @@ class WebhookService {
 
 		if ( ! $this->isIpAllowed( $client_ip, $webhook->ipAllowList() ) ) {
 			return new WP_Error(
-				'wfa_webhook_ip_denied',
+				'aiawa_webhook_ip_denied',
 				__( 'Request IP is not allowed for this webhook.', 'workflow-automate' ),
 				array( 'status' => 403 )
 			);
@@ -282,7 +282,7 @@ class WebhookService {
 		if ( $requires_signature ) {
 			if ( ! $webhook->hasSigningSecret() ) {
 				return new WP_Error(
-					'wfa_webhook_signing_required',
+					'aiawa_webhook_signing_required',
 					__( 'This webhook has no signing secret configured, but site settings require one.', 'workflow-automate' ),
 					array( 'status' => 403 )
 				);
@@ -292,7 +292,7 @@ class WebhookService {
 
 			if ( null === $secret || '' === $secret ) {
 				return new WP_Error(
-					'wfa_webhook_signing_unavailable',
+					'aiawa_webhook_signing_unavailable',
 					__( 'Unable to verify this webhook\'s signature.', 'workflow-automate' ),
 					array( 'status' => 500 )
 				);
@@ -300,7 +300,7 @@ class WebhookService {
 
 			if ( ! $this->signatureIsValid( $raw_body, $secret, $signature_header ) ) {
 				return new WP_Error(
-					'wfa_webhook_invalid_signature',
+					'aiawa_webhook_invalid_signature',
 					__( 'Invalid webhook signature.', 'workflow-automate' ),
 					array( 'status' => 401 )
 				);
@@ -311,7 +311,7 @@ class WebhookService {
 
 		if ( null === $workflow_id ) {
 			return new WP_Error(
-				'wfa_webhook_unlinked',
+				'aiawa_webhook_unlinked',
 				__( 'This webhook is not linked to a workflow.', 'workflow-automate' ),
 				array( 'status' => 409 )
 			);
@@ -321,7 +321,7 @@ class WebhookService {
 
 		if ( null === $workflow || Workflow::STATUS_ACTIVE !== $workflow->status() ) {
 			return new WP_Error(
-				'wfa_webhook_workflow_inactive',
+				'aiawa_webhook_workflow_inactive',
 				__( 'The workflow linked to this webhook is not active.', 'workflow-automate' ),
 				array( 'status' => 409 )
 			);
@@ -349,7 +349,7 @@ class WebhookService {
 			);
 		} catch ( InvalidArgumentException | RuntimeException $e ) {
 			return new WP_Error(
-				'wfa_webhook_run_failed',
+				'aiawa_webhook_run_failed',
 				__( 'The workflow could not be started.', 'workflow-automate' ),
 				array( 'status' => 500 )
 			);

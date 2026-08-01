@@ -2,15 +2,15 @@
 /**
  * Creates the webhooks table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database\Migrations;
+namespace AIAWA\Plugin\Database\Migrations;
 
-use AIAWAB\Plugin\Database\Migration;
-use AIAWAB\Plugin\Database\Table;
+use AIAWA\Plugin\Database\Migration;
+use AIAWA\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_webhooks` holds one row per inbound webhook endpoint (roadmap item
+ * `aiawa_webhooks` holds one row per inbound webhook endpoint (roadmap item
  * 13). `public_id` is the unguessable UUID segment of the public URL;
  * `signing_secret` stores an *encrypted* HMAC secret (or empty when
  * signature verification is off for that webhook) — architecture §2.3
  * originally typed this as VARCHAR(191), but field-level AES ciphertext
  * from `Core\Encryption` needs more room, so this migration uses TEXT
- * instead (same reasoning as `wfa_connections.credentials_json`). No
+ * instead (same reasoning as `aiawa_connections.credentials_json`). No
  * SQL-level FOREIGN KEY for the same `dbDelta()` limitation noted on
  * every other table; application code nulls `workflow_id` when a
  * workflow is permanently deleted.

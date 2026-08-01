@@ -2,14 +2,14 @@
 /**
  * Shared Google Sheet helper utilities.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\GoogleSheet\Helpers;
+namespace AIAWA\Plugin\Integration\GoogleSheet\Helpers;
 
-use AIAWAB\Plugin\Integration\GoogleSheet\GoogleSheetsHttpClient;
+use AIAWA\Plugin\Integration\GoogleSheet\GoogleSheetsHttpClient;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

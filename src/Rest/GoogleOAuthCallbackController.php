@@ -2,16 +2,16 @@
 /**
  * Google OAuth callback REST endpoint.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Rest;
+namespace AIAWA\Plugin\Rest;
 
-use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
 use WP_REST_Request;
 
 // Prevent direct file access.
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class GoogleOAuthCallbackController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'aiawa/v1';
 
 	private ConnectionService $connections;
 
@@ -138,21 +138,21 @@ class GoogleOAuthCallbackController {
 
 		if ( '' !== $return_url ) {
 			$args = array(
-				'wfa_notice' => $notice,
+				'aiawa_notice' => $notice,
 			);
 
 			if ( $connection_id > 0 ) {
-				$args['wfa_connection'] = $connection_id;
+				$args['aiawa_connection'] = $connection_id;
 			}
 
 			$node_id = isset( $state_payload['node_id'] ) ? (string) $state_payload['node_id'] : '';
 
 			if ( '' !== $node_id ) {
-				$args['wfa_node'] = $node_id;
+				$args['aiawa_node'] = $node_id;
 			}
 
 			if ( '' !== $detail ) {
-				$args['wfa_error'] = $detail;
+				$args['aiawa_error'] = $detail;
 			}
 
 			wp_safe_redirect( add_query_arg( $args, $return_url ) );
@@ -161,7 +161,7 @@ class GoogleOAuthCallbackController {
 
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'wfa_notice' => $notice,
+			'aiawa_notice' => $notice,
 		);
 
 		if ( $connection_id > 0 ) {
@@ -169,7 +169,7 @@ class GoogleOAuthCallbackController {
 		}
 
 		if ( '' !== $detail ) {
-			$args['wfa_error'] = $detail;
+			$args['aiawa_error'] = $detail;
 		}
 
 		wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php' ) ) );

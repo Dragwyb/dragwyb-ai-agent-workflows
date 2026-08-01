@@ -159,8 +159,8 @@ export default function PickerSidebar({
 					type="button"
 					className={
 						isDisabled
-							? 'wfa-builder-picker__item wfa-builder-picker__item--disabled'
-							: 'wfa-builder-picker__item'
+							? 'aiawa-builder-picker__item aiawa-builder-picker__item--disabled'
+							: 'aiawa-builder-picker__item'
 					}
 					onClick={() => handlePick(item)}
 					title={isDisabled ? disabledMessage : item.description}
@@ -168,7 +168,7 @@ export default function PickerSidebar({
 					aria-disabled={isDisabled}
 				>
 					<span
-						className="wfa-builder-picker__item-icon"
+						className="aiawa-builder-picker__item-icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -177,12 +177,12 @@ export default function PickerSidebar({
 					>
 						{meta.icon}
 					</span>
-					<span className="wfa-builder-picker__item-content">
-						<span className="wfa-builder-picker__item-label">
+					<span className="aiawa-builder-picker__item-content">
+						<span className="aiawa-builder-picker__item-label">
 							{getPickerItemLabel(item, itemAppId)}
 						</span>
 						{isDisabled && (
-							<span className="wfa-builder-picker__item-hint">
+							<span className="aiawa-builder-picker__item-hint">
 								{disabledMessage}
 							</span>
 						)}
@@ -194,22 +194,22 @@ export default function PickerSidebar({
 
 	return (
 		<aside
-			className="wfa-builder-picker"
+			className="aiawa-builder-picker"
 			aria-label={title}
 		>
-			<div className="wfa-builder-picker__header">
+			<div className="aiawa-builder-picker__header">
 				{showBack && (
 					<Button
 						variant="link"
-						className="wfa-builder-picker__back"
+						className="aiawa-builder-picker__back"
 						onClick={handleBack}
 					>
 						{__('← Back', 'workflow-automate')}
 					</Button>
 				)}
-				<h2 className="wfa-builder-picker__title">{title}</h2>
+				<h2 className="aiawa-builder-picker__title">{title}</h2>
 				<Button
-					className="wfa-builder-picker__close"
+					className="aiawa-builder-picker__close"
 					icon="no-alt"
 					label={__('Close', 'workflow-automate')}
 					onClick={onClose}
@@ -217,19 +217,19 @@ export default function PickerSidebar({
 			</div>
 
 			{replaceHint && (
-				<p className="wfa-builder-picker__hint">{replaceHint}</p>
+				<p className="aiawa-builder-picker__hint">{replaceHint}</p>
 			)}
 
 			{showGroups ? (
-				<ul className="wfa-builder-picker__list">
+				<ul className="aiawa-builder-picker__list">
 					{groups.map((group) => (
 						<li key={group.id}>
 							<button
 								type="button"
-								className="wfa-builder-picker__item"
+								className="aiawa-builder-picker__item"
 								onClick={() => setGroupId(group.id)}
 							>
-								<span className="wfa-builder-picker__item-label">
+								<span className="aiawa-builder-picker__item-label">
 									{group.label}
 								</span>
 							</button>
@@ -238,7 +238,7 @@ export default function PickerSidebar({
 				</ul>
 			) : kind === 'agent-tool' ? (
 				<>
-					<div className="wfa-builder-picker__search">
+					<div className="aiawa-builder-picker__search">
 						<TextControl
 							label={__('Search tools', 'workflow-automate')}
 							hideLabelFromVision
@@ -248,7 +248,7 @@ export default function PickerSidebar({
 						/>
 					</div>
 					{toolSections.length === 0 ? (
-						<p className="wfa-builder-picker__empty">
+						<p className="aiawa-builder-picker__empty">
 							{__(
 								'No tools match your search.',
 								'workflow-automate'
@@ -258,12 +258,12 @@ export default function PickerSidebar({
 						toolSections.map((section) => (
 							<div
 								key={section.id}
-								className="wfa-builder-picker__section"
+								className="aiawa-builder-picker__section"
 							>
-								<h3 className="wfa-builder-picker__section-heading">
+								<h3 className="aiawa-builder-picker__section-heading">
 									{section.label}
 								</h3>
-								<ul className="wfa-builder-picker__list">
+								<ul className="aiawa-builder-picker__list">
 									{section.items.map((item) =>
 										renderItem(item, item.pickerAppId)
 									)}
@@ -274,7 +274,7 @@ export default function PickerSidebar({
 				</>
 			) : usesGroupedSections && groupedItems ? (
 				<>
-					<div className="wfa-builder-picker__search">
+					<div className="aiawa-builder-picker__search">
 						<TextControl
 							label={__('Search actions', 'workflow-automate')}
 							hideLabelFromVision
@@ -284,7 +284,7 @@ export default function PickerSidebar({
 						/>
 					</div>
 					{groupedItems.length === 0 ? (
-						<p className="wfa-builder-picker__empty">
+						<p className="aiawa-builder-picker__empty">
 							{__(
 								'No actions match your search.',
 								'workflow-automate'
@@ -294,12 +294,12 @@ export default function PickerSidebar({
 						groupedItems.map((group) => (
 							<div
 								key={group.id}
-								className="wfa-builder-picker__section"
+								className="aiawa-builder-picker__section"
 							>
-								<h3 className="wfa-builder-picker__section-heading">
+								<h3 className="aiawa-builder-picker__section-heading">
 									{group.label}
 								</h3>
-								<ul className="wfa-builder-picker__list">
+								<ul className="aiawa-builder-picker__list">
 									{group.items.map((item) =>
 										renderItem(item, metaAppId)
 									)}
@@ -309,7 +309,7 @@ export default function PickerSidebar({
 					)}
 				</>
 			) : (
-				<ul className="wfa-builder-picker__list">
+				<ul className="aiawa-builder-picker__list">
 					{showCommunicationList &&
 						subApps.map((subApp) => (
 							<PickerSubApp
@@ -332,11 +332,11 @@ function PickerSubApp({ subApp, onOpen }) {
 		<li>
 			<button
 				type="button"
-				className="wfa-builder-picker__item wfa-builder-picker__item--subapp"
+				className="aiawa-builder-picker__item aiawa-builder-picker__item--subapp"
 				onClick={onOpen}
 			>
 				<span
-					className="wfa-builder-picker__item-icon"
+					className="aiawa-builder-picker__item-icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -345,12 +345,12 @@ function PickerSubApp({ subApp, onOpen }) {
 				>
 					{meta.icon}
 				</span>
-				<span className="wfa-builder-picker__item-content">
-					<span className="wfa-builder-picker__item-label">
+				<span className="aiawa-builder-picker__item-content">
+					<span className="aiawa-builder-picker__item-label">
 						{subApp.label}
 					</span>
 				</span>
-				<span className="wfa-builder-picker__item-chevron" aria-hidden="true">
+				<span className="aiawa-builder-picker__item-chevron" aria-hidden="true">
 					›
 				</span>
 			</button>

@@ -2,16 +2,16 @@
 /**
  * Settings admin page.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin\Pages;
+namespace AIAWA\Plugin\Admin\Pages;
 
-use AIAWAB\Plugin\Admin\AdminPage;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Admin\AdminPage;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class SettingsPage implements AdminPage {
 
-	public const SLUG = 'wfa-settings';
+	public const SLUG = 'aiawa-settings';
 
 	private const TABS = array( 'general', 'retention', 'advanced' );
 
@@ -94,10 +94,10 @@ class SettingsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'aiawa-admin',
+			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			AIAWA_VERSION
 		);
 	}
 
@@ -111,7 +111,7 @@ class SettingsPage implements AdminPage {
 
 		$tab = $this->currentTab();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap aiawa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -182,10 +182,10 @@ class SettingsPage implements AdminPage {
 		$on_failure  = $this->settings->onNodeFailure();
 		$display_utc = $this->settings->displayTimestampsInUtc();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
-		echo '<input type="hidden" name="action" value="wfa_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form">';
+		echo '<input type="hidden" name="action" value="aiawa_settings_action" />';
 		echo '<input type="hidden" name="op" value="general" />';
-		wp_nonce_field( 'wfa_settings_action_general' );
+		wp_nonce_field( 'aiawa_settings_action_general' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -224,15 +224,15 @@ class SettingsPage implements AdminPage {
 	private function renderRetentionTab(): void {
 		$days = $this->settings->retentionDays();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
-		echo '<input type="hidden" name="action" value="wfa_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form">';
+		echo '<input type="hidden" name="action" value="aiawa_settings_action" />';
 		echo '<input type="hidden" name="op" value="retention" />';
-		wp_nonce_field( 'wfa_settings_action_retention' );
+		wp_nonce_field( 'aiawa_settings_action_retention' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
-		echo '<tr><th scope="row"><label for="wfa-retention-days">' . esc_html__( 'Keep finished run history for', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-retention-days">' . esc_html__( 'Keep finished run history for', 'workflow-automate' ) . '</label></th><td>';
 		printf(
-			'<input type="number" id="wfa-retention-days" name="retention_days" min="%1$d" max="%2$d" value="%3$d" class="small-text" /> %4$s',
+			'<input type="number" id="aiawa-retention-days" name="retention_days" min="%1$d" max="%2$d" value="%3$d" class="small-text" /> %4$s',
 			(int) SettingsService::MIN_RETENTION_DAYS,
 			(int) SettingsService::MAX_RETENTION_DAYS,
 			(int) $days,
@@ -255,9 +255,9 @@ class SettingsPage implements AdminPage {
 		}
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="wfa_settings_action" />';
+		echo '<input type="hidden" name="action" value="aiawa_settings_action" />';
 		echo '<input type="hidden" name="op" value="purge_now" />';
-		wp_nonce_field( 'wfa_settings_action_purge_now' );
+		wp_nonce_field( 'aiawa_settings_action_purge_now' );
 		submit_button( __( 'Purge Now', 'workflow-automate' ), 'secondary' );
 		echo '</form>';
 	}
@@ -270,10 +270,10 @@ class SettingsPage implements AdminPage {
 		$require_webhook_signing = $this->settings->requireWebhookSigning();
 		$remove_data             = $this->settings->removeDataOnUninstall();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
-		echo '<input type="hidden" name="action" value="wfa_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form">';
+		echo '<input type="hidden" name="action" value="aiawa_settings_action" />';
 		echo '<input type="hidden" name="op" value="advanced" />';
-		wp_nonce_field( 'wfa_settings_action_advanced' );
+		wp_nonce_field( 'aiawa_settings_action_advanced' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -307,10 +307,10 @@ class SettingsPage implements AdminPage {
 
 		echo '<hr />';
 		echo '<h2>' . esc_html__( 'Uninstall', 'workflow-automate' ) . '</h2>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form wfa-settings-danger-zone">';
-		echo '<input type="hidden" name="action" value="wfa_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form aiawa-settings-danger-zone">';
+		echo '<input type="hidden" name="action" value="aiawa_settings_action" />';
 		echo '<input type="hidden" name="op" value="uninstall" />';
-		wp_nonce_field( 'wfa_settings_action_uninstall' );
+		wp_nonce_field( 'aiawa_settings_action_uninstall' );
 
 		echo '<p><strong>' . esc_html__( 'This plugin keeps all of its data when deleted, by default.', 'workflow-automate' ) . '</strong></p>';
 		echo '<input type="hidden" name="remove_data_on_uninstall" value="0" />';
@@ -326,7 +326,7 @@ class SettingsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?aiawa_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -354,7 +354,7 @@ class SettingsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

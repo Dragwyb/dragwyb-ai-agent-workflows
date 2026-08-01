@@ -2,14 +2,14 @@
 /**
  * Migration runner.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database;
+namespace AIAWA\Plugin\Database;
 
-use AIAWAB\Plugin\Core\Options;
+use AIAWA\Plugin\Core\Options;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

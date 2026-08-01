@@ -2,20 +2,20 @@
 /**
  * Registers persistence repositories against the container.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Provider;
+namespace AIAWA\Plugin\Provider;
 
-use AIAWAB\Plugin\Core\Container;
-use AIAWAB\Plugin\Persistence\ConnectionRepository;
-use AIAWAB\Plugin\Persistence\WebhookRepository;
-use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Core\Container;
+use AIAWA\Plugin\Persistence\ConnectionRepository;
+use AIAWA\Plugin\Persistence\WebhookRepository;
+use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWA\Plugin\Persistence\WorkflowRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

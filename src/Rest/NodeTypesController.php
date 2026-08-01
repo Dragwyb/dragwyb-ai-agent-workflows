@@ -2,21 +2,21 @@
 /**
  * Node types REST controller.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Rest;
+namespace AIAWA\Plugin\Rest;
 
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Domain\Contracts\ActionGroupInterface;
-use AIAWAB\Plugin\Domain\Contracts\NodeTypeInterface;
-use AIAWAB\Plugin\Domain\Contracts\TriggerGroupInterface;
-use AIAWAB\Plugin\Integration\IntegrationTriggerCatalog;
-use AIAWAB\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use AIAWAB\Plugin\Service\ElementorFormsService;
-use AIAWAB\Plugin\Service\NodeTypeRegistry;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Domain\Contracts\ActionGroupInterface;
+use AIAWA\Plugin\Domain\Contracts\NodeTypeInterface;
+use AIAWA\Plugin\Domain\Contracts\TriggerGroupInterface;
+use AIAWA\Plugin\Integration\IntegrationTriggerCatalog;
+use AIAWA\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use AIAWA\Plugin\Service\ElementorFormsService;
+use AIAWA\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -30,13 +30,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Exposes the server-side `NodeTypeRegistry` (item 5) to the builder's node
  * palette. Read-only by design — node types are registered in PHP via the
- * `wfa/nodes/register` action, never created/edited over HTTP — so this is
+ * `aiawa/nodes/register` action, never created/edited over HTTP — so this is
  * a plain class rather than a `WP_REST_Controller` subclass: there is no
  * CRUD/schema-derivation machinery to inherit for a single GET route.
  */
 class NodeTypesController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'aiawa/v1';
 
 	private const ROUTE = '/node-types';
 
@@ -96,7 +96,7 @@ class NodeTypesController {
 	public function permissionsCheck( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'wfa_rest_forbidden',
+				'aiawa_rest_forbidden',
 				__( 'Sorry, you are not allowed to view node types.', 'workflow-automate' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -161,7 +161,7 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'wfa_trigger_sample_unavailable',
+					'aiawa_trigger_sample_unavailable',
 					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
 					array( 'status' => 404 )
 				);
@@ -180,7 +180,7 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'wfa_trigger_sample_unavailable',
+					'aiawa_trigger_sample_unavailable',
 					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
 					array( 'status' => 404 )
 				);
@@ -195,7 +195,7 @@ class NodeTypesController {
 		}
 
 		return new WP_Error(
-			'wfa_trigger_sample_unsupported',
+			'aiawa_trigger_sample_unsupported',
 			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'workflow-automate' ),
 			array( 'status' => 400 )
 		);

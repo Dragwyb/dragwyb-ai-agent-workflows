@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is deleted via the WordPress admin.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 // If this file is called directly and not by WordPress, abort.
@@ -18,12 +18,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  */
 require_once __DIR__ . '/src/Core/WordPressCompat.php';
 
-$wfa_has_core_ai_client = wfa_has_core_ai_client();
+$aiawa_has_core_ai_client = aiawa_has_core_ai_client();
 
-if ( ! $wfa_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( ! $aiawa_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 } else {
 	require_once __DIR__ . '/src/autoload.php';
 }
 
-AIAWAB\Plugin\Core\Uninstaller::uninstall();
+AIAWA\Plugin\Core\Uninstaller::uninstall();

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AIAWAB\AiProviders\DeepSeek;
+namespace AIAWA\AiProviders\DeepSeek;
 
-use AIAWAB\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use AIAWA\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * DeepSeek AI provider (OpenAI-compatible).

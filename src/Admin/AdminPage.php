@@ -2,12 +2,12 @@
 /**
  * Admin page contract.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

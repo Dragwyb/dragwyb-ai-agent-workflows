@@ -272,9 +272,9 @@ export default function App() {
 
 				const urlParams = new URLSearchParams(window.location.search);
 				const oauthConnectionId = Number(
-					urlParams.get('wfa_connection') || 0
+					urlParams.get('aiawa_connection') || 0
 				);
-				const oauthNodeId = urlParams.get('wfa_node') || '';
+				const oauthNodeId = urlParams.get('aiawa_node') || '';
 
 				if (oauthConnectionId > 0 && oauthNodeId) {
 					setGraph((previous) => ({
@@ -293,10 +293,10 @@ export default function App() {
 					}));
 					setSelectedNodeId(oauthNodeId);
 
-					urlParams.delete('wfa_connection');
-					urlParams.delete('wfa_node');
-					urlParams.delete('wfa_notice');
-					urlParams.delete('wfa_error');
+					urlParams.delete('aiawa_connection');
+					urlParams.delete('aiawa_node');
+					urlParams.delete('aiawa_notice');
+					urlParams.delete('aiawa_error');
 
 					const cleaned = `${window.location.pathname}?${urlParams.toString()}`;
 					window.history.replaceState(
@@ -1845,7 +1845,7 @@ export default function App() {
 
 	if (loading) {
 		return (
-			<div className="wfa-builder-loading" role="status">
+			<div className="aiawa-builder-loading" role="status">
 				{__('Loading…', 'workflow-automate')}
 			</div>
 		);
@@ -1853,7 +1853,7 @@ export default function App() {
 
 	if (loadError) {
 		return (
-			<div className="wfa-builder-error" role="alert">
+			<div className="aiawa-builder-error" role="alert">
 				{loadError}
 			</div>
 		);
@@ -1880,7 +1880,7 @@ export default function App() {
 		.filter(Boolean);
 
 	return (
-		<div className={`wfa-builder${chatOpen ? ' wfa-builder--chat-open' : ''}`}>
+		<div className={`aiawa-builder${chatOpen ? ' aiawa-builder--chat-open' : ''}`}>
 			<Header
 				title={title}
 				onTitleChange={setTitle}
@@ -1898,13 +1898,13 @@ export default function App() {
 				chatOpen={chatOpen}
 				onToggleChat={handleToggleChat}
 			/>
-			<div className="wfa-builder__body">
+			<div className="aiawa-builder__body">
 				<Palette
 					triggers={nodeTypes.triggers}
 					actions={nodeTypes.actions}
 					onOpenPicker={handleOpenPicker}
 				/>
-				<div className="wfa-builder__canvas-wrap">
+				<div className="aiawa-builder__canvas-wrap">
 				<Canvas
 					nodes={graph.nodes}
 					connections={graph.connections}

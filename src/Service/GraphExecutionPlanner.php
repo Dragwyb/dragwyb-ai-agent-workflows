@@ -2,12 +2,12 @@
 /**
  * Branch-aware execution order for workflow graphs.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

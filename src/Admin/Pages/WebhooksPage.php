@@ -2,22 +2,22 @@
 /**
  * Webhooks admin page.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin\Pages;
+namespace AIAWA\Plugin\Admin\Pages;
 
-use AIAWAB\Plugin\Admin\AdminPage;
-use AIAWAB\Plugin\Admin\EmptyState;
-use AIAWAB\Plugin\Admin\ListTableUi;
-use AIAWAB\Plugin\Admin\WebhookActionsController;
-use AIAWAB\Plugin\Admin\WebhooksListTable;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\WebhookService;
-use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Admin\AdminPage;
+use AIAWA\Plugin\Admin\EmptyState;
+use AIAWA\Plugin\Admin\ListTableUi;
+use AIAWA\Plugin\Admin\WebhookActionsController;
+use AIAWA\Plugin\Admin\WebhooksListTable;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\WebhookService;
+use AIAWA\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WebhooksPage implements AdminPage {
 
-	public const SLUG = 'wfa-webhooks';
+	public const SLUG = 'aiawa-webhooks';
 
 	private WebhookService $webhooks;
 
@@ -88,10 +88,10 @@ class WebhooksPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'aiawa-admin',
+			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			AIAWA_VERSION
 		);
 	}
 
@@ -106,7 +106,7 @@ class WebhooksPage implements AdminPage {
 		$table = new WebhooksListTable( $this->webhooks, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap aiawa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
@@ -141,12 +141,12 @@ class WebhooksPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="aiawa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_webhook_bulk_action', 'wfa_webhook_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'aiawa_webhook_bulk_action', 'aiawa_webhook_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -189,7 +189,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

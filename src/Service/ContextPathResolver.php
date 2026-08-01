@@ -2,12 +2,12 @@
 /**
  * Resolves {{nodes.id.path}} and literal values from execution context.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

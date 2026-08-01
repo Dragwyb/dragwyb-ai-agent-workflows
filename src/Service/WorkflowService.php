@@ -2,22 +2,22 @@
 /**
  * Workflow application service.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWAB\Plugin\Domain\Workflow;
-use AIAWAB\Plugin\Domain\WorkflowNode;
-use AIAWAB\Plugin\Persistence\WebhookRepository;
-use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Domain\Workflow;
+use AIAWA\Plugin\Domain\WorkflowNode;
+use AIAWA\Plugin\Persistence\WebhookRepository;
+use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWA\Plugin\Persistence\WorkflowRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -273,13 +273,13 @@ class WorkflowService {
 	}
 
 	/**
-	 * Reconciles `wfa_workflow_nodes` rows with a workflow's current
+	 * Reconciles `aiawa_workflow_nodes` rows with a workflow's current
 	 * `graph_json` (the builder's source of truth for node identity and
 	 * configuration): existing nodes are updated, new ones inserted, and
 	 * ones no longer present in the graph are removed.
 	 *
 	 * The builder (roadmap item 6) only ever writes the whole graph as JSON
-	 * via update(); nothing keeps `wfa_workflow_nodes` in sync with it as
+	 * via update(); nothing keeps `aiawa_workflow_nodes` in sync with it as
 	 * that happens, since nothing read that table until the execution
 	 * engine needed real, stable node ids to log run outcomes against.
 	 * Rather than pay a sync cost on every autosave, this is called lazily,

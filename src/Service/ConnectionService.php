@@ -2,18 +2,18 @@
 /**
  * Connection application service.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWAB\Plugin\Core\Encryption;
-use AIAWAB\Plugin\Domain\Connection;
-use AIAWAB\Plugin\Persistence\ConnectionRepository;
+use AIAWA\Plugin\Core\Encryption;
+use AIAWA\Plugin\Domain\Connection;
+use AIAWA\Plugin\Persistence\ConnectionRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

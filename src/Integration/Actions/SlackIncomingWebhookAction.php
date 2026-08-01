@@ -2,14 +2,14 @@
 /**
  * Slack Incoming Webhook action.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

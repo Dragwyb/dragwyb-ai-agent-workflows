@@ -12,7 +12,7 @@ import apiFetch from '@wordpress/api-fetch';
  * @return {Promise<Object>} The workflow resource.
  */
 export function fetchWorkflow(id) {
-	return apiFetch({ path: `/wfa/v1/workflows/${id}` });
+	return apiFetch({ path: `/aiawa/v1/workflows/${id}` });
 }
 
 /**
@@ -21,7 +21,7 @@ export function fetchWorkflow(id) {
  */
 export function createWorkflow(data) {
 	return apiFetch({
-		path: '/wfa/v1/workflows',
+		path: '/aiawa/v1/workflows',
 		method: 'POST',
 		data,
 	});
@@ -34,7 +34,7 @@ export function createWorkflow(data) {
  */
 export function updateWorkflow(id, data) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}`,
+		path: `/aiawa/v1/workflows/${id}`,
 		method: 'PUT',
 		data,
 	});
@@ -44,7 +44,7 @@ export function updateWorkflow(id, data) {
  * @return {Promise<{triggers: Array<Object>, actions: Array<Object>}>} Registered node types.
  */
 export function fetchNodeTypes() {
-	return apiFetch({ path: '/wfa/v1/node-types' });
+	return apiFetch({ path: '/aiawa/v1/node-types' });
 }
 
 /**
@@ -64,7 +64,7 @@ export function fetchTriggerSampleSchema(triggerType, formId = '') {
 	}
 
 	return apiFetch({
-		path: `/wfa/v1/trigger-sample-schema?${params.toString()}`,
+		path: `/aiawa/v1/trigger-sample-schema?${params.toString()}`,
 	});
 }
 
@@ -75,7 +75,7 @@ export function fetchTriggerSampleSchema(triggerType, formId = '') {
  * @return {Promise<Array<Object>>} Every stored connection's id/label/auth type.
  */
 export function fetchConnections() {
-	return apiFetch({ path: '/wfa/v1/connections' });
+	return apiFetch({ path: '/aiawa/v1/connections' });
 }
 
 /**
@@ -88,7 +88,7 @@ export function fetchConnections() {
  */
 export function createConnection(data) {
 	return apiFetch({
-		path: '/wfa/v1/connections',
+		path: '/aiawa/v1/connections',
 		method: 'POST',
 		data,
 	});
@@ -113,7 +113,7 @@ export function fetchGoogleOAuthAuthorizeUrl(connectionId, options = {}) {
 	const query = params.toString();
 
 	return apiFetch({
-		path: `/wfa/v1/connections/${connectionId}/oauth/authorize-url${
+		path: `/aiawa/v1/connections/${connectionId}/oauth/authorize-url${
 			query ? `?${query}` : ''
 		}`,
 	});
@@ -126,7 +126,7 @@ export function fetchGoogleOAuthAuthorizeUrl(connectionId, options = {}) {
  */
 export function getBootstrap() {
 	return (
-		window.wfaBuilderSettings || {
+		window.aiawaBuilderSettings || {
 			workflowId: 0,
 			listUrl: '',
 			connectionsUrl: '',
@@ -151,7 +151,7 @@ export function fetchAiProviderModels(provider, nodeType = '') {
 		params.set('node_type', nodeType);
 	}
 	return apiFetch({
-		path: `/wfa/v1/ai/models?${params.toString()}`,
+		path: `/aiawa/v1/ai/models?${params.toString()}`,
 	});
 }
 
@@ -159,7 +159,7 @@ export function fetchAiProviderModels(provider, nodeType = '') {
  * @return {Promise<{available: boolean, providers: Object<string, boolean>}>}
  */
 export function fetchAiProviderStatus() {
-	return apiFetch({ path: '/wfa/v1/ai/status' });
+	return apiFetch({ path: '/aiawa/v1/ai/status' });
 }
 
 /**
@@ -169,7 +169,7 @@ export function fetchAiProviderStatus() {
  */
 export function saveAiProviderCredentials(provider, apiKey) {
 	return apiFetch({
-		path: '/wfa/v1/ai/credentials',
+		path: '/aiawa/v1/ai/credentials',
 		method: 'POST',
 		data: {
 			provider,
@@ -185,7 +185,7 @@ export function saveAiProviderCredentials(provider, apiKey) {
 export function clearAiProviderCredentials(provider) {
 	const params = new URLSearchParams({ provider });
 	return apiFetch({
-		path: `/wfa/v1/ai/credentials?${params.toString()}`,
+		path: `/aiawa/v1/ai/credentials?${params.toString()}`,
 		method: 'DELETE',
 	});
 }
@@ -197,7 +197,7 @@ export function clearAiProviderCredentials(provider) {
  */
 export function startTestListen(id) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}/test/listen`,
+		path: `/aiawa/v1/workflows/${id}/test/listen`,
 		method: 'POST',
 	});
 }
@@ -208,7 +208,7 @@ export function startTestListen(id) {
  */
 export function stopTestListen(id) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}/test/listen`,
+		path: `/aiawa/v1/workflows/${id}/test/listen`,
 		method: 'DELETE',
 	});
 }
@@ -218,7 +218,7 @@ export function stopTestListen(id) {
  * @return {Promise<Object>}
  */
 export function fetchTestStatus(id) {
-	return apiFetch({ path: `/wfa/v1/workflows/${id}/test/status` });
+	return apiFetch({ path: `/aiawa/v1/workflows/${id}/test/status` });
 }
 
 /**
@@ -227,7 +227,7 @@ export function fetchTestStatus(id) {
  */
 export function clearTestSample(id) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}/test/sample`,
+		path: `/aiawa/v1/workflows/${id}/test/sample`,
 		method: 'DELETE',
 	});
 }
@@ -239,7 +239,7 @@ export function clearTestSample(id) {
  */
 export function testWorkflowNode(id, data) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}/test/node`,
+		path: `/aiawa/v1/workflows/${id}/test/node`,
 		method: 'POST',
 		data,
 	});
@@ -252,7 +252,7 @@ export function testWorkflowNode(id, data) {
  */
 export function runWorkflow(id, data = {}) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}/run`,
+		path: `/aiawa/v1/workflows/${id}/run`,
 		method: 'POST',
 		data,
 	});
@@ -267,7 +267,7 @@ export function runWorkflow(id, data = {}) {
  */
 export function sendWorkflowChat(id, data) {
 	return apiFetch({
-		path: `/wfa/v1/workflows/${id}/chat`,
+		path: `/aiawa/v1/workflows/${id}/chat`,
 		method: 'POST',
 		data,
 	});

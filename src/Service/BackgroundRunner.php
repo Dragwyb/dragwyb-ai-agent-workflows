@@ -2,14 +2,14 @@
 /**
  * WP-Cron-driven background execution worker.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,14 +29,14 @@ class BackgroundRunner {
 	/**
 	 * The WP-Cron hook this worker's processBatch() is bound to.
 	 */
-	public const CRON_HOOK = 'wfa/cron/process_queue';
+	public const CRON_HOOK = 'aiawa/cron/process_queue';
 
 	/**
 	 * The custom cron_schedules key registered for that hook. WordPress
 	 * ships nothing finer-grained than hourly, so a custom schedule is
 	 * required for timely queue draining — see registerCronSchedule().
 	 */
-	public const CRON_SCHEDULE = 'wfa_every_minute';
+	public const CRON_SCHEDULE = 'aiawa_every_minute';
 
 	/**
 	 * Maximum runs claimed per cron tick. Kept modest because a single

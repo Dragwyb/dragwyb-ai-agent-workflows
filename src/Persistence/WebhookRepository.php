@@ -2,15 +2,15 @@
 /**
  * Webhook repository.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Persistence;
+namespace AIAWA\Plugin\Persistence;
 
-use AIAWAB\Plugin\Database\Table;
-use AIAWAB\Plugin\Domain\Webhook;
+use AIAWA\Plugin\Database\Table;
+use AIAWA\Plugin\Domain\Webhook;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_webhooks` access goes through this class. Never decrypts the
+ * All `aiawa_webhooks` access goes through this class. Never decrypts the
  * signing secret — that stays the job of `Service\WebhookService`.
  */
 class WebhookRepository {

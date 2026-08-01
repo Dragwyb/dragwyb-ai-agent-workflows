@@ -127,10 +127,10 @@ export default function ConditionNodeCard({
 	};
 
 	const classNames = [
-		'wfa-builder-node',
-		'wfa-builder-node--condition',
-		selected ? 'wfa-builder-node--selected' : '',
-		hasUnknownType ? 'wfa-builder-node--unknown' : '',
+		'aiawa-builder-node',
+		'aiawa-builder-node--condition',
+		selected ? 'aiawa-builder-node--selected' : '',
+		hasUnknownType ? 'aiawa-builder-node--unknown' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -144,16 +144,16 @@ export default function ConditionNodeCard({
 			: '';
 
 		return (
-			<div className="wfa-condition-node__row-port">
+			<div className="aiawa-condition-node__row-port">
 				{targetId && (
-					<span className="wfa-condition-node__link-chip" title={targetLabel}>
+					<span className="aiawa-condition-node__link-chip" title={targetLabel}>
 						→ {targetLabel}
 					</span>
 				)}
 				{targetId && (
 					<Button
 						variant="link"
-						className="wfa-condition-node__row-btn wfa-condition-node__row-btn--danger"
+						className="aiawa-condition-node__row-btn aiawa-condition-node__row-btn--danger"
 						onPointerDown={stopPointer}
 						onClick={(event) => {
 							event.stopPropagation();
@@ -167,10 +167,10 @@ export default function ConditionNodeCard({
 					type="button"
 					className={
 						targetId
-							? 'wfa-condition-node__port-dot wfa-condition-node__port-dot--connected'
+							? 'aiawa-condition-node__port-dot aiawa-condition-node__port-dot--connected'
 							: isDragging
-								? 'wfa-condition-node__port-dot wfa-condition-node__port-dot--dragging'
-								: 'wfa-condition-node__port-dot'
+								? 'aiawa-condition-node__port-dot aiawa-condition-node__port-dot--dragging'
+								: 'aiawa-condition-node__port-dot'
 					}
 					data-branch-id={branchId}
 					title={__(
@@ -205,20 +205,20 @@ export default function ConditionNodeCard({
 		const branchLabel = row.label || __('Untitled Condition', 'workflow-automate');
 
 		return (
-			<div key={branchId} className="wfa-condition-node__row">
-				<div className="wfa-condition-node__row-main">
-					<span className="wfa-condition-node__row-index">
+			<div key={branchId} className="aiawa-condition-node__row">
+				<div className="aiawa-condition-node__row-main">
+					<span className="aiawa-condition-node__row-index">
 						{index + 1}
 					</span>
-					<span className="wfa-condition-node__row-label">
+					<span className="aiawa-condition-node__row-label">
 						{branchLabel}
 					</span>
 				</div>
 				{row && (
-					<div className="wfa-condition-node__row-tools">
+					<div className="aiawa-condition-node__row-tools">
 						<Button
 							variant="link"
-							className="wfa-condition-node__row-btn"
+							className="aiawa-condition-node__row-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -229,7 +229,7 @@ export default function ConditionNodeCard({
 						</Button>
 						<Button
 							variant="link"
-							className="wfa-condition-node__row-btn wfa-condition-node__row-btn--danger"
+							className="aiawa-condition-node__row-btn aiawa-condition-node__row-btn--danger"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -266,14 +266,14 @@ export default function ConditionNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="wfa-condition-node__input-dot"
+				className="aiawa-condition-node__input-dot"
 				aria-hidden="true"
 			/>
 
-			<div className="wfa-condition-node__card">
-				<div className="wfa-condition-node__header">
+			<div className="aiawa-condition-node__card">
+				<div className="aiawa-condition-node__header">
 					<span
-						className="wfa-condition-node__icon"
+						className="aiawa-condition-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -282,11 +282,11 @@ export default function ConditionNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="wfa-condition-node__header-text">
-						<span className="wfa-condition-node__title">
+					<div className="aiawa-condition-node__header-text">
+						<span className="aiawa-condition-node__title">
 							{__('Condition', 'workflow-automate')}
 						</span>
-						<span className="wfa-condition-node__subtitle">
+						<span className="aiawa-condition-node__subtitle">
 							{__(
 								'Each orange port connects to a different step — drag one port per branch',
 								'workflow-automate'
@@ -295,19 +295,19 @@ export default function ConditionNodeCard({
 					</div>
 				</div>
 
-				<div className="wfa-condition-node__body">
+				<div className="aiawa-condition-node__body">
 					{displayRows.map((row, index) => (
 						<div key={row?.id || `row-${index}`}>
 							{renderBranchRow(row, index)}
 							{index < displayRows.length - 1 && (
-								<div className="wfa-condition-node__add-between">
+								<div className="aiawa-condition-node__add-between">
 									<span
-										className="wfa-condition-node__add-line"
+										className="aiawa-condition-node__add-line"
 										aria-hidden="true"
 									/>
 									<button
 										type="button"
-										className="wfa-condition-node__add-btn"
+										className="aiawa-condition-node__add-btn"
 										onPointerDown={stopPointer}
 										onClick={(event) => {
 											event.stopPropagation();
@@ -322,7 +322,7 @@ export default function ConditionNodeCard({
 										+
 									</button>
 									<span
-										className="wfa-condition-node__add-line"
+										className="aiawa-condition-node__add-line"
 										aria-hidden="true"
 									/>
 								</div>
@@ -330,14 +330,14 @@ export default function ConditionNodeCard({
 						</div>
 					))}
 
-					<div className="wfa-condition-node__add-between">
+					<div className="aiawa-condition-node__add-between">
 						<span
-							className="wfa-condition-node__add-line"
+							className="aiawa-condition-node__add-line"
 							aria-hidden="true"
 						/>
 						<button
 							type="button"
-							className="wfa-condition-node__add-btn"
+							className="aiawa-condition-node__add-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -349,15 +349,15 @@ export default function ConditionNodeCard({
 							+
 						</button>
 						<span
-							className="wfa-condition-node__add-line"
+							className="aiawa-condition-node__add-line"
 							aria-hidden="true"
 						/>
 					</div>
 
-					<div className="wfa-condition-node__row wfa-condition-node__row--default">
-						<div className="wfa-condition-node__row-main">
-							<span className="wfa-condition-node__row-index">∅</span>
-							<span className="wfa-condition-node__row-label">
+					<div className="aiawa-condition-node__row aiawa-condition-node__row--default">
+						<div className="aiawa-condition-node__row-main">
+							<span className="aiawa-condition-node__row-index">∅</span>
+							<span className="aiawa-condition-node__row-label">
 								{__('No Condition Matched', 'workflow-automate')}
 							</span>
 						</div>

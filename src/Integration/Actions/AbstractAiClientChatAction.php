@@ -2,15 +2,15 @@
 /**
  * Shared AI chat action backed by WordPress AI Client.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\Agent\AgentAiClient;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\Agent\AgentAiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,7 +34,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 	abstract public function description(): string;
 
 	/**
-	 * WFA provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * aiawa provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 */
 	abstract protected function providerSlug(): string;
 

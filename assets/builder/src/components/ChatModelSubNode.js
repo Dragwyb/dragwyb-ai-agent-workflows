@@ -29,8 +29,8 @@ export default function ChatModelSubNode({
 	return (
 		<div
 			className={[
-				'wfa-chat-model-node',
-				selected ? 'wfa-chat-model-node--selected' : '',
+				'aiawa-chat-model-node',
+				selected ? 'aiawa-chat-model-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -41,18 +41,18 @@ export default function ChatModelSubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-chat-model-node__port" aria-hidden="true" />
+			<span className="aiawa-chat-model-node__port" aria-hidden="true" />
 			<span
-				className="wfa-chat-model-node__ring"
+				className="aiawa-chat-model-node__ring"
 				style={{ backgroundColor: meta.bg, color: meta.accent }}
 				aria-hidden="true"
 			>
-				<span className="wfa-chat-model-node__icon">{meta.icon}</span>
+				<span className="aiawa-chat-model-node__icon">{meta.icon}</span>
 			</span>
-			<span className="wfa-chat-model-node__label">
+			<span className="aiawa-chat-model-node__label">
 				{node.label || __('Chat Model', 'workflow-automate')}
 			</span>
-			<span className="wfa-chat-model-node__subtitle">
+			<span className="aiawa-chat-model-node__subtitle">
 				{__('Chat Model', 'workflow-automate')}
 			</span>
 		</div>

@@ -2,14 +2,14 @@
 /**
  * Contact Form 7 submission trigger.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Triggers;
+namespace AIAWA\Plugin\Integration\Triggers;
 
-use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWA\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

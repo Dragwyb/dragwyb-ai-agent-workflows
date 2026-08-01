@@ -2,70 +2,70 @@
 /**
  * Main plugin bootstrap class.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use AIAWAB\Plugin\Admin\ConnectionActionsController;
-use AIAWAB\Plugin\Admin\GoogleOAuthStartController;
-use AIAWAB\Plugin\Admin\Menu;
-use AIAWAB\Plugin\Admin\Pages\BuilderPage;
-use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWAB\Plugin\Admin\Pages\ConnectionsPage;
-use AIAWAB\Plugin\Admin\Pages\RunDetailPage;
-use AIAWAB\Plugin\Admin\Pages\RunsPage;
-use AIAWAB\Plugin\Admin\Pages\SettingsPage;
-use AIAWAB\Plugin\Admin\Pages\WebhookFormPage;
-use AIAWAB\Plugin\Admin\Pages\WebhooksPage;
-use AIAWAB\Plugin\Admin\Pages\WorkflowsPage;
-use AIAWAB\Plugin\Admin\RunActionsController;
-use AIAWAB\Plugin\Admin\SettingsController;
-use AIAWAB\Plugin\Admin\WebhookActionsController;
-use AIAWAB\Plugin\Admin\WorkflowActionsController;
-use AIAWAB\Plugin\Database\MigrationRunner;
-use AIAWAB\Plugin\Database\SchemaMigrations;
-use AIAWAB\Plugin\Integration\BuiltInNodeTypes;
-use AIAWAB\Plugin\Integration\WorkflowTriggerBinder;
-use AIAWAB\Plugin\Persistence\ConnectionRepository;
-use AIAWAB\Plugin\Persistence\WebhookRepository;
-use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
-use AIAWAB\Plugin\Rest\RestApi;
-use AIAWAB\Plugin\Service\Agent\AgentAiClient;
-use AIAWAB\Plugin\Service\Agent\AgentService;
-use AIAWAB\Plugin\Service\Agent\AgentToolExecutor;
-use AIAWAB\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
-use AIAWAB\Plugin\Service\AiModelsService;
-use AIAWAB\Plugin\Service\BackgroundRunner;
-use AIAWAB\Plugin\Service\ChatMessageService;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\ConnectionVerifier;
-use AIAWAB\Plugin\Service\ElementorFormsService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
-use AIAWAB\Plugin\Service\NodeExecutionService;
-use AIAWAB\Plugin\Service\NodeTypeRegistry;
-use AIAWAB\Plugin\Service\RunRetentionService;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
-use AIAWAB\Plugin\Service\WebhookService;
-use AIAWAB\Plugin\Service\WorkflowExecutionService;
-use AIAWAB\Plugin\Service\WorkflowService;
-use AIAWAB\Plugin\Service\WorkflowNodeTestService;
-use AIAWAB\Plugin\Service\WorkflowTestListenerService;
-use AIAWAB\Plugin\Provider\PersistenceServiceProvider;
-use AIAWAB\Plugin\Provider\AdminServiceProvider;
-use AIAWAB\Plugin\Provider\RestServiceProvider;
-use AIAWAB\Plugin\Provider\ExecutionServiceProvider;
+use AIAWA\Plugin\Admin\ConnectionActionsController;
+use AIAWA\Plugin\Admin\GoogleOAuthStartController;
+use AIAWA\Plugin\Admin\Menu;
+use AIAWA\Plugin\Admin\Pages\BuilderPage;
+use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWA\Plugin\Admin\Pages\ConnectionsPage;
+use AIAWA\Plugin\Admin\Pages\RunDetailPage;
+use AIAWA\Plugin\Admin\Pages\RunsPage;
+use AIAWA\Plugin\Admin\Pages\SettingsPage;
+use AIAWA\Plugin\Admin\Pages\WebhookFormPage;
+use AIAWA\Plugin\Admin\Pages\WebhooksPage;
+use AIAWA\Plugin\Admin\Pages\WorkflowsPage;
+use AIAWA\Plugin\Admin\RunActionsController;
+use AIAWA\Plugin\Admin\SettingsController;
+use AIAWA\Plugin\Admin\WebhookActionsController;
+use AIAWA\Plugin\Admin\WorkflowActionsController;
+use AIAWA\Plugin\Database\MigrationRunner;
+use AIAWA\Plugin\Database\SchemaMigrations;
+use AIAWA\Plugin\Integration\BuiltInNodeTypes;
+use AIAWA\Plugin\Integration\WorkflowTriggerBinder;
+use AIAWA\Plugin\Persistence\ConnectionRepository;
+use AIAWA\Plugin\Persistence\WebhookRepository;
+use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWA\Plugin\Persistence\WorkflowRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Rest\RestApi;
+use AIAWA\Plugin\Service\Agent\AgentAiClient;
+use AIAWA\Plugin\Service\Agent\AgentService;
+use AIAWA\Plugin\Service\Agent\AgentToolExecutor;
+use AIAWA\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWA\Plugin\Service\AiModelsService;
+use AIAWA\Plugin\Service\BackgroundRunner;
+use AIAWA\Plugin\Service\ChatMessageService;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\ConnectionVerifier;
+use AIAWA\Plugin\Service\ElementorFormsService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Service\NodeExecutionService;
+use AIAWA\Plugin\Service\NodeTypeRegistry;
+use AIAWA\Plugin\Service\RunRetentionService;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\TriggerReentrancyGuard;
+use AIAWA\Plugin\Service\WebhookService;
+use AIAWA\Plugin\Service\WorkflowExecutionService;
+use AIAWA\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Service\WorkflowNodeTestService;
+use AIAWA\Plugin\Service\WorkflowTestListenerService;
+use AIAWA\Plugin\Provider\PersistenceServiceProvider;
+use AIAWA\Plugin\Provider\AdminServiceProvider;
+use AIAWA\Plugin\Provider\RestServiceProvider;
+use AIAWA\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -200,7 +200,7 @@ class Plugin {
 		 *
 		 * @param Container $container The plugin's service container.
 		 */
-		do_action( 'wfa/loaded', $this->container );
+		do_action( 'aiawa/loaded', $this->container );
 	}
 
 	/**
@@ -234,11 +234,11 @@ class Plugin {
 	 * Registers the node type registry and, on `init`, fires the extension
 	 * point that populates it.
 	 *
-	 * The `wfa/nodes/register` action is deliberately fired on `init` rather
+	 * The `aiawa/nodes/register` action is deliberately fired on `init` rather
 	 * than directly from here (this method itself runs during our own
 	 * `plugins_loaded` callback): by `init`, every other plugin's
 	 * `plugins_loaded` callback has already run, so third-party code hooking
-	 * `wfa/nodes/register` from inside its own `plugins_loaded` handler is
+	 * `aiawa/nodes/register` from inside its own `plugins_loaded` handler is
 	 * guaranteed to have registered before this fires. Firing immediately
 	 * here would make that depend on plugin load order.
 	 *
@@ -259,7 +259,7 @@ class Plugin {
 			$this->container->get( AgentAiClient::class )
 		);
 
-		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );
+		add_action( 'aiawa/nodes/register', array( $built_in_node_types, 'register' ) );
 
 		add_action(
 			'init',
@@ -272,7 +272,7 @@ class Plugin {
 				 *
 				 * @param NodeTypeRegistry $registry The plugin's node type registry.
 				 */
-				do_action( 'wfa/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
+				do_action( 'aiawa/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
 		);
 	}

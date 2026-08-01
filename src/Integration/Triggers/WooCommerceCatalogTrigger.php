@@ -2,15 +2,15 @@
 /**
  * Catalog-defined WooCommerce hook trigger.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Triggers;
+namespace AIAWA\Plugin\Integration\Triggers;
 
-use AIAWAB\Plugin\Domain\Contracts\TriggerInterface;
-use AIAWAB\Plugin\Integration\WooCommerce\WooCommercePayloadBuilder;
+use AIAWA\Plugin\Domain\Contracts\TriggerInterface;
+use AIAWA\Plugin\Integration\WooCommerce\WooCommercePayloadBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

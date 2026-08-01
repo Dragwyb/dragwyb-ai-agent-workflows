@@ -2,23 +2,23 @@
 /**
  * Workflows admin page.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin\Pages;
+namespace AIAWA\Plugin\Admin\Pages;
 
-use AIAWAB\Plugin\Admin\AdminPage;
-use AIAWAB\Plugin\Admin\EmptyState;
-use AIAWAB\Plugin\Admin\ListTableUi;
-use AIAWAB\Plugin\Admin\WorkflowActionsController;
-use AIAWAB\Plugin\Admin\WorkflowsListTable;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Admin\AdminPage;
+use AIAWA\Plugin\Admin\EmptyState;
+use AIAWA\Plugin\Admin\ListTableUi;
+use AIAWA\Plugin\Admin\WorkflowActionsController;
+use AIAWA\Plugin\Admin\WorkflowsListTable;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\WorkflowService;
 
-// BuilderPage lives in this same namespace (AIAWAB\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
+// BuilderPage lives in this same namespace (AIAWA\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,7 +39,7 @@ class WorkflowsPage implements AdminPage {
 	 * instantiated `WorkflowsPage` (see `BuilderPage::SLUG` for the same
 	 * pattern used in reverse, for the "Add New"/"Edit" links below).
 	 */
-	public const SLUG = 'wfa-dashboard';
+	public const SLUG = 'aiawa-dashboard';
 
 	private WorkflowService $workflows;
 
@@ -93,10 +93,10 @@ class WorkflowsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'aiawa-admin',
+			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			AIAWA_VERSION
 		);
 	}
 
@@ -111,7 +111,7 @@ class WorkflowsPage implements AdminPage {
 		$table = new WorkflowsListTable( $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap aiawa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
@@ -146,7 +146,7 @@ class WorkflowsPage implements AdminPage {
 
 			// Keep the status views (especially Trash) reachable when the
 			// "all" list is empty but trashed workflows still exist.
-			echo '<form method="get" class="wfa-list-table-filters-form">';
+			echo '<form method="get" class="aiawa-list-table-filters-form">';
 			printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 			$table->views();
 			echo '</form>';
@@ -155,7 +155,7 @@ class WorkflowsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="aiawa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view selector.
 		$view = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
@@ -167,7 +167,7 @@ class WorkflowsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_workflow_bulk_action', 'wfa_workflow_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'aiawa_workflow_bulk_action', 'aiawa_workflow_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -197,7 +197,7 @@ class WorkflowsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg. Kept as literal `__()` calls (rather than a
+	 * `?aiawa_notice=` query arg. Kept as literal `__()` calls (rather than a
 	 * class constant) so i18n string-extraction tooling can find them.
 	 *
 	 * @return array<string, array{message: string, type: string}>
@@ -245,32 +245,32 @@ class WorkflowsPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderImportButton(): void {
-		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-workflow-import-form page-title-action">';
-		echo '<input type="hidden" name="action" value="wfa_workflow_import" />';
-		wp_nonce_field( 'wfa_workflow_import' );
-		echo '<label class="wfa-workflow-import-form__label">';
+		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-workflow-import-form page-title-action">';
+		echo '<input type="hidden" name="action" value="aiawa_workflow_import" />';
+		wp_nonce_field( 'aiawa_workflow_import' );
+		echo '<label class="aiawa-workflow-import-form__label">';
 		echo '<span class="screen-reader-text">' . esc_html__( 'Import workflow JSON', 'workflow-automate' ) . '</span>';
 		echo '<span aria-hidden="true">' . esc_html__( 'Import', 'workflow-automate' ) . '</span>';
-		echo '<input type="file" name="wfa_workflow_json" accept="application/json,.json" class="wfa-workflow-import-form__input" required />';
+		echo '<input type="file" name="aiawa_workflow_json" accept="application/json,.json" class="aiawa-workflow-import-form__input" required />';
 		echo '</label>';
-		echo '<button type="submit" class="wfa-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'workflow-automate' ) . '</button>';
+		echo '<button type="submit" class="aiawa-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'workflow-automate' ) . '</button>';
 		echo '</form>';
 
 		// Auto-submit when a file is chosen so the Import control feels like a single click.
 		echo '<script>';
-		echo '(function(){var f=document.querySelector(".wfa-workflow-import-form");if(!f)return;var i=f.querySelector(".wfa-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();';
+		echo '(function(){var f=document.querySelector(".aiawa-workflow-import-form");if(!f)return;var i=f.querySelector(".aiawa-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();';
 		echo '</script>';
 	}
 
 	/**
-	 * Prints an admin notice for the read-only `?wfa_notice=` query arg, if
+	 * Prints an admin notice for the read-only `?aiawa_notice=` query arg, if
 	 * it matches one of the allow-listed keys from self::notices().
 	 *
 	 * @return void
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

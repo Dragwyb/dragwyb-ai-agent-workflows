@@ -2,21 +2,21 @@
 /**
  * Connections admin page.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin\Pages;
+namespace AIAWA\Plugin\Admin\Pages;
 
-use AIAWAB\Plugin\Admin\AdminPage;
-use AIAWAB\Plugin\Admin\ConnectionActionsController;
-use AIAWAB\Plugin\Admin\ConnectionsListTable;
-use AIAWAB\Plugin\Admin\EmptyState;
-use AIAWAB\Plugin\Admin\ListTableUi;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Admin\AdminPage;
+use AIAWA\Plugin\Admin\ConnectionActionsController;
+use AIAWA\Plugin\Admin\ConnectionsListTable;
+use AIAWA\Plugin\Admin\EmptyState;
+use AIAWA\Plugin\Admin\ListTableUi;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ConnectionsPage implements AdminPage {
 
-	public const SLUG = 'wfa-connections';
+	public const SLUG = 'aiawa-connections';
 
 	private ConnectionService $connections;
 
@@ -89,10 +89,10 @@ class ConnectionsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'aiawa-admin',
+			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			AIAWA_VERSION
 		);
 	}
 
@@ -107,7 +107,7 @@ class ConnectionsPage implements AdminPage {
 		$table = new ConnectionsListTable( $this->connections, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap aiawa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
@@ -138,12 +138,12 @@ class ConnectionsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="aiawa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_connection_bulk_action', 'wfa_connection_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'aiawa_connection_bulk_action', 'aiawa_connection_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -155,7 +155,7 @@ class ConnectionsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?aiawa_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -189,7 +189,7 @@ class ConnectionsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {
@@ -209,7 +209,7 @@ class ConnectionsPage implements AdminPage {
 	 */
 	private function noticeDetailHtml(): string {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail from a prior redirect.
-		$detail = isset( $_GET['wfa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['wfa_error'] ) ) : '';
+		$detail = isset( $_GET['aiawa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['aiawa_error'] ) ) : '';
 
 		if ( '' === $detail ) {
 			return '';

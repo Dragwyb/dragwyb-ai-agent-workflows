@@ -2,18 +2,18 @@
 /**
  * Optional co-plugin triggers — catalog + availability checks.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration;
+namespace AIAWA\Plugin\Integration;
 
-use AIAWAB\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
-use AIAWAB\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
-use AIAWAB\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use AIAWAB\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use AIAWAB\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
+use AIAWA\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use AIAWA\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
+use AIAWA\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
+use AIAWA\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use AIAWA\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

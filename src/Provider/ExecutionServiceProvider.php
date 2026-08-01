@@ -2,34 +2,34 @@
 /**
  * Registers workflow execution services against the container.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Provider;
+namespace AIAWA\Plugin\Provider;
 
-use AIAWAB\Plugin\Core\Container;
-use AIAWAB\Plugin\Service\NodeTypeRegistry;
-use AIAWAB\Plugin\Persistence\WebhookRepository;
-use AIAWAB\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
-use AIAWAB\Plugin\Service\Agent\AgentAiClient;
-use AIAWAB\Plugin\Service\Agent\AgentService;
-use AIAWAB\Plugin\Service\Agent\AgentToolExecutor;
-use AIAWAB\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use AIAWAB\Plugin\Service\BackgroundRunner;
-use AIAWAB\Plugin\Service\NodeExecutionService;
-use AIAWAB\Plugin\Service\RunRetentionService;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
-use AIAWAB\Plugin\Service\WebhookService;
-use AIAWAB\Plugin\Service\WorkflowExecutionService;
-use AIAWAB\Plugin\Service\WorkflowNodeTestService;
-use AIAWAB\Plugin\Service\WorkflowService;
-use AIAWAB\Plugin\Service\WorkflowTestListenerService;
+use AIAWA\Plugin\Core\Container;
+use AIAWA\Plugin\Service\NodeTypeRegistry;
+use AIAWA\Plugin\Persistence\WebhookRepository;
+use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
+use AIAWA\Plugin\Persistence\WorkflowRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Service\Agent\AgentAiClient;
+use AIAWA\Plugin\Service\Agent\AgentService;
+use AIAWA\Plugin\Service\Agent\AgentToolExecutor;
+use AIAWA\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use AIAWA\Plugin\Service\BackgroundRunner;
+use AIAWA\Plugin\Service\NodeExecutionService;
+use AIAWA\Plugin\Service\RunRetentionService;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\TriggerReentrancyGuard;
+use AIAWA\Plugin\Service\WebhookService;
+use AIAWA\Plugin\Service\WorkflowExecutionService;
+use AIAWA\Plugin\Service\WorkflowNodeTestService;
+use AIAWA\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

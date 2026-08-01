@@ -41,11 +41,11 @@ export default function AgentNodeCard({
 	};
 
 	const classNames = [
-		'wfa-builder-node',
-		'wfa-builder-node--agent',
-		selected ? 'wfa-builder-node--selected' : '',
-		hasUnknownType ? 'wfa-builder-node--unknown' : '',
-		isLinkTarget ? 'wfa-builder-node--link-target' : '',
+		'aiawa-builder-node',
+		'aiawa-builder-node--agent',
+		selected ? 'aiawa-builder-node--selected' : '',
+		hasUnknownType ? 'aiawa-builder-node--unknown' : '',
+		isLinkTarget ? 'aiawa-builder-node--link-target' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -67,17 +67,17 @@ export default function AgentNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<div
-				className="wfa-agent-node__main"
+				className="aiawa-agent-node__main"
 				style={{ minHeight: `${AGENT_BODY_HEIGHT}px` }}
 			>
 				<span
-					className="wfa-builder-node__handle wfa-builder-node__handle--input"
+					className="aiawa-builder-node__handle aiawa-builder-node__handle--input"
 					aria-hidden="true"
 				/>
 
-				<div className="wfa-builder-node__body">
+				<div className="aiawa-builder-node__body">
 					<span
-						className="wfa-builder-node__icon"
+						className="aiawa-builder-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -86,9 +86,9 @@ export default function AgentNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="wfa-builder-node__text">
-						<span className="wfa-builder-node__label">{node.label}</span>
-						<span className="wfa-builder-node__subtitle">
+					<div className="aiawa-builder-node__text">
+						<span className="aiawa-builder-node__label">{node.label}</span>
+						<span className="aiawa-builder-node__subtitle">
 							{__('AI Agent', 'workflow-automate')}
 						</span>
 					</div>
@@ -97,7 +97,7 @@ export default function AgentNodeCard({
 				{canStartFlowConnection && onStartFlowConnectionDrag && (
 					<button
 						type="button"
-						className="wfa-builder-node__output-port wfa-builder-node__output-port--side"
+						className="aiawa-builder-node__output-port aiawa-builder-node__output-port--side"
 						title={__(
 							'Drag to the next step to connect',
 							'workflow-automate'
@@ -115,18 +115,18 @@ export default function AgentNodeCard({
 			</div>
 
 			<div
-				className="wfa-agent-node__ports"
+				className="aiawa-agent-node__ports"
 				style={{ minHeight: `${AGENT_PORTS_HEIGHT}px` }}
 			>
-				<div className="wfa-agent-node__port">
-					<span className="wfa-agent-node__port-label">
+				<div className="aiawa-agent-node__port">
+					<span className="aiawa-agent-node__port-label">
 						{__('Chat Model', 'workflow-automate')}
-						<span className="wfa-agent-node__required">*</span>
+						<span className="aiawa-agent-node__required">*</span>
 					</span>
 					{hasChatModel ? (
 						<button
 							type="button"
-							className="wfa-agent-node__port-dot wfa-agent-node__port-dot--ok wfa-agent-node__port-dot--link"
+							className="aiawa-agent-node__port-dot aiawa-agent-node__port-dot--ok aiawa-agent-node__port-dot--link"
 							title={__('Open chat model settings', 'workflow-automate')}
 							aria-label={__(
 								'Open chat model settings',
@@ -143,7 +143,7 @@ export default function AgentNodeCard({
 					) : (
 						<button
 							type="button"
-							className="wfa-agent-node__add-port"
+							className="aiawa-agent-node__add-port"
 							aria-label={__(
 								'Add chat model to agent',
 								'workflow-automate'
@@ -163,19 +163,19 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="wfa-agent-node__port">
-					<span className="wfa-agent-node__port-label">
+				<div className="aiawa-agent-node__port">
+					<span className="aiawa-agent-node__port-label">
 						{__('Memory', 'workflow-automate')}
 					</span>
 					{hasMemory ? (
 						<span
-							className="wfa-agent-node__port-dot wfa-agent-node__port-dot--ok"
+							className="aiawa-agent-node__port-dot aiawa-agent-node__port-dot--ok"
 							title={__('Memory connected', 'workflow-automate')}
 						/>
 					) : (
 						<button
 							type="button"
-							className="wfa-agent-node__add-port wfa-agent-node__add-port--muted"
+							className="aiawa-agent-node__add-port aiawa-agent-node__add-port--muted"
 							aria-label={__('Add memory to agent', 'workflow-automate')}
 							title={__('Add simple memory', 'workflow-automate')}
 							onPointerDown={stopPointer}
@@ -189,13 +189,13 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="wfa-agent-node__port wfa-agent-node__port--tool">
-					<span className="wfa-agent-node__port-label">
+				<div className="aiawa-agent-node__port aiawa-agent-node__port--tool">
+					<span className="aiawa-agent-node__port-label">
 						{__('Tool', 'workflow-automate')}
 					</span>
 					<button
 						type="button"
-						className="wfa-agent-node__add-port"
+						className="aiawa-agent-node__add-port"
 						aria-label={__('Add tool to agent', 'workflow-automate')}
 						title={__(
 							'Add an action as an agent tool',

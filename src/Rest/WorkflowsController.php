@@ -2,23 +2,23 @@
 /**
  * Workflows REST controller.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Rest;
+namespace AIAWA\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Domain\Workflow;
-use AIAWAB\Plugin\Domain\WorkflowRun;
-use AIAWAB\Plugin\Domain\WorkflowRunLog;
-use AIAWAB\Plugin\Service\ChatMessageService;
-use AIAWAB\Plugin\Service\WorkflowExecutionService;
-use AIAWAB\Plugin\Service\WorkflowService;
-use AIAWAB\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Domain\Workflow;
+use AIAWA\Plugin\Domain\WorkflowRun;
+use AIAWA\Plugin\Domain\WorkflowRunLog;
+use AIAWA\Plugin\Service\ChatMessageService;
+use AIAWA\Plugin\Service\WorkflowExecutionService;
+use AIAWA\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Exposes `wfa/v1/workflows` for workflow CRUD, plus a `restore` action for
+ * Exposes `aiawa/v1/workflows` for workflow CRUD, plus a `restore` action for
  * un-trashing a soft-deleted workflow. Every route has an explicit
  * permission callback and a JSON-Schema argument definition; no route ever
  * relies on `__return_true` or skips input validation.
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Node-level endpoints (`workflow_nodes`) are intentionally out of scope
  * for this increment and will be added when the visual builder needs them.
  *
- * A dedicated, paginated `wfa/v1/runs` resource (for the run history UI) is
+ * A dedicated, paginated `aiawa/v1/runs` resource (for the run history UI) is
  * deferred to that later roadmap item; `run_item()` here only exists so the
  * synchronous execution engine (roadmap item 7) is testable/usable before
  * that UI exists, and returns a single run's outcome plus its logs inline
@@ -68,7 +68,7 @@ class WorkflowsController extends WP_REST_Controller {
 		WorkflowExecutionService $executor,
 		ChatMessageService $chat
 	) {
-		$this->namespace = 'wfa/v1';
+		$this->namespace = 'aiawa/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
 		$this->executor  = $executor;
@@ -225,7 +225,7 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	/**
-	 * All routes on this controller require `wfa_manage_workflows`
+	 * All routes on this controller require `aiawa_manage_workflows`
 	 * (administrators and anyone with `manage_options` receive it via
 	 * `Core\Capabilities::filterUserHasCap()`).
 	 *
@@ -234,7 +234,7 @@ class WorkflowsController extends WP_REST_Controller {
 	private function checkPermission() {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'wfa_rest_forbidden',
+				'aiawa_rest_forbidden',
 				__( 'Sorry, you are not allowed to manage workflows.', 'workflow-automate' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -356,9 +356,9 @@ class WorkflowsController extends WP_REST_Controller {
 				)
 			);
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'wfa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'aiawa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		} catch ( RuntimeException $exception ) {
-			return new WP_Error( 'wfa_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
+			return new WP_Error( 'aiawa_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
 		}
 
 		$response = rest_ensure_response( $this->prepare_item_for_response( $workflow, $request ) );
@@ -393,7 +393,7 @@ class WorkflowsController extends WP_REST_Controller {
 				$workflow = $this->workflows->changeStatus( $id, (int) $request->get_param( 'status' ) );
 			}
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'wfa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'aiawa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		}
 
 		if ( null === $workflow ) {
@@ -423,7 +423,7 @@ class WorkflowsController extends WP_REST_Controller {
 		$previous = $this->prepare_item_for_response( $workflow, $request );
 
 		if ( ! $this->workflows->delete( $id, $force ) ) {
-			return new WP_Error( 'wfa_rest_cannot_delete', __( 'Failed to delete the workflow.', 'workflow-automate' ), array( 'status' => 500 ) );
+			return new WP_Error( 'aiawa_rest_cannot_delete', __( 'Failed to delete the workflow.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(
@@ -449,7 +449,7 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		if ( ! $this->workflows->restore( $id ) ) {
-			return new WP_Error( 'wfa_rest_cannot_restore', __( 'Failed to restore the workflow.', 'workflow-automate' ), array( 'status' => 500 ) );
+			return new WP_Error( 'aiawa_rest_cannot_restore', __( 'Failed to restore the workflow.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
 		$workflow = $this->workflows->find( $id, true );
@@ -480,7 +480,7 @@ class WorkflowsController extends WP_REST_Controller {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST runs.
 				error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
 			}
-			return new WP_Error( 'wfa_rest_run_failed', __( 'Workflow execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
+			return new WP_Error( 'aiawa_rest_run_failed', __( 'Workflow execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response( $this->serializeRun( $run ) );
@@ -516,7 +516,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( ! $has_chat_trigger ) {
 			return new WP_Error(
-				'wfa_chat_trigger_required',
+				'aiawa_chat_trigger_required',
 				__( 'Add a “When chat message received” trigger to use Chat.', 'workflow-automate' ),
 				array( 'status' => 400 )
 			);
@@ -526,7 +526,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( '' === $chat_input ) {
 			return new WP_Error(
-				'wfa_chat_empty',
+				'aiawa_chat_empty',
 				__( 'chatInput is required.', 'workflow-automate' ),
 				array( 'status' => 422 )
 			);
@@ -551,7 +551,7 @@ class WorkflowsController extends WP_REST_Controller {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST chat runs.
 				error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
 			}
-			return new WP_Error( 'wfa_rest_run_failed', __( 'Chat execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
+			return new WP_Error( 'aiawa_rest_run_failed', __( 'Chat execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(
@@ -646,7 +646,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_Error
 	 */
 	private function notFoundError(): WP_Error {
-		return new WP_Error( 'wfa_rest_not_found', __( 'Workflow not found.', 'workflow-automate' ), array( 'status' => 404 ) );
+		return new WP_Error( 'aiawa_rest_not_found', __( 'Workflow not found.', 'workflow-automate' ), array( 'status' => 404 ) );
 	}
 
 	/**

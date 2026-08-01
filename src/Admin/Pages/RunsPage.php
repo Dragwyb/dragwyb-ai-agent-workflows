@@ -2,22 +2,22 @@
 /**
  * Runs (execution history) admin page.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin\Pages;
+namespace AIAWA\Plugin\Admin\Pages;
 
-use AIAWAB\Plugin\Admin\AdminPage;
-use AIAWAB\Plugin\Admin\EmptyState;
-use AIAWAB\Plugin\Admin\ListTableUi;
-use AIAWAB\Plugin\Admin\RunActionsController;
-use AIAWAB\Plugin\Admin\RunsListTable;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Persistence\WorkflowRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
-use AIAWAB\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Admin\AdminPage;
+use AIAWA\Plugin\Admin\EmptyState;
+use AIAWA\Plugin\Admin\ListTableUi;
+use AIAWA\Plugin\Admin\RunActionsController;
+use AIAWA\Plugin\Admin\RunsListTable;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Persistence\WorkflowRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunsPage implements AdminPage {
 
-	public const SLUG = 'wfa-runs';
+	public const SLUG = 'aiawa-runs';
 
 	private WorkflowRunRepository $runs;
 
@@ -92,10 +92,10 @@ class RunsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'aiawa-admin',
+			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			AIAWA_VERSION
 		);
 	}
 
@@ -110,7 +110,7 @@ class RunsPage implements AdminPage {
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap aiawa-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -142,7 +142,7 @@ class RunsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_run_bulk_action', 'wfa_run_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'aiawa_run_bulk_action', 'aiawa_run_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -161,7 +161,7 @@ class RunsPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter form.
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="aiawa-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 
 		if ( '' !== $status ) {
@@ -194,7 +194,7 @@ class RunsPage implements AdminPage {
 		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'workflow-automate' );
 
 		printf(
-			'<p class="wfa-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
+			'<p class="aiawa-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
 				esc_html__( 'Showing runs for: %s', 'workflow-automate' ),
@@ -207,7 +207,7 @@ class RunsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?aiawa_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -241,7 +241,7 @@ class RunsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

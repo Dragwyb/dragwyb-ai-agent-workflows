@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AIAWAB\AiProviders\Compatible;
+namespace AIAWA\AiProviders\Compatible;
 
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;

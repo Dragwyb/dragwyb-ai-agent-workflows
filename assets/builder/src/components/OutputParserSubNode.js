@@ -24,8 +24,8 @@ export default function OutputParserSubNode({
 	return (
 		<div
 			className={[
-				'wfa-output-parser-node',
-				selected ? 'wfa-output-parser-node--selected' : '',
+				'aiawa-output-parser-node',
+				selected ? 'aiawa-output-parser-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -35,23 +35,23 @@ export default function OutputParserSubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-output-parser-node__input-dot" aria-hidden="true" />
-			<span className="wfa-output-parser-node__icon" aria-hidden="true">
+			<span className="aiawa-output-parser-node__input-dot" aria-hidden="true" />
+			<span className="aiawa-output-parser-node__icon" aria-hidden="true">
 				{'{✓}'}
 			</span>
-			<span className="wfa-output-parser-node__label">
+			<span className="aiawa-output-parser-node__label">
 				{node.label ||
 					__('Structured Output Parser', 'workflow-automate')}
 			</span>
-			<div className="wfa-output-parser-node__model-row">
-				<span className="wfa-output-parser-node__model-label">
+			<div className="aiawa-output-parser-node__model-row">
+				<span className="aiawa-output-parser-node__model-label">
 					{__('Model', 'workflow-automate')}
 					{!hasChatModel ? '*' : ''}
 				</span>
 				{!hasChatModel && onAddChatModel ? (
 					<button
 						type="button"
-						className="wfa-output-parser-node__model-add"
+						className="aiawa-output-parser-node__model-add"
 						onClick={(event) => {
 							event.stopPropagation();
 							onAddChatModel(node.id);
@@ -62,7 +62,7 @@ export default function OutputParserSubNode({
 					</button>
 				) : (
 					<span
-						className="wfa-output-parser-node__model-dot"
+						className="aiawa-output-parser-node__model-dot"
 						aria-hidden="true"
 					/>
 				)}

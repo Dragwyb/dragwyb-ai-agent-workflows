@@ -2,14 +2,14 @@
 /**
  * Lists AI models via WordPress AI Client provider registry.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
-use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\AiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,7 +24,7 @@ class AiModelsService {
 	private const CACHE_TTL = 900;
 
 	/**
-	 * Node type → WFA provider slug.
+	 * Node type → aiawa provider slug.
 	 *
 	 * @var array<string, string>
 	 */
@@ -39,7 +39,7 @@ class AiModelsService {
 	);
 
 	/**
-	 * @param string $provider_or_node WFA provider slug or node type slug.
+	 * @param string $provider_or_node aiawa provider slug or node type slug.
 	 *
 	 * @return array{options: array<int, array{value: string, label: string}>, error: string|null, configured?: bool}
 	 */
@@ -79,7 +79,7 @@ class AiModelsService {
 		}
 
 		$provider_id = AiClientBootstrap::resolveProviderId( $provider );
-		$cache_key   = 'wfa_ai_models_' . $provider_id;
+		$cache_key   = 'aiawa_ai_models_' . $provider_id;
 		$cached      = get_transient( $cache_key );
 
 		if ( is_array( $cached ) && isset( $cached['options'] ) ) {

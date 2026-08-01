@@ -29,7 +29,7 @@ export default function NodeTestResult({
 	if (error) {
 		return (
 			<div
-				className="wfa-builder-config__test-result wfa-builder-config__test-result--error"
+				className="aiawa-builder-config__test-result aiawa-builder-config__test-result--error"
 				role="alert"
 			>
 				<h3>{__('Response', 'workflow-automate')}</h3>
@@ -50,14 +50,14 @@ export default function NodeTestResult({
 	const showInput = activeTab === 'input';
 
 	return (
-		<div className="wfa-builder-config__test-result">
-			<div className="wfa-builder-config__test-result-header">
+		<div className="aiawa-builder-config__test-result">
+			<div className="aiawa-builder-config__test-result-header">
 				<h3>{__('Response', 'workflow-automate')}</h3>
 				<span
 					className={
 						success
-							? 'wfa-builder-config__test-badge wfa-builder-config__test-badge--success'
-							: 'wfa-builder-config__test-badge wfa-builder-config__test-badge--failed'
+							? 'aiawa-builder-config__test-badge aiawa-builder-config__test-badge--success'
+							: 'aiawa-builder-config__test-badge aiawa-builder-config__test-badge--failed'
 					}
 				>
 					{success
@@ -66,34 +66,34 @@ export default function NodeTestResult({
 				</span>
 			</div>
 
-			<div className="wfa-test-io wfa-test-io--tabs">
-				<div className="wfa-test-io__tabs" role="tablist">
+			<div className="aiawa-test-io aiawa-test-io--tabs">
+				<div className="aiawa-test-io__tabs" role="tablist">
 					<button
 						type="button"
-						id="wfa-test-tab-input"
+						id="aiawa-test-tab-input"
 						role="tab"
 						className={
 							showInput
-								? 'wfa-test-io__tab wfa-test-io__tab--active'
-								: 'wfa-test-io__tab'
+								? 'aiawa-test-io__tab aiawa-test-io__tab--active'
+								: 'aiawa-test-io__tab'
 						}
 						aria-selected={showInput}
-						aria-controls="wfa-test-tabpanel"
+						aria-controls="aiawa-test-tabpanel"
 						onClick={() => setActiveTab('input')}
 					>
 						{__('Input', 'workflow-automate')}
 					</button>
 					<button
 						type="button"
-						id="wfa-test-tab-output"
+						id="aiawa-test-tab-output"
 						role="tab"
 						className={
 							!showInput
-								? 'wfa-test-io__tab wfa-test-io__tab--active'
-								: 'wfa-test-io__tab'
+								? 'aiawa-test-io__tab aiawa-test-io__tab--active'
+								: 'aiawa-test-io__tab'
 						}
 						aria-selected={!showInput}
-						aria-controls="wfa-test-tabpanel"
+						aria-controls="aiawa-test-tabpanel"
 						onClick={() => setActiveTab('output')}
 					>
 						{__('Output', 'workflow-automate')}
@@ -101,11 +101,11 @@ export default function NodeTestResult({
 				</div>
 
 				<div
-					id="wfa-test-tabpanel"
-					className="wfa-test-io__body"
+					id="aiawa-test-tabpanel"
+					className="aiawa-test-io__body"
 					role="tabpanel"
 					aria-labelledby={
-						showInput ? 'wfa-test-tab-input' : 'wfa-test-tab-output'
+						showInput ? 'aiawa-test-tab-input' : 'aiawa-test-tab-output'
 					}
 				>
 					{showInput ? (

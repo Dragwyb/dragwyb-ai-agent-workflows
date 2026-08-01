@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AIAWAB\AiProviders\Compatible;
+namespace AIAWA\AiProviders\Compatible;
 
 use WordPress\AiClient\Providers\DTO\ProviderMetadata;
 use WordPress\AiClient\Providers\Http\DTO\Request;

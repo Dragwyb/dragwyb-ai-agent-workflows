@@ -2,15 +2,15 @@
 /**
  * Creates the workflow nodes table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database\Migrations;
+namespace AIAWA\Plugin\Database\Migrations;
 
-use AIAWAB\Plugin\Database\Migration;
-use AIAWAB\Plugin\Database\Table;
+use AIAWA\Plugin\Database\Migration;
+use AIAWA\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_workflow_nodes` holds one row per node in a workflow's graph. There
- * is no SQL-level FOREIGN KEY to `wfa_workflows` because `dbDelta()` does
+ * `aiawa_workflow_nodes` holds one row per node in a workflow's graph. There
+ * is no SQL-level FOREIGN KEY to `aiawa_workflows` because `dbDelta()` does
  * not reliably manage foreign key constraints; cascade-on-delete is instead
  * enforced explicitly in the repository/service layer. See
  * docs/internal/architecture.md §2.3.

@@ -2,16 +2,16 @@
 /**
  * Base class for Google Sheets workflow actions.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\GoogleSheet;
+namespace AIAWA\Plugin\Integration\GoogleSheet;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

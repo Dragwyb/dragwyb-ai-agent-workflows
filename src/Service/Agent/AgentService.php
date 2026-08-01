@@ -2,15 +2,15 @@
 /**
  * AI Agent execution engine (tool-calling loop).
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
-use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
-use AIAWAB\Plugin\Service\ConfigInterpolator;
+use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWA\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -559,7 +559,7 @@ class AgentService {
 		 * @param int                  $max    Requested iterations.
 		 * @param array<string, mixed> $config Agent node config.
 		 */
-		$max = (int) apply_filters( 'wfa_agent_max_iterations', $max, $config );
+		$max = (int) apply_filters( 'aiawa_agent_max_iterations', $max, $config );
 
 		if ( $max < 1 ) {
 			$max = self::DEFAULT_MAX_ITERATIONS;

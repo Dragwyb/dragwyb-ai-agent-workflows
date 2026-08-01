@@ -64,11 +64,11 @@ export default function ChatPanel({
 			  }));
 
 	return (
-		<aside className="wfa-builder-chat" aria-label={__('Chat', 'workflow-automate')}>
-			<div className="wfa-builder-chat__header">
+		<aside className="aiawa-builder-chat" aria-label={__('Chat', 'workflow-automate')}>
+			<div className="aiawa-builder-chat__header">
 				<div>
 					<strong>{title || __('Chat', 'workflow-automate')}</strong>
-					<p className="wfa-builder-chat__subtitle">
+					<p className="aiawa-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
 							'workflow-automate'
@@ -80,29 +80,29 @@ export default function ChatPanel({
 				</Button>
 			</div>
 
-			<div className="wfa-builder-chat__messages" ref={listRef}>
+			<div className="aiawa-builder-chat__messages" ref={listRef}>
 				{displayMessages.map((message) => (
 					<div
 						key={message.id}
-						className={`wfa-builder-chat__bubble wfa-builder-chat__bubble--${message.role}`}
+						className={`aiawa-builder-chat__bubble aiawa-builder-chat__bubble--${message.role}`}
 					>
 						{message.content}
 					</div>
 				))}
 				{sending && (
-					<div className="wfa-builder-chat__bubble wfa-builder-chat__bubble--assistant wfa-builder-chat__bubble--pending">
+					<div className="aiawa-builder-chat__bubble aiawa-builder-chat__bubble--assistant aiawa-builder-chat__bubble--pending">
 						{__('Thinking…', 'workflow-automate')}
 					</div>
 				)}
 			</div>
 
 			{error && (
-				<p className="wfa-builder-chat__error" role="alert">
+				<p className="aiawa-builder-chat__error" role="alert">
 					{error}
 				</p>
 			)}
 
-			<form className="wfa-builder-chat__composer" onSubmit={handleSubmit}>
+			<form className="aiawa-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
 					label={__('Message', 'workflow-automate')}
 					hideLabelFromVision

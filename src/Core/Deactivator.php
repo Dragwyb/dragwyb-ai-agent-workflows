@@ -2,15 +2,15 @@
 /**
  * Plugin deactivation handler.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
-use AIAWAB\Plugin\Service\BackgroundRunner;
-use AIAWAB\Plugin\Service\RunRetentionService;
+use AIAWA\Plugin\Service\BackgroundRunner;
+use AIAWA\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

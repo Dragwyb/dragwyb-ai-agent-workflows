@@ -2,15 +2,15 @@
 /**
  * Workflow repository.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Persistence;
+namespace AIAWA\Plugin\Persistence;
 
-use AIAWAB\Plugin\Database\Table;
-use AIAWAB\Plugin\Domain\Workflow;
+use AIAWA\Plugin\Database\Table;
+use AIAWA\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflows` access goes through this class. Every query is built
+ * All `aiawa_workflows` access goes through this class. Every query is built
  * with `$wpdb->prepare()` or the `$wpdb` helper methods; the table name
  * itself is never user input, so its direct interpolation into SQL strings
  * is safe (each occurrence is annotated for WPCS accordingly).

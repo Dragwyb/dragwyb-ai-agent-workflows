@@ -2,12 +2,12 @@
 /**
  * Transient-backed conversation memory for AI Agent nodes.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -46,7 +46,7 @@ class AgentMemoryStore {
 
 		$key_suffix = '' !== $session_key ? $session_key . '_' : '';
 
-		$this->storage_key = 'wfa_agent_mem_' . md5( $agent_id . '_' . $memory_id . '_' . $key_suffix );
+		$this->storage_key = 'aiawa_agent_mem_' . md5( $agent_id . '_' . $memory_id . '_' . $key_suffix );
 	}
 
 	/**

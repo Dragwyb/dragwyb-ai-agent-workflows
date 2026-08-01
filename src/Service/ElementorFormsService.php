@@ -2,14 +2,14 @@
 /**
  * Lists Elementor Pro forms for builder config fields.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
-use AIAWAB\Plugin\Integration\IntegrationTriggerCatalog;
+use AIAWA\Plugin\Integration\IntegrationTriggerCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

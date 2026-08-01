@@ -2,16 +2,16 @@
 /**
  * REST controller for AI provider models / credentials.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Rest;
+namespace AIAWA\Plugin\Rest;
 
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
-use AIAWAB\Plugin\Service\AiModelsService;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWA\Plugin\Service\AiModelsService;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -30,7 +30,7 @@ class AiProvidersController extends WP_REST_Controller {
 	private AiModelsService $ai_models;
 
 	public function __construct( AiModelsService $ai_models ) {
-		$this->namespace = 'wfa/v1';
+		$this->namespace = 'aiawa/v1';
 		$this->rest_base = 'ai';
 		$this->ai_models = $ai_models;
 	}
@@ -135,7 +135,7 @@ class AiProvidersController extends WP_REST_Controller {
 		$key = '' !== $provider ? $provider : $node_type;
 		if ( '' === $key ) {
 			return new WP_Error(
-				'wfa_rest_invalid',
+				'aiawa_rest_invalid',
 				__( 'Provider is required.', 'workflow-automate' ),
 				array( 'status' => 400 )
 			);

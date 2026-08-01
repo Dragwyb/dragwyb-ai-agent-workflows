@@ -2,21 +2,21 @@
 /**
  * Binds active workflows' triggers to their real-world event sources.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration;
+namespace AIAWA\Plugin\Integration;
 
-use AIAWAB\Plugin\Domain\Workflow;
-use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
-use AIAWAB\Plugin\Service\NodeTypeRegistry;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\TriggerReentrancyGuard;
-use AIAWAB\Plugin\Service\WorkflowExecutionService;
-use AIAWAB\Plugin\Service\WorkflowService;
-use AIAWAB\Plugin\Service\WorkflowTestListenerService;
+use AIAWA\Plugin\Domain\Workflow;
+use AIAWA\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWA\Plugin\Service\NodeTypeRegistry;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\TriggerReentrancyGuard;
+use AIAWA\Plugin\Service\WorkflowExecutionService;
+use AIAWA\Plugin\Service\WorkflowService;
+use AIAWA\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * not recommended otherwise.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
- * rather than the `wfa_workflow_nodes` table: binding must happen as early
+ * rather than the `aiawa_workflow_nodes` table: binding must happen as early
  * as possible in the request (see Core\Plugin::registerExecutionEngine()),
  * before WorkflowExecutionService ever gets a chance to lazily sync that
  * table, so `graph_json` — the builder's own always-current source of
@@ -176,7 +176,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Mid-write: any WFA create/update/delete is still on the stack.
+					// Mid-write: any aiawa create/update/delete is still on the stack.
 					if ( $this->trigger_guard->isWriting() ) {
 						return;
 					}
@@ -186,7 +186,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Entity was created by a previous WFA action (translated post,
+					// Entity was created by a previous aiawa action (translated post,
 					// auto-user, auto-comment, etc.) — do not start another loop.
 					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
 						return;

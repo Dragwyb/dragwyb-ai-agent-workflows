@@ -122,15 +122,15 @@ export default function NodeCard({
 		);
 	};
 
-	const classNames = ['wfa-builder-node'];
+	const classNames = ['aiawa-builder-node'];
 	if (selected) {
-		classNames.push('wfa-builder-node--selected');
+		classNames.push('aiawa-builder-node--selected');
 	}
 	if (hasUnknownType) {
-		classNames.push('wfa-builder-node--unknown');
+		classNames.push('aiawa-builder-node--unknown');
 	}
 	if (isLinkTarget) {
-		classNames.push('wfa-builder-node--link-target');
+		classNames.push('aiawa-builder-node--link-target');
 	}
 
 	const ariaLabel = [
@@ -161,12 +161,12 @@ export default function NodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="wfa-builder-node__handle wfa-builder-node__handle--top"
+				className="aiawa-builder-node__handle aiawa-builder-node__handle--top"
 				aria-hidden="true"
 			/>
-			<div className="wfa-builder-node__body">
+			<div className="aiawa-builder-node__body">
 				<span
-					className="wfa-builder-node__icon"
+					className="aiawa-builder-node__icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -175,23 +175,23 @@ export default function NodeCard({
 				>
 					{meta.icon}
 				</span>
-				<div className="wfa-builder-node__text">
-					<span className="wfa-builder-node__label" aria-hidden="true">
+				<div className="aiawa-builder-node__text">
+					<span className="aiawa-builder-node__label" aria-hidden="true">
 						{node.label}
 					</span>
-					<span className="wfa-builder-node__subtitle" aria-hidden="true">
+					<span className="aiawa-builder-node__subtitle" aria-hidden="true">
 						{meta.categoryLabel}
 					</span>
 				</div>
 			</div>
 			<span
-				className="wfa-builder-node__handle wfa-builder-node__handle--bottom"
+				className="aiawa-builder-node__handle aiawa-builder-node__handle--bottom"
 				aria-hidden="true"
 			/>
 			{canStartFlowConnection && onStartFlowConnectionDrag && (
 				<button
 					type="button"
-					className="wfa-builder-node__output-port"
+					className="aiawa-builder-node__output-port"
 					title={__(
 						'Drag to the next step to connect',
 						'workflow-automate'

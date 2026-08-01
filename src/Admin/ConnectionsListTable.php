@@ -2,18 +2,18 @@
 /**
  * Connections admin list table.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
-use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWAB\Plugin\Domain\Connection;
-use AIAWAB\Plugin\Service\ConnectionAuthTypes;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWA\Plugin\Domain\Connection;
+use AIAWA\Plugin\Service\ConnectionAuthTypes;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -200,7 +200,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'wfa-connections-table' );
+		return array( 'widefat', 'fixed', 'striped', 'aiawa-connections-table' );
 	}
 
 	/**
@@ -215,12 +215,12 @@ class ConnectionsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id     = 'wfa-connection-delete-' . $id;
-		$nonce_field = wp_nonce_field( 'wfa_connection_action_delete_' . $id, '_wpnonce', true, false );
+		$form_id     = 'aiawa-connection-delete-' . $id;
+		$nonce_field = wp_nonce_field( 'aiawa_connection_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="wfa_connection_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="aiawa-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="aiawa_connection_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
 				. '<input type="hidden" name="connection_id" value="%3$d" />'
 				. '%4$s'

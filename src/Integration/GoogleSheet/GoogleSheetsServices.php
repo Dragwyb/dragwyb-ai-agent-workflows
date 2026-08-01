@@ -2,17 +2,17 @@
 /**
  * Google Sheets service factory.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\GoogleSheet;
+namespace AIAWA\Plugin\Integration\GoogleSheet;
 
-use AIAWAB\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
-use AIAWAB\Plugin\Service\ConnectionSecretResolver;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use AIAWA\Plugin\Service\ConnectionSecretResolver;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

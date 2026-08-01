@@ -2,12 +2,12 @@
 /**
  * Builds Gutenberg block markup from structured design sections.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\WordPress;
+namespace AIAWA\Plugin\Integration\WordPress;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

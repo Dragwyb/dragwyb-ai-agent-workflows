@@ -2,14 +2,14 @@
 /**
  * Worksheet-level Google Sheets workflow actions.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\GoogleSheet\Actions;
+namespace AIAWA\Plugin\Integration\GoogleSheet\Actions;
 
-use AIAWAB\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use AIAWA\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "AIAWAB\\AiProviders\\": "src/"
+            "AIAWA\\AiProviders\\": "src/"
         }
     },
     "config": {

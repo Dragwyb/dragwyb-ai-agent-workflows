@@ -2,14 +2,14 @@
 /**
  * Service provider contract.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Provider;
+namespace AIAWA\Plugin\Provider;
 
-use AIAWAB\Plugin\Core\Container;
+use AIAWA\Plugin\Core\Container;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

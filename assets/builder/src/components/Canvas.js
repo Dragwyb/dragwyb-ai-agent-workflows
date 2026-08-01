@@ -390,28 +390,28 @@ export default function Canvas({
 	});
 
 	return (
-		<div className="wfa-builder-canvas-host">
+		<div className="aiawa-builder-canvas-host">
 		<div
 			ref={setCanvasRef}
 			className={
 				connectionDrag
-					? 'wfa-builder-canvas wfa-builder-canvas--connecting'
-					: 'wfa-builder-canvas'
+					? 'aiawa-builder-canvas aiawa-builder-canvas--connecting'
+					: 'aiawa-builder-canvas'
 			}
-			style={{ '--wfa-canvas-zoom': String(zoom) }}
+			style={{ '--aiawa-canvas-zoom': String(zoom) }}
 			role="region"
 			aria-label={__('Workflow canvas', 'workflow-automate')}
 			onClick={onCanvasClick}
 		>
 			<div
-				className="wfa-builder-canvas__scaler"
+				className="aiawa-builder-canvas__scaler"
 				style={{
 					width: bounds.w * zoom,
 					height: bounds.h * zoom,
 				}}
 			>
 				<div
-					className="wfa-builder-canvas__world"
+					className="aiawa-builder-canvas__world"
 					style={{
 						width: bounds.w,
 						height: bounds.h,
@@ -423,7 +423,7 @@ export default function Canvas({
 				branchEdges.length > 0 ||
 				connectionDrag) && (
 				<svg
-					className="wfa-builder-canvas__edges"
+					className="aiawa-builder-canvas__edges"
 
 					aria-hidden="true"
 
@@ -441,8 +441,8 @@ export default function Canvas({
 								key={edge.id}
 								className={
 									isSelected
-										? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--selected'
-										: 'wfa-builder-canvas__edge'
+										? 'aiawa-builder-canvas__edge aiawa-builder-canvas__edge--selected'
+										: 'aiawa-builder-canvas__edge'
 								}
 								d={edge.path}
 								fill="none"
@@ -460,8 +460,8 @@ export default function Canvas({
 								key={edge.id}
 								className={
 									isSelected
-										? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--branch wfa-builder-canvas__edge--selected'
-										: 'wfa-builder-canvas__edge wfa-builder-canvas__edge--branch'
+										? 'aiawa-builder-canvas__edge aiawa-builder-canvas__edge--branch aiawa-builder-canvas__edge--selected'
+										: 'aiawa-builder-canvas__edge aiawa-builder-canvas__edge--branch'
 								}
 								d={edge.path}
 								fill="none"
@@ -473,8 +473,8 @@ export default function Canvas({
 						<path
 							className={
 								connectionDrag.kind === 'branch'
-									? 'wfa-builder-canvas__edge wfa-builder-canvas__edge--branch wfa-builder-canvas__edge--preview'
-									: 'wfa-builder-canvas__edge wfa-builder-canvas__edge--preview'
+									? 'aiawa-builder-canvas__edge aiawa-builder-canvas__edge--branch aiawa-builder-canvas__edge--preview'
+									: 'aiawa-builder-canvas__edge aiawa-builder-canvas__edge--preview'
 							}
 							d={
 								connectionDrag.kind === 'branch'
@@ -495,7 +495,7 @@ export default function Canvas({
 						<path
 							key={edge.id}
 
-							className="wfa-builder-canvas__edge wfa-builder-canvas__edge--attachment"
+							className="aiawa-builder-canvas__edge aiawa-builder-canvas__edge--attachment"
 
 							d={dashedPath(edge.from, edge.to)}
 
@@ -607,7 +607,7 @@ export default function Canvas({
 				.map((chatModel) => (
 					<div
 						key={chatModel.id}
-						className="wfa-chat-model-node-wrap"
+						className="aiawa-chat-model-node-wrap"
 						style={{
 							transform: `translate(${chatModel.x}px, ${chatModel.y}px)`,
 						}}
@@ -630,7 +630,7 @@ export default function Canvas({
 				.map((memory) => (
 					<div
 						key={memory.id}
-						className="wfa-memory-node-wrap"
+						className="aiawa-memory-node-wrap"
 						style={{
 							transform: `translate(${memory.x}px, ${memory.y}px)`,
 						}}
@@ -654,7 +654,7 @@ export default function Canvas({
 				.map((parser) => (
 					<div
 						key={parser.id}
-						className="wfa-output-parser-node-wrap"
+						className="aiawa-output-parser-node-wrap"
 						style={{
 							transform: `translate(${parser.x}px, ${parser.y}px)`,
 						}}
@@ -681,7 +681,7 @@ export default function Canvas({
 				.map((tool) => (
 					<div
 						key={tool.id}
-						className="wfa-tool-node-wrap"
+						className="aiawa-tool-node-wrap"
 						style={{
 							transform: `translate(${tool.x}px, ${tool.y}px)`,
 						}}
@@ -697,10 +697,10 @@ export default function Canvas({
 				</div>
 			</div>
 		</div>
-			<div className="wfa-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'workflow-automate')}>
+			<div className="aiawa-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'workflow-automate')}>
 				<button
 					type="button"
-					className="wfa-builder-canvas__zoom-btn"
+					className="aiawa-builder-canvas__zoom-btn"
 					aria-label={__('Zoom out', 'workflow-automate')}
 					disabled={zoom <= ZOOM_MIN}
 					onClick={(event) => {
@@ -710,12 +710,12 @@ export default function Canvas({
 				>
 					−
 				</button>
-				<span className="wfa-builder-canvas__zoom-label">
+				<span className="aiawa-builder-canvas__zoom-label">
 					{Math.round(zoom * 100)}%
 				</span>
 				<button
 					type="button"
-					className="wfa-builder-canvas__zoom-btn"
+					className="aiawa-builder-canvas__zoom-btn"
 					aria-label={__('Zoom in', 'workflow-automate')}
 					disabled={zoom >= ZOOM_MAX}
 					onClick={(event) => {
@@ -732,12 +732,12 @@ export default function Canvas({
 
 function EmptyCanvasGuide() {
 	return (
-		<div className="wfa-builder-canvas__guide" role="status">
-			<h2 className="wfa-builder-canvas__guide-title">
+		<div className="aiawa-builder-canvas__guide" role="status">
+			<h2 className="aiawa-builder-canvas__guide-title">
 				{__('Build your workflow', 'workflow-automate')}
 			</h2>
 
-			<ol className="wfa-builder-canvas__guide-steps">
+			<ol className="aiawa-builder-canvas__guide-steps">
 				<li>
 					{__(
 						'Add a trigger, then add an AI Agent from the Agents section.',

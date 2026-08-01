@@ -2,18 +2,18 @@
 /**
  * Public chat-message ingress REST controller.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Rest;
+namespace AIAWA\Plugin\Rest;
 
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use AIAWAB\Plugin\Service\ChatMessageService;
-use AIAWAB\Plugin\Service\WorkflowExecutionService;
-use AIAWAB\Plugin\Service\WorkflowTestListenerService;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use AIAWA\Plugin\Service\ChatMessageService;
+use AIAWA\Plugin\Service\WorkflowExecutionService;
+use AIAWA\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ChatMessageIngressController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'aiawa/v1';
 
 	private const ROUTE = '/chat/(?P<endpoint_id>[0-9a-fA-F-]{36})';
 
@@ -109,7 +109,7 @@ class ChatMessageIngressController {
 			}
 
 			return new WP_Error(
-				'wfa_chat_not_found',
+				'aiawa_chat_not_found',
 				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'workflow-automate' ),
 				array( 'status' => 404 )
 			);
@@ -126,7 +126,7 @@ class ChatMessageIngressController {
 		}
 
 		return new WP_Error(
-			'wfa_chat_forbidden',
+			'aiawa_chat_forbidden',
 			__( 'This chat requires a logged-in WordPress user.', 'workflow-automate' ),
 			array( 'status' => 401 )
 		);
@@ -149,7 +149,7 @@ class ChatMessageIngressController {
 
 		if ( null === $match ) {
 			return new WP_Error(
-				'wfa_chat_not_found',
+				'aiawa_chat_not_found',
 				__( 'No chat endpoint found for this ID.', 'workflow-automate' ),
 				array( 'status' => 404 )
 			);
@@ -187,7 +187,7 @@ class ChatMessageIngressController {
 
 		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
 			return new WP_Error(
-				'wfa_chat_rate_limit_exceeded',
+				'aiawa_chat_rate_limit_exceeded',
 				__( 'Rate limit exceeded. Please try again in a minute.', 'workflow-automate' ),
 				array( 'status' => 429 )
 			);
@@ -197,7 +197,7 @@ class ChatMessageIngressController {
 
 		if ( null === $match ) {
 			return new WP_Error(
-				'wfa_chat_not_found',
+				'aiawa_chat_not_found',
 				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'workflow-automate' ),
 				array( 'status' => 404 )
 			);
@@ -228,7 +228,7 @@ class ChatMessageIngressController {
 
 		if ( '' === $payload['chatInput'] ) {
 			return new WP_Error(
-				'wfa_chat_empty',
+				'aiawa_chat_empty',
 				__( 'chatInput is required.', 'workflow-automate' ),
 				array( 'status' => 422 )
 			);
@@ -271,7 +271,7 @@ class ChatMessageIngressController {
 				error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
 			}
 			return new WP_Error(
-				'wfa_chat_run_failed',
+				'aiawa_chat_run_failed',
 				__( 'Chat execution failed.', 'workflow-automate' ),
 				array( 'status' => 500 )
 			);
@@ -298,7 +298,7 @@ class ChatMessageIngressController {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] )
 			? sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) )
 			: '127.0.0.1';
-		$transient_key = 'wfa_chat_rl_' . md5( $ip . '|' . $endpoint_id );
+		$transient_key = 'aiawa_chat_rl_' . md5( $ip . '|' . $endpoint_id );
 		$count         = (int) get_transient( $transient_key );
 
 		if ( $count >= 30 ) {

@@ -2,21 +2,21 @@
 /**
  * Ordered list of all schema migrations.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database;
+namespace AIAWA\Plugin\Database;
 
-use AIAWAB\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
-use AIAWAB\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
-use AIAWAB\Plugin\Database\Migrations\CreateConnectionsTable;
-use AIAWAB\Plugin\Database\Migrations\CreateWebhooksTable;
-use AIAWAB\Plugin\Database\Migrations\CreateWorkflowNodesTable;
-use AIAWAB\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
-use AIAWAB\Plugin\Database\Migrations\CreateWorkflowRunsTable;
-use AIAWAB\Plugin\Database\Migrations\CreateWorkflowsTable;
+use AIAWA\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
+use AIAWA\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
+use AIAWA\Plugin\Database\Migrations\CreateConnectionsTable;
+use AIAWA\Plugin\Database\Migrations\CreateWebhooksTable;
+use AIAWA\Plugin\Database\Migrations\CreateWorkflowNodesTable;
+use AIAWA\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
+use AIAWA\Plugin\Database\Migrations\CreateWorkflowRunsTable;
+use AIAWA\Plugin\Database\Migrations\CreateWorkflowsTable;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

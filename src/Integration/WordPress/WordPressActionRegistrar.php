@@ -2,14 +2,14 @@
 /**
  * Registers all WordPress workflow actions.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\WordPress;
+namespace AIAWA\Plugin\Integration\WordPress;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

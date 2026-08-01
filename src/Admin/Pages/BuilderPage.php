@@ -2,16 +2,16 @@
 /**
  * Workflow builder admin page.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin\Pages;
+namespace AIAWA\Plugin\Admin\Pages;
 
-use AIAWAB\Plugin\Admin\AdminPage;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Admin\AdminPage;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class BuilderPage implements AdminPage {
 	 * needing an instantiated `BuilderPage` (see `WorkflowsPage::SLUG` for
 	 * the same pattern used in reverse, for this page's back-to-list link).
 	 */
-	public const SLUG = 'wfa-builder';
+	public const SLUG = 'aiawa-builder';
 
 	/**
 	 * {@inheritDoc}
@@ -79,7 +79,7 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function enqueueAssets(): void {
-		$asset_file = WFA_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
+		$asset_file = AIAWA_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			// The React app hasn't been built (e.g. a git checkout without
@@ -93,21 +93,21 @@ class BuilderPage implements AdminPage {
 		$asset   = require $asset_file;
 		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
 		// Bust browser caches when the built bundle changes on disk.
-		$built_js = WFA_PLUGIN_DIR . 'assets/builder/build/index.js';
+		$built_js = AIAWA_PLUGIN_DIR . 'assets/builder/build/index.js';
 		if ( file_exists( $built_js ) ) {
 			$version = (string) filemtime( $built_js );
 		}
 
 		wp_enqueue_style(
-			'wfa-builder-font',
+			'aiawa-builder-font',
 			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
 			array(),
-			WFA_VERSION
+			AIAWA_VERSION
 		);
 
 		wp_enqueue_script(
-			'wfa-builder',
-			WFA_PLUGIN_URL . 'assets/builder/build/index.js',
+			'aiawa-builder',
+			AIAWA_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
 			$version,
 			true
@@ -116,19 +116,19 @@ class BuilderPage implements AdminPage {
 		// wp-scripts' MiniCssExtractPlugin config names the extracted
 		// stylesheet "style-{entry}.css" (plus an auto-generated
 		// "-rtl.css" companion), not "{entry}.css".
-		if ( file_exists( WFA_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
+		if ( file_exists( AIAWA_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
 			wp_enqueue_style(
-				'wfa-builder',
-				WFA_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components', 'wfa-builder-font' ),
+				'aiawa-builder',
+				AIAWA_PLUGIN_URL . 'assets/builder/build/style-index.css',
+				array( 'wp-components', 'aiawa-builder-font' ),
 				$version
 			);
-			wp_style_add_data( 'wfa-builder', 'rtl', 'replace' );
+			wp_style_add_data( 'aiawa-builder', 'rtl', 'replace' );
 		}
 
 		wp_add_inline_script(
-			'wfa-builder',
-			'var wfaBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
+			'aiawa-builder',
+			'var aiawaBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
 			'before'
 		);
 	}
@@ -145,9 +145,9 @@ class BuilderPage implements AdminPage {
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl'                => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
 			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
-			'aiCredentialsUrl'       => \AIAWAB\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'aiCredentialsUrl'       => \AIAWA\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
-			'googleOAuthCallbackUrl' => rest_url( 'wfa/v1/oauth/google/callback' ),
+			'googleOAuthCallbackUrl' => rest_url( 'aiawa/v1/oauth/google/callback' ),
 		);
 	}
 
@@ -172,9 +172,9 @@ class BuilderPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
 		}
 
-		echo '<div class="wrap wfa-admin-page wfa-builder-page">';
+		echo '<div class="wrap aiawa-admin-page aiawa-builder-page">';
 		$this->renderImportNotice();
-		echo '<div id="wfa-builder-root"></div>';
+		echo '<div id="aiawa-builder-root"></div>';
 		echo '</div>';
 	}
 
@@ -185,7 +185,7 @@ class BuilderPage implements AdminPage {
 	 */
 	private function renderImportNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
 
 		if ( 'imported' !== $key ) {
 			return;

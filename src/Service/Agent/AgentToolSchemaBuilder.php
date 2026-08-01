@@ -2,15 +2,15 @@
 /**
  * Builds LLM tool schemas from attached workflow action nodes.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\NodeTypeRegistry;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\NodeTypeRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

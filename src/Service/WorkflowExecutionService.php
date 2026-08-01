@@ -2,21 +2,21 @@
 /**
  * Workflow execution service.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWAB\Plugin\Domain\WorkflowNode;
-use AIAWAB\Plugin\Domain\WorkflowRun;
-use AIAWAB\Plugin\Domain\WorkflowRunLog;
-use AIAWAB\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWAB\Plugin\Persistence\WorkflowRunRepository;
-use AIAWAB\Plugin\Service\Agent\AgentGraphHelper;
+use AIAWA\Plugin\Domain\WorkflowNode;
+use AIAWA\Plugin\Domain\WorkflowRun;
+use AIAWA\Plugin\Domain\WorkflowRunLog;
+use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
+use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use AIAWA\Plugin\Service\Agent\AgentGraphHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -327,7 +327,7 @@ class WorkflowExecutionService {
 
 		/**
 		 * Fires immediately before a workflow run starts executing nodes.
-		 * The `wfa_workflow_runs` row already exists with status `running`.
+		 * The `aiawa_workflow_runs` row already exists with status `running`.
 		 * See docs/hooks-reference.md.
 		 *
 		 * @since 0.1.0
@@ -335,7 +335,7 @@ class WorkflowExecutionService {
 		 * @param int                   $workflow_id     The workflow about to run.
 		 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
 		 */
-		do_action( 'wfa/workflow/before_run', $workflow_id, $trigger_payload );
+		do_action( 'aiawa/workflow/before_run', $workflow_id, $trigger_payload );
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
 
@@ -523,7 +523,7 @@ class WorkflowExecutionService {
 			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'workflow-automate' ) );
 		}
 
-		do_action( 'wfa/workflow/after_run', $finished, $trigger_payload );
+		do_action( 'aiawa/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
 	}

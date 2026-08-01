@@ -2,14 +2,14 @@
 /**
  * Plugin uninstall handler.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
-use AIAWAB\Plugin\Database\SchemaMigrations;
+use AIAWA\Plugin\Database\SchemaMigrations;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

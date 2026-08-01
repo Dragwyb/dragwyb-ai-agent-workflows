@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "AIAWAB\\Plugin\\": "src/"
+      "AIAWA\\Plugin\\": "src/"
     }
   },
   "scripts": {

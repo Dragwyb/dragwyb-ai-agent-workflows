@@ -2,16 +2,16 @@
 /**
  * AI Agent — reasoning node with attached chat model, memory, and tools.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\Agent\AgentService;
-use AIAWAB\Plugin\Service\ConfigInterpolator;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\Agent\AgentService;
+use AIAWA\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

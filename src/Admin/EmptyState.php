@@ -2,12 +2,12 @@
 /**
  * Shared empty-state markup for admin list screens.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,12 +31,12 @@ class EmptyState {
 	 * @return void
 	 */
 	public static function render( string $title, string $description, array $steps = array(), array $actions = array() ): void {
-		echo '<div class="wfa-empty-state" role="status">';
-		echo '<h2 class="wfa-empty-state__title">' . esc_html( $title ) . '</h2>';
-		echo '<p class="wfa-empty-state__description">' . esc_html( $description ) . '</p>';
+		echo '<div class="aiawa-empty-state" role="status">';
+		echo '<h2 class="aiawa-empty-state__title">' . esc_html( $title ) . '</h2>';
+		echo '<p class="aiawa-empty-state__description">' . esc_html( $description ) . '</p>';
 
 		if ( array() !== $steps ) {
-			echo '<ol class="wfa-empty-state__steps">';
+			echo '<ol class="aiawa-empty-state__steps">';
 			foreach ( $steps as $step ) {
 				echo '<li>' . esc_html( (string) $step ) . '</li>';
 			}
@@ -44,7 +44,7 @@ class EmptyState {
 		}
 
 		if ( array() !== $actions ) {
-			echo '<p class="wfa-empty-state__actions">';
+			echo '<p class="aiawa-empty-state__actions">';
 			foreach ( $actions as $action ) {
 				$class = ! empty( $action['primary'] ) ? 'button button-primary' : 'button';
 				printf(

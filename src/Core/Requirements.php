@@ -2,12 +2,12 @@
 /**
  * Runtime environment requirement checks.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,25 +38,25 @@ class Requirements {
 
 		$errors = new \WP_Error();
 
-		if ( version_compare( PHP_VERSION, WFA_MIN_PHP_VERSION, '<' ) ) {
+		if ( version_compare( PHP_VERSION, AIAWA_MIN_PHP_VERSION, '<' ) ) {
 			$errors->add(
-				'wfa_php_version',
+				'aiawa_php_version',
 				sprintf(
 					/* translators: 1: required PHP version, 2: current PHP version. */
 					__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s.', 'workflow-automate' ),
-					WFA_MIN_PHP_VERSION,
+					AIAWA_MIN_PHP_VERSION,
 					PHP_VERSION
 				)
 			);
 		}
 
-		if ( isset( $wp_version ) && version_compare( $wp_version, WFA_MIN_WP_VERSION, '<' ) ) {
+		if ( isset( $wp_version ) && version_compare( $wp_version, AIAWA_MIN_WP_VERSION, '<' ) ) {
 			$errors->add(
-				'wfa_wp_version',
+				'aiawa_wp_version',
 				sprintf(
 					/* translators: 1: required WordPress version, 2: current WordPress version. */
 					__( 'Workflow Automate requires WordPress %1$s or higher. Your site is running WordPress %2$s.', 'workflow-automate' ),
-					WFA_MIN_WP_VERSION,
+					AIAWA_MIN_WP_VERSION,
 					$wp_version
 				)
 			);
@@ -64,7 +64,7 @@ class Requirements {
 
 		if ( ! Encryption::isAvailable() ) {
 			$errors->add(
-				'wfa_openssl_missing',
+				'aiawa_openssl_missing',
 				__( 'Workflow Automate requires the PHP openssl extension (used to encrypt stored connection credentials) to be enabled.', 'workflow-automate' )
 			);
 		}

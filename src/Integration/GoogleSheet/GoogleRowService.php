@@ -2,14 +2,14 @@
 /**
  * Row and column Google Sheets operations.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\GoogleSheet;
+namespace AIAWA\Plugin\Integration\GoogleSheet;
 
-use AIAWAB\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use AIAWA\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

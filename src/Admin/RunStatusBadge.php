@@ -2,14 +2,14 @@
 /**
  * Renders a WorkflowRun status as a small colored badge.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
-use AIAWAB\Plugin\Domain\WorkflowRun;
+use AIAWA\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ class RunStatusBadge {
 	 */
 	public static function render( string $status ): string {
 		return sprintf(
-			'<span class="wfa-status-badge wfa-status-badge--%1$s">%2$s</span>',
+			'<span class="aiawa-status-badge aiawa-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);

@@ -2,12 +2,12 @@
 /**
  * Optional trigger grouping for the builder palette.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Domain\Contracts;
+namespace AIAWA\Plugin\Domain\Contracts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

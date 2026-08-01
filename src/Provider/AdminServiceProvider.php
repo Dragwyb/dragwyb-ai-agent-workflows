@@ -2,19 +2,19 @@
 /**
  * Registers admin domain services against the container.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Provider;
+namespace AIAWA\Plugin\Provider;
 
-use AIAWAB\Plugin\Core\Container;
-use AIAWAB\Plugin\Persistence\ConnectionRepository;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
-use AIAWAB\Plugin\Service\SettingsService;
-use AIAWAB\Plugin\Service\ConnectionVerifier;
+use AIAWA\Plugin\Core\Container;
+use AIAWA\Plugin\Persistence\ConnectionRepository;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Service\SettingsService;
+use AIAWA\Plugin\Service\ConnectionVerifier;
 
 
 // Prevent direct file access.

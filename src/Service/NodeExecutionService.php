@@ -2,15 +2,15 @@
 /**
  * Node execution service.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
 use Throwable;
-use AIAWAB\Plugin\Domain\WorkflowNode;
+use AIAWA\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,7 +54,7 @@ class NodeExecutionService {
 		 * @param WorkflowNode         $node    The node about to execute.
 		 * @param array<string, mixed> $context Runtime data available to this node.
 		 */
-		do_action( 'wfa/node/before_execute', $node, $context );
+		do_action( 'aiawa/node/before_execute', $node, $context );
 
 		$result = $this->executeAction( $node, $context );
 
@@ -68,7 +68,7 @@ class NodeExecutionService {
 		 * @param array                $result  Its outcome (see return value of execute()).
 		 * @param array<string, mixed> $context Runtime data that was available to this node.
 		 */
-		do_action( 'wfa/node/after_execute', $node, $result, $context );
+		do_action( 'aiawa/node/after_execute', $node, $result, $context );
 
 		return $result;
 	}

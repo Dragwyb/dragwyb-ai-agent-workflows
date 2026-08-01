@@ -2,17 +2,17 @@
 /**
  * Plugin activation handler.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
-use AIAWAB\Plugin\Database\MigrationRunner;
-use AIAWAB\Plugin\Database\SchemaMigrations;
-use AIAWAB\Plugin\Service\BackgroundRunner;
-use AIAWAB\Plugin\Service\RunRetentionService;
+use AIAWA\Plugin\Database\MigrationRunner;
+use AIAWA\Plugin\Database\SchemaMigrations;
+use AIAWA\Plugin\Service\BackgroundRunner;
+use AIAWA\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class Activator {
 		$requirements = Requirements::check();
 
 		if ( is_wp_error( $requirements ) ) {
-			deactivate_plugins( WFA_PLUGIN_BASENAME );
+			deactivate_plugins( AIAWA_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
@@ -55,7 +55,7 @@ class Activator {
 			Options::add( 'installed_at', time(), true );
 		}
 
-		Options::update( 'db_version', WFA_VERSION );
+		Options::update( 'db_version', AIAWA_VERSION );
 
 		self::scheduleBackgroundQueue();
 		self::scheduleRetentionPruning();

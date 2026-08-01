@@ -2,15 +2,15 @@
 /**
  * Structured Output Parser — n8n-style JSON schema for AI Agent replies.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
-use AIAWAB\Plugin\Domain\Contracts\ActionInterface;
-use AIAWAB\Plugin\Service\Agent\AgentStructuredOutputParser;
+use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use AIAWA\Plugin\Service\Agent\AgentStructuredOutputParser;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

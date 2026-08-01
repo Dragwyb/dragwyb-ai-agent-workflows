@@ -2,12 +2,12 @@
 /**
  * Connection domain entity.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Domain;
+namespace AIAWA\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

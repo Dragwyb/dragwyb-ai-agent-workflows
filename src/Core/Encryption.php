@@ -2,12 +2,12 @@
 /**
  * Symmetric encryption helper for credential-at-rest storage.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Core;
+namespace AIAWA\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,12 +2,12 @@
 /**
  * Optional action grouping for the builder palette.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Domain\Contracts;
+namespace AIAWA\Plugin\Domain\Contracts;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

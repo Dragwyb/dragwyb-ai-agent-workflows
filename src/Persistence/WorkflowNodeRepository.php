@@ -2,15 +2,15 @@
 /**
  * Workflow node repository.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Persistence;
+namespace AIAWA\Plugin\Persistence;
 
-use AIAWAB\Plugin\Database\Table;
-use AIAWAB\Plugin\Domain\WorkflowNode;
+use AIAWA\Plugin\Database\Table;
+use AIAWA\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflow_nodes` access goes through this class.
+ * All `aiawa_workflow_nodes` access goes through this class.
  */
 class WorkflowNodeRepository {
 

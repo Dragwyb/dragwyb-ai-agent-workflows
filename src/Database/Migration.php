@@ -2,12 +2,12 @@
 /**
  * Base migration contract.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Database;
+namespace AIAWA\Plugin\Database;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

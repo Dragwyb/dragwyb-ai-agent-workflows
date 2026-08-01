@@ -2,12 +2,12 @@
 /**
  * OpenAI Chat Completions action.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\Actions;
+namespace AIAWA\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

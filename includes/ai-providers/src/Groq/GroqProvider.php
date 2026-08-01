@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AIAWAB\AiProviders\Groq;
+namespace AIAWA\AiProviders\Groq;
 
-use AIAWAB\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use AIAWA\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * Groq AI provider (OpenAI-compatible).

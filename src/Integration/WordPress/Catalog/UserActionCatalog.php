@@ -2,12 +2,12 @@
 /**
  * User, Role, and Capabilities catalog definitions.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\WordPress\Catalog;
+namespace AIAWA\Plugin\Integration\WordPress\Catalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

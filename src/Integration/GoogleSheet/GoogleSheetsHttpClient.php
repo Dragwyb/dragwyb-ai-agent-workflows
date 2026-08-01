@@ -2,14 +2,14 @@
 /**
  * Authenticated HTTP client for Google Sheets and Drive APIs.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\GoogleSheet;
+namespace AIAWA\Plugin\Integration\GoogleSheet;
 
-use AIAWAB\Plugin\Integration\Actions\TelegramSendMessageAction;
+use AIAWA\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AIAWAB\AiProviders\OpenRouter;
+namespace AIAWA\AiProviders\OpenRouter;
 
-use AIAWAB\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use AIAWA\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * OpenRouter AI provider (OpenAI-compatible).

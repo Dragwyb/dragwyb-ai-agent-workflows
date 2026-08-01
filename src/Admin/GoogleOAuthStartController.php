@@ -2,19 +2,19 @@
 /**
  * Starts the Google OAuth authorization redirect from wp-admin.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Admin;
+namespace AIAWA\Plugin\Admin;
 
 use RuntimeException;
-use AIAWAB\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWAB\Plugin\Core\Capabilities;
-use AIAWAB\Plugin\Service\ConnectionAuthTypes;
-use AIAWAB\Plugin\Service\ConnectionService;
-use AIAWAB\Plugin\Service\GoogleOAuthService;
+use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
+use AIAWA\Plugin\Core\Capabilities;
+use AIAWA\Plugin\Service\ConnectionAuthTypes;
+use AIAWA\Plugin\Service\ConnectionService;
+use AIAWA\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles `admin-post.php?action=wfa_google_oauth_authorize`.
+ * Handles `admin-post.php?action=aiawa_google_oauth_authorize`.
  */
 class GoogleOAuthStartController {
 
@@ -39,7 +39,7 @@ class GoogleOAuthStartController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_google_oauth_authorize', array( $this, 'handle' ) );
+		add_action( 'admin_post_aiawa_google_oauth_authorize', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class GoogleOAuthStartController {
 			$this->redirectWithError( 0, __( 'Invalid connection.', 'workflow-automate' ) );
 		}
 
-		check_admin_referer( 'wfa_google_oauth_authorize_' . $connection_id );
+		check_admin_referer( 'aiawa_google_oauth_authorize_' . $connection_id );
 
 		$connection = $this->connections->find( $connection_id );
 
@@ -88,8 +88,8 @@ class GoogleOAuthStartController {
 	private function redirectWithError( int $connection_id, string $message ): void {
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'wfa_notice' => 'error',
-			'wfa_error'  => $message,
+			'aiawa_notice' => 'error',
+			'aiawa_error'  => $message,
 		);
 
 		if ( $connection_id > 0 ) {

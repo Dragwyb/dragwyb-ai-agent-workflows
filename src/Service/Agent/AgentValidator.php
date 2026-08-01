@@ -2,14 +2,14 @@
 /**
  * Validates AI Agent configuration before execution.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service\Agent;
+namespace AIAWA\Plugin\Service\Agent;
 
-use AIAWAB\Plugin\Service\Ai\AiClientBootstrap;
+use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

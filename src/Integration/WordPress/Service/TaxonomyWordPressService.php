@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Taxonomy, Term, Category, Tag, and Media actions.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Integration\WordPress\Service;
+namespace AIAWA\Plugin\Integration\WordPress\Service;
 
-use AIAWAB\Plugin\Integration\WordPress\WordPressActionHelper;
+use AIAWA\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,14 +2,14 @@
 /**
  * Global plugin settings.
  *
- * @package AIAWAB\Plugin
+ * @package AIAWA\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWAB\Plugin\Service;
+namespace AIAWA\Plugin\Service;
 
-use AIAWAB\Plugin\Core\Options;
+use AIAWA\Plugin\Core\Options;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
