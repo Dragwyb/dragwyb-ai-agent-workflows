@@ -118,7 +118,9 @@ class WorkflowsPage implements AdminPage {
 			esc_url( admin_url( 'admin.php?page=' . BuilderPage::SLUG ) ),
 			esc_html__( 'Add New', 'workflow-automate' )
 		);
-		$this->renderImportButton();
+		if($table->has_items()) {
+			$this->renderImportButton();
+		}
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();

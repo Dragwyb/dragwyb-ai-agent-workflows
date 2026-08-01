@@ -168,10 +168,12 @@ class RunsPage implements AdminPage {
 			printf( '<input type="hidden" name="status" value="%s" />', esc_attr( $status ) );
 		}
 
-		ListTableUi::renderFilterBar(
-			'top',
-			$table->filterFields()
-		);
+		if($table->has_items()) {
+			ListTableUi::renderFilterBar(
+				'top',
+				$table->filterFields()
+			);
+		}
 		echo '</form>';
 	}
 
