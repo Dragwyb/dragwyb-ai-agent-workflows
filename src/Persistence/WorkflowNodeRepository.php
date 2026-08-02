@@ -147,8 +147,9 @@ class WorkflowNodeRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows  = $wpdb->get_results( $wpdb->prepare( $sql, $workflow_id, self::MAX_NODES_PER_WORKFLOW ) );
+		$rows  = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d", $workflow_id, self::MAX_NODES_PER_WORKFLOW )
+		);
 
 		return array_map( array( WorkflowNode::class, 'fromRow' ), $rows );
 	}

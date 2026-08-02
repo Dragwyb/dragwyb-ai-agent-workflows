@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * All `aiawa_workflows` access goes through this class. Every query is built
  * with `$wpdb->prepare()` or the `$wpdb` helper methods; the table name
  * itself is never user input, so its direct interpolation into SQL strings
- * is safe (each occurrence is annotated for WPCS accordingly).
+ * is safe.
  */
 class WorkflowRepository {
 
@@ -205,15 +205,13 @@ class WorkflowRepository {
 	public function find( int $id, bool $include_trashed = false ): ?Workflow {
 		global $wpdb;
 
-		$table  = $this->table();
-		$sql    = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$params = array( $id );
+		$table = $this->table();
 
-		if ( ! $include_trashed ) {
-			$sql .= ' AND deleted_at IS NULL';
+		if ( $include_trashed ) {
+			$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
+		} else {
+			$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND deleted_at IS NULL", $id ) );
 		}
-
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $params ) );
 
 		return $row ? Workflow::fromRow( $row ) : null;
 	}
@@ -245,9 +243,9 @@ class WorkflowRepository {
 		$table        = $this->table();
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
-		$sql  = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $ids ) );
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id IN ({$placeholders})", $ids )
+		);
 
 		$map = array();
 
@@ -271,10 +269,10 @@ class WorkflowRepository {
 	public function incrementRunCount( int $id ): bool {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql   = "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-
-		$updated = $wpdb->query( $wpdb->prepare( $sql, current_time( 'mysql', true ), $id ) );
+		$table   = $this->table();
+		$updated = $wpdb->query(
+			$wpdb->prepare( "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d", current_time( 'mysql', true ), $id )
+		);
 
 		return false !== $updated;
 	}
@@ -301,8 +299,12 @@ class WorkflowRepository {
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$where  = array();
-		$params = array();
+		// `id > %d` is always true (id is an AUTO_INCREMENT primary key
+		// starting at 1); it guarantees $where/$params are never empty so
+		// every query below can go through $wpdb->prepare() unconditionally,
+		// instead of branching between a prepared and an unprepared call.
+		$where  = array( 'id > %d' );
+		$params = array( 0 );
 
 		if ( ! empty( $args['only_trashed'] ) ) {
 			$where[] = 'deleted_at IS NOT NULL';
@@ -320,15 +322,17 @@ class WorkflowRepository {
 			$params[] = '%' . $wpdb->esc_like( (string) $args['search'] ) . '%';
 		}
 
-		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = $this->table();
 
-		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
+		);
 
-		$list_sql    = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows        = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		$rows        = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
+		);
 
 		return array(
 			'items'    => array_map( array( Workflow::class, 'fromRow' ), $rows ),

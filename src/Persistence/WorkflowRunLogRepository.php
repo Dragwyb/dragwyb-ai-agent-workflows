@@ -107,8 +107,9 @@ class WorkflowRunLogRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows  = $wpdb->get_results( $wpdb->prepare( $sql, $run_id, self::MAX_LOGS_PER_RUN ) );
+		$rows  = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d", $run_id, self::MAX_LOGS_PER_RUN )
+		);
 
 		return array_map( array( WorkflowRunLog::class, 'fromRow' ), $rows );
 	}
@@ -134,8 +135,9 @@ class WorkflowRunLogRepository {
 		$placeholders = implode( ', ', array_fill( 0, count( $run_ids ), '%d' ) );
 		$table        = $this->table();
 
-		$sql     = "DELETE FROM {$table} WHERE run_id IN ({$placeholders})"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
-		$deleted = $wpdb->query( $wpdb->prepare( $sql, $run_ids ) );
+		$deleted = $wpdb->query(
+			$wpdb->prepare( "DELETE FROM {$table} WHERE run_id IN ({$placeholders})", $run_ids )
+		);
 
 		return false !== $deleted;
 	}

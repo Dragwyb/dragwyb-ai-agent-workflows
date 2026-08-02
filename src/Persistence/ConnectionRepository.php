@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * All `aiawa_connections` access goes through this class. Every query is
  * built with `$wpdb->prepare()` or the `$wpdb` helper methods; the table
  * name itself is never user input, so its direct interpolation into SQL
- * strings is safe (each occurrence is annotated for WPCS accordingly).
+ * strings is safe.
  *
  * Never decrypts anything — `credentials_json` is stored and returned
  * exactly as given (already individually field-encrypted by the caller,
@@ -150,9 +150,7 @@ class ConnectionRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $id ) );
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 
 		return $row ? Connection::fromRow( $row ) : null;
 	}
@@ -176,23 +174,29 @@ class ConnectionRepository {
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$where  = array();
-		$params = array();
+		// `id > %d` is always true (id is an AUTO_INCREMENT primary key
+		// starting at 1); it guarantees $where/$params are never empty so
+		// every query below can go through $wpdb->prepare() unconditionally,
+		// instead of branching between a prepared and an unprepared call.
+		$where  = array( 'id > %d' );
+		$params = array( 0 );
 
 		if ( ! empty( $args['integration_slug'] ) ) {
 			$where[]  = 'integration_slug = %s';
 			$params[] = (string) $args['integration_slug'];
 		}
 
-		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = $this->table();
 
-		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
+		);
 
-		$list_sql    = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows        = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		$rows        = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
+		);
 
 		return array(
 			'items'    => array_map( array( Connection::class, 'fromRow' ), $rows ),

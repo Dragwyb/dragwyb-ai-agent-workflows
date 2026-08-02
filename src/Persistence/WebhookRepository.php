@@ -161,9 +161,7 @@ class WebhookRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $id ) );
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 
 		return $row ? Webhook::fromRow( $row ) : null;
 	}
@@ -179,9 +177,7 @@ class WebhookRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT * FROM {$table} WHERE public_id = %s"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $public_id ) );
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE public_id = %s", $public_id ) );
 
 		return $row ? Webhook::fromRow( $row ) : null;
 	}
@@ -204,23 +200,29 @@ class WebhookRepository {
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$where  = array();
-		$params = array();
+		// `id > %d` is always true (id is an AUTO_INCREMENT primary key
+		// starting at 1); it guarantees $where/$params are never empty so
+		// every query below can go through $wpdb->prepare() unconditionally,
+		// instead of branching between a prepared and an unprepared call.
+		$where  = array( 'id > %d' );
+		$params = array( 0 );
 
 		if ( ! empty( $args['workflow_id'] ) ) {
 			$where[]  = 'workflow_id = %d';
 			$params[] = (int) $args['workflow_id'];
 		}
 
-		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = $this->table();
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input.
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params ) ) : $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) );
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
+		);
 
-		$list_sql    = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows        = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		$rows        = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
+		);
 
 		return array(
 			'items'    => array_map( array( Webhook::class, 'fromRow' ), $rows ? $rows : array() ),

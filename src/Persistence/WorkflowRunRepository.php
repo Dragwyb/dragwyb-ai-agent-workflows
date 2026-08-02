@@ -112,16 +112,13 @@ class WorkflowRunRepository {
 		$table = $this->table();
 		$like  = '%' . $wpdb->esc_like( $payload_needle ) . '%';
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; all values are passed through wpdb->prepare().
-		$sql = "SELECT id FROM {$table}
-			WHERE workflow_id = %d
-				AND status IN ( %s, %s )
-				AND trigger_payload_json LIKE %s
-			LIMIT 1";
-
 		$found = $wpdb->get_var(
 			$wpdb->prepare(
-				$sql,
+				"SELECT id FROM {$table}
+					WHERE workflow_id = %d
+						AND status IN ( %s, %s )
+						AND trigger_payload_json LIKE %s
+					LIMIT 1",
 				$workflow_id,
 				WorkflowRun::STATUS_QUEUED,
 				WorkflowRun::STATUS_RUNNING,
@@ -166,18 +163,15 @@ class WorkflowRunRepository {
 		$claim_token  = wp_generate_uuid4();
 		$stale_before = gmdate( 'Y-m-d H:i:s', time() - ( $stale_after_minutes * MINUTE_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; all values are passed through wpdb->prepare() below.
-		$sql = "UPDATE {$table}
-			SET status = %s, claim_token = %s, started_at = %s
-			WHERE
-				( status = %s AND ( next_attempt_at IS NULL OR next_attempt_at <= %s ) )
-				OR ( status = %s AND started_at IS NOT NULL AND started_at <= %s )
-			ORDER BY id ASC
-			LIMIT %d";
-
 		$wpdb->query(
 			$wpdb->prepare(
-				$sql,
+				"UPDATE {$table}
+					SET status = %s, claim_token = %s, started_at = %s
+					WHERE
+						( status = %s AND ( next_attempt_at IS NULL OR next_attempt_at <= %s ) )
+						OR ( status = %s AND started_at IS NOT NULL AND started_at <= %s )
+					ORDER BY id ASC
+					LIMIT %d",
 				WorkflowRun::STATUS_RUNNING,
 				$claim_token,
 				$now,
@@ -193,9 +187,9 @@ class WorkflowRunRepository {
 			return array();
 		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$select_sql = "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC";
-		$rows       = $wpdb->get_results( $wpdb->prepare( $select_sql, $claim_token ) );
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC", $claim_token )
+		);
 
 		return array_map( array( WorkflowRun::class, 'fromRow' ), $rows );
 	}
@@ -296,11 +290,13 @@ class WorkflowRunRepository {
 
 		$table = $this->table();
 
-		$count_sql = "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$total     = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $workflow_id ) );
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d", $workflow_id )
+		);
 
-		$list_sql = "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows     = $wpdb->get_results( $wpdb->prepare( $list_sql, $workflow_id, $per_page, $offset ) );
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $workflow_id, $per_page, $offset )
+		);
 
 		return array(
 			'items'    => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
@@ -333,8 +329,12 @@ class WorkflowRunRepository {
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$where  = array();
-		$params = array();
+		// `id > %d` is always true (id is an AUTO_INCREMENT primary key
+		// starting at 1); it guarantees $where/$params are never empty so
+		// every query below can go through $wpdb->prepare() unconditionally,
+		// instead of branching between a prepared and an unprepared call.
+		$where  = array( 'id > %d' );
+		$params = array( 0 );
 
 		if ( ! empty( $args['workflow_id'] ) ) {
 			$where[]  = 'workflow_id = %d';
@@ -346,17 +346,17 @@ class WorkflowRunRepository {
 			$params[] = (string) $args['status'];
 		}
 
-		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = $this->table();
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}";
-		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
+		);
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$list_sql    = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d";
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows        = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		$rows        = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
+		);
 
 		return array(
 			'items'    => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
@@ -379,9 +379,11 @@ class WorkflowRunRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT id FROM {$table} WHERE workflow_id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
-		return array_map( 'intval', $wpdb->get_col( $wpdb->prepare( $sql, $workflow_id ) ) );
+		return array_map(
+			'intval',
+			$wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE workflow_id = %d", $workflow_id ) )
+		);
 	}
 
 	/**
@@ -401,9 +403,13 @@ class WorkflowRunRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$sql   = "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 
-		return array_map( 'intval', $wpdb->get_col( $wpdb->prepare( $sql, $cutoff_gmt, self::MAX_PRUNE_BATCH ) ) );
+		return array_map(
+			'intval',
+			$wpdb->get_col(
+				$wpdb->prepare( "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d", $cutoff_gmt, self::MAX_PRUNE_BATCH )
+			)
+		);
 	}
 
 	/**
@@ -426,9 +432,9 @@ class WorkflowRunRepository {
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
 		$table        = $this->table();
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
-		$sql     = "DELETE FROM {$table} WHERE id IN ({$placeholders})";
-		$deleted = $wpdb->query( $wpdb->prepare( $sql, $ids ) );
+		$deleted = $wpdb->query(
+			$wpdb->prepare( "DELETE FROM {$table} WHERE id IN ({$placeholders})", $ids )
+		);
 
 		return false === $deleted ? 0 : (int) $deleted;
 	}
