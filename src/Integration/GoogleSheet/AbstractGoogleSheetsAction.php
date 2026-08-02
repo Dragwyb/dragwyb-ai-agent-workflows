@@ -193,7 +193,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 		return $values;
 	}
 
-	protected function requireSpreadsheetId( array $config ): string|array {
+	protected function requireSpreadsheetId( array $config ) {
 		$spreadsheet_id = $this->configString( $config, 'spreadsheet_id' );
 
 		if ( '' === $spreadsheet_id ) {
