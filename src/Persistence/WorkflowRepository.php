@@ -205,7 +205,7 @@ class WorkflowRepository {
 	public function find( int $id, bool $include_trashed = false ): ?Workflow {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 
 		if ( $include_trashed ) {
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
@@ -242,7 +242,7 @@ class WorkflowRepository {
 			return array();
 		}
 
-		$table        = $this->table();
+		$table        = esc_sql($this->table());
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
 
 		$rows = $wpdb->get_results(
@@ -272,7 +272,7 @@ class WorkflowRepository {
 	public function incrementRunCount( int $id ): bool {
 		global $wpdb;
 
-		$table   = $this->table();
+		$table   = esc_sql($this->table());
 		$updated = $wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d", current_time( 'mysql', true ), $id )
@@ -327,14 +327,16 @@ class WorkflowRepository {
 		}
 
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
-		$table     = $this->table();
+		$table     = esc_sql($this->table());
 
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql is static text and placeholders
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql is static text and placeholders
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )

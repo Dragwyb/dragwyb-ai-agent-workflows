@@ -130,7 +130,7 @@ class WorkflowNodeRepository {
 	public function find( int $id ): ?WorkflowNode {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
 		return $row ? WorkflowNode::fromRow( $row ) : null;
@@ -146,7 +146,7 @@ class WorkflowNodeRepository {
 	public function findByWorkflow( int $workflow_id ): array {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		$rows  = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d", $workflow_id, self::MAX_NODES_PER_WORKFLOW )

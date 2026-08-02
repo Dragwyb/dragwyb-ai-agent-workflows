@@ -109,7 +109,7 @@ class WorkflowRunRepository {
 			return false;
 		}
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		$like  = '%' . $wpdb->esc_like( $payload_needle ) . '%';
 
 		$found = $wpdb->get_var(
@@ -159,7 +159,7 @@ class WorkflowRunRepository {
 	public function claimBatch( int $limit, int $stale_after_minutes ): array {
 		global $wpdb;
 
-		$table        = $this->table();
+		$table        = esc_sql($this->table());
 		$now          = current_time( 'mysql', true );
 		$claim_token  = wp_generate_uuid4();
 		$stale_before = gmdate( 'Y-m-d H:i:s', time() - ( $stale_after_minutes * MINUTE_IN_SECONDS ) );
@@ -264,7 +264,7 @@ class WorkflowRunRepository {
 	public function find( int $id ): ?WorkflowRun {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
 		return $row ? WorkflowRun::fromRow( $row ) : null;
@@ -291,7 +291,7 @@ class WorkflowRunRepository {
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
@@ -352,7 +352,7 @@ class WorkflowRunRepository {
 		}
 
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
-		$table     = $this->table();
+		$table     = esc_sql($this->table());
 
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
@@ -385,7 +385,7 @@ class WorkflowRunRepository {
 	public function idsForWorkflow( int $workflow_id ): array {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 
 		return array_map(
 			'intval',
@@ -410,7 +410,7 @@ class WorkflowRunRepository {
 	public function idsFinishedBefore( string $cutoff_gmt ): array {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 
 		return array_map(
 			'intval',
@@ -439,7 +439,7 @@ class WorkflowRunRepository {
 
 		$ids          = array_map( 'intval', $ids );
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-		$table        = $this->table();
+		$table        = esc_sql($this->table());
 
 		$deleted = $wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $placeholders is escaped

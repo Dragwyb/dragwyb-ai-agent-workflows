@@ -160,7 +160,7 @@ class WebhookRepository {
 	public function find( int $id ): ?Webhook {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 
@@ -177,7 +177,7 @@ class WebhookRepository {
 	public function findByPublicId( string $public_id ): ?Webhook {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE public_id = %s", $public_id ) );
 
@@ -215,7 +215,7 @@ class WebhookRepository {
 		}
 
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
-		$table     = $this->table();
+		$table     = esc_sql($this->table());
 
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped

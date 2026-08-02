@@ -90,7 +90,7 @@ class WorkflowRunLogRepository {
 	public function find( int $id ): ?WorkflowRunLog {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
 		return $row ? WorkflowRunLog::fromRow( $row ) : null;
@@ -106,7 +106,7 @@ class WorkflowRunLogRepository {
 	public function findByRun( int $run_id ): array {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 		$rows  = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d", $run_id, self::MAX_LOGS_PER_RUN )
@@ -134,7 +134,7 @@ class WorkflowRunLogRepository {
 
 		$run_ids      = array_map( 'intval', $run_ids );
 		$placeholders = implode( ', ', array_fill( 0, count( $run_ids ), '%d' ) );
-		$table        = $this->table();
+		$table        = esc_sql($this->table());
 
 		$deleted = $wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+
