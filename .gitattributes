@@ -1,0 +1,12 @@
+.github/ export-ignore
+.claude/ export-ignore
+.editorconfig export-ignore
+.eslintrc export-ignore
+.gitattributes export-ignore
+composer.lock export-ignore
+package-lock.json export-ignore
+package.json export-ignore
+phpcs.xml.dist export-ignore
+README.md export-ignore
+webpack.config.js export-ignore
+assets/builder/src/ export-ignore
