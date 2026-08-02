@@ -53,7 +53,7 @@ class RunTimestamp {
 
 		return sprintf(
 			/* translators: %s: formatted date/time. */
-			__( '%s UTC', 'ai-agent-workflow-automation' ),
+			__( '%s UTC', 'dragwyb-agentflow' ),
 			gmdate( $format, $timestamp )
 		);
 	}

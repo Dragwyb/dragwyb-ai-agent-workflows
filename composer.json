@@ -1,5 +1,5 @@
 {
-  "name": "ai-agent-workflow-automation/plugin",
+  "name": "dragwyb-agentflow/plugin",
   "description": "WordPress workflow automation plugin (scaffolding — identifiers finalized in Phase Two).",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",

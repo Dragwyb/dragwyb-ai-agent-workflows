@@ -89,7 +89,7 @@ export default function AgentNodeCard({
 					<div className="aiawa-builder-node__text">
 						<span className="aiawa-builder-node__label">{node.label}</span>
 						<span className="aiawa-builder-node__subtitle">
-							{__('AI Agent', 'ai-agent-workflow-automation')}
+							{__('AI Agent', 'dragwyb-agentflow')}
 						</span>
 					</div>
 				</div>
@@ -100,11 +100,11 @@ export default function AgentNodeCard({
 						className="aiawa-builder-node__output-port aiawa-builder-node__output-port--side"
 						title={__(
 							'Drag to the next step to connect',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						aria-label={__(
 							'Drag to the next step to connect',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						onPointerDown={(event) => {
 							stopPointer(event);
@@ -120,17 +120,17 @@ export default function AgentNodeCard({
 			>
 				<div className="aiawa-agent-node__port">
 					<span className="aiawa-agent-node__port-label">
-						{__('Chat Model', 'ai-agent-workflow-automation')}
+						{__('Chat Model', 'dragwyb-agentflow')}
 						<span className="aiawa-agent-node__required">*</span>
 					</span>
 					{hasChatModel ? (
 						<button
 							type="button"
 							className="aiawa-agent-node__port-dot aiawa-agent-node__port-dot--ok aiawa-agent-node__port-dot--link"
-							title={__('Open chat model settings', 'ai-agent-workflow-automation')}
+							title={__('Open chat model settings', 'dragwyb-agentflow')}
 							aria-label={__(
 								'Open chat model settings',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -146,11 +146,11 @@ export default function AgentNodeCard({
 							className="aiawa-agent-node__add-port"
 							aria-label={__(
 								'Add chat model to agent',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							title={__(
 								'Select OpenAI, Gemini, Claude, OpenRouter, Groq, or DeepSeek',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -165,19 +165,19 @@ export default function AgentNodeCard({
 
 				<div className="aiawa-agent-node__port">
 					<span className="aiawa-agent-node__port-label">
-						{__('Memory', 'ai-agent-workflow-automation')}
+						{__('Memory', 'dragwyb-agentflow')}
 					</span>
 					{hasMemory ? (
 						<span
 							className="aiawa-agent-node__port-dot aiawa-agent-node__port-dot--ok"
-							title={__('Memory connected', 'ai-agent-workflow-automation')}
+							title={__('Memory connected', 'dragwyb-agentflow')}
 						/>
 					) : (
 						<button
 							type="button"
 							className="aiawa-agent-node__add-port aiawa-agent-node__add-port--muted"
-							aria-label={__('Add memory to agent', 'ai-agent-workflow-automation')}
-							title={__('Add simple memory', 'ai-agent-workflow-automation')}
+							aria-label={__('Add memory to agent', 'dragwyb-agentflow')}
+							title={__('Add simple memory', 'dragwyb-agentflow')}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -191,15 +191,15 @@ export default function AgentNodeCard({
 
 				<div className="aiawa-agent-node__port aiawa-agent-node__port--tool">
 					<span className="aiawa-agent-node__port-label">
-						{__('Tool', 'ai-agent-workflow-automation')}
+						{__('Tool', 'dragwyb-agentflow')}
 					</span>
 					<button
 						type="button"
 						className="aiawa-agent-node__add-port"
-						aria-label={__('Add tool to agent', 'ai-agent-workflow-automation')}
+						aria-label={__('Add tool to agent', 'dragwyb-agentflow')}
 						title={__(
 							'Add an action as an agent tool',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						onPointerDown={stopPointer}
 						onClick={(event) => {

@@ -31,7 +31,7 @@ final class ElementorFormsService {
 		$options = array(
 			array(
 				'value' => '',
-				'label' => __( 'All forms', 'ai-agent-workflow-automation' ),
+				'label' => __( 'All forms', 'dragwyb-agentflow' ),
 			),
 		);
 
@@ -50,7 +50,7 @@ final class ElementorFormsService {
 		$options = array(
 			array(
 				'value' => '',
-				'label' => __( 'All forms', 'ai-agent-workflow-automation' ),
+				'label' => __( 'All forms', 'dragwyb-agentflow' ),
 			),
 		);
 
@@ -68,7 +68,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorAtomicFormsActive() ) {
 			return array(
 				'options' => array(),
-				'error'   => __( 'Elementor Pro atomic forms are not available.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Elementor Pro atomic forms are not available.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -78,7 +78,7 @@ final class ElementorFormsService {
 		);
 
 		if ( array() === $result['options'] ) {
-			$result['error'] = __( 'No Elementor atomic forms were found on this site.', 'ai-agent-workflow-automation' );
+			$result['error'] = __( 'No Elementor atomic forms were found on this site.', 'dragwyb-agentflow' );
 		}
 
 		return $result;
@@ -91,7 +91,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorProActive() ) {
 			return array(
 				'options' => array(),
-				'error'   => __( 'Elementor Pro is not active.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Elementor Pro is not active.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -106,7 +106,7 @@ final class ElementorFormsService {
 		);
 
 		if ( array() === $result['options'] ) {
-			$result['error'] = __( 'No Elementor forms were found on this site.', 'ai-agent-workflow-automation' );
+			$result['error'] = __( 'No Elementor forms were found on this site.', 'dragwyb-agentflow' );
 		}
 
 		return $result;
@@ -128,8 +128,8 @@ final class ElementorFormsService {
 			return array(
 				'success' => false,
 				'error'   => $atomic
-					? __( 'No Elementor atomic form was found for the variable picker.', 'ai-agent-workflow-automation' )
-					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'ai-agent-workflow-automation' ),
+					? __( 'No Elementor atomic form was found for the variable picker.', 'dragwyb-agentflow' )
+					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -287,7 +287,7 @@ final class ElementorFormsService {
 				$form_name = $resolve_form_name( $settings );
 
 				if ( '' === $form_name ) {
-					$form_name = __( 'Untitled Form', 'ai-agent-workflow-automation' );
+					$form_name = __( 'Untitled Form', 'dragwyb-agentflow' );
 				}
 
 				$parsed = $atomic
@@ -542,14 +542,14 @@ final class ElementorFormsService {
 			if ( count( $page_titles ) > 1 ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: comma-separated page titles */
-					__( '%1$s (%2$s)', 'ai-agent-workflow-automation' ),
+					__( '%1$s (%2$s)', 'dragwyb-agentflow' ),
 					$entry['form_name'],
 					implode( ', ', $page_titles )
 				);
 			} elseif ( 1 === count( $page_titles ) ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: page title */
-					__( '%1$s — %2$s', 'ai-agent-workflow-automation' ),
+					__( '%1$s — %2$s', 'dragwyb-agentflow' ),
 					$entry['form_name'],
 					$page_titles[0]
 				);
@@ -823,7 +823,7 @@ final class ElementorFormsService {
 				$form_name = $resolve_form_name( $settings );
 
 				if ( '' === $form_name ) {
-					$form_name = __( 'Untitled Form', 'ai-agent-workflow-automation' );
+					$form_name = __( 'Untitled Form', 'dragwyb-agentflow' );
 				}
 
 				if ( ! isset( $forms_by_id[ $form_id ] ) ) {

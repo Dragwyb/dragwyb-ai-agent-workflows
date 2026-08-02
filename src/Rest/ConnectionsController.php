@@ -155,7 +155,7 @@ class ConnectionsController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
 				'aiawa_rest_forbidden',
-				__( 'Sorry, you are not allowed to view connections.', 'ai-agent-workflow-automation' ),
+				__( 'Sorry, you are not allowed to view connections.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -175,7 +175,7 @@ class ConnectionsController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
 				'aiawa_rest_forbidden',
-				__( 'Sorry, you are not allowed to create connections.', 'ai-agent-workflow-automation' ),
+				__( 'Sorry, you are not allowed to create connections.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -210,7 +210,7 @@ class ConnectionsController {
 		if ( ! is_array( $credentials ) ) {
 			return new WP_Error(
 				'aiawa_rest_invalid',
-				__( 'Credentials must be an object of field values.', 'ai-agent-workflow-automation' ),
+				__( 'Credentials must be an object of field values.', 'dragwyb-agentflow' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -275,7 +275,7 @@ class ConnectionsController {
 		if ( null === $connection ) {
 			return new WP_Error(
 				'aiawa_rest_not_found',
-				__( 'Connection not found.', 'ai-agent-workflow-automation' ),
+				__( 'Connection not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -283,7 +283,7 @@ class ConnectionsController {
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
 			return new WP_Error(
 				'aiawa_rest_invalid',
-				__( 'This connection is not a Google OAuth connection.', 'ai-agent-workflow-automation' ),
+				__( 'This connection is not a Google OAuth connection.', 'dragwyb-agentflow' ),
 				array( 'status' => 400 )
 			);
 		}

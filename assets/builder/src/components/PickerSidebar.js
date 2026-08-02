@@ -91,28 +91,28 @@ export default function PickerSidebar({
 		kind === 'agent-fallback-chat-model' ||
 		kind === 'parser-chat-model'
 			? kind === 'agent-fallback-chat-model'
-				? __('Select fallback chat model', 'ai-agent-workflow-automation')
+				? __('Select fallback chat model', 'dragwyb-agentflow')
 				: kind === 'parser-chat-model'
-					? __('Select Auto-Fix chat model', 'ai-agent-workflow-automation')
-					: __('Select chat model', 'ai-agent-workflow-automation')
+					? __('Select Auto-Fix chat model', 'dragwyb-agentflow')
+					: __('Select chat model', 'dragwyb-agentflow')
 			: kind === 'agent-tool'
-				? __('Add tool to agent', 'ai-agent-workflow-automation')
+				? __('Add tool to agent', 'dragwyb-agentflow')
 				: kind === 'branch-action'
-					? __('Add step to branch', 'ai-agent-workflow-automation')
+					? __('Add step to branch', 'dragwyb-agentflow')
 					: kind === 'edge-insert' || kind === 'edge-branch-insert'
-						? __('Add step between nodes', 'ai-agent-workflow-automation')
+						? __('Add step between nodes', 'dragwyb-agentflow')
 						: showGroups
-						? __('Choose a group', 'ai-agent-workflow-automation')
+						? __('Choose a group', 'dragwyb-agentflow')
 						: usesGroupedSections
 							? appLabel
-							: __('Choose a node', 'ai-agent-workflow-automation');
+							: __('Choose a node', 'dragwyb-agentflow');
 	const replaceHint =
 		kind === 'trigger' && hasExistingTrigger && !showGroups
-			? __('Selecting a trigger replaces your current one.', 'ai-agent-workflow-automation')
+			? __('Selecting a trigger replaces your current one.', 'dragwyb-agentflow')
 			: kind === 'agent-chat-model'
 				? __(
 					'Pick a provider — configure API key and model on the canvas node.',
-					'ai-agent-workflow-automation'
+					'dragwyb-agentflow'
 				)
 				: '';
 	const showBack = (usesGroups && groupId) || subAppId;
@@ -147,9 +147,9 @@ export default function PickerSidebar({
 					/* translators: %s: plugin name, e.g. WooCommerce */
 					__(
 						'Activate %s to use this trigger.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					),
-					item.requires_plugin || __('this plugin', 'ai-agent-workflow-automation')
+					item.requires_plugin || __('this plugin', 'dragwyb-agentflow')
 				)
 			: '';
 
@@ -204,14 +204,14 @@ export default function PickerSidebar({
 						className="aiawa-builder-picker__back"
 						onClick={handleBack}
 					>
-						{__('← Back', 'ai-agent-workflow-automation')}
+						{__('← Back', 'dragwyb-agentflow')}
 					</Button>
 				)}
 				<h2 className="aiawa-builder-picker__title">{title}</h2>
 				<Button
 					className="aiawa-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'ai-agent-workflow-automation')}
+					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
 				/>
 			</div>
@@ -240,9 +240,9 @@ export default function PickerSidebar({
 				<>
 					<div className="aiawa-builder-picker__search">
 						<TextControl
-							label={__('Search tools', 'ai-agent-workflow-automation')}
+							label={__('Search tools', 'dragwyb-agentflow')}
 							hideLabelFromVision
-							placeholder={__('Search tools…', 'ai-agent-workflow-automation')}
+							placeholder={__('Search tools…', 'dragwyb-agentflow')}
 							value={toolQuery}
 							onChange={setToolQuery}
 						/>
@@ -251,7 +251,7 @@ export default function PickerSidebar({
 						<p className="aiawa-builder-picker__empty">
 							{__(
 								'No tools match your search.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						</p>
 					) : (
@@ -276,9 +276,9 @@ export default function PickerSidebar({
 				<>
 					<div className="aiawa-builder-picker__search">
 						<TextControl
-							label={__('Search actions', 'ai-agent-workflow-automation')}
+							label={__('Search actions', 'dragwyb-agentflow')}
 							hideLabelFromVision
-							placeholder={__('Search actions…', 'ai-agent-workflow-automation')}
+							placeholder={__('Search actions…', 'dragwyb-agentflow')}
 							value={groupedQuery}
 							onChange={setGroupedQuery}
 						/>
@@ -287,7 +287,7 @@ export default function PickerSidebar({
 						<p className="aiawa-builder-picker__empty">
 							{__(
 								'No actions match your search.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						</p>
 					) : (

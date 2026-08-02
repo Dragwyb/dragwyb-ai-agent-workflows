@@ -256,19 +256,19 @@ class AgentToolSchemaBuilder {
 		$parts = array( $description );
 
 		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
-			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'ai-agent-workflow-automation' );
+			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-agentflow' );
 		}
 
 		if ( 'post_type' === $field_key ) {
-			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'ai-agent-workflow-automation' );
+			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-agentflow' );
 		}
 
 		if ( 'array' === $field_type ) {
-			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'ai-agent-workflow-automation' );
+			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-agentflow' );
 		}
 
 		if ( 'key_value' === $field_type ) {
-			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'ai-agent-workflow-automation' );
+			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-agentflow' );
 		}
 
 		if ( array_key_exists( $field_key, $config ) && ! $this->configValueIsEmpty( $config[ $field_key ] ) ) {
@@ -276,7 +276,7 @@ class AgentToolSchemaBuilder {
 			if ( is_scalar( $default ) ) {
 				$parts[] = sprintf(
 					/* translators: %s: current default value */
-					__( 'Current node default: %s. You may override this value.', 'ai-agent-workflow-automation' ),
+					__( 'Current node default: %s. You may override this value.', 'dragwyb-agentflow' ),
 					(string) $default
 				);
 			}

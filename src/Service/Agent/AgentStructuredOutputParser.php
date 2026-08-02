@@ -90,7 +90,7 @@ Respond with JSON only — no markdown fences.';
 			if ( '' === $raw ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'JSON Schema is empty on the Structured Output Parser.', 'ai-agent-workflow-automation' ),
+					'error'   => __( 'JSON Schema is empty on the Structured Output Parser.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -99,7 +99,7 @@ Respond with JSON only — no markdown fences.';
 			if ( ! is_array( $decoded ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'Structured Output Parser JSON Schema is invalid JSON.', 'ai-agent-workflow-automation' ),
+					'error'   => __( 'Structured Output Parser JSON Schema is invalid JSON.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -111,7 +111,7 @@ Respond with JSON only — no markdown fences.';
 		if ( '' === $raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'JSON Example is empty on the Structured Output Parser.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'JSON Example is empty on the Structured Output Parser.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -120,7 +120,7 @@ Respond with JSON only — no markdown fences.';
 		if ( ! is_array( $example ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Structured Output Parser JSON Example is invalid JSON.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Structured Output Parser JSON Example is invalid JSON.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -193,7 +193,7 @@ Respond with JSON only — no markdown fences.';
 			$encoded = '{}';
 		}
 
-		return __( 'You must respond with a single JSON value that validates against this JSON Schema. No markdown fences, no commentary.', 'ai-agent-workflow-automation' )
+		return __( 'You must respond with a single JSON value that validates against this JSON Schema. No markdown fences, no commentary.', 'dragwyb-agentflow' )
 			. "\n\n"
 			. $encoded;
 	}
@@ -210,7 +210,7 @@ Respond with JSON only — no markdown fences.';
 		if ( null === $data && 'null' !== trim( $raw_response ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Model reply is not valid JSON.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Model reply is not valid JSON.', 'dragwyb-agentflow' ),
 				'raw'     => $raw_response,
 			);
 		}
@@ -275,7 +275,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected object at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected object at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -296,7 +296,7 @@ Respond with JSON only — no markdown fences.';
 							'valid' => false,
 							'error' => sprintf(
 								/* translators: 1: property name, 2: JSON path */
-								__( 'Missing required property "%1$s" at %2$s.', 'ai-agent-workflow-automation' ),
+								__( 'Missing required property "%1$s" at %2$s.', 'dragwyb-agentflow' ),
 								$key,
 								$path
 							),
@@ -333,7 +333,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected array at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected array at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -360,7 +360,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected string at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected string at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -377,7 +377,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected integer at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected integer at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -394,7 +394,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected number at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected number at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -411,7 +411,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected boolean at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected boolean at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -428,7 +428,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected null at %s.', 'ai-agent-workflow-automation' ),
+							__( 'Expected null at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);

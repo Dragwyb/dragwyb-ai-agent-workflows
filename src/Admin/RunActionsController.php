@@ -99,7 +99,7 @@ class RunActionsController {
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_RUNS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		if ( ! ListTableUi::verifyBulkNonce( 'aiawa_run_bulk_action' ) ) {
@@ -135,7 +135,7 @@ class RunActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_RUNS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation and per-id.

@@ -45,7 +45,7 @@ final class GoogleSheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the sheet payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the sheet payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -94,7 +94,7 @@ final class GoogleSheetService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Source worksheet was not found.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Source worksheet was not found.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -107,7 +107,7 @@ final class GoogleSheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the copy payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the copy payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -127,7 +127,7 @@ final class GoogleSheetService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Worksheet was not found.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Worksheet was not found.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -146,7 +146,7 @@ final class GoogleSheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the delete payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the delete payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -177,7 +177,7 @@ final class GoogleSheetService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Worksheet was not found.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Worksheet was not found.', 'dragwyb-agentflow' ),
 			);
 		}
 

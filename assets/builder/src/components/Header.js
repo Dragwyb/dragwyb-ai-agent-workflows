@@ -4,20 +4,20 @@ import { __ } from '@wordpress/i18n';
 
 const SAVE_STATUS_LABELS = {
 	idle: '',
-	dirty: __('Unsaved changes', 'ai-agent-workflow-automation'),
-	saving: __('Saving…', 'ai-agent-workflow-automation'),
-	saved: __('Saved', 'ai-agent-workflow-automation'),
+	dirty: __('Unsaved changes', 'dragwyb-agentflow'),
+	saving: __('Saving…', 'dragwyb-agentflow'),
+	saved: __('Saved', 'dragwyb-agentflow'),
 	error: __(
 		'Save failed — check your connection and try again.',
-		'ai-agent-workflow-automation'
+		'dragwyb-agentflow'
 	),
 };
 
 /** @type {Record<number, string>} */
 const WORKFLOW_STATUS_LABELS = {
-	0: __('Draft', 'ai-agent-workflow-automation'),
-	1: __('Active', 'ai-agent-workflow-automation'),
-	2: __('Paused', 'ai-agent-workflow-automation'),
+	0: __('Draft', 'dragwyb-agentflow'),
+	1: __('Active', 'dragwyb-agentflow'),
+	2: __('Paused', 'dragwyb-agentflow'),
 };
 
 /**
@@ -76,18 +76,18 @@ export default function Header({
 						href={listUrl}
 						aria-label={__(
 							'Back to workflows list',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					>
-						{__('← Workflows', 'ai-agent-workflow-automation')}
+						{__('← Workflows', 'dragwyb-agentflow')}
 					</a>
 				)}
 				<input
 					type="text"
 					className="aiawa-builder-header__title"
 					value={title}
-					placeholder={__('Untitled workflow', 'ai-agent-workflow-automation')}
-					aria-label={__('Workflow title', 'ai-agent-workflow-automation')}
+					placeholder={__('Untitled workflow', 'dragwyb-agentflow')}
+					aria-label={__('Workflow title', 'dragwyb-agentflow')}
 					onChange={(event) => onTitleChange(event.target.value)}
 				/>
 				<span
@@ -135,10 +135,10 @@ export default function Header({
 							onClick={() => importInputRef.current?.click()}
 							aria-label={__(
 								'Import workflow from JSON',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						>
-							{__('Import', 'ai-agent-workflow-automation')}
+							{__('Import', 'dragwyb-agentflow')}
 						</Button>
 					</>
 				)}
@@ -148,10 +148,10 @@ export default function Header({
 						onClick={onExport}
 						aria-label={__(
 							'Export workflow as JSON',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					>
-						{__('Export', 'ai-agent-workflow-automation')}
+						{__('Export', 'dragwyb-agentflow')}
 					</Button>
 				)}
 				{testFlow && (
@@ -166,8 +166,8 @@ export default function Header({
 							disabled={testFlow.listening}
 						>
 							{testFlow.listening
-								? __('Listening…', 'ai-agent-workflow-automation')
-								: __('Test Flow', 'ai-agent-workflow-automation')}
+								? __('Listening…', 'dragwyb-agentflow')
+								: __('Test Flow', 'dragwyb-agentflow')}
 						</Button>
 						{testFlow.menuOpen && (
 							<div className="aiawa-builder-header__test-menu">
@@ -178,7 +178,7 @@ export default function Header({
 								>
 									{__(
 										'Listen new response',
-										'ai-agent-workflow-automation'
+										'dragwyb-agentflow'
 									)}
 								</button>
 								<button
@@ -188,7 +188,7 @@ export default function Header({
 								>
 									{__(
 										'Use existing data',
-										'ai-agent-workflow-automation'
+										'dragwyb-agentflow'
 									)}
 								</button>
 							</div>
@@ -202,7 +202,7 @@ export default function Header({
 						onClick={onToggleChat}
 						aria-pressed={chatOpen}
 					>
-						{__('Chat', 'ai-agent-workflow-automation')}
+						{__('Chat', 'dragwyb-agentflow')}
 					</Button>
 				)}
 				<Button
@@ -212,18 +212,18 @@ export default function Header({
 					disabled={toggleActiveBusy}
 					aria-label={
 						isActive
-							? __('Pause workflow', 'ai-agent-workflow-automation')
-							: __('Activate workflow', 'ai-agent-workflow-automation')
+							? __('Pause workflow', 'dragwyb-agentflow')
+							: __('Activate workflow', 'dragwyb-agentflow')
 					}
 				>
 					{toggleActiveBusy
-						? __('Updating…', 'ai-agent-workflow-automation')
+						? __('Updating…', 'dragwyb-agentflow')
 						: isActive
-							? __('Pause', 'ai-agent-workflow-automation')
-							: __('Activate', 'ai-agent-workflow-automation')}
+							? __('Pause', 'dragwyb-agentflow')
+							: __('Activate', 'dragwyb-agentflow')}
 				</Button>
 				<Button isPrimary onClick={onSave} disabled={saveDisabled}>
-					{__('Save', 'ai-agent-workflow-automation')}
+					{__('Save', 'dragwyb-agentflow')}
 				</Button>
 			</div>
 		</header>

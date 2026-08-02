@@ -60,17 +60,17 @@ class ConnectionsListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'               => '<input type="checkbox" />',
-			'label'            => __( 'Label', 'ai-agent-workflow-automation' ),
-			'integration_slug' => __( 'Integration', 'ai-agent-workflow-automation' ),
-			'auth_type'        => __( 'Authentication', 'ai-agent-workflow-automation' ),
-			'status'           => __( 'Status', 'ai-agent-workflow-automation' ),
-			'created_at'       => __( 'Created', 'ai-agent-workflow-automation' ),
+			'label'            => __( 'Label', 'dragwyb-agentflow' ),
+			'integration_slug' => __( 'Integration', 'dragwyb-agentflow' ),
+			'auth_type'        => __( 'Authentication', 'dragwyb-agentflow' ),
+			'status'           => __( 'Status', 'dragwyb-agentflow' ),
+			'created_at'       => __( 'Created', 'dragwyb-agentflow' ),
 		);
 	}
 
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'ai-agent-workflow-automation' ),
+			'delete' => __( 'Delete', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -109,7 +109,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No connections yet.', 'ai-agent-workflow-automation' );
+		esc_html_e( 'No connections yet.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -127,7 +127,7 @@ class ConnectionsListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'ai-agent-workflow-automation' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-agentflow' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -139,8 +139,8 @@ class ConnectionsListTable extends WP_List_Table {
 			array(
 				'name'        => 'integration_slug',
 				'type'        => 'search',
-				'label'       => __( 'Filter by integration', 'ai-agent-workflow-automation' ),
-				'placeholder' => __( 'e.g. gemini, openai', 'ai-agent-workflow-automation' ),
+				'label'       => __( 'Filter by integration', 'dragwyb-agentflow' ),
+				'placeholder' => __( 'e.g. gemini, openai', 'dragwyb-agentflow' ),
 				'value'       => $this->currentIntegrationFilter(),
 			),
 		);
@@ -231,7 +231,7 @@ class ConnectionsListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'ai-agent-workflow-automation' ) );
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'dragwyb-agentflow' ) );
 	}
 
 	private function currentIntegrationFilter(): string {

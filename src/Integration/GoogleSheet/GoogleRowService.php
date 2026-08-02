@@ -33,7 +33,7 @@ final class GoogleRowService {
 		if ( empty( $values ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -58,7 +58,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the row payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the row payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -112,7 +112,7 @@ final class GoogleRowService {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -129,7 +129,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the update payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the update payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -145,7 +145,7 @@ final class GoogleRowService {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -162,7 +162,7 @@ final class GoogleRowService {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -207,7 +207,7 @@ final class GoogleRowService {
 		if ( null === $sheet_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Worksheet was not found.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Worksheet was not found.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -242,7 +242,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the column payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the column payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -264,7 +264,7 @@ final class GoogleRowService {
 		if ( ! is_string( $header_body ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the column header payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the column header payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -313,7 +313,7 @@ final class GoogleRowService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the batch update payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the batch update payload.', 'dragwyb-agentflow' ),
 			);
 		}
 

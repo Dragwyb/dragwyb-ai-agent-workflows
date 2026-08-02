@@ -140,7 +140,7 @@ export default function ConditionNodeCard({
 			activeBranchDrag?.conditionNodeId === node.id &&
 			activeBranchDrag?.branchId === branchId;
 		const targetLabel = targetId
-			? nodesById[targetId]?.label || __('Connected', 'ai-agent-workflow-automation')
+			? nodesById[targetId]?.label || __('Connected', 'dragwyb-agentflow')
 			: '';
 
 		return (
@@ -160,7 +160,7 @@ export default function ConditionNodeCard({
 							onDisconnectBranch(node.id, branchId);
 						}}
 					>
-						{__('×', 'ai-agent-workflow-automation')}
+						{__('×', 'dragwyb-agentflow')}
 					</Button>
 				)}
 				<button
@@ -175,13 +175,13 @@ export default function ConditionNodeCard({
 					data-branch-id={branchId}
 					title={__(
 						'Drag this port to any step on the canvas (each condition can connect to a different step)',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 					aria-label={sprintf(
 						/* translators: %s: condition branch label */
 						__(
 							'Drag to connect branch: %s',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						),
 						branchLabel
 					)}
@@ -202,7 +202,7 @@ export default function ConditionNodeCard({
 
 		const branchId = row.id;
 		const targetId = row.node_id || '';
-		const branchLabel = row.label || __('Untitled Condition', 'ai-agent-workflow-automation');
+		const branchLabel = row.label || __('Untitled Condition', 'dragwyb-agentflow');
 
 		return (
 			<div key={branchId} className="aiawa-condition-node__row">
@@ -225,7 +225,7 @@ export default function ConditionNodeCard({
 								onSelect(node.id);
 							}}
 						>
-							{__('Edit', 'ai-agent-workflow-automation')}
+							{__('Edit', 'dragwyb-agentflow')}
 						</Button>
 						<Button
 							variant="link"
@@ -236,7 +236,7 @@ export default function ConditionNodeCard({
 								onRemoveCondition(node.id, row.id);
 							}}
 						>
-							{__('Remove', 'ai-agent-workflow-automation')}
+							{__('Remove', 'dragwyb-agentflow')}
 						</Button>
 					</div>
 				)}
@@ -284,12 +284,12 @@ export default function ConditionNodeCard({
 					</span>
 					<div className="aiawa-condition-node__header-text">
 						<span className="aiawa-condition-node__title">
-							{__('Condition', 'ai-agent-workflow-automation')}
+							{__('Condition', 'dragwyb-agentflow')}
 						</span>
 						<span className="aiawa-condition-node__subtitle">
 							{__(
 								'Each orange port connects to a different step — drag one port per branch',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						</span>
 					</div>
@@ -313,10 +313,10 @@ export default function ConditionNodeCard({
 											event.stopPropagation();
 											onAddCondition(node.id, index + 1);
 										}}
-										title={__('Add condition', 'ai-agent-workflow-automation')}
+										title={__('Add condition', 'dragwyb-agentflow')}
 										aria-label={__(
 											'Add condition',
-											'ai-agent-workflow-automation'
+											'dragwyb-agentflow'
 										)}
 									>
 										+
@@ -343,8 +343,8 @@ export default function ConditionNodeCard({
 								event.stopPropagation();
 								onAddCondition(node.id, rows.length);
 							}}
-							title={__('Add condition', 'ai-agent-workflow-automation')}
-							aria-label={__('Add condition', 'ai-agent-workflow-automation')}
+							title={__('Add condition', 'dragwyb-agentflow')}
+							aria-label={__('Add condition', 'dragwyb-agentflow')}
 						>
 							+
 						</button>
@@ -358,13 +358,13 @@ export default function ConditionNodeCard({
 						<div className="aiawa-condition-node__row-main">
 							<span className="aiawa-condition-node__row-index">∅</span>
 							<span className="aiawa-condition-node__row-label">
-								{__('No Condition Matched', 'ai-agent-workflow-automation')}
+								{__('No Condition Matched', 'dragwyb-agentflow')}
 							</span>
 						</div>
 						{renderBranchPort(
 							'default',
 							defaultTargetId,
-							__('No Condition Matched', 'ai-agent-workflow-automation')
+							__('No Condition Matched', 'dragwyb-agentflow')
 						)}
 					</div>
 				</div>

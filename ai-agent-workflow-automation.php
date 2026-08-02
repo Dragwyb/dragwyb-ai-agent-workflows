@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:       AI Agent & Workflow Automation Builder
- * Plugin URI:        https://dragwyb.com/ai-agent-workflow-automation
+ * Plugin Name:       Dragwyb AgentFlow: Visual workflow builder and automation
+ * Plugin URI:        https://dragwyb.com/dragwyb-agentflow
  * Description:       Build and run visual, multi-step automation workflows in WordPress.
  * Version:           0.0.0
  * Requires at least: 5.8
@@ -10,7 +10,7 @@
  * Author URI:        https://dragwyb.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       ai-agent-workflow-automation
+ * Text Domain:       dragwyb-agentflow
  * Domain Path:       /languages
  *
  * @package AIAWA\Plugin
@@ -55,7 +55,7 @@ function aiawa_php_version_notice() {
 		esc_html(
 			sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version. */
-				__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'ai-agent-workflow-automation' ),
+				__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-agentflow' ),
 				AIAWA_MIN_PHP_VERSION,
 				PHP_VERSION
 			)

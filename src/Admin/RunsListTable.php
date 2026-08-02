@@ -92,12 +92,12 @@ class RunsListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'         => '<input type="checkbox" />',
-			'id'         => __( 'Run', 'ai-agent-workflow-automation' ),
-			'workflow'   => __( 'Workflow', 'ai-agent-workflow-automation' ),
-			'status'     => __( 'Status', 'ai-agent-workflow-automation' ),
-			'attempt'    => __( 'Attempt', 'ai-agent-workflow-automation' ),
-			'started_at' => __( 'Started', 'ai-agent-workflow-automation' ),
-			'duration'   => __( 'Duration', 'ai-agent-workflow-automation' ),
+			'id'         => __( 'Run', 'dragwyb-agentflow' ),
+			'workflow'   => __( 'Workflow', 'dragwyb-agentflow' ),
+			'status'     => __( 'Status', 'dragwyb-agentflow' ),
+			'attempt'    => __( 'Attempt', 'dragwyb-agentflow' ),
+			'started_at' => __( 'Started', 'dragwyb-agentflow' ),
+			'duration'   => __( 'Duration', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -106,7 +106,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'ai-agent-workflow-automation' ),
+			'delete' => __( 'Delete', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -166,7 +166,7 @@ class RunsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No runs match this filter.', 'ai-agent-workflow-automation' );
+		esc_html_e( 'No runs match this filter.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -218,7 +218,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	public function filterFields(): array {
 		$options = array(
-			'0' => __( 'All workflows', 'ai-agent-workflow-automation' ),
+			'0' => __( 'All workflows', 'dragwyb-agentflow' ),
 		);
 
 		foreach ( $this->workflowFilterOptions as $id => $title ) {
@@ -228,7 +228,7 @@ class RunsListTable extends WP_List_Table {
 		return array(
 			array(
 				'name'    => 'workflow_id',
-				'label'   => __( 'Filter by workflow', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'Filter by workflow', 'dragwyb-agentflow' ),
 				'value'   => (string) $this->currentWorkflowFilter(),
 				'options' => $options,
 			),
@@ -262,12 +262,12 @@ class RunsListTable extends WP_List_Table {
 	protected function get_views() {
 		$current = $this->currentView();
 		$labels  = array(
-			'all'                       => __( 'All', 'ai-agent-workflow-automation' ),
-			WorkflowRun::STATUS_QUEUED  => __( 'Queued', 'ai-agent-workflow-automation' ),
-			WorkflowRun::STATUS_RUNNING => __( 'Running', 'ai-agent-workflow-automation' ),
-			WorkflowRun::STATUS_SUCCESS => __( 'Success', 'ai-agent-workflow-automation' ),
-			WorkflowRun::STATUS_FAILED  => __( 'Failed', 'ai-agent-workflow-automation' ),
-			WorkflowRun::STATUS_PARTIAL => __( 'Partial', 'ai-agent-workflow-automation' ),
+			'all'                       => __( 'All', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_QUEUED  => __( 'Queued', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_RUNNING => __( 'Running', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_SUCCESS => __( 'Success', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_FAILED  => __( 'Failed', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_PARTIAL => __( 'Partial', 'dragwyb-agentflow' ),
 		);
 
 		$views = array();
@@ -288,18 +288,18 @@ class RunsListTable extends WP_List_Table {
 		$view_url = $this->detailUrl( $item->id() );
 
 		$actions = array(
-			'view' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $view_url ), esc_html__( 'View', 'ai-agent-workflow-automation' ) ),
+			'view' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $view_url ), esc_html__( 'View', 'dragwyb-agentflow' ) ),
 		);
 
 		if ( in_array( $item->status(), self::RERUNNABLE_STATUSES, true ) ) {
-			$actions['rerun'] = $this->actionForm( 'rerun', $item->id(), __( 'Re-run', 'ai-agent-workflow-automation' ) );
+			$actions['rerun'] = $this->actionForm( 'rerun', $item->id(), __( 'Re-run', 'dragwyb-agentflow' ) );
 		}
 
 		$actions['delete'] = $this->actionForm(
 			'delete',
 			$item->id(),
-			__( 'Delete', 'ai-agent-workflow-automation' ),
-			__( 'Delete this run permanently? This cannot be undone.', 'ai-agent-workflow-automation' )
+			__( 'Delete', 'dragwyb-agentflow' ),
+			__( 'Delete this run permanently? This cannot be undone.', 'dragwyb-agentflow' )
 		);
 
 		$label = sprintf(
@@ -331,7 +331,7 @@ class RunsListTable extends WP_List_Table {
 			case 'started_at':
 				return $item->startedAt()
 					? esc_html( RunTimestamp::format( $item->startedAt(), $this->settings->displayTimestampsInUtc() ) )
-					: esc_html__( 'Not started yet', 'ai-agent-workflow-automation' );
+					: esc_html__( 'Not started yet', 'dragwyb-agentflow' );
 
 			case 'duration':
 				return esc_html( RunDuration::forRun( $item ) );
@@ -348,7 +348,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	private function workflowCell( WorkflowRun $item ): string {
 		if ( ! isset( $this->workflowTitles[ $item->workflowId() ] ) ) {
-			return esc_html__( '(deleted workflow)', 'ai-agent-workflow-automation' );
+			return esc_html__( '(deleted workflow)', 'dragwyb-agentflow' );
 		}
 
 		return sprintf(

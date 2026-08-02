@@ -1,5 +1,5 @@
 {
-    "name": "ai-agent-workflow-automation/ai-providers",
+    "name": "dragwyb-agentflow/ai-providers",
     "description": "Vendored AI provider packages for Workflow Automate",
     "type": "library",
     "require": {

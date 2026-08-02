@@ -40,14 +40,14 @@ class ConditionAction implements ActionInterface {
 
 	public function label(): string {
 
-		return __( 'Condition', 'ai-agent-workflow-automation' );
+		return __( 'Condition', 'dragwyb-agentflow' );
 	}
 
 
 
 	public function description(): string {
 
-		return __( 'Route the workflow down different branches when conditions match.', 'ai-agent-workflow-automation' );
+		return __( 'Route the workflow down different branches when conditions match.', 'dragwyb-agentflow' );
 	}
 
 
@@ -60,7 +60,7 @@ class ConditionAction implements ActionInterface {
 
 				'type'    => 'condition_routes',
 
-				'label'   => __( 'Conditions', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'Conditions', 'dragwyb-agentflow' ),
 
 				'default' => array(),
 
@@ -70,7 +70,7 @@ class ConditionAction implements ActionInterface {
 
 				'type'    => 'node_select',
 
-				'label'   => __( 'No Condition Matched', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'No Condition Matched', 'dragwyb-agentflow' ),
 
 				'default' => '',
 
@@ -137,7 +137,7 @@ class ConditionAction implements ActionInterface {
 
 			'matched_condition_id'    => 'default',
 
-			'matched_condition_label' => __( 'No Condition Matched', 'ai-agent-workflow-automation' ),
+			'matched_condition_label' => __( 'No Condition Matched', 'dragwyb-agentflow' ),
 
 			'evaluated_value'         => '',
 
@@ -184,7 +184,7 @@ class ConditionAction implements ActionInterface {
 
 				'id'       => 'legacy-true',
 
-				'label'    => __( 'If yes', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'If yes', 'dragwyb-agentflow' ),
 
 				'field'    => $field,
 

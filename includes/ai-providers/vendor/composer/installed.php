@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'ai-agent-workflow-automation/ai-providers',
+        'name' => 'dragwyb-agentflow/ai-providers',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
         'reference' => 'e306cd31591c1ec9bc3b9653fcfde7d23a05f437',
@@ -37,7 +37,7 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'ai-agent-workflow-automation/ai-providers' => array(
+        'dragwyb-agentflow/ai-providers' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
             'reference' => 'e306cd31591c1ec9bc3b9653fcfde7d23a05f437',

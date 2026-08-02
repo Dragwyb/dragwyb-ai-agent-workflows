@@ -45,14 +45,14 @@ class TelegramSendMessageAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Telegram Send Message', 'ai-agent-workflow-automation' );
+		return __( 'Telegram Send Message', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends a text message with a Telegram bot.', 'ai-agent-workflow-automation' );
+		return __( 'Sends a text message with a Telegram bot.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -62,18 +62,18 @@ class TelegramSendMessageAction implements ActionInterface {
 		return array(
 			'connection_id' => array(
 				'type'     => 'connection',
-				'label'    => __( 'Telegram bot token connection', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'Telegram bot token connection', 'dragwyb-agentflow' ),
 				'required' => true,
 				'default'  => 0,
 			),
 			'chat_id'       => array(
 				'type'     => 'string',
-				'label'    => __( 'Chat ID', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'Chat ID', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'message'       => array(
 				'type'     => 'string',
-				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 		);
@@ -97,14 +97,14 @@ class TelegramSendMessageAction implements ActionInterface {
 		if ( '' === $chat_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No Telegram chat ID configured.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'No Telegram chat ID configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
 		if ( '' === trim( $message ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No message configured.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'No message configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -120,7 +120,7 @@ class TelegramSendMessageAction implements ActionInterface {
 		if ( ! is_string( $body ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the Telegram payload.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'Failed to encode the Telegram payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -165,7 +165,7 @@ class TelegramSendMessageAction implements ActionInterface {
 				'success'     => false,
 				'error'       => sprintf(
 					/* translators: 1: service name, 2: HTTP status, 3: error detail */
-					__( '%1$s returned HTTP %2$d: %3$s', 'ai-agent-workflow-automation' ),
+					__( '%1$s returned HTTP %2$d: %3$s', 'dragwyb-agentflow' ),
 					$service,
 					$status_code,
 					$detail
@@ -179,7 +179,7 @@ class TelegramSendMessageAction implements ActionInterface {
 				'success' => false,
 				'error'   => isset( $decoded['description'] )
 					? (string) $decoded['description']
-					: __( 'Telegram reported failure.', 'ai-agent-workflow-automation' ),
+					: __( 'Telegram reported failure.', 'dragwyb-agentflow' ),
 			);
 		}
 

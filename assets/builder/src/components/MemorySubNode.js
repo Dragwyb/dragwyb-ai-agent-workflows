@@ -38,7 +38,7 @@ export default function MemorySubNode({
 				🧠
 			</span>
 			<span className="aiawa-memory-node__label">
-				{node.label || __('Simple Memory', 'ai-agent-workflow-automation')}
+				{node.label || __('Simple Memory', 'dragwyb-agentflow')}
 			</span>
 		</div>
 	);

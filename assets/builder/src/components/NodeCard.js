@@ -136,9 +136,9 @@ export default function NodeCard({
 	const ariaLabel = [
 		node.label || node.type,
 		node.category === 'trigger'
-			? __('Trigger', 'ai-agent-workflow-automation')
-			: __('Action', 'ai-agent-workflow-automation'),
-		selected ? __('selected', 'ai-agent-workflow-automation') : '',
+			? __('Trigger', 'dragwyb-agentflow')
+			: __('Action', 'dragwyb-agentflow'),
+		selected ? __('selected', 'dragwyb-agentflow') : '',
 	]
 		.filter(Boolean)
 		.join(', ');
@@ -194,11 +194,11 @@ export default function NodeCard({
 					className="aiawa-builder-node__output-port"
 					title={__(
 						'Drag to the next step to connect',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 					aria-label={__(
 						'Drag to the next step to connect',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 					onPointerDown={(event) => {
 						stopPointer(event);

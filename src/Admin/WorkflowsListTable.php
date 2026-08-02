@@ -68,10 +68,10 @@ class WorkflowsListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'         => '<input type="checkbox" />',
-			'title'      => __( 'Title', 'ai-agent-workflow-automation' ),
-			'status'     => __( 'Status', 'ai-agent-workflow-automation' ),
-			'run_count'  => __( 'Runs', 'ai-agent-workflow-automation' ),
-			'updated_at' => __( 'Last Updated', 'ai-agent-workflow-automation' ),
+			'title'      => __( 'Title', 'dragwyb-agentflow' ),
+			'status'     => __( 'Status', 'dragwyb-agentflow' ),
+			'run_count'  => __( 'Runs', 'dragwyb-agentflow' ),
+			'updated_at' => __( 'Last Updated', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -81,13 +81,13 @@ class WorkflowsListTable extends WP_List_Table {
 	protected function get_bulk_actions() {
 		if ( 'trash' === $this->currentView() ) {
 			return array(
-				'restore' => __( 'Restore', 'ai-agent-workflow-automation' ),
-				'delete'  => __( 'Delete Permanently', 'ai-agent-workflow-automation' ),
+				'restore' => __( 'Restore', 'dragwyb-agentflow' ),
+				'delete'  => __( 'Delete Permanently', 'dragwyb-agentflow' ),
 			);
 		}
 
 		return array(
-			'trash' => __( 'Move to Trash', 'ai-agent-workflow-automation' ),
+			'trash' => __( 'Move to Trash', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -150,16 +150,16 @@ class WorkflowsListTable extends WP_List_Table {
 		$view = $this->currentView();
 
 		if ( 'trash' === $view ) {
-			esc_html_e( 'Trash is empty.', 'ai-agent-workflow-automation' );
+			esc_html_e( 'Trash is empty.', 'dragwyb-agentflow' );
 			return;
 		}
 
 		if ( 'all' !== $view ) {
-			esc_html_e( 'No workflows match this filter.', 'ai-agent-workflow-automation' );
+			esc_html_e( 'No workflows match this filter.', 'dragwyb-agentflow' );
 			return;
 		}
 
-		esc_html_e( 'No workflows yet.', 'ai-agent-workflow-automation' );
+		esc_html_e( 'No workflows yet.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -187,8 +187,8 @@ class WorkflowsListTable extends WP_List_Table {
 		if ( $item->isTrashed() ) {
 			$title   = '<strong>' . esc_html( $item->title() ) . '</strong>';
 			$actions = array(
-				'restore' => $this->actionForm( 'restore', $item->id(), __( 'Restore', 'ai-agent-workflow-automation' ) ),
-				'delete'  => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'ai-agent-workflow-automation' ) ),
+				'restore' => $this->actionForm( 'restore', $item->id(), __( 'Restore', 'dragwyb-agentflow' ) ),
+				'delete'  => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'dragwyb-agentflow' ) ),
 			);
 		} else {
 			$edit_url = $this->editUrl( $item->id() );
@@ -198,18 +198,18 @@ class WorkflowsListTable extends WP_List_Table {
 				esc_html( $item->title() )
 			);
 			$actions  = array(
-				'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'ai-agent-workflow-automation' ) ),
-				'runs'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'ai-agent-workflow-automation' ) ),
-				'export' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->exportUrl( $item->id() ) ), esc_html__( 'Export', 'ai-agent-workflow-automation' ) ),
+				'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-agentflow' ) ),
+				'runs'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'dragwyb-agentflow' ) ),
+				'export' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->exportUrl( $item->id() ) ), esc_html__( 'Export', 'dragwyb-agentflow' ) ),
 			);
 
 			if ( Workflow::STATUS_ACTIVE === $item->status() ) {
-				$actions['pause'] = $this->actionForm( 'pause', $item->id(), __( 'Pause', 'ai-agent-workflow-automation' ) );
+				$actions['pause'] = $this->actionForm( 'pause', $item->id(), __( 'Pause', 'dragwyb-agentflow' ) );
 			} else {
-				$actions['activate'] = $this->actionForm( 'activate', $item->id(), __( 'Activate', 'ai-agent-workflow-automation' ) );
+				$actions['activate'] = $this->actionForm( 'activate', $item->id(), __( 'Activate', 'dragwyb-agentflow' ) );
 			}
 
-			$actions['trash'] = $this->actionForm( 'trash', $item->id(), __( 'Trash', 'ai-agent-workflow-automation' ) );
+			$actions['trash'] = $this->actionForm( 'trash', $item->id(), __( 'Trash', 'dragwyb-agentflow' ) );
 		}
 
 		return $title . $this->row_actions( $actions );
@@ -225,8 +225,8 @@ class WorkflowsListTable extends WP_List_Table {
 			array(
 				'name'        => 's',
 				'type'        => 'search',
-				'label'       => __( 'Search workflows', 'ai-agent-workflow-automation' ),
-				'placeholder' => __( 'Search by title…', 'ai-agent-workflow-automation' ),
+				'label'       => __( 'Search workflows', 'dragwyb-agentflow' ),
+				'placeholder' => __( 'Search by title…', 'dragwyb-agentflow' ),
 				'value'       => $this->currentSearch(),
 			),
 		);
@@ -387,26 +387,26 @@ class WorkflowsListTable extends WP_List_Table {
 	private function viewLabel( string $view ): string {
 		switch ( $view ) {
 			case 'draft':
-				return __( 'Draft', 'ai-agent-workflow-automation' );
+				return __( 'Draft', 'dragwyb-agentflow' );
 			case 'active':
-				return __( 'Active', 'ai-agent-workflow-automation' );
+				return __( 'Active', 'dragwyb-agentflow' );
 			case 'paused':
-				return __( 'Paused', 'ai-agent-workflow-automation' );
+				return __( 'Paused', 'dragwyb-agentflow' );
 			case 'trash':
-				return __( 'Trash', 'ai-agent-workflow-automation' );
+				return __( 'Trash', 'dragwyb-agentflow' );
 			default:
-				return __( 'All', 'ai-agent-workflow-automation' );
+				return __( 'All', 'dragwyb-agentflow' );
 		}
 	}
 
 	private function statusLabel( int $status ): string {
 		switch ( $status ) {
 			case Workflow::STATUS_ACTIVE:
-				return __( 'Active', 'ai-agent-workflow-automation' );
+				return __( 'Active', 'dragwyb-agentflow' );
 			case Workflow::STATUS_PAUSED:
-				return __( 'Paused', 'ai-agent-workflow-automation' );
+				return __( 'Paused', 'dragwyb-agentflow' );
 			default:
-				return __( 'Draft', 'ai-agent-workflow-automation' );
+				return __( 'Draft', 'dragwyb-agentflow' );
 		}
 	}
 

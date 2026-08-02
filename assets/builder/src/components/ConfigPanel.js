@@ -55,13 +55,13 @@ function isGoogleSheetsAction(slug) {
 const INTEGRATION_CONNECTION_SETTINGS = {
 	telegram_send_message_action: {
 		authType: 'api_key',
-		secretLabel: __('Bot token', 'ai-agent-workflow-automation'),
+		secretLabel: __('Bot token', 'dragwyb-agentflow'),
 		secretFieldName: 'api_key',
 		hideAuthTypeSelect: true,
 	},
 	whatsapp_cloud_send_message_action: {
 		authType: 'bearer_token',
-		secretLabel: __('Access token', 'ai-agent-workflow-automation'),
+		secretLabel: __('Access token', 'dragwyb-agentflow'),
 	},
 };
 
@@ -142,22 +142,22 @@ const AGENT_PROVIDER_NODE_SLUGS = {
 /** @type {Record<string, { secretLabel: string }>} */
 const AGENT_PROVIDER_CONNECTION_SETTINGS = {
 	openai: {
-		secretLabel: __('OpenAI API key', 'ai-agent-workflow-automation'),
+		secretLabel: __('OpenAI API key', 'dragwyb-agentflow'),
 	},
 	gemini: {
-		secretLabel: __('Google AI API key', 'ai-agent-workflow-automation'),
+		secretLabel: __('Google AI API key', 'dragwyb-agentflow'),
 	},
 	claude: {
-		secretLabel: __('Anthropic API key', 'ai-agent-workflow-automation'),
+		secretLabel: __('Anthropic API key', 'dragwyb-agentflow'),
 	},
 	openrouter: {
-		secretLabel: __('OpenRouter API key', 'ai-agent-workflow-automation'),
+		secretLabel: __('OpenRouter API key', 'dragwyb-agentflow'),
 	},
 	groq: {
-		secretLabel: __('Groq API key', 'ai-agent-workflow-automation'),
+		secretLabel: __('Groq API key', 'dragwyb-agentflow'),
 	},
 	deepseek: {
-		secretLabel: __('DeepSeek API key', 'ai-agent-workflow-automation'),
+		secretLabel: __('DeepSeek API key', 'dragwyb-agentflow'),
 	},
 };
 
@@ -429,7 +429,7 @@ export default function ConfigPanel({
 				error:
 					error && error.message
 						? error.message
-						: __('Could not test this node.', 'ai-agent-workflow-automation'),
+						: __('Could not test this node.', 'dragwyb-agentflow'),
 			});
 		} finally {
 			setTesting(false);
@@ -440,12 +440,12 @@ export default function ConfigPanel({
 		return (
 			<aside
 				className="aiawa-builder-config aiawa-builder-config--empty"
-				aria-label={__('Node settings', 'ai-agent-workflow-automation')}
+				aria-label={__('Node settings', 'dragwyb-agentflow')}
 			>
 				<p>
 					{__(
 						'Select a node to edit its settings.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			</aside>
@@ -459,20 +459,20 @@ export default function ConfigPanel({
 					? 'aiawa-builder-config aiawa-builder-config--agent'
 					: 'aiawa-builder-config'
 			}
-			aria-label={__('Node settings', 'ai-agent-workflow-automation')}
+			aria-label={__('Node settings', 'dragwyb-agentflow')}
 		>
 			<div className="aiawa-builder-config__header">
 				<h2>{nodeType ? nodeType.label : node.type}</h2>
 				<Button
 					className="aiawa-builder-config__close"
 					icon="no-alt"
-					label={__('Close', 'ai-agent-workflow-automation')}
+					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
 				/>
 			</div>
 
 			<TextControl
-				label={__('Node label', 'ai-agent-workflow-automation')}
+				label={__('Node label', 'dragwyb-agentflow')}
 				value={node.label}
 				onChange={onChangeLabel}
 			/>
@@ -481,7 +481,7 @@ export default function ConfigPanel({
 				<p className="aiawa-builder-config__field-help">
 					{__(
 						'This tool is attached to your AI Agent. Remove it from the agent or delete it here.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}
@@ -490,7 +490,7 @@ export default function ConfigPanel({
 				<p className="aiawa-builder-config__field-help">
 					{__(
 						'Chat model linked to your agent. Add an API key and pick a model below.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}
@@ -499,7 +499,7 @@ export default function ConfigPanel({
 				<p className="aiawa-builder-config__field-help">
 					{__(
 						'Fallback chat model used when the primary model fails.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}
@@ -509,7 +509,7 @@ export default function ConfigPanel({
 					<p className="aiawa-builder-config__field-help">
 						{__(
 							'JSON structure for the AI Agent reply. Connect a Model* on the canvas for Auto-Fix.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					</p>
 					{onAddParserChatModel &&
@@ -522,7 +522,7 @@ export default function ConfigPanel({
 								variant="secondary"
 								onClick={() => onAddParserChatModel(node.id)}
 							>
-								{__('Connect model', 'ai-agent-workflow-automation')}
+								{__('Connect model', 'dragwyb-agentflow')}
 							</Button>
 						)}
 				</>
@@ -532,7 +532,7 @@ export default function ConfigPanel({
 				<p className="aiawa-builder-config__field-help">
 					{__(
 						'Simple memory keeps conversation context for this agent run.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}
@@ -541,7 +541,7 @@ export default function ConfigPanel({
 				<p className="aiawa-builder-config__field-help">
 					{__(
 						'Each condition has its own orange port on the right — drag each port to a different step (AI Agent, actions, etc.). Or pick targets under “Then run” for each condition below.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}
@@ -570,7 +570,7 @@ export default function ConfigPanel({
 					<p className="aiawa-builder-config__field-help">
 						{__(
 							'Click Chat in the header to open the chat panel and send messages (same idea as n8n). Save the workflow first if you just added this trigger.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					</p>
 				)}
@@ -587,7 +587,7 @@ export default function ConfigPanel({
 				<p className="aiawa-builder-config__warning">
 					{__(
 						'This node\u2019s type is not currently registered (the plugin or code that provided it may be inactive). Its saved configuration is preserved but cannot be edited here.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}
@@ -655,7 +655,7 @@ export default function ConfigPanel({
 					disabled={testing || !workflowId}
 					className="aiawa-builder-config__test"
 				>
-					{__('Test node', 'ai-agent-workflow-automation')}
+					{__('Test node', 'dragwyb-agentflow')}
 				</Button>
 
 				<Button
@@ -664,7 +664,7 @@ export default function ConfigPanel({
 					onClick={onDelete}
 					className="aiawa-builder-config__delete"
 				>
-					{__('Delete node', 'ai-agent-workflow-automation')}
+					{__('Delete node', 'dragwyb-agentflow')}
 				</Button>
 			</div>
 		</aside>
@@ -746,7 +746,7 @@ function ConfigField({
 							>
 								{__(
 									'Open form page',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								)}
 								{pageLinks[0].label
 									? ` — ${pageLinks[0].label}`
@@ -755,7 +755,7 @@ function ConfigField({
 						) : (
 							<>
 								<span className="aiawa-builder-config__form-page-link-label">
-									{__('Form pages:', 'ai-agent-workflow-automation')}
+									{__('Form pages:', 'dragwyb-agentflow')}
 								</span>
 								<ul className="aiawa-builder-config__form-page-link-list">
 									{pageLinks.map((page) => (
@@ -768,7 +768,7 @@ function ConfigField({
 												{page.label ||
 													__(
 														'Open form page',
-														'ai-agent-workflow-automation'
+														'dragwyb-agentflow'
 													)}
 											</a>
 										</li>
@@ -1077,7 +1077,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 
 	const handleSave = async () => {
 		if (!apiKey.trim()) {
-			setError(__('Enter an API key.', 'ai-agent-workflow-automation'));
+			setError(__('Enter an API key.', 'dragwyb-agentflow'));
 			return;
 		}
 
@@ -1090,7 +1090,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			setApiKey('');
 			setReplacing(false);
 			setConfigured(true);
-			setNotice(__('API key saved.', 'ai-agent-workflow-automation'));
+			setNotice(__('API key saved.', 'dragwyb-agentflow'));
 			notifyModels();
 		} catch (err) {
 			setError(
@@ -1098,7 +1098,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 					? err.message
 					: __(
 							'Could not save API key. Check that the key is valid.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)
 			);
 		} finally {
@@ -1115,13 +1115,13 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			await clearAiProviderCredentials(provider);
 			setConfigured(false);
 			setReplacing(true);
-			setNotice(__('API key removed.', 'ai-agent-workflow-automation'));
+			setNotice(__('API key removed.', 'dragwyb-agentflow'));
 			notifyModels();
 		} catch (err) {
 			setError(
 				err && err.message
 					? err.message
-					: __('Could not remove API key.', 'ai-agent-workflow-automation')
+					: __('Could not remove API key.', 'dragwyb-agentflow')
 			);
 		} finally {
 			setClearing(false);
@@ -1132,7 +1132,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 		return (
 			<div className="aiawa-field aiawa-field--ai-credentials">
 				<p className="aiawa-builder-config__field-help">
-					{__('Checking API key…', 'ai-agent-workflow-automation')}
+					{__('Checking API key…', 'dragwyb-agentflow')}
 				</p>
 			</div>
 		);
@@ -1143,7 +1143,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			<div className="aiawa-field aiawa-field--ai-credentials">
 				<strong>{label}</strong>
 				<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
-					{__('API key saved for this site.', 'ai-agent-workflow-automation')}
+					{__('API key saved for this site.', 'dragwyb-agentflow')}
 				</p>
 				{notice ? (
 					<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
@@ -1165,7 +1165,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 							setNotice('');
 						}}
 					>
-						{__('Replace API key', 'ai-agent-workflow-automation')}
+						{__('Replace API key', 'dragwyb-agentflow')}
 					</Button>
 					<Button
 						variant="link"
@@ -1174,8 +1174,8 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 						disabled={clearing}
 					>
 						{clearing
-							? __('Removing…', 'ai-agent-workflow-automation')
-							: __('Remove', 'ai-agent-workflow-automation')}
+							? __('Removing…', 'dragwyb-agentflow')
+							: __('Remove', 'dragwyb-agentflow')}
 					</Button>
 				</div>
 			</div>
@@ -1192,7 +1192,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 				autoComplete="off"
 				help={__(
 					'Saved for this WordPress site and used by all workflows.',
-					'ai-agent-workflow-automation'
+					'dragwyb-agentflow'
 				)}
 			/>
 			{error ? (
@@ -1208,8 +1208,8 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			<div className="aiawa-builder-config__connection-actions">
 				<Button isPrimary onClick={handleSave} disabled={saving}>
 					{saving
-						? __('Saving…', 'ai-agent-workflow-automation')
-						: __('Save API key', 'ai-agent-workflow-automation')}
+						? __('Saving…', 'dragwyb-agentflow')
+						: __('Save API key', 'dragwyb-agentflow')}
 				</Button>
 				{configured || replacing ? (
 					<Button
@@ -1221,7 +1221,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 						}}
 						disabled={saving}
 					>
-						{__('Cancel', 'ai-agent-workflow-automation')}
+						{__('Cancel', 'dragwyb-agentflow')}
 					</Button>
 				) : null}
 			</div>
@@ -1301,7 +1301,7 @@ function AiModelField({
 				setError(
 					err && err.message
 						? err.message
-						: __('Could not load models.', 'ai-agent-workflow-automation')
+						: __('Could not load models.', 'dragwyb-agentflow')
 				);
 			})
 			.finally(() => {
@@ -1334,7 +1334,7 @@ function AiModelField({
 				options={[
 					{
 						value: value || defaultValue || '',
-						label: __('Loading models…', 'ai-agent-workflow-automation'),
+						label: __('Loading models…', 'dragwyb-agentflow'),
 					},
 				]}
 				disabled
@@ -1353,7 +1353,7 @@ function AiModelField({
 					error ||
 					__(
 						'No models listed. Enter a model id manually or save an API key above.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)
 				}
 			/>
@@ -1447,7 +1447,7 @@ function ConnectionField({
 	const [connectionLabel, setConnectionLabel] = useState(
 		nodeTypeLabel
 			? `${nodeTypeLabel}`
-			: __('New connection', 'ai-agent-workflow-automation')
+			: __('New connection', 'dragwyb-agentflow')
 	);
 	const [authType, setAuthType] = useState(defaultAuthType);
 	const [secret, setSecret] = useState('');
@@ -1464,7 +1464,7 @@ function ConnectionField({
 
 		if ('oauth_connected' === notice) {
 			setOauthNotice(
-				__('Google account connected successfully.', 'ai-agent-workflow-automation')
+				__('Google account connected successfully.', 'dragwyb-agentflow')
 			);
 		} else if ('error' === notice && params.get('aiawa_error')) {
 			setOauthNotice(String(params.get('aiawa_error')));
@@ -1477,7 +1477,7 @@ function ConnectionField({
 		setConnectionLabel(
 			nodeTypeLabel
 				? `${nodeTypeLabel}`
-				: __('New connection', 'ai-agent-workflow-automation')
+				: __('New connection', 'dragwyb-agentflow')
 		);
 		setAuthType(defaultAuthType);
 		setSecret('');
@@ -1513,7 +1513,7 @@ function ConnectionField({
 	}, [required, selectedId, matchingConnections, onChange]);
 
 	const options = [
-		{ value: '0', label: __('None', 'ai-agent-workflow-automation') },
+		{ value: '0', label: __('None', 'dragwyb-agentflow') },
 		...matchingConnections.map((connection) => ({
 			value: String(connection.id),
 			label: `${connection.label} (${connection.auth_type_label})`,
@@ -1526,14 +1526,14 @@ function ConnectionField({
 	const secretFieldLabel =
 		integrationSettings.secretLabel ||
 		(authType === 'bearer_token'
-			? __('Bearer token / access token', 'ai-agent-workflow-automation')
-			: __('API key', 'ai-agent-workflow-automation'));
+			? __('Bearer token / access token', 'dragwyb-agentflow')
+			: __('API key', 'dragwyb-agentflow'));
 
 	const handleSaveConnection = async () => {
 		const trimmedLabel = connectionLabel.trim();
 
 		if (!trimmedLabel) {
-			setError(__('Enter a name for this connection.', 'ai-agent-workflow-automation'));
+			setError(__('Enter a name for this connection.', 'dragwyb-agentflow'));
 			return;
 		}
 
@@ -1545,7 +1545,7 @@ function ConnectionField({
 				setError(
 					__(
 						'Enter both Client ID and Client Secret.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)
 				);
 				return;
@@ -1582,7 +1582,7 @@ function ConnectionField({
 						? err.message
 						: __(
 							'Could not save the connection. Check your permissions and try again.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)
 				);
 			} finally {
@@ -1595,7 +1595,7 @@ function ConnectionField({
 		const trimmedSecret = secret.trim();
 
 		if (!trimmedSecret) {
-			setError(__('Enter your API key or token.', 'ai-agent-workflow-automation'));
+			setError(__('Enter your API key or token.', 'dragwyb-agentflow'));
 			return;
 		}
 
@@ -1629,7 +1629,7 @@ function ConnectionField({
 					? err.message
 					: __(
 						'Could not save the connection. Check your permissions and try again.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)
 			);
 		} finally {
@@ -1658,7 +1658,7 @@ function ConnectionField({
 			setError(
 				__(
 					'Save your Client ID and Client Secret first.',
-					'ai-agent-workflow-automation'
+					'dragwyb-agentflow'
 				)
 			);
 			return;
@@ -1681,7 +1681,7 @@ function ConnectionField({
 			setError(
 				__(
 					'Could not start Google authorization.',
-					'ai-agent-workflow-automation'
+					'dragwyb-agentflow'
 				)
 			);
 		} catch (err) {
@@ -1690,7 +1690,7 @@ function ConnectionField({
 					? err.message
 					: __(
 						'Could not start Google authorization.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)
 			);
 		} finally {
@@ -1717,11 +1717,11 @@ function ConnectionField({
 						? isGoogleOAuth
 							? __(
 								'Required — add your Google OAuth credentials below, then connect your Google account.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)
 							: __(
 								'Required — add an API key below or pick an existing connection.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)
 						: undefined
 				}
@@ -1748,7 +1748,7 @@ function ConnectionField({
 						<p className="aiawa-builder-config__connection-form-help">
 							{__(
 								'Credentials saved. Connect your Google account to finish setup.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						</p>
 						<Button
@@ -1757,8 +1757,8 @@ function ConnectionField({
 							disabled={connecting}
 						>
 							{connecting
-								? __('Connecting…', 'ai-agent-workflow-automation')
-								: __('Connect with Google', 'ai-agent-workflow-automation')}
+								? __('Connecting…', 'dragwyb-agentflow')
+								: __('Connect with Google', 'dragwyb-agentflow')}
 						</Button>
 					</div>
 				)}
@@ -1768,7 +1768,7 @@ function ConnectionField({
 				isGoogleOAuth &&
 				selectedConnection.oauth_connected && (
 					<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
-						{__('Google account connected.', 'ai-agent-workflow-automation')}
+						{__('Google account connected.', 'dragwyb-agentflow')}
 					</p>
 				)}
 
@@ -1783,7 +1783,7 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('+ Add API key here', 'ai-agent-workflow-automation')}
+					{__('+ Add API key here', 'dragwyb-agentflow')}
 				</Button>
 			)}
 
@@ -1798,7 +1798,7 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('+ Add Google OAuth connection', 'ai-agent-workflow-automation')}
+					{__('+ Add Google OAuth connection', 'dragwyb-agentflow')}
 				</Button>
 			)}
 
@@ -1813,7 +1813,7 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('Use a different API key', 'ai-agent-workflow-automation')}
+					{__('Use a different API key', 'dragwyb-agentflow')}
 				</Button>
 			)}
 
@@ -1829,14 +1829,14 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('Use different Google credentials', 'ai-agent-workflow-automation')}
+					{__('Use different Google credentials', 'dragwyb-agentflow')}
 				</Button>
 			)}
 
 			{showAddForm && isGoogleOAuth && (
 				<div className="aiawa-builder-config__connection-form">
 					<p className="aiawa-builder-config__connection-form-title">
-						{__('Google OAuth connection', 'ai-agent-workflow-automation')}
+						{__('Google OAuth connection', 'dragwyb-agentflow')}
 					</p>
 					<p className="aiawa-builder-config__connection-form-help">
 						<a
@@ -1846,44 +1846,44 @@ function ConnectionField({
 						>
 							{__(
 								'Create credentials in Google Cloud Console',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						</a>
 						{' · '}
 						{__(
 							'Enable Google Sheets API and Google Drive API.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					</p>
 					<TextControl
-						label={__('Connection name', 'ai-agent-workflow-automation')}
+						label={__('Connection name', 'dragwyb-agentflow')}
 						value={connectionLabel}
 						onChange={setConnectionLabel}
 					/>
 					<TextControl
-						label={__('Client ID', 'ai-agent-workflow-automation')}
+						label={__('Client ID', 'dragwyb-agentflow')}
 						value={clientId}
 						onChange={setClientId}
 						autoComplete="off"
 					/>
 					<TextControl
-						label={__('Client Secret', 'ai-agent-workflow-automation')}
+						label={__('Client Secret', 'dragwyb-agentflow')}
 						type="password"
 						value={clientSecret}
 						onChange={setClientSecret}
 						autoComplete="off"
 						help={__(
 							'Saved encrypted. You will not see it again after saving.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					/>
 					<TextControl
-						label={__('Callback URL', 'ai-agent-workflow-automation')}
+						label={__('Callback URL', 'dragwyb-agentflow')}
 						value={bootstrap.googleOAuthCallbackUrl || ''}
 						readOnly
 						help={__(
 							'Add this exact URL as an Authorized redirect URI in your Google OAuth client.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						onFocus={(event) => event.target.select()}
 					/>
@@ -1899,8 +1899,8 @@ function ConnectionField({
 							disabled={saving || connecting}
 						>
 							{saving
-								? __('Saving…', 'ai-agent-workflow-automation')
-								: __('Save credentials', 'ai-agent-workflow-automation')}
+								? __('Saving…', 'dragwyb-agentflow')
+								: __('Save credentials', 'dragwyb-agentflow')}
 						</Button>
 						<Button
 							isPrimary
@@ -1922,7 +1922,7 @@ function ConnectionField({
 									setError(
 										__(
 											'Enter connection name, Client ID, and Client Secret first.',
-											'ai-agent-workflow-automation'
+											'dragwyb-agentflow'
 										)
 									);
 									return;
@@ -1960,7 +1960,7 @@ function ConnectionField({
 											? err.message
 											: __(
 												'Could not save the connection.',
-												'ai-agent-workflow-automation'
+												'dragwyb-agentflow'
 											)
 									);
 								} finally {
@@ -1970,8 +1970,8 @@ function ConnectionField({
 							disabled={saving || connecting}
 						>
 							{connecting
-								? __('Connecting…', 'ai-agent-workflow-automation')
-								: __('Connect with Google', 'ai-agent-workflow-automation')}
+								? __('Connecting…', 'dragwyb-agentflow')
+								: __('Connect with Google', 'dragwyb-agentflow')}
 						</Button>
 						{!needsConnection && (
 							<Button
@@ -1983,7 +1983,7 @@ function ConnectionField({
 								}}
 								disabled={saving || connecting}
 							>
-								{__('Cancel', 'ai-agent-workflow-automation')}
+								{__('Cancel', 'dragwyb-agentflow')}
 							</Button>
 						)}
 					</div>
@@ -1998,32 +1998,32 @@ function ConnectionField({
 								/* translators: %s: integration label */
 								__(
 									'Credentials for %s',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								),
 								nodeTypeLabel
 							)
 							: __(
 								'Add credentials for this node',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 					</p>
 					<TextControl
-						label={__('Connection name', 'ai-agent-workflow-automation')}
+						label={__('Connection name', 'dragwyb-agentflow')}
 						value={connectionLabel}
 						onChange={setConnectionLabel}
 					/>
 					{!integrationSettings.hideAuthTypeSelect && (
 						<SelectControl
-							label={__('Auth type', 'ai-agent-workflow-automation')}
+							label={__('Auth type', 'dragwyb-agentflow')}
 							value={authType}
 							options={[
 								{
 									value: 'api_key',
-									label: __('API Key', 'ai-agent-workflow-automation'),
+									label: __('API Key', 'dragwyb-agentflow'),
 								},
 								{
 									value: 'bearer_token',
-									label: __('Bearer Token', 'ai-agent-workflow-automation'),
+									label: __('Bearer Token', 'dragwyb-agentflow'),
 								},
 							]}
 							onChange={setAuthType}
@@ -2037,7 +2037,7 @@ function ConnectionField({
 						onChange={setSecret}
 						help={__(
 							'Saved encrypted. You will not see it again after saving.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 					/>
 					{error && (
@@ -2052,8 +2052,8 @@ function ConnectionField({
 							disabled={saving}
 						>
 							{saving
-								? __('Saving…', 'ai-agent-workflow-automation')
-								: __('Save & use connection', 'ai-agent-workflow-automation')}
+								? __('Saving…', 'dragwyb-agentflow')
+								: __('Save & use connection', 'dragwyb-agentflow')}
 						</Button>
 						{!needsConnection && (
 							<Button
@@ -2065,7 +2065,7 @@ function ConnectionField({
 								}}
 								disabled={saving}
 							>
-								{__('Cancel', 'ai-agent-workflow-automation')}
+								{__('Cancel', 'dragwyb-agentflow')}
 							</Button>
 						)}
 					</div>
@@ -2115,7 +2115,7 @@ function isFieldVisible(fieldSchema, nodeConfig = {}) {
 function NodeSelectField({ label, value, help, nodeId, graphNodes, onChange }) {
 	const connectable = getConnectableCanvasNodes(graphNodes, nodeId);
 	const options = [
-		{ label: __('— None —', 'ai-agent-workflow-automation'), value: '' },
+		{ label: __('— None —', 'dragwyb-agentflow'), value: '' },
 		...connectable.map((graphNode) => ({
 			label: `${graphNode.label || graphNode.type}${
 				graphNode.type === 'ai_agent_action' ? ' (AI Agent)' : ''
@@ -2178,14 +2178,14 @@ function ConditionRoutesField({
 					className="aiawa-builder-config__condition-route"
 				>
 					<TextControl
-						label={__('Label', 'ai-agent-workflow-automation')}
+						label={__('Label', 'dragwyb-agentflow')}
 						value={row.label || ''}
 						onChange={(nextValue) =>
 							updateRow(index, 'label', nextValue)
 						}
 					/>
 					<TokenField
-						label={__('Value to check', 'ai-agent-workflow-automation')}
+						label={__('Value to check', 'dragwyb-agentflow')}
 						value={row.field || ''}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
@@ -2194,7 +2194,7 @@ function ConditionRoutesField({
 						}
 					/>
 					<SelectControl
-						label={__('Comparison', 'ai-agent-workflow-automation')}
+						label={__('Comparison', 'dragwyb-agentflow')}
 						value={row.operator || 'equals'}
 						options={getConditionOperatorSelectOptions()}
 						onChange={(nextValue) => {
@@ -2207,7 +2207,7 @@ function ConditionRoutesField({
 					/>
 					{conditionOperatorNeedsValue(row.operator || 'equals') && (
 						<TextControl
-							label={__('Compare to', 'ai-agent-workflow-automation')}
+							label={__('Compare to', 'dragwyb-agentflow')}
 							value={row.value || ''}
 							onChange={(nextValue) =>
 								updateRow(index, 'value', nextValue)
@@ -2215,7 +2215,7 @@ function ConditionRoutesField({
 						/>
 					)}
 					<NodeSelectField
-						label={__('Then run', 'ai-agent-workflow-automation')}
+						label={__('Then run', 'dragwyb-agentflow')}
 						value={row.node_id || ''}
 						nodeId={nodeId}
 						graphNodes={graphNodes}
@@ -2228,12 +2228,12 @@ function ConditionRoutesField({
 						variant="tertiary"
 						onClick={() => removeRow(index)}
 					>
-						{__('Remove condition', 'ai-agent-workflow-automation')}
+						{__('Remove condition', 'dragwyb-agentflow')}
 					</Button>
 				</div>
 			))}
 			<Button variant="secondary" onClick={addRow}>
-				{__('Add condition', 'ai-agent-workflow-automation')}
+				{__('Add condition', 'dragwyb-agentflow')}
 			</Button>
 		</div>
 	);
@@ -2292,7 +2292,7 @@ function KeyValueField({
 					className="aiawa-builder-config__key-value-row"
 				>
 					<TokenField
-						label={__('Name', 'ai-agent-workflow-automation')}
+						label={__('Name', 'dragwyb-agentflow')}
 						value={row.name || ''}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
@@ -2301,7 +2301,7 @@ function KeyValueField({
 						}
 					/>
 					<TokenField
-						label={__('Value', 'ai-agent-workflow-automation')}
+						label={__('Value', 'dragwyb-agentflow')}
 						value={row.value || ''}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
@@ -2315,7 +2315,7 @@ function KeyValueField({
 						className="aiawa-builder-config__key-value-remove"
 						onClick={() => removeRow(index)}
 					>
-						{__('Remove', 'ai-agent-workflow-automation')}
+						{__('Remove', 'dragwyb-agentflow')}
 					</Button>
 				</div>
 			))}
@@ -2324,7 +2324,7 @@ function KeyValueField({
 				className="aiawa-builder-config__key-value-add"
 				onClick={addRow}
 			>
-				{addLabel || __('Add Field', 'ai-agent-workflow-automation')}
+				{addLabel || __('Add Field', 'dragwyb-agentflow')}
 			</Button>
 		</div>
 	);
@@ -2358,7 +2358,7 @@ function JsonField({ label, value, onChange }) {
 			setError(
 				__(
 					'Invalid JSON — changes here are not saved until this is fixed.',
-					'ai-agent-workflow-automation'
+					'dragwyb-agentflow'
 				)
 			);
 		}

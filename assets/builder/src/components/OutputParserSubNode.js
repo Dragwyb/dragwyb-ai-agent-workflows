@@ -41,11 +41,11 @@ export default function OutputParserSubNode({
 			</span>
 			<span className="aiawa-output-parser-node__label">
 				{node.label ||
-					__('Structured Output Parser', 'ai-agent-workflow-automation')}
+					__('Structured Output Parser', 'dragwyb-agentflow')}
 			</span>
 			<div className="aiawa-output-parser-node__model-row">
 				<span className="aiawa-output-parser-node__model-label">
-					{__('Model', 'ai-agent-workflow-automation')}
+					{__('Model', 'dragwyb-agentflow')}
 					{!hasChatModel ? '*' : ''}
 				</span>
 				{!hasChatModel && onAddChatModel ? (
@@ -56,7 +56,7 @@ export default function OutputParserSubNode({
 							event.stopPropagation();
 							onAddChatModel(node.id);
 						}}
-						aria-label={__('Connect model', 'ai-agent-workflow-automation')}
+						aria-label={__('Connect model', 'dragwyb-agentflow')}
 					>
 						+
 					</button>

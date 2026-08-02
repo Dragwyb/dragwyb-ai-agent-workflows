@@ -70,11 +70,11 @@ export default function FlowEdgeControls({
 							className="aiawa-builder-edge-toolbar__btn aiawa-builder-edge-toolbar__btn--add"
 							title={__(
 								'Add a step between these nodes',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							aria-label={__(
 								'Add a step between these nodes',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							onClick={() => onInsertOnConnection(edge)}
 						>
@@ -85,15 +85,15 @@ export default function FlowEdgeControls({
 							className="aiawa-builder-edge-toolbar__btn aiawa-builder-edge-toolbar__btn--delete"
 							title={__(
 								'Delete this connection',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							aria-label={__(
 								'Delete this connection',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							onClick={() => onDeleteConnection(edge)}
 						>
-							{__('×', 'ai-agent-workflow-automation')}
+							{__('×', 'dragwyb-agentflow')}
 						</button>
 					</div>
 				);

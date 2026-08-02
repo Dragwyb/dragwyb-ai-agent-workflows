@@ -38,7 +38,7 @@ final class CommentWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$comments = get_comments( array( 'post_id' => $postId ) );
@@ -57,7 +57,7 @@ final class CommentWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$comments = get_comments( array( 'user_id' => $userId ) );
@@ -76,7 +76,7 @@ final class CommentWordPressService {
 		$email = WordPressActionHelper::str( $config, 'user_email' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'User email is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$comments = get_comments( array( 'author_email' => $email ) );
@@ -95,13 +95,13 @@ final class CommentWordPressService {
 		$commentId = WordPressActionHelper::int( $config, 'comment_id' );
 
 		if ( $commentId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Comment id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$meta = get_comment_meta( $commentId );
 
 		if ( empty( $meta ) ) {
-			return WordPressActionHelper::fail( __( 'Comment metadata not found.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment metadata not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( $meta );
@@ -112,17 +112,17 @@ final class CommentWordPressService {
 		$metaKey   = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $commentId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Comment id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $metaKey ) {
-			return WordPressActionHelper::fail( __( 'Meta key is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$val = get_comment_meta( $commentId, $metaKey, true );
 
 		if ( '' === $val ) {
-			return WordPressActionHelper::fail( __( 'Comment metadata not found.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment metadata not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( array( $metaKey => $val ) );
@@ -134,15 +134,15 @@ final class CommentWordPressService {
 		$author  = WordPressActionHelper::str( $config, 'author_name' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $content ) {
-			return WordPressActionHelper::fail( __( 'Comment content is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment content is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $author ) {
-			return WordPressActionHelper::fail( __( 'Author name is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Author name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$commentData = array(
@@ -156,7 +156,7 @@ final class CommentWordPressService {
 		$commentId = wp_insert_comment( $commentData );
 
 		if ( ! $commentId ) {
-			return WordPressActionHelper::fail( __( 'Failed to create comment.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to create comment.', 'dragwyb-agentflow' ) );
 		}
 
 		$comment = get_comment( $commentId );
@@ -176,19 +176,19 @@ final class CommentWordPressService {
 		$author   = WordPressActionHelper::str( $config, 'author_name' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( $parentId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Parent comment id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Parent comment id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $content ) {
-			return WordPressActionHelper::fail( __( 'Comment content is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment content is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $author ) {
-			return WordPressActionHelper::fail( __( 'Author name is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Author name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$commentData = array(
@@ -203,7 +203,7 @@ final class CommentWordPressService {
 		$commentId = wp_insert_comment( $commentData );
 
 		if ( ! $commentId ) {
-			return WordPressActionHelper::fail( __( 'Failed to create comment reply.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to create comment reply.', 'dragwyb-agentflow' ) );
 		}
 
 		$comment = get_comment( $commentId );
@@ -220,18 +220,18 @@ final class CommentWordPressService {
 		$commentId = WordPressActionHelper::int( $config, 'comment_id' );
 
 		if ( $commentId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Comment id is required.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! get_comment( $commentId ) ) {
-			return WordPressActionHelper::fail( __( 'Comment not found.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Comment not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );
 		$res   = wp_delete_comment( $commentId, $force );
 
 		if ( ! $res ) {
-			return WordPressActionHelper::fail( __( 'Failed to delete comment.', 'ai-agent-workflow-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to delete comment.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'comment_id' => $commentId ) );

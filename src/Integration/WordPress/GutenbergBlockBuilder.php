@@ -232,7 +232,7 @@ class GutenbergBlockBuilder {
 	private static function ctaSection( array $section ): string {
 		$heading     = (string) ( $section['heading'] ?? $section['title'] ?? '' );
 		$text        = (string) ( $section['text'] ?? '' );
-		$button_text = (string) ( $section['button_text'] ?? __( 'Learn more', 'ai-agent-workflow-automation' ) );
+		$button_text = (string) ( $section['button_text'] ?? __( 'Learn more', 'dragwyb-agentflow' ) );
 		$button_url  = (string) ( $section['button_url'] ?? '#' );
 		$background  = self::sanitizeColor( (string) ( $section['background'] ?? '#f97316' ) );
 		$text_color  = self::sanitizeColor( (string) ( $section['text_color'] ?? '#ffffff' ) );

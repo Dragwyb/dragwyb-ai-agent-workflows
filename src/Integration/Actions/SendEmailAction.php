@@ -43,14 +43,14 @@ class SendEmailAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Send Email', 'ai-agent-workflow-automation' );
+		return __( 'Send Email', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an email using the site\'s configured mail delivery method.', 'ai-agent-workflow-automation' );
+		return __( 'Sends an email using the site\'s configured mail delivery method.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -60,22 +60,22 @@ class SendEmailAction implements ActionInterface {
 		return array(
 			'to'      => array(
 				'type'     => 'string',
-				'label'    => __( 'To (comma-separated for multiple recipients)', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'To (comma-separated for multiple recipients)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'subject' => array(
 				'type'     => 'string',
-				'label'    => __( 'Subject', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'Subject', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'message' => array(
 				'type'     => 'string',
-				'label'    => __( 'Message', 'ai-agent-workflow-automation' ),
+				'label'    => __( 'Message', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'headers' => array(
 				'type'    => 'object',
-				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'dragwyb-agentflow' ),
 				'default' => array(),
 			),
 		);
@@ -90,7 +90,7 @@ class SendEmailAction implements ActionInterface {
 		if ( array() === $recipients ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No valid recipient address configured.', 'ai-agent-workflow-automation' ),
+				'error'   => __( 'No valid recipient address configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -117,7 +117,7 @@ class SendEmailAction implements ActionInterface {
 				'success' => false,
 				'error'   => $captured_error instanceof WP_Error
 					? $captured_error->get_error_message()
-					: __( 'wp_mail() reported failure for an unknown reason.', 'ai-agent-workflow-automation' ),
+					: __( 'wp_mail() reported failure for an unknown reason.', 'dragwyb-agentflow' ),
 			);
 		}
 

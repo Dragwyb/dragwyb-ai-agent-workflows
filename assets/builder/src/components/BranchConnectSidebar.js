@@ -49,16 +49,16 @@ export default function BranchConnectSidebar({
 	return (
 		<aside
 			className="aiawa-builder-picker aiawa-builder-picker--branch-connect"
-			aria-label={__('Connect branch to node', 'ai-agent-workflow-automation')}
+			aria-label={__('Connect branch to node', 'dragwyb-agentflow')}
 		>
 			<div className="aiawa-builder-picker__header">
 				<h2 className="aiawa-builder-picker__title">
-					{__('Connect branch', 'ai-agent-workflow-automation')}
+					{__('Connect branch', 'dragwyb-agentflow')}
 				</h2>
 				<Button
 					className="aiawa-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'ai-agent-workflow-automation')}
+					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
 				/>
 			</div>
@@ -66,16 +66,16 @@ export default function BranchConnectSidebar({
 			<p className="aiawa-builder-picker__hint">
 				{__(
 					'Choose any step on the canvas for',
-					'ai-agent-workflow-automation'
+					'dragwyb-agentflow'
 				)}{' '}
 				<strong>{branchLabel}</strong>
 			</p>
 
 			<div className="aiawa-builder-picker__search">
 				<TextControl
-					label={__('Search nodes', 'ai-agent-workflow-automation')}
+					label={__('Search nodes', 'dragwyb-agentflow')}
 					hideLabelFromVision
-					placeholder={__('Search nodes…', 'ai-agent-workflow-automation')}
+					placeholder={__('Search nodes…', 'dragwyb-agentflow')}
 					value={query}
 					onChange={setQuery}
 				/>
@@ -85,7 +85,7 @@ export default function BranchConnectSidebar({
 				<p className="aiawa-builder-picker__empty">
 					{__(
 						'No steps on the canvas yet. Add an AI Agent or action first.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			) : (
@@ -121,17 +121,17 @@ export default function BranchConnectSidebar({
 										</span>
 										<span className="aiawa-builder-picker__item-hint">
 											{node.type === 'ai_agent_action'
-												? __('AI Agent', 'ai-agent-workflow-automation')
+												? __('AI Agent', 'dragwyb-agentflow')
 												: node.type === 'condition_action'
-													? __('Condition', 'ai-agent-workflow-automation')
+													? __('Condition', 'dragwyb-agentflow')
 													: node.type === 'router_action'
-														? __('Router', 'ai-agent-workflow-automation')
-														: __('Action', 'ai-agent-workflow-automation')}
+														? __('Router', 'dragwyb-agentflow')
+														: __('Action', 'dragwyb-agentflow')}
 										</span>
 									</span>
 									{isCurrent && (
 										<span className="aiawa-builder-picker__item-badge">
-											{__('Connected', 'ai-agent-workflow-automation')}
+											{__('Connected', 'dragwyb-agentflow')}
 										</span>
 									)}
 								</button>

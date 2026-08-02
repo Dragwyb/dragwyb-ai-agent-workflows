@@ -33,14 +33,14 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Contact Form 7 Submitted', 'ai-agent-workflow-automation' );
+		return __( 'Contact Form 7 Submitted', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'ai-agent-workflow-automation' );
+		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'string',
-				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
 				'default' => '',
 			),
 		);

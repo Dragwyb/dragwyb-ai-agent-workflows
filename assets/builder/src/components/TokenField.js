@@ -308,7 +308,7 @@ export default function TokenField({
 						className="aiawa-token-field__insert"
 						onClick={openPicker}
 					>
-						{__('Insert variable', 'ai-agent-workflow-automation')}
+						{__('Insert variable', 'dragwyb-agentflow')}
 					</button>
 				)}
 			</div>
@@ -331,7 +331,7 @@ export default function TokenField({
 				<p className="aiawa-token-field__hint">
 					{__(
 						'Add steps above this node, or use Test Flow → Listen to load trigger variables.',
-						'ai-agent-workflow-automation'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}

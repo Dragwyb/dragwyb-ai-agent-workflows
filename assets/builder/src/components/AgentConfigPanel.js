@@ -135,7 +135,7 @@ export default function AgentConfigPanel({
 					}
 					onClick={() => setActiveTab('parameters')}
 				>
-					{__('Parameters', 'ai-agent-workflow-automation')}
+					{__('Parameters', 'dragwyb-agentflow')}
 				</button>
 				<button
 					type="button"
@@ -146,7 +146,7 @@ export default function AgentConfigPanel({
 					}
 					onClick={() => setActiveTab('settings')}
 				>
-					{__('Settings', 'ai-agent-workflow-automation')}
+					{__('Settings', 'dragwyb-agentflow')}
 				</button>
 				<Button
 					variant="primary"
@@ -155,7 +155,7 @@ export default function AgentConfigPanel({
 					isBusy={testing}
 					disabled={testing || !canExecute}
 				>
-					{__('Execute step', 'ai-agent-workflow-automation')}
+					{__('Execute step', 'dragwyb-agentflow')}
 				</Button>
 			</div>
 
@@ -169,21 +169,21 @@ export default function AgentConfigPanel({
 							<p className="aiawa-agent-config__banner-text">
 								{__(
 									'Tip: Get a feel for agents with our quick',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								)}{' '}
 								<a
 									href={TUTORIAL_URL}
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{__('tutorial', 'ai-agent-workflow-automation')}
+									{__('tutorial', 'dragwyb-agentflow')}
 								</a>
 								.
 							</p>
 							<button
 								type="button"
 								className="aiawa-agent-config__banner-close"
-								aria-label={__('Dismiss tip', 'ai-agent-workflow-automation')}
+								aria-label={__('Dismiss tip', 'dragwyb-agentflow')}
 								onClick={() => {
 									dismissAgentTutorial();
 									setBannerDismissed(true);
@@ -197,19 +197,19 @@ export default function AgentConfigPanel({
 					<SelectControl
 						label={__(
 							'Source for Prompt (User Message)',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						value={config.prompt_source}
 						options={[
 							{
 								label: __(
 									'Connected Chat Trigger Node',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								),
 								value: PROMPT_SOURCE_CHAT_TRIGGER,
 							},
 							{
-								label: __('Define below', 'ai-agent-workflow-automation'),
+								label: __('Define below', 'dragwyb-agentflow'),
 								value: PROMPT_SOURCE_DEFINE,
 							},
 						]}
@@ -220,14 +220,14 @@ export default function AgentConfigPanel({
 						<p className="aiawa-agent-config__help">
 							{__(
 								'Looks for an input field called chatInput from a directly connected Chat Trigger node. The prompt textarea is hidden while this source is selected.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 							{!hasChatTrigger && (
 								<span className="aiawa-builder-config__field-error">
 									{' '}
 									{__(
 										'No trigger is connected to this agent yet.',
-										'ai-agent-workflow-automation'
+										'dragwyb-agentflow'
 									)}
 								</span>
 							)}
@@ -237,7 +237,7 @@ export default function AgentConfigPanel({
 							<TokenField
 								label={__(
 									'Prompt (User Message)',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								)}
 								value={config.prompt}
 								variableSources={variableSources}
@@ -255,7 +255,7 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Require Specific Output Format',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						checked={config.require_output_format}
 						onChange={(checked) =>
@@ -268,11 +268,11 @@ export default function AgentConfigPanel({
 							{attachments.outputParser
 								? __(
 										'Output Parser connected. Click it on the canvas to edit the JSON example or schema.',
-										'ai-agent-workflow-automation'
+										'dragwyb-agentflow'
 								  )
 								: __(
 										'Connect an Output Parser node on the canvas to specify the output format you require.',
-										'ai-agent-workflow-automation'
+										'dragwyb-agentflow'
 								  )}
 						</div>
 					)}
@@ -286,11 +286,11 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Clean output (strip markdown)',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						help={__(
 							'Removes ``` code fences from {{output}} so HTTP Request gets plain text. Raw reply stays in {{response}}.',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						checked={config.clean_output}
 						onChange={(checked) =>
@@ -299,7 +299,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Enable Fallback Model', 'ai-agent-workflow-automation')}
+						label={__('Enable Fallback Model', 'dragwyb-agentflow')}
 						checked={config.fallback_enabled}
 						onChange={(checked) =>
 							onChangeConfig('fallback_enabled', checked)
@@ -310,7 +310,7 @@ export default function AgentConfigPanel({
 						<div className="aiawa-agent-config__notice aiawa-agent-config__notice--info">
 							{__(
 								'Connect an additional language model on the canvas to use it as a fallback if the main model fails.',
-								'ai-agent-workflow-automation'
+								'dragwyb-agentflow'
 							)}
 						</div>
 					)}
@@ -323,12 +323,12 @@ export default function AgentConfigPanel({
 
 					<div className="aiawa-agent-config__options">
 						<h3 className="aiawa-agent-config__options-title">
-							{__('Options', 'ai-agent-workflow-automation')}
+							{__('Options', 'dragwyb-agentflow')}
 						</h3>
 
 						{config.options.length === 0 ? (
 							<p className="aiawa-agent-config__options-empty">
-								{__('No properties', 'ai-agent-workflow-automation')}
+								{__('No properties', 'dragwyb-agentflow')}
 							</p>
 						) : (
 							config.options.map((optionId) => {
@@ -360,7 +360,7 @@ export default function AgentConfigPanel({
 												isDestructive
 												onClick={() => removeOption(optionId)}
 											>
-												{__('Remove', 'ai-agent-workflow-automation')}
+												{__('Remove', 'dragwyb-agentflow')}
 											</Button>
 										</div>
 									);
@@ -390,7 +390,7 @@ export default function AgentConfigPanel({
 												isDestructive
 												onClick={() => removeOption(optionId)}
 											>
-												{__('Remove', 'ai-agent-workflow-automation')}
+												{__('Remove', 'dragwyb-agentflow')}
 											</Button>
 										</div>
 									);
@@ -407,7 +407,7 @@ export default function AgentConfigPanel({
 								onClick={() => setOptionsMenuOpen((open) => !open)}
 								disabled={availableOptions.length === 0}
 							>
-								{__('Add Option', 'ai-agent-workflow-automation')}
+								{__('Add Option', 'dragwyb-agentflow')}
 							</Button>
 							{optionsMenuOpen && availableOptions.length > 0 && (
 								<div className="aiawa-agent-config__add-option-menu">
@@ -431,7 +431,7 @@ export default function AgentConfigPanel({
 			{activeTab === 'settings' && (
 				<div className="aiawa-agent-config__panel">
 					<ToggleControl
-						label={__('Always Output Data', 'ai-agent-workflow-automation')}
+						label={__('Always Output Data', 'dragwyb-agentflow')}
 						checked={config.settings.always_output_data}
 						onChange={(checked) =>
 							patchSettings({ always_output_data: checked })
@@ -439,7 +439,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Execute Once', 'ai-agent-workflow-automation')}
+						label={__('Execute Once', 'dragwyb-agentflow')}
 						checked={config.settings.execute_once}
 						onChange={(checked) =>
 							patchSettings({ execute_once: checked })
@@ -447,7 +447,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Retry On Fail', 'ai-agent-workflow-automation')}
+						label={__('Retry On Fail', 'dragwyb-agentflow')}
 						checked={config.settings.retry_on_fail}
 						onChange={(checked) =>
 							patchSettings({ retry_on_fail: checked })
@@ -457,7 +457,7 @@ export default function AgentConfigPanel({
 					{config.settings.retry_on_fail && (
 						<>
 							<TextControl
-								label={__('Max. Tries', 'ai-agent-workflow-automation')}
+								label={__('Max. Tries', 'dragwyb-agentflow')}
 								type="number"
 								min={1}
 								max={10}
@@ -471,7 +471,7 @@ export default function AgentConfigPanel({
 							<TextControl
 								label={__(
 									'Wait Between Tries (ms)',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								)}
 								type="number"
 								min={0}
@@ -489,21 +489,21 @@ export default function AgentConfigPanel({
 					)}
 
 					<SelectControl
-						label={__('On Error', 'ai-agent-workflow-automation')}
+						label={__('On Error', 'dragwyb-agentflow')}
 						value={config.settings.on_error}
 						options={[
 							{
-								label: __('Stop Workflow', 'ai-agent-workflow-automation'),
+								label: __('Stop Workflow', 'dragwyb-agentflow'),
 								value: ON_ERROR_STOP,
 							},
 							{
-								label: __('Continue', 'ai-agent-workflow-automation'),
+								label: __('Continue', 'dragwyb-agentflow'),
 								value: ON_ERROR_CONTINUE,
 							},
 							{
 								label: __(
 									'Continue using Error Output',
-									'ai-agent-workflow-automation'
+									'dragwyb-agentflow'
 								),
 								value: ON_ERROR_ERROR_OUTPUT,
 							},
@@ -512,7 +512,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<TextareaControl
-						label={__('Notes', 'ai-agent-workflow-automation')}
+						label={__('Notes', 'dragwyb-agentflow')}
 						value={config.settings.notes}
 						onChange={(value) => patchSettings({ notes: value })}
 					/>
@@ -520,7 +520,7 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Display Note in Flow?',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}
 						checked={config.settings.display_note_in_flow}
 						onChange={(checked) =>
@@ -531,7 +531,7 @@ export default function AgentConfigPanel({
 					<p className="aiawa-agent-config__version">
 						{__(
 							'AI Agent node version',
-							'ai-agent-workflow-automation'
+							'dragwyb-agentflow'
 						)}{' '}
 						{AI_AGENT_VERSION}
 					</p>
@@ -569,7 +569,7 @@ function AgentConnectorRow({
 	const connectors = [
 		{
 			id: 'chat_model',
-			label: __('Chat Model', 'ai-agent-workflow-automation'),
+			label: __('Chat Model', 'dragwyb-agentflow'),
 			required: true,
 			connected: attachments.chatModel,
 			onAdd: onAddChatModel,
@@ -577,13 +577,13 @@ function AgentConnectorRow({
 		},
 		{
 			id: 'memory',
-			label: __('Memory', 'ai-agent-workflow-automation'),
+			label: __('Memory', 'dragwyb-agentflow'),
 			connected: attachments.memory,
 			onAdd: onAddMemory,
 		},
 		{
 			id: 'tool',
-			label: __('Tool', 'ai-agent-workflow-automation'),
+			label: __('Tool', 'dragwyb-agentflow'),
 			connected: attachments.tools?.length > 0 ? attachments.tools[0] : null,
 			toolCount: attachments.tools?.length || 0,
 			onAdd: onAddTool,
@@ -593,7 +593,7 @@ function AgentConnectorRow({
 	if (fallbackEnabled) {
 		connectors.push({
 			id: 'fallback_chat_model',
-			label: __('Fallback Chat Model', 'ai-agent-workflow-automation'),
+			label: __('Fallback Chat Model', 'dragwyb-agentflow'),
 			required: true,
 			connected: attachments.fallbackChatModel,
 			onAdd: onAddFallbackModel,
@@ -604,7 +604,7 @@ function AgentConnectorRow({
 	if (requireOutputFormat) {
 		connectors.splice(1, 0, {
 			id: 'output_parser',
-			label: __('Output Parser', 'ai-agent-workflow-automation'),
+			label: __('Output Parser', 'dragwyb-agentflow'),
 			required: true,
 			connected: attachments.outputParser,
 			onAdd: onAddOutputParser,
@@ -653,7 +653,7 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 					type="button"
 					className="aiawa-agent-config__connector-add"
 					onClick={onAdd}
-					aria-label={__('Add connection', 'ai-agent-workflow-automation')}
+					aria-label={__('Add connection', 'dragwyb-agentflow')}
 				>
 					+
 				</button>

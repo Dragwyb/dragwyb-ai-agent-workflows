@@ -90,7 +90,7 @@ class ConnectionActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation (and per-id for update/delete).
@@ -200,7 +200,7 @@ class ConnectionActionsController {
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		if ( ! ListTableUi::verifyBulkNonce( 'aiawa_connection_bulk_action' ) ) {

@@ -53,14 +53,14 @@ class ConnectionAuthTypes {
 	public static function label( string $auth_type ): string {
 		switch ( $auth_type ) {
 			case self::BASIC:
-				return __( 'Username & Password', 'ai-agent-workflow-automation' );
+				return __( 'Username & Password', 'dragwyb-agentflow' );
 			case self::BEARER_TOKEN:
-				return __( 'Bearer Token', 'ai-agent-workflow-automation' );
+				return __( 'Bearer Token', 'dragwyb-agentflow' );
 			case self::OAUTH2:
-				return __( 'OAuth 2', 'ai-agent-workflow-automation' );
+				return __( 'OAuth 2', 'dragwyb-agentflow' );
 			case self::API_KEY:
 			default:
-				return __( 'API Key', 'ai-agent-workflow-automation' );
+				return __( 'API Key', 'dragwyb-agentflow' );
 		}
 	}
 
@@ -76,43 +76,43 @@ class ConnectionAuthTypes {
 			case self::BASIC:
 				return array(
 					'username' => array(
-						'label'  => __( 'Username', 'ai-agent-workflow-automation' ),
+						'label'  => __( 'Username', 'dragwyb-agentflow' ),
 						'secret' => false,
 					),
 					'password' => array(
-						'label'  => __( 'Password', 'ai-agent-workflow-automation' ),
+						'label'  => __( 'Password', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 				);
 			case self::BEARER_TOKEN:
 				return array(
 					'token' => array(
-						'label'  => __( 'Bearer Token', 'ai-agent-workflow-automation' ),
+						'label'  => __( 'Bearer Token', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 				);
 			case self::OAUTH2:
 				return array(
 					'client_id'     => array(
-						'label'  => __( 'Client ID', 'ai-agent-workflow-automation' ),
+						'label'  => __( 'Client ID', 'dragwyb-agentflow' ),
 						'secret' => false,
 					),
 					'client_secret' => array(
-						'label'  => __( 'Client Secret', 'ai-agent-workflow-automation' ),
+						'label'  => __( 'Client Secret', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 					'access_token'  => array(
-						'label'              => __( 'Access Token', 'ai-agent-workflow-automation' ),
+						'label'              => __( 'Access Token', 'dragwyb-agentflow' ),
 						'secret'             => true,
 						'required_on_create' => false,
 					),
 					'refresh_token' => array(
-						'label'              => __( 'Refresh Token', 'ai-agent-workflow-automation' ),
+						'label'              => __( 'Refresh Token', 'dragwyb-agentflow' ),
 						'secret'             => true,
 						'required_on_create' => false,
 					),
 					'expires_at'    => array(
-						'label'              => __( 'Token Expires At', 'ai-agent-workflow-automation' ),
+						'label'              => __( 'Token Expires At', 'dragwyb-agentflow' ),
 						'secret'             => false,
 						'required_on_create' => false,
 					),
@@ -121,7 +121,7 @@ class ConnectionAuthTypes {
 			default:
 				return array(
 					'api_key' => array(
-						'label'  => __( 'API Key', 'ai-agent-workflow-automation' ),
+						'label'  => __( 'API Key', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 				);

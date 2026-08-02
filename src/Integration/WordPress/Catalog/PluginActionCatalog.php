@@ -31,27 +31,27 @@ final class PluginActionCatalog {
 
 		$definitions[] = array(
 			'slug'          => 'wp_check_plugin_activation_status_action',
-			'label'         => __( 'Check Plugin Activation Status', 'ai-agent-workflow-automation' ),
-			'description'   => __( 'Checks whether a plugin is currently active.', 'ai-agent-workflow-automation' ),
+			'label'         => __( 'Check Plugin Activation Status', 'dragwyb-agentflow' ),
+			'description'   => __( 'Checks whether a plugin is currently active.', 'dragwyb-agentflow' ),
 			'group'         => 'plugin',
 			'group_label'   => $groups['plugin'],
 			'method'        => 'checkPluginActivationStatus',
 			'method_args'   => array(),
 			'config_schema' => array(
-				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
+				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'dragwyb-agentflow' ), array( 'required' => true ) ),
 			),
 		);
 
 		$definitions[] = array(
 			'slug'          => 'wp_activate_plugin_action',
-			'label'         => __( 'Activate Plugin', 'ai-agent-workflow-automation' ),
-			'description'   => __( 'Activates an installed but inactive plugin.', 'ai-agent-workflow-automation' ),
+			'label'         => __( 'Activate Plugin', 'dragwyb-agentflow' ),
+			'description'   => __( 'Activates an installed but inactive plugin.', 'dragwyb-agentflow' ),
 			'group'         => 'plugin',
 			'group_label'   => $groups['plugin'],
 			'method'        => 'activatePlugin',
 			'method_args'   => array(),
 			'config_schema' => array(
-				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
+				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'dragwyb-agentflow' ), array( 'required' => true ) ),
 			),
 		);
 

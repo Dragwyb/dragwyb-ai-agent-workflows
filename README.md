@@ -44,7 +44,7 @@ A from-scratch WordPress workflow automation plugin. See `CURSOR_INSTRUCTIONS.md
 ## Project structure
 
 ```
-ai-agent-workflow-automation.php   Plugin bootstrap (header, version gate, autoload, activation hooks)
+dragwyb-agentflow.php   Plugin bootstrap (header, version gate, autoload, activation hooks)
 uninstall.php           WordPress-invoked cleanup entry point
 src/
   autoload.php           Fallback PSR-4 autoloader (see "Local setup" above)

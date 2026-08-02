@@ -74,7 +74,7 @@ class WebhookService {
 		$workflow = $this->workflows->find( $workflow_id );
 
 		if ( null === $workflow ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'ai-agent-workflow-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-agentflow' ) );
 		}
 
 		$ip_allow_list  = $this->normalizeIpAllowList( $ip_allow_list );
@@ -88,7 +88,7 @@ class WebhookService {
 		// shows the last 4 characters). The form documents that the
 		// field is required when the setting is on.
 		if ( '' === $signing_secret && $this->settings->requireWebhookSigning() ) {
-			throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'ai-agent-workflow-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'dragwyb-agentflow' ) );
 		}
 
 		$webhook = $this->webhooks->insert(
@@ -101,7 +101,7 @@ class WebhookService {
 		);
 
 		if ( null === $webhook ) {
-			throw new RuntimeException( esc_html__( 'Failed to create the webhook.', 'ai-agent-workflow-automation' ) );
+			throw new RuntimeException( esc_html__( 'Failed to create the webhook.', 'dragwyb-agentflow' ) );
 		}
 
 		return $webhook;
@@ -130,13 +130,13 @@ class WebhookService {
 		$webhook = $this->webhooks->find( $id );
 
 		if ( null === $webhook ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified webhook does not exist.', 'ai-agent-workflow-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified webhook does not exist.', 'dragwyb-agentflow' ) );
 		}
 
 		$workflow = $this->workflows->find( $workflow_id );
 
 		if ( null === $workflow ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'ai-agent-workflow-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-agentflow' ) );
 		}
 
 		$ip_allow_list  = $this->normalizeIpAllowList( $ip_allow_list );
@@ -149,7 +149,7 @@ class WebhookService {
 
 		if ( $clear_signing_secret ) {
 			if ( $this->settings->requireWebhookSigning() ) {
-				throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'ai-agent-workflow-automation' ) );
+				throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'dragwyb-agentflow' ) );
 			}
 
 			$attributes['signing_secret'] = '';
@@ -160,7 +160,7 @@ class WebhookService {
 		$updated = $this->webhooks->update( $id, $attributes );
 
 		if ( null === $updated ) {
-			throw new RuntimeException( esc_html__( 'Failed to update the webhook.', 'ai-agent-workflow-automation' ) );
+			throw new RuntimeException( esc_html__( 'Failed to update the webhook.', 'dragwyb-agentflow' ) );
 		}
 
 		return $updated;
@@ -236,7 +236,7 @@ class WebhookService {
 		if ( null === $plaintext ) {
 			return array(
 				'configured' => true,
-				'display'    => __( '(unable to decrypt — please re-enter this value)', 'ai-agent-workflow-automation' ),
+				'display'    => __( '(unable to decrypt — please re-enter this value)', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -264,7 +264,7 @@ class WebhookService {
 		if ( null === $webhook ) {
 			return new WP_Error(
 				'aiawa_webhook_not_found',
-				__( 'Webhook not found.', 'ai-agent-workflow-automation' ),
+				__( 'Webhook not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -272,7 +272,7 @@ class WebhookService {
 		if ( ! $this->isIpAllowed( $client_ip, $webhook->ipAllowList() ) ) {
 			return new WP_Error(
 				'aiawa_webhook_ip_denied',
-				__( 'Request IP is not allowed for this webhook.', 'ai-agent-workflow-automation' ),
+				__( 'Request IP is not allowed for this webhook.', 'dragwyb-agentflow' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -283,7 +283,7 @@ class WebhookService {
 			if ( ! $webhook->hasSigningSecret() ) {
 				return new WP_Error(
 					'aiawa_webhook_signing_required',
-					__( 'This webhook has no signing secret configured, but site settings require one.', 'ai-agent-workflow-automation' ),
+					__( 'This webhook has no signing secret configured, but site settings require one.', 'dragwyb-agentflow' ),
 					array( 'status' => 403 )
 				);
 			}
@@ -293,7 +293,7 @@ class WebhookService {
 			if ( null === $secret || '' === $secret ) {
 				return new WP_Error(
 					'aiawa_webhook_signing_unavailable',
-					__( 'Unable to verify this webhook\'s signature.', 'ai-agent-workflow-automation' ),
+					__( 'Unable to verify this webhook\'s signature.', 'dragwyb-agentflow' ),
 					array( 'status' => 500 )
 				);
 			}
@@ -301,7 +301,7 @@ class WebhookService {
 			if ( ! $this->signatureIsValid( $raw_body, $secret, $signature_header ) ) {
 				return new WP_Error(
 					'aiawa_webhook_invalid_signature',
-					__( 'Invalid webhook signature.', 'ai-agent-workflow-automation' ),
+					__( 'Invalid webhook signature.', 'dragwyb-agentflow' ),
 					array( 'status' => 401 )
 				);
 			}
@@ -312,7 +312,7 @@ class WebhookService {
 		if ( null === $workflow_id ) {
 			return new WP_Error(
 				'aiawa_webhook_unlinked',
-				__( 'This webhook is not linked to a workflow.', 'ai-agent-workflow-automation' ),
+				__( 'This webhook is not linked to a workflow.', 'dragwyb-agentflow' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -322,7 +322,7 @@ class WebhookService {
 		if ( null === $workflow || Workflow::STATUS_ACTIVE !== $workflow->status() ) {
 			return new WP_Error(
 				'aiawa_webhook_workflow_inactive',
-				__( 'The workflow linked to this webhook is not active.', 'ai-agent-workflow-automation' ),
+				__( 'The workflow linked to this webhook is not active.', 'dragwyb-agentflow' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -350,7 +350,7 @@ class WebhookService {
 		} catch ( InvalidArgumentException | RuntimeException $e ) {
 			return new WP_Error(
 				'aiawa_webhook_run_failed',
-				__( 'The workflow could not be started.', 'ai-agent-workflow-automation' ),
+				__( 'The workflow could not be started.', 'dragwyb-agentflow' ),
 				array( 'status' => 500 )
 			);
 		}

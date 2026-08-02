@@ -50,10 +50,10 @@ export default function ChatModelSubNode({
 				<span className="aiawa-chat-model-node__icon">{meta.icon}</span>
 			</span>
 			<span className="aiawa-chat-model-node__label">
-				{node.label || __('Chat Model', 'ai-agent-workflow-automation')}
+				{node.label || __('Chat Model', 'dragwyb-agentflow')}
 			</span>
 			<span className="aiawa-chat-model-node__subtitle">
-				{__('Chat Model', 'ai-agent-workflow-automation')}
+				{__('Chat Model', 'dragwyb-agentflow')}
 			</span>
 		</div>
 	);

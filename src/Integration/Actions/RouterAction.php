@@ -23,29 +23,29 @@ class RouterAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'Router', 'ai-agent-workflow-automation' );
+		return __( 'Router', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Routes to different steps based on a value.', 'ai-agent-workflow-automation' );
+		return __( 'Routes to different steps based on a value.', 'dragwyb-agentflow' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'route_field'            => array(
 				'type'               => 'string',
-				'label'              => __( 'Value to check', 'ai-agent-workflow-automation' ),
+				'label'              => __( 'Value to check', 'dragwyb-agentflow' ),
 				'supports_variables' => true,
 				'required'           => true,
 			),
 			'routes'                 => array(
 				'type'    => 'router_routes',
-				'label'   => __( 'Matching rules', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'Matching rules', 'dragwyb-agentflow' ),
 				'default' => array(),
 			),
 			'default_branch_node_id' => array(
 				'type'    => 'node_select',
-				'label'   => __( 'Otherwise, run this step', 'ai-agent-workflow-automation' ),
+				'label'   => __( 'Otherwise, run this step', 'dragwyb-agentflow' ),
 				'default' => '',
 			),
 		);

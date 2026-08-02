@@ -50,7 +50,7 @@ class AgentToolExecutor {
 			return array(
 				'error' => sprintf(
 					/* translators: %s: tool function name */
-					__( 'Unrecognized tool name "%s".', 'ai-agent-workflow-automation' ),
+					__( 'Unrecognized tool name "%s".', 'dragwyb-agentflow' ),
 					$tool_name
 				),
 			);
@@ -75,7 +75,7 @@ class AgentToolExecutor {
 
 		if ( empty( $result['success'] ) ) {
 			return array(
-				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'The tool action failed.', 'ai-agent-workflow-automation' ),
+				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'The tool action failed.', 'dragwyb-agentflow' ),
 			);
 		}
 

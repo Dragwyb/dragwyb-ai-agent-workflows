@@ -62,11 +62,11 @@ class ConnectionStatusBadge {
 	private static function label( int $status ): string {
 		switch ( $status ) {
 			case Connection::STATUS_VERIFIED:
-				return __( 'Verified', 'ai-agent-workflow-automation' );
+				return __( 'Verified', 'dragwyb-agentflow' );
 			case Connection::STATUS_FAILED:
-				return __( 'Failed', 'ai-agent-workflow-automation' );
+				return __( 'Failed', 'dragwyb-agentflow' );
 			default:
-				return __( 'Not yet verified', 'ai-agent-workflow-automation' );
+				return __( 'Not yet verified', 'dragwyb-agentflow' );
 		}
 	}
 }

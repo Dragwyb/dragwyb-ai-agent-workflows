@@ -20,11 +20,11 @@ class DeepSeekChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'DeepSeek Chat', 'ai-agent-workflow-automation' );
+		return __( 'DeepSeek Chat', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to DeepSeek and returns the reply.', 'ai-agent-workflow-automation' );
+		return __( 'Sends a prompt to DeepSeek and returns the reply.', 'dragwyb-agentflow' );
 	}
 
 	protected function providerSlug(): string {

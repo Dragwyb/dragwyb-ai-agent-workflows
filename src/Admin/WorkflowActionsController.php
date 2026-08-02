@@ -95,7 +95,7 @@ class WorkflowActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation and per-id.
@@ -121,7 +121,7 @@ class WorkflowActionsController {
 	 */
 	public function handleImport(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		check_admin_referer( 'aiawa_workflow_import' );
@@ -188,7 +188,7 @@ class WorkflowActionsController {
 	 */
 	public function handleExport(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below.
@@ -236,7 +236,7 @@ class WorkflowActionsController {
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-workflow-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		if ( ! ListTableUi::verifyBulkNonce( 'aiawa_workflow_bulk_action' ) ) {
