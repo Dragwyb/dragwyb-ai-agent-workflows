@@ -130,6 +130,7 @@ class WorkflowActionsController {
 			$this->redirect( 'import_error' );
 		}
 
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- manual sanitization is performed below
 		$file  = $_FILES['aiawa_workflow_json'];
 		$error = isset( $file['error'] ) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
 
@@ -242,18 +243,15 @@ class WorkflowActionsController {
 			$this->redirect( 'error', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( ! in_array( $bulk_action, self::ALLOWED_OPS, true ) ) {
 			$this->redirect( 'error', $this->bulkRedirectArgs() );
 		}
 
-		$ids = isset( $_POST['workflows'] ) && is_array( $_POST['workflows'] )
-			? array_map( 'absint', wp_unslash( $_POST['workflows'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['workflows'] ) && is_array( $_POST['workflows'] ) ? array_map( 'absint', wp_unslash( $_POST['workflows'] ) ) : array();
 
 		$ids = array_values( array_filter( $ids ) );
 

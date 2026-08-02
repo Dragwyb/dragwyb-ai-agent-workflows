@@ -174,18 +174,15 @@ class WebhookActionsController {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( 'delete' !== $bulk_action ) {
 			$this->redirect( 'error' );
 		}
 
-		$ids = isset( $_POST['webhooks'] ) && is_array( $_POST['webhooks'] )
-			? array_map( 'absint', wp_unslash( $_POST['webhooks'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['webhooks'] ) && is_array( $_POST['webhooks'] ) ? array_map( 'absint', wp_unslash( $_POST['webhooks'] ) ) : array();
 
 		foreach ( array_filter( $ids ) as $id ) {
 			$this->webhooks->delete( $id );

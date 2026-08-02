@@ -207,18 +207,15 @@ class ConnectionActionsController {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( 'delete' !== $bulk_action ) {
 			$this->redirect( 'error' );
 		}
 
-		$ids = isset( $_POST['connections'] ) && is_array( $_POST['connections'] )
-			? array_map( 'absint', wp_unslash( $_POST['connections'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['connections'] ) && is_array($_POST['connections'] ) ? array_map( 'absint', wp_unslash( $_POST['connections'] ) ) : array();
 
 		foreach ( array_filter( $ids ) as $id ) {
 			$this->connections->delete( $id );
@@ -238,7 +235,7 @@ class ConnectionActionsController {
 	 * @return array<string,string>
 	 */
 	private function extractCredentialValues(): array {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in handle().
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce(), WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- manual sanitization is performed below
 		$raw = isset( $_POST['credential'] ) && is_array( $_POST['credential'] ) ? wp_unslash( $_POST['credential'] ) : array();
 
 		$values = array();

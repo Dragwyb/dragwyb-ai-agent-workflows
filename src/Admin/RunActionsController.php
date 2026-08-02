@@ -106,18 +106,15 @@ class RunActionsController {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( 'delete' !== $bulk_action ) {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
-		$ids = isset( $_POST['runs'] ) && is_array( $_POST['runs'] )
-			? array_map( 'absint', wp_unslash( $_POST['runs'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['runs'] ) && is_array( $_POST['runs'] ) ? array_map( 'absint', wp_unslash( $_POST['runs'] ) ) : array();
 
 		$ids = array_values( array_filter( $ids ) );
 

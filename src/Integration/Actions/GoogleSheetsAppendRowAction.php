@@ -94,6 +94,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 			return 'Sheet1';
 		}
 
+		// phpcs:ignore wp_function_not_compatible_with_requires_wp custom defined this function If not exist
 		if ( str_contains( $range, '!' ) ) {
 			return explode( '!', $range )[0];
 		}

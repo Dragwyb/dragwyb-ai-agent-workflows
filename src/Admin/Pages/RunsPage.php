@@ -119,8 +119,7 @@ class RunsPage implements AdminPage {
 		$this->renderFilters( $table );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filters.
-		$has_filters = ( isset( $_GET['workflow_id'] ) && absint( wp_unslash( $_GET['workflow_id'] ) ) > 0 )
-			|| ( isset( $_GET['status'] ) && '' !== sanitize_key( wp_unslash( $_GET['status'] ) ) );
+		$has_filters = ( isset( $_GET['workflow_id'] ) && absint( wp_unslash( $_GET['workflow_id'] ) ) > 0 ) || ( isset( $_GET['status'] ) && '' !== sanitize_key( wp_unslash( $_GET['status'] ) ) );
 
 		if ( ! $table->has_items() && ! $has_filters ) {
 			EmptyState::render(
