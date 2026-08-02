@@ -70,6 +70,7 @@ class WorkflowRepository {
 
 		$formats = array( '%s', '%d', '%d', '%s', '%s', '%d', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -125,6 +126,7 @@ class WorkflowRepository {
 		$data['updated_at'] = current_time( 'mysql', true );
 		$formats[]          = '%s';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via invalidateCache().
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
 		if ( false === $updated ) {
@@ -146,6 +148,7 @@ class WorkflowRepository {
 	public function softDelete( int $id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via invalidateCache().
 		$updated = $wpdb->update(
 			$this->table(),
 			array(
@@ -172,6 +175,7 @@ class WorkflowRepository {
 	public function restore( int $id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via invalidateCache().
 		$updated = $wpdb->update(
 			$this->table(),
 			array(
@@ -199,6 +203,7 @@ class WorkflowRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via invalidateCache().
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
 
 		$this->invalidateCache( $id );
@@ -227,10 +232,10 @@ class WorkflowRepository {
 		$table = esc_sql($this->table());
 
 		if ( $include_trashed ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; result is cached above via cacheGet() and below via cacheSet().
 			$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 		} else {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; result is cached above via cacheGet() and below via cacheSet().
 			$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND deleted_at IS NULL", $id ) );
 		}
 
@@ -295,6 +300,7 @@ class WorkflowRepository {
 		$table        = esc_sql($this->table());
 		$placeholders = implode( ', ', array_fill( 0, count( $missing_ids ), '%d' ) );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Results are cached above via cacheGetMultiple() and below via cacheSet().
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE id IN ({$placeholders})", $missing_ids )
@@ -322,6 +328,7 @@ class WorkflowRepository {
 		global $wpdb;
 
 		$table   = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via invalidateCache().
 		$updated = $wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d", current_time( 'mysql', true ), $id )
@@ -412,16 +419,14 @@ class WorkflowRepository {
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = esc_sql($this->table());
 
-		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql is static text and placeholders
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- intentionally uncached: filter+page combinations would need one cache key per combination, invalidated on nearly every write, for little real hit rate. See paginate() docblock.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $where_sql is static text and placeholders; custom table, no WP API exists for it; intentionally uncached: filter+page combinations would need one cache key per combination, invalidated on nearly every write, for little real hit rate. See paginate() docblock.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql is static text and placeholders
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- intentionally uncached, see paginate() docblock.
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $where_sql is static text and placeholders; custom table, no WP API exists for it; intentionally uncached, see paginate() docblock.
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )

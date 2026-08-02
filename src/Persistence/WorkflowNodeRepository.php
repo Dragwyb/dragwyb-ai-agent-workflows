@@ -70,6 +70,7 @@ class WorkflowNodeRepository {
 
 		$formats = array( '%d', '%s', '%s', '%s', '%s', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -118,6 +119,7 @@ class WorkflowNodeRepository {
 		$data['updated_at'] = current_time( 'mysql', true );
 		$formats[]          = '%s';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
 		if ( false === $updated ) {
@@ -155,7 +157,7 @@ class WorkflowNodeRepository {
 		}
 
 		$table = esc_sql($this->table());
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; result is cached above via cacheGet() and below via cacheSet().
 
 		$node = $row ? WorkflowNode::fromRow( $row ) : null;
 
@@ -184,6 +186,7 @@ class WorkflowNodeRepository {
 		}
 
 		$table = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Result is cached above via cacheGet() and below via cacheSet().
 		$rows  = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d", $workflow_id, self::MAX_NODES_PER_WORKFLOW )
@@ -210,6 +213,7 @@ class WorkflowNodeRepository {
 		// which findByWorkflow() collection cache needs invalidating.
 		$node = $this->find( $id );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
 
 		$this->cacheDelete( (string) $id );
@@ -239,6 +243,7 @@ class WorkflowNodeRepository {
 	public function deleteByWorkflow( int $workflow_id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the collection cache is invalidated below via cacheDelete().
 		$deleted = $wpdb->delete( $this->table(), array( 'workflow_id' => $workflow_id ), array( '%d' ) );
 
 		$this->cacheDelete( $this->workflowCacheKey( $workflow_id ) );

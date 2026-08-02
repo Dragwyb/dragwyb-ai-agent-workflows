@@ -68,6 +68,7 @@ class WebhookRepository {
 		// we pass null — which we do above.
 		$formats = array( '%d', '%s', '%s', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -110,6 +111,7 @@ class WebhookRepository {
 			return $this->find( $id );
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
 		if ( false === $updated ) {
@@ -143,6 +145,7 @@ class WebhookRepository {
 		// the public_id cache key that also needs invalidating.
 		$webhook = $this->find( $id );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
 
 		$this->cacheDelete( (string) $id );
@@ -172,6 +175,7 @@ class WebhookRepository {
 	public function nullifyWorkflow( int $workflow_id ): void {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it. Not cache-invalidated here, see docblock above.
 		$wpdb->update(
 			$this->table(),
 			array( 'workflow_id' => null ),
@@ -199,7 +203,7 @@ class WebhookRepository {
 		}
 
 		$table = esc_sql($this->table());
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; result is cached above via cacheGet() and below via cacheSet().
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 
 		$webhook = $row ? Webhook::fromRow( $row ) : null;
@@ -229,7 +233,7 @@ class WebhookRepository {
 		}
 
 		$table = esc_sql($this->table());
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; result is cached above via cacheGet() and below via cacheSet().
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE public_id = %s", $public_id ) );
 
 		$webhook = $row ? Webhook::fromRow( $row ) : null;
@@ -289,14 +293,14 @@ class WebhookRepository {
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = esc_sql($this->table());
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginate() docblock.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginate() docblock.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginate() docblock.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginate() docblock.
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )

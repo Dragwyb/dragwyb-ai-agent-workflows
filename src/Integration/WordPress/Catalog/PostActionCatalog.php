@@ -105,8 +105,8 @@ final class PostActionCatalog {
 			'method_args'   => array(),
 			'config_schema' => array(
 				'post_type'  => $field( 'string', __( 'Post Type', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
-				'meta_key'   => $field( 'string', __( 'Meta Key', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
-				'meta_value' => $field( 'string', __( 'Meta Value', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
+				'meta_key'   => $field( 'string', __( 'Meta Key', 'ai-agent-workflow-automation' ), array( 'required' => true ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- config field name for a builder UI, not a live query.
+				'meta_value' => $field( 'string', __( 'Meta Value', 'ai-agent-workflow-automation' ), array( 'required' => true ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- config field name for a builder UI, not a live query.
 				'limit'      => $field( 'integer', __( 'Limit', 'ai-agent-workflow-automation' ), array( 'default' => 50 ) ),
 			),
 		);
@@ -134,7 +134,7 @@ final class PostActionCatalog {
 			'method_args'   => array(),
 			'config_schema' => array(
 				'post_id'  => $field( 'string', __( 'Post ID', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
-				'meta_key' => $field( 'string', __( 'Meta Key', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
+				'meta_key' => $field( 'string', __( 'Meta Key', 'ai-agent-workflow-automation' ), array( 'required' => true ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- config field name for a builder UI, not a live query.
 			),
 		);
 
@@ -415,7 +415,7 @@ final class PostActionCatalog {
 			'method_args'   => array(),
 			'config_schema' => array(
 				'comment_id' => $field( 'string', __( 'Comment ID', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
-				'meta_key'   => $field( 'string', __( 'Meta Key', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
+				'meta_key'   => $field( 'string', __( 'Meta Key', 'ai-agent-workflow-automation' ), array( 'required' => true ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- config field name for a builder UI, not a live query.
 			),
 		);
 

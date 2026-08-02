@@ -75,6 +75,7 @@ class WorkflowRunLogRepository {
 
 		$formats = array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -105,7 +106,7 @@ class WorkflowRunLogRepository {
 		}
 
 		$table = esc_sql($this->table());
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; result is cached above via cacheGet() and below via cacheSet().
 
 		$log = $row ? WorkflowRunLog::fromRow( $row ) : null;
 
@@ -134,6 +135,7 @@ class WorkflowRunLogRepository {
 		}
 
 		$table = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Result is cached above via cacheGet() and below via cacheSet().
 		$rows  = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d", $run_id, self::MAX_LOGS_PER_RUN )
@@ -172,6 +174,7 @@ class WorkflowRunLogRepository {
 		$placeholders = implode( ', ', array_fill( 0, count( $run_ids ), '%d' ) );
 		$table        = esc_sql($this->table());
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected per-run collection caches are invalidated below via cacheDelete().
 		$deleted = $wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "DELETE FROM {$table} WHERE run_id IN ({$placeholders})", $run_ids )

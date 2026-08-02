@@ -127,8 +127,9 @@ final class PostWordPressService {
 		$posts = get_posts(
 			array(
 				'post_type'   => $postType,
-				'meta_key'    => $metaKey,
-				'meta_value'  => $metaValue,
+				// This action's entire purpose is querying by an arbitrary, user-configured meta key/value pair; there is no fixed key to index around.
+				'meta_key'    => $metaKey, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'  => $metaValue, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				'numberposts' => WordPressActionHelper::resolveListLimit( $limit > 0 ? $limit : null ),
 			)
 		);

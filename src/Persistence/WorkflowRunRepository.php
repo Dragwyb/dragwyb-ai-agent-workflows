@@ -85,6 +85,7 @@ class WorkflowRunRepository {
 
 		$formats = array( '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -120,7 +121,7 @@ class WorkflowRunRepository {
 		// live queue state at the instant a new trigger fires, to decide
 		// whether to collapse it into an existing pending run. A cached
 		// answer could let duplicate runs through.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
 		$found = $wpdb->get_var(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
@@ -173,7 +174,7 @@ class WorkflowRunRepository {
 		$claim_token  = wp_generate_uuid4();
 		$stale_before = gmdate( 'Y-m-d H:i:s', time() - ( $stale_after_minutes * MINUTE_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- this is a write (atomic claim), not a cacheable read.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. This is a write (atomic claim), not a cacheable read.
 		$wpdb->query(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
@@ -201,7 +202,7 @@ class WorkflowRunRepository {
 
 		// Not object-cached: $claim_token is freshly generated every call,
 		// so this SELECT would always be a guaranteed cache miss anyway.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC", $claim_token )
@@ -231,6 +232,7 @@ class WorkflowRunRepository {
 	public function requeue( int $id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entry is invalidated below via cacheDelete().
 		$updated = $wpdb->update(
 			$this->table(),
 			array(
@@ -259,6 +261,7 @@ class WorkflowRunRepository {
 	public function finish( int $id, string $status ): ?WorkflowRun {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entry is invalidated below via cacheDelete().
 		$updated = $wpdb->update(
 			$this->table(),
 			array(
@@ -297,7 +300,7 @@ class WorkflowRunRepository {
 		}
 
 		$table = esc_sql($this->table());
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; result is cached above via cacheGet() and below via cacheSet().
 
 		$run = $row ? WorkflowRun::fromRow( $row ) : null;
 
@@ -333,13 +336,13 @@ class WorkflowRunRepository {
 
 		// Intentionally not object-cached: see paginateAll()'s docblock —
 		// same reasoning applies to every filtered/paginated list query.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d", $workflow_id )
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $workflow_id, $per_page, $offset )
@@ -402,14 +405,14 @@ class WorkflowRunRepository {
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = esc_sql($this->table());
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginateAll() docblock.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginateAll() docblock.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginateAll() docblock.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginateAll() docblock.
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
@@ -443,7 +446,7 @@ class WorkflowRunRepository {
 
 		return array_map(
 			'intval',
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; not cached, see docblock
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; not cached, see docblock
 			$wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE workflow_id = %d", $workflow_id ) )
 		);
 	}
@@ -472,7 +475,7 @@ class WorkflowRunRepository {
 
 		return array_map(
 			'intval',
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see docblock.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see docblock.
 			$wpdb->get_col(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 				$wpdb->prepare( "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d", $cutoff_gmt, self::MAX_PRUNE_BATCH )
@@ -500,6 +503,7 @@ class WorkflowRunRepository {
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
 		$table        = esc_sql($this->table());
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected rows' cache entries are invalidated below via cacheDelete().
 		$deleted = $wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $placeholders is escaped
 			$wpdb->prepare( "DELETE FROM {$table} WHERE id IN ({$placeholders})", $ids )
@@ -533,6 +537,7 @@ class WorkflowRunRepository {
 	public function deleteByWorkflow( int $workflow_id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it. Not cache-invalidated here, see docblock above.
 		$deleted = $wpdb->delete( $this->table(), array( 'workflow_id' => $workflow_id ), array( '%d' ) );
 
 		return false !== $deleted;
