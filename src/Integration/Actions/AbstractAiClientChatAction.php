@@ -44,12 +44,12 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		return array(
 			'api_credentials' => array(
 				'type'     => 'ai_credentials',
-				'label'    => __( 'API key', 'workflow-automate' ),
+				'label'    => __( 'API key', 'ai-agent-workflow-automation' ),
 				'provider' => $this->providerSlug(),
 			),
 			'model'           => array(
 				'type'           => 'dynamic_select',
-				'label'          => __( 'Model', 'workflow-automate' ),
+				'label'          => __( 'Model', 'ai-agent-workflow-automation' ),
 				'default'        => $this->defaultModel(),
 				'options_source' => 'ai_models',
 				'provider_field' => 'provider',
@@ -57,12 +57,12 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 			),
 			'system_prompt'   => array(
 				'type'    => 'string',
-				'label'   => __( 'System prompt (optional)', 'workflow-automate' ),
+				'label'   => __( 'System prompt (optional)', 'ai-agent-workflow-automation' ),
 				'default' => '',
 			),
 			'prompt'          => array(
 				'type'     => 'string',
-				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'workflow-automate' ),
+				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 		);
@@ -76,7 +76,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		if ( '' === $prompt ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No prompt configured.', 'workflow-automate' ),
+				'error'   => __( 'No prompt configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

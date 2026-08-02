@@ -42,7 +42,7 @@ class Activator {
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
-				esc_html__( 'Plugin activation error', 'workflow-automate' ),
+				esc_html__( 'Plugin activation error', 'ai-agent-workflow-automation' ),
 				array( 'back_link' => true )
 			);
 		}

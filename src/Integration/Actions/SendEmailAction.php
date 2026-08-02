@@ -43,14 +43,14 @@ class SendEmailAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Send Email', 'workflow-automate' );
+		return __( 'Send Email', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an email using the site\'s configured mail delivery method.', 'workflow-automate' );
+		return __( 'Sends an email using the site\'s configured mail delivery method.', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -60,22 +60,22 @@ class SendEmailAction implements ActionInterface {
 		return array(
 			'to'      => array(
 				'type'     => 'string',
-				'label'    => __( 'To (comma-separated for multiple recipients)', 'workflow-automate' ),
+				'label'    => __( 'To (comma-separated for multiple recipients)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'subject' => array(
 				'type'     => 'string',
-				'label'    => __( 'Subject', 'workflow-automate' ),
+				'label'    => __( 'Subject', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'message' => array(
 				'type'     => 'string',
-				'label'    => __( 'Message', 'workflow-automate' ),
+				'label'    => __( 'Message', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'headers' => array(
 				'type'    => 'object',
-				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'workflow-automate' ),
+				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'ai-agent-workflow-automation' ),
 				'default' => array(),
 			),
 		);
@@ -90,7 +90,7 @@ class SendEmailAction implements ActionInterface {
 		if ( array() === $recipients ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No valid recipient address configured.', 'workflow-automate' ),
+				'error'   => __( 'No valid recipient address configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -117,7 +117,7 @@ class SendEmailAction implements ActionInterface {
 				'success' => false,
 				'error'   => $captured_error instanceof WP_Error
 					? $captured_error->get_error_message()
-					: __( 'wp_mail() reported failure for an unknown reason.', 'workflow-automate' ),
+					: __( 'wp_mail() reported failure for an unknown reason.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

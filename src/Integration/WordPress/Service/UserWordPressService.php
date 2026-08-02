@@ -58,33 +58,33 @@ final class UserWordPressService {
 		$username = WordPressActionHelper::str( $config, 'username' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'Email is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Email is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $username ) {
-			return WordPressActionHelper::fail( __( 'Username is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Username is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( get_user_by( 'email', $email ) ) {
-			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
 		$password     = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
 
 		if ( '' === $password ) {
-			return WordPressActionHelper::fail( __( 'Password is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Password is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' === $userRole ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$editableRoles = get_editable_roles();
 		if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
-			return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$userData = WordPressActionHelper::mapUserFields( $config );
@@ -130,11 +130,11 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$userData       = WordPressActionHelper::mapUserFields( $config );
@@ -145,7 +145,7 @@ final class UserWordPressService {
 		if ( '' !== $userRole ) {
 			$editableRoles = get_editable_roles();
 			if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
-				return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'ai-agent-workflow-automation' ) );
 			}
 			$userData['role'] = $userRole;
 		}
@@ -182,22 +182,22 @@ final class UserWordPressService {
 
 		if ( $useEmail ) {
 			if ( '' === $userEmail ) {
-				return WordPressActionHelper::fail( __( 'User email is required.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'User email is required.', 'ai-agent-workflow-automation' ) );
 			}
 
 			$user = get_user_by( 'email', $userEmail );
 
 			if ( ! $user ) {
-				return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 			}
 
 			$userId = (int) $user->ID;
 		} elseif ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		WordPressActionHelper::ensureMediaIncludes();
@@ -205,7 +205,7 @@ final class UserWordPressService {
 		$result = wp_delete_user( $userId, $reassignUserId > 0 ? $reassignUserId : null );
 
 		if ( ! $result ) {
-			return WordPressActionHelper::fail( __( 'Failed to delete user.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Failed to delete user.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'user_id' => $userId ) );
@@ -227,7 +227,7 @@ final class UserWordPressService {
 		$role = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' === $role ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -244,13 +244,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$user = $this->fetchUserInfo( $userId );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -260,13 +260,13 @@ final class UserWordPressService {
 		$email = WordPressActionHelper::str( $config, 'user_email' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'User email is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User email is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$user = $this->fetchUserByField( 'email', $email );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -277,17 +277,17 @@ final class UserWordPressService {
 		$fieldValue = WordPressActionHelper::str( $config, 'field_value' );
 
 		if ( '' === $fieldKey ) {
-			return WordPressActionHelper::fail( __( 'Field is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Field is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $fieldValue ) {
-			return WordPressActionHelper::fail( __( 'Field value is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Field value is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$user = $this->fetchUserByField( $fieldKey, $fieldValue );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -297,13 +297,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$metadata = $this->fetchUserMeta( $userId );
 
 		if ( empty( $metadata ) ) {
-			return WordPressActionHelper::fail( __( 'User metadata not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User metadata not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( $metadata );
@@ -314,17 +314,17 @@ final class UserWordPressService {
 		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $metaKey ) {
-			return WordPressActionHelper::fail( __( 'Meta key is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Meta key is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$metadata = $this->fetchUserMeta( $userId, $metaKey, true );
 
 		if ( '' === $metadata ) {
-			return WordPressActionHelper::fail( __( 'User metadata not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User metadata not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( array( $metaKey => $metadata ) );
@@ -334,11 +334,11 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$metadataMap = WordPressActionHelper::keyValue( $config, 'metadata' );
@@ -347,7 +347,7 @@ final class UserWordPressService {
 			$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 			if ( '' === $metaKey ) {
-				return WordPressActionHelper::fail( __( 'Metadata is required.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'Metadata is required.', 'ai-agent-workflow-automation' ) );
 			}
 
 			$metadataMap[ $metaKey ] = $config['meta_value'] ?? '';
@@ -371,17 +371,17 @@ final class UserWordPressService {
 		$capabilities    = WordPressActionHelper::parseCapabilities( $config['role_capabilities'] ?? array() );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $roleDisplayName ) {
-			return WordPressActionHelper::fail( __( 'Role display name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role display name is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$role = add_role( $roleName, $roleDisplayName, $capabilities );
 
 		if ( null === $role ) {
-			return WordPressActionHelper::fail( __( 'Role already exists.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role already exists.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -397,11 +397,11 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( ! wp_roles()->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		remove_role( $roleName );
@@ -413,19 +413,19 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$roles = WordPressActionHelper::parseList( $config['user_role'] ?? array() );
 
 		if ( array() === $roles ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( $update ) {
@@ -473,13 +473,13 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$wpRoles = wp_roles();
 
 		if ( ! $wpRoles || ! $wpRoles->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$role = $wpRoles->get_role( $roleName );
@@ -491,25 +491,25 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$wpRoles = wp_roles();
 
 		if ( ! $wpRoles || ! $wpRoles->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$role = $wpRoles->get_role( $roleName );
 
 		if ( ! $role ) {
-			return WordPressActionHelper::fail( __( 'Role object unavailable.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role object unavailable.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$capabilities = WordPressActionHelper::parseList( $config['role_capabilities'] ?? array() );
 
 		if ( array() === $capabilities ) {
-			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		foreach ( $capabilities as $cap ) {
@@ -532,13 +532,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return WordPressActionHelper::ok( $user->allcaps );
@@ -548,19 +548,19 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$capabilities = WordPressActionHelper::parseList( $config['role_capabilities'] ?? array() );
 
 		if ( array() === $capabilities ) {
-			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		foreach ( $capabilities as $cap ) {

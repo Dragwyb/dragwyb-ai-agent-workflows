@@ -25,7 +25,7 @@ final class PluginWordPressService {
 		$file = WordPressActionHelper::str( $config, 'plugin_file' );
 
 		if ( '' === $file ) {
-			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		WordPressActionHelper::ensurePluginIncludes();
@@ -44,7 +44,7 @@ final class PluginWordPressService {
 		$file = WordPressActionHelper::str( $config, 'plugin_file' );
 
 		if ( '' === $file ) {
-			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		WordPressActionHelper::ensurePluginIncludes();

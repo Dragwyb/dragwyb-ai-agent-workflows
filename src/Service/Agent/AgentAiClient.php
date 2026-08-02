@@ -49,7 +49,7 @@ class AgentAiClient {
 		if ( ! AiClientBootstrap::isAvailable() ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'WordPress AI Client is not available.', 'workflow-automate' ),
+				'error'   => __( 'WordPress AI Client is not available.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -68,7 +68,7 @@ class AgentAiClient {
 				'success' => false,
 				'error'   => sprintf(
 					/* translators: %s: provider name */
-					__( 'No API key configured for %s. Add an API key in this node.', 'workflow-automate' ),
+					__( 'No API key configured for %s. Add an API key in this node.', 'ai-agent-workflow-automation' ),
 					$provider_id
 				),
 			);
@@ -84,7 +84,7 @@ class AgentAiClient {
 			if ( null === $builder ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The WordPress AI Client is not available on this site.', 'workflow-automate' ),
+					'error'   => __( 'The WordPress AI Client is not available on this site.', 'ai-agent-workflow-automation' ),
 				);
 			}
 			$builder->using_provider( $provider_id );
@@ -110,7 +110,7 @@ class AgentAiClient {
 			if ( ! $result instanceof GenerativeAiResult ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The AI client returned an unexpected result.', 'workflow-automate' ),
+					'error'   => __( 'The AI client returned an unexpected result.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -151,7 +151,7 @@ class AgentAiClient {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => $result['error'] ?? __( 'AI request failed.', 'workflow-automate' ),
+				'error'   => $result['error'] ?? __( 'AI request failed.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

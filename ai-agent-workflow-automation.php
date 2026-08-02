@@ -10,7 +10,7 @@
  * Author URI:        https://dragwyb.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       workflow-automate
+ * Text Domain:       ai-agent-workflow-automation
  * Domain Path:       /languages
  *
  * @package AIAWA\Plugin
@@ -55,7 +55,7 @@ function aiawa_php_version_notice() {
 		esc_html(
 			sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version. */
-				__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'workflow-automate' ),
+				__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'ai-agent-workflow-automation' ),
 				AIAWA_MIN_PHP_VERSION,
 				PHP_VERSION
 			)

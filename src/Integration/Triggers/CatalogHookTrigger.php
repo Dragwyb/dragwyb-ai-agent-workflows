@@ -41,10 +41,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		$hook = (string) ( $this->definition['hook_name'] ?? '' );
 
 		if ( self::isPostContentHook( $hook ) ) {
-			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'workflow-automate' );
+			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'ai-agent-workflow-automation' );
 		}
 
-		return __( 'Starts the workflow when this WordPress event fires.', 'workflow-automate' );
+		return __( 'Starts the workflow when this WordPress event fires.', 'ai-agent-workflow-automation' );
 	}
 
 	public function group(): string {
@@ -81,10 +81,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		if ( self::isPostContentHook( (string) $this->definition['hook_name'] ) ) {
 			$schema['post_types'] = array(
 				'type'        => 'string',
-				'label'       => __( 'Post Types', 'workflow-automate' ),
+				'label'       => __( 'Post Types', 'ai-agent-workflow-automation' ),
 				'default'     => '',
-				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'workflow-automate' ),
-				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'workflow-automate' ),
+				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'ai-agent-workflow-automation' ),
+				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

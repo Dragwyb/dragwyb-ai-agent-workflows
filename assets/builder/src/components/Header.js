@@ -4,20 +4,20 @@ import { __ } from '@wordpress/i18n';
 
 const SAVE_STATUS_LABELS = {
 	idle: '',
-	dirty: __('Unsaved changes', 'workflow-automate'),
-	saving: __('Saving…', 'workflow-automate'),
-	saved: __('Saved', 'workflow-automate'),
+	dirty: __('Unsaved changes', 'ai-agent-workflow-automation'),
+	saving: __('Saving…', 'ai-agent-workflow-automation'),
+	saved: __('Saved', 'ai-agent-workflow-automation'),
 	error: __(
 		'Save failed — check your connection and try again.',
-		'workflow-automate'
+		'ai-agent-workflow-automation'
 	),
 };
 
 /** @type {Record<number, string>} */
 const WORKFLOW_STATUS_LABELS = {
-	0: __('Draft', 'workflow-automate'),
-	1: __('Active', 'workflow-automate'),
-	2: __('Paused', 'workflow-automate'),
+	0: __('Draft', 'ai-agent-workflow-automation'),
+	1: __('Active', 'ai-agent-workflow-automation'),
+	2: __('Paused', 'ai-agent-workflow-automation'),
 };
 
 /**
@@ -76,18 +76,18 @@ export default function Header({
 						href={listUrl}
 						aria-label={__(
 							'Back to workflows list',
-							'workflow-automate'
+							'ai-agent-workflow-automation'
 						)}
 					>
-						{__('← Workflows', 'workflow-automate')}
+						{__('← Workflows', 'ai-agent-workflow-automation')}
 					</a>
 				)}
 				<input
 					type="text"
 					className="aiawa-builder-header__title"
 					value={title}
-					placeholder={__('Untitled workflow', 'workflow-automate')}
-					aria-label={__('Workflow title', 'workflow-automate')}
+					placeholder={__('Untitled workflow', 'ai-agent-workflow-automation')}
+					aria-label={__('Workflow title', 'ai-agent-workflow-automation')}
 					onChange={(event) => onTitleChange(event.target.value)}
 				/>
 				<span
@@ -135,10 +135,10 @@ export default function Header({
 							onClick={() => importInputRef.current?.click()}
 							aria-label={__(
 								'Import workflow from JSON',
-								'workflow-automate'
+								'ai-agent-workflow-automation'
 							)}
 						>
-							{__('Import', 'workflow-automate')}
+							{__('Import', 'ai-agent-workflow-automation')}
 						</Button>
 					</>
 				)}
@@ -148,10 +148,10 @@ export default function Header({
 						onClick={onExport}
 						aria-label={__(
 							'Export workflow as JSON',
-							'workflow-automate'
+							'ai-agent-workflow-automation'
 						)}
 					>
-						{__('Export', 'workflow-automate')}
+						{__('Export', 'ai-agent-workflow-automation')}
 					</Button>
 				)}
 				{testFlow && (
@@ -166,8 +166,8 @@ export default function Header({
 							disabled={testFlow.listening}
 						>
 							{testFlow.listening
-								? __('Listening…', 'workflow-automate')
-								: __('Test Flow', 'workflow-automate')}
+								? __('Listening…', 'ai-agent-workflow-automation')
+								: __('Test Flow', 'ai-agent-workflow-automation')}
 						</Button>
 						{testFlow.menuOpen && (
 							<div className="aiawa-builder-header__test-menu">
@@ -178,7 +178,7 @@ export default function Header({
 								>
 									{__(
 										'Listen new response',
-										'workflow-automate'
+										'ai-agent-workflow-automation'
 									)}
 								</button>
 								<button
@@ -188,7 +188,7 @@ export default function Header({
 								>
 									{__(
 										'Use existing data',
-										'workflow-automate'
+										'ai-agent-workflow-automation'
 									)}
 								</button>
 							</div>
@@ -202,7 +202,7 @@ export default function Header({
 						onClick={onToggleChat}
 						aria-pressed={chatOpen}
 					>
-						{__('Chat', 'workflow-automate')}
+						{__('Chat', 'ai-agent-workflow-automation')}
 					</Button>
 				)}
 				<Button
@@ -212,18 +212,18 @@ export default function Header({
 					disabled={toggleActiveBusy}
 					aria-label={
 						isActive
-							? __('Pause workflow', 'workflow-automate')
-							: __('Activate workflow', 'workflow-automate')
+							? __('Pause workflow', 'ai-agent-workflow-automation')
+							: __('Activate workflow', 'ai-agent-workflow-automation')
 					}
 				>
 					{toggleActiveBusy
-						? __('Updating…', 'workflow-automate')
+						? __('Updating…', 'ai-agent-workflow-automation')
 						: isActive
-							? __('Pause', 'workflow-automate')
-							: __('Activate', 'workflow-automate')}
+							? __('Pause', 'ai-agent-workflow-automation')
+							: __('Activate', 'ai-agent-workflow-automation')}
 				</Button>
 				<Button isPrimary onClick={onSave} disabled={saveDisabled}>
-					{__('Save', 'workflow-automate')}
+					{__('Save', 'ai-agent-workflow-automation')}
 				</Button>
 			</div>
 		</header>

@@ -40,14 +40,14 @@ class ConditionAction implements ActionInterface {
 
 	public function label(): string {
 
-		return __( 'Condition', 'workflow-automate' );
+		return __( 'Condition', 'ai-agent-workflow-automation' );
 	}
 
 
 
 	public function description(): string {
 
-		return __( 'Route the workflow down different branches when conditions match.', 'workflow-automate' );
+		return __( 'Route the workflow down different branches when conditions match.', 'ai-agent-workflow-automation' );
 	}
 
 
@@ -60,7 +60,7 @@ class ConditionAction implements ActionInterface {
 
 				'type'    => 'condition_routes',
 
-				'label'   => __( 'Conditions', 'workflow-automate' ),
+				'label'   => __( 'Conditions', 'ai-agent-workflow-automation' ),
 
 				'default' => array(),
 
@@ -70,7 +70,7 @@ class ConditionAction implements ActionInterface {
 
 				'type'    => 'node_select',
 
-				'label'   => __( 'No Condition Matched', 'workflow-automate' ),
+				'label'   => __( 'No Condition Matched', 'ai-agent-workflow-automation' ),
 
 				'default' => '',
 
@@ -137,7 +137,7 @@ class ConditionAction implements ActionInterface {
 
 			'matched_condition_id'    => 'default',
 
-			'matched_condition_label' => __( 'No Condition Matched', 'workflow-automate' ),
+			'matched_condition_label' => __( 'No Condition Matched', 'ai-agent-workflow-automation' ),
 
 			'evaluated_value'         => '',
 
@@ -184,7 +184,7 @@ class ConditionAction implements ActionInterface {
 
 				'id'       => 'legacy-true',
 
-				'label'    => __( 'If yes', 'workflow-automate' ),
+				'label'    => __( 'If yes', 'ai-agent-workflow-automation' ),
 
 				'field'    => $field,
 

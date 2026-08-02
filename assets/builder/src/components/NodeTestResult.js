@@ -32,7 +32,7 @@ export default function NodeTestResult({
 				className="aiawa-builder-config__test-result aiawa-builder-config__test-result--error"
 				role="alert"
 			>
-				<h3>{__('Response', 'workflow-automate')}</h3>
+				<h3>{__('Response', 'ai-agent-workflow-automation')}</h3>
 				<p>{error}</p>
 			</div>
 		);
@@ -52,7 +52,7 @@ export default function NodeTestResult({
 	return (
 		<div className="aiawa-builder-config__test-result">
 			<div className="aiawa-builder-config__test-result-header">
-				<h3>{__('Response', 'workflow-automate')}</h3>
+				<h3>{__('Response', 'ai-agent-workflow-automation')}</h3>
 				<span
 					className={
 						success
@@ -61,8 +61,8 @@ export default function NodeTestResult({
 					}
 				>
 					{success
-						? __('Success', 'workflow-automate')
-						: __('Failed', 'workflow-automate')}
+						? __('Success', 'ai-agent-workflow-automation')
+						: __('Failed', 'ai-agent-workflow-automation')}
 				</span>
 			</div>
 
@@ -81,7 +81,7 @@ export default function NodeTestResult({
 						aria-controls="aiawa-test-tabpanel"
 						onClick={() => setActiveTab('input')}
 					>
-						{__('Input', 'workflow-automate')}
+						{__('Input', 'ai-agent-workflow-automation')}
 					</button>
 					<button
 						type="button"
@@ -96,7 +96,7 @@ export default function NodeTestResult({
 						aria-controls="aiawa-test-tabpanel"
 						onClick={() => setActiveTab('output')}
 					>
-						{__('Output', 'workflow-automate')}
+						{__('Output', 'ai-agent-workflow-automation')}
 					</button>
 				</div>
 

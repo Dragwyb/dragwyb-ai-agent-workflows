@@ -41,59 +41,59 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 	return (
 		<nav
 			className="aiawa-builder-palette"
-			aria-label={__('Node palette', 'workflow-automate')}
+			aria-label={__('Node palette', 'ai-agent-workflow-automation')}
 		>
 			<div className="aiawa-builder-palette__search">
 				<TextControl
-					label={__('Search nodes', 'workflow-automate')}
+					label={__('Search nodes', 'ai-agent-workflow-automation')}
 					hideLabelFromVision
-					placeholder={__('Search nodes…', 'workflow-automate')}
+					placeholder={__('Search nodes…', 'ai-agent-workflow-automation')}
 					value={query}
 					onChange={setQuery}
 				/>
 			</div>
 			<PaletteSection
-				title={__('Triggers', 'workflow-automate')}
+				title={__('Triggers', 'ai-agent-workflow-automation')}
 				apps={triggerApps}
 				kind="trigger"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No triggers match your search.', 'workflow-automate')
-						: __('No triggers are registered.', 'workflow-automate')
+						? __('No triggers match your search.', 'ai-agent-workflow-automation')
+						: __('No triggers are registered.', 'ai-agent-workflow-automation')
 				}
 			/>
 			<PaletteSection
-				title={__('Agents', 'workflow-automate')}
+				title={__('Agents', 'ai-agent-workflow-automation')}
 				apps={agentApps}
 				kind="agent"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No agents match your search.', 'workflow-automate')
-						: __('No agents are registered.', 'workflow-automate')
+						? __('No agents match your search.', 'ai-agent-workflow-automation')
+						: __('No agents are registered.', 'ai-agent-workflow-automation')
 				}
 			/>
 			<PaletteSection
-				title={__('Tools', 'workflow-automate')}
+				title={__('Tools', 'ai-agent-workflow-automation')}
 				apps={toolApps}
 				kind="tool"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No tools match your search.', 'workflow-automate')
-						: __('No tools are registered.', 'workflow-automate')
+						? __('No tools match your search.', 'ai-agent-workflow-automation')
+						: __('No tools are registered.', 'ai-agent-workflow-automation')
 				}
 			/>
 			<PaletteSection
-				title={__('Actions', 'workflow-automate')}
+				title={__('Actions', 'ai-agent-workflow-automation')}
 				apps={actionApps}
 				kind="action"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No actions match your search.', 'workflow-automate')
-						: __('No actions are registered.', 'workflow-automate')
+						? __('No actions match your search.', 'ai-agent-workflow-automation')
+						: __('No actions are registered.', 'ai-agent-workflow-automation')
 				}
 			/>
 		</nav>
@@ -116,9 +116,9 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 							/* translators: %s: plugin name, e.g. WooCommerce */
 							__(
 								'Activate %s to use this trigger.',
-								'workflow-automate'
+								'ai-agent-workflow-automation'
 							),
-							app.requiresPlugin || __('this plugin', 'workflow-automate')
+							app.requiresPlugin || __('this plugin', 'ai-agent-workflow-automation')
 						)
 						: '';
 

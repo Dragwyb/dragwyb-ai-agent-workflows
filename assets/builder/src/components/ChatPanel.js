@@ -64,19 +64,19 @@ export default function ChatPanel({
 			  }));
 
 	return (
-		<aside className="aiawa-builder-chat" aria-label={__('Chat', 'workflow-automate')}>
+		<aside className="aiawa-builder-chat" aria-label={__('Chat', 'ai-agent-workflow-automation')}>
 			<div className="aiawa-builder-chat__header">
 				<div>
-					<strong>{title || __('Chat', 'workflow-automate')}</strong>
+					<strong>{title || __('Chat', 'ai-agent-workflow-automation')}</strong>
 					<p className="aiawa-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
-							'workflow-automate'
+							'ai-agent-workflow-automation'
 						)}
 					</p>
 				</div>
 				<Button isSmall isSecondary onClick={onClose}>
-					{__('Close', 'workflow-automate')}
+					{__('Close', 'ai-agent-workflow-automation')}
 				</Button>
 			</div>
 
@@ -91,7 +91,7 @@ export default function ChatPanel({
 				))}
 				{sending && (
 					<div className="aiawa-builder-chat__bubble aiawa-builder-chat__bubble--assistant aiawa-builder-chat__bubble--pending">
-						{__('Thinking…', 'workflow-automate')}
+						{__('Thinking…', 'ai-agent-workflow-automation')}
 					</div>
 				)}
 			</div>
@@ -104,18 +104,18 @@ export default function ChatPanel({
 
 			<form className="aiawa-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
-					label={__('Message', 'workflow-automate')}
+					label={__('Message', 'ai-agent-workflow-automation')}
 					hideLabelFromVision
 					value={draft}
 					onChange={setDraft}
-					placeholder={__('Type a message…', 'workflow-automate')}
+					placeholder={__('Type a message…', 'ai-agent-workflow-automation')}
 					rows={2}
 					disabled={sending}
 				/>
 				<Button isPrimary type="submit" disabled={sending || !draft.trim()}>
 					{sending
-						? __('Sending…', 'workflow-automate')
-						: __('Send', 'workflow-automate')}
+						? __('Sending…', 'ai-agent-workflow-automation')
+						: __('Send', 'ai-agent-workflow-automation')}
 				</Button>
 			</form>
 		</aside>

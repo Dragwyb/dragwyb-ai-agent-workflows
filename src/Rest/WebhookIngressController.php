@@ -86,7 +86,7 @@ class WebhookIngressController {
 		if ( ! $this->checkRateLimit( $public_id, $client_ip ) ) {
 			return new WP_Error(
 				'aiawa_webhook_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again later.', 'workflow-automate' ),
+				__( 'Rate limit exceeded. Please try again later.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 429 )
 			);
 		}

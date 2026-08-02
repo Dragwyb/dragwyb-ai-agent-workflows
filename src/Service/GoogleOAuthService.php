@@ -87,7 +87,7 @@ class GoogleOAuthService {
 
 		if ( '' === $client_id ) {
 			throw new RuntimeException(
-				esc_html__( 'Client ID is missing. Save your Google OAuth credentials first.', 'workflow-automate' )
+				esc_html__( 'Client ID is missing. Save your Google OAuth credentials first.', 'ai-agent-workflow-automation' )
 			);
 		}
 
@@ -163,7 +163,7 @@ class GoogleOAuthService {
 		if ( '' === $code ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google did not return an authorization code.', 'workflow-automate' ),
+				'error'   => __( 'Google did not return an authorization code.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -174,7 +174,7 @@ class GoogleOAuthService {
 		if ( '' === $client_id || '' === $client_secret ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Client ID and Client Secret are required before connecting to Google.', 'workflow-automate' ),
+				'error'   => __( 'Client ID and Client Secret are required before connecting to Google.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -207,7 +207,7 @@ class GoogleOAuthService {
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'This connection is not a Google OAuth connection.', 'workflow-automate' ),
+				'error'   => __( 'This connection is not a Google OAuth connection.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -224,7 +224,7 @@ class GoogleOAuthService {
 		if ( '' === $refresh ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google access token expired. Reconnect this connection in Connections.', 'workflow-automate' ),
+				'error'   => __( 'Google access token expired. Reconnect this connection in Connections.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -234,7 +234,7 @@ class GoogleOAuthService {
 		if ( '' === $client_id || '' === $client_secret ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google OAuth client credentials are missing.', 'workflow-automate' ),
+				'error'   => __( 'Google OAuth client credentials are missing.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -259,7 +259,7 @@ class GoogleOAuthService {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to refresh the Google access token.', 'workflow-automate' ),
+				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to refresh the Google access token.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -268,7 +268,7 @@ class GoogleOAuthService {
 		if ( null === $updated ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'The connection no longer exists.', 'workflow-automate' ),
+				'error'   => __( 'The connection no longer exists.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -278,7 +278,7 @@ class GoogleOAuthService {
 		if ( '' === $token ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Unable to read the refreshed Google access token.', 'workflow-automate' ),
+				'error'   => __( 'Unable to read the refreshed Google access token.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -298,7 +298,7 @@ class GoogleOAuthService {
 				'success' => false,
 				'error'   => isset( $result['error'] )
 					? (string) $result['error']
-					: __( 'Google OAuth token request failed.', 'workflow-automate' ),
+					: __( 'Google OAuth token request failed.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -310,7 +310,7 @@ class GoogleOAuthService {
 		if ( '' === $access_token ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google did not return an access token.', 'workflow-automate' ),
+				'error'   => __( 'Google did not return an access token.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

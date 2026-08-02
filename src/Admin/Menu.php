@@ -76,7 +76,7 @@ class Menu {
 		// own capability so unauthorized items stay hidden.
 		$hook = add_menu_page(
 			$first->pageTitle(),
-			__( 'Workflow Automate', 'workflow-automate' ),
+			__( 'Workflow Automate', 'ai-agent-workflow-automation' ),
 			Capabilities::ACCESS,
 			$first->slug(),
 			array( $this, 'renderCurrentPage' ),
@@ -170,7 +170,7 @@ class Menu {
 			}
 		}
 
-		wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ), 403 );
+		wp_die( esc_html__( 'You are not allowed to access this page.', 'ai-agent-workflow-automation' ), 403 );
 	}
 
 	/**

@@ -184,7 +184,7 @@ export default function TestDataTree({ title, data, embedded = false }) {
 
 			{!hasData ? (
 				<p className="aiawa-test-io__empty">
-					{__('No data', 'workflow-automate')}
+					{__('No data', 'ai-agent-workflow-automation')}
 				</p>
 			) : (
 				<div className="aiawa-test-io__tree-wrap">
@@ -201,7 +201,7 @@ export default function TestDataTree({ title, data, embedded = false }) {
 								<span className="aiawa-test-io__count">
 									{sprintf(
 										/* translators: %d: number of fields */
-										__('%d items', 'workflow-automate'),
+										__('%d items', 'ai-agent-workflow-automation'),
 										itemCount
 									)}
 								</span>
@@ -273,7 +273,7 @@ function ReadOnlyBranch({ node, depth }) {
 				<span className="aiawa-test-io__count">
 					{sprintf(
 						/* translators: %d: number of nested fields */
-						__('%d items', 'workflow-automate'),
+						__('%d items', 'ai-agent-workflow-automation'),
 						childCount
 					)}
 				</span>

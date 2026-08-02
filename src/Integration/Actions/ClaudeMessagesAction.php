@@ -23,11 +23,11 @@ class ClaudeMessagesAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'Anthropic Claude', 'workflow-automate' );
+		return __( 'Anthropic Claude', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to Anthropic Claude and returns the reply.', 'workflow-automate' );
+		return __( 'Sends a prompt to Anthropic Claude and returns the reply.', 'ai-agent-workflow-automation' );
 	}
 
 	protected function providerSlug(): string {

@@ -23,11 +23,11 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Create Sheet', 'workflow-automate' );
+		return __( 'Google Sheets Create Sheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Adds a new worksheet tab to a spreadsheet.', 'workflow-automate' );
+		return __( 'Adds a new worksheet tab to a spreadsheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -36,7 +36,7 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'sheet_title'    => array(
 				'type'     => 'string',
-				'label'    => __( 'New sheet tab name', 'workflow-automate' ),
+				'label'    => __( 'New sheet tab name', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 		);
@@ -62,7 +62,7 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $sheet_title ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Sheet tab name is required.', 'workflow-automate' ),
+				'error'   => __( 'Sheet tab name is required.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -77,11 +77,11 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Find Sheet', 'workflow-automate' );
+		return __( 'Google Sheets Find Sheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Finds worksheet tabs in a spreadsheet by title.', 'workflow-automate' );
+		return __( 'Finds worksheet tabs in a spreadsheet by title.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -90,12 +90,12 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'title'          => array(
 				'type'     => 'string',
-				'label'    => __( 'Sheet title to find', 'workflow-automate' ),
+				'label'    => __( 'Sheet title to find', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'exact_match'    => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Exact match', 'workflow-automate' ),
+				'label'   => __( 'Exact match', 'ai-agent-workflow-automation' ),
 				'default' => false,
 			),
 		);
@@ -121,7 +121,7 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Sheet title is required.', 'workflow-automate' ),
+				'error'   => __( 'Sheet title is required.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -142,11 +142,11 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Copy Sheet', 'workflow-automate' );
+		return __( 'Google Sheets Copy Sheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Copies a worksheet tab to another spreadsheet.', 'workflow-automate' );
+		return __( 'Copies a worksheet tab to another spreadsheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -156,7 +156,7 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 			'sheet_title'                => $this->sheetTitleField(),
 			'destination_spreadsheet_id' => array(
 				'type'     => 'string',
-				'label'    => __( 'Destination spreadsheet ID', 'workflow-automate' ),
+				'label'    => __( 'Destination spreadsheet ID', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 		);
@@ -182,7 +182,7 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $destination ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Destination spreadsheet ID is required.', 'workflow-automate' ),
+				'error'   => __( 'Destination spreadsheet ID is required.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -203,11 +203,11 @@ final class GoogleSheetsDeleteSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Delete Sheet', 'workflow-automate' );
+		return __( 'Google Sheets Delete Sheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Deletes a worksheet tab from a spreadsheet.', 'workflow-automate' );
+		return __( 'Deletes a worksheet tab from a spreadsheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -246,11 +246,11 @@ final class GoogleSheetsClearSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Clear Sheet', 'workflow-automate' );
+		return __( 'Google Sheets Clear Sheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Clears all cell values from a worksheet.', 'workflow-automate' );
+		return __( 'Clears all cell values from a worksheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -260,7 +260,7 @@ final class GoogleSheetsClearSheetAction extends AbstractGoogleSheetsAction {
 			'sheet_title'          => $this->sheetTitleField(),
 			'is_first_row_headers' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Keep first row as headers', 'workflow-automate' ),
+				'label'   => __( 'Keep first row as headers', 'ai-agent-workflow-automation' ),
 				'default' => false,
 			),
 		);
@@ -298,11 +298,11 @@ final class GoogleSheetsExportSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Export Sheet', 'workflow-automate' );
+		return __( 'Google Sheets Export Sheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Builds an export URL for a worksheet (CSV, PDF, or XLSX).', 'workflow-automate' );
+		return __( 'Builds an export URL for a worksheet (CSV, PDF, or XLSX).', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -312,7 +312,7 @@ final class GoogleSheetsExportSheetAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'format'         => array(
 				'type'    => 'string',
-				'label'   => __( 'Export format (csv, pdf, xlsx)', 'workflow-automate' ),
+				'label'   => __( 'Export format (csv, pdf, xlsx)', 'ai-agent-workflow-automation' ),
 				'default' => 'csv',
 			),
 		);

@@ -97,7 +97,7 @@ class NodeTypesController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
 				'aiawa_rest_forbidden',
-				__( 'Sorry, you are not allowed to view node types.', 'workflow-automate' ),
+				__( 'Sorry, you are not allowed to view node types.', 'ai-agent-workflow-automation' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -162,7 +162,7 @@ class NodeTypesController {
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
 					'aiawa_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'ai-agent-workflow-automation' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -181,7 +181,7 @@ class NodeTypesController {
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
 					'aiawa_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'ai-agent-workflow-automation' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -196,7 +196,7 @@ class NodeTypesController {
 
 		return new WP_Error(
 			'aiawa_trigger_sample_unsupported',
-			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'workflow-automate' ),
+			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'ai-agent-workflow-automation' ),
 			array( 'status' => 400 )
 		);
 	}

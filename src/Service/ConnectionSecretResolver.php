@@ -39,7 +39,7 @@ class ConnectionSecretResolver {
 		if ( $connection_id <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No connection configured for this action.', 'workflow-automate' ),
+				'error'   => __( 'No connection configured for this action.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -48,7 +48,7 @@ class ConnectionSecretResolver {
 		if ( null === $connection ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'The connection configured for this action no longer exists.', 'workflow-automate' ),
+				'error'   => __( 'The connection configured for this action no longer exists.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -56,7 +56,7 @@ class ConnectionSecretResolver {
 			if ( null === $this->google_oauth ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'Google OAuth is not available.', 'workflow-automate' ),
+					'error'   => __( 'Google OAuth is not available.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -78,7 +78,7 @@ class ConnectionSecretResolver {
 				if ( null === $token || '' === (string) $token ) {
 					return array(
 						'success' => false,
-						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' ),
+						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'ai-agent-workflow-automation' ),
 					);
 				}
 
@@ -91,7 +91,7 @@ class ConnectionSecretResolver {
 				if ( null === $api_key || '' === (string) $api_key ) {
 					return array(
 						'success' => false,
-						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' ),
+						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'ai-agent-workflow-automation' ),
 					);
 				}
 

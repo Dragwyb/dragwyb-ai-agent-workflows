@@ -49,7 +49,7 @@ export default function ToolNodeCard({
 			<span className="aiawa-tool-node__text">
 				<span className="aiawa-tool-node__label">{node.label}</span>
 				<span className="aiawa-tool-node__subtitle">
-					{__('Tool', 'workflow-automate')}
+					{__('Tool', 'ai-agent-workflow-automation')}
 				</span>
 			</span>
 		</div>

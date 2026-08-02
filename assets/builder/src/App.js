@@ -235,7 +235,7 @@ export default function App() {
 					workflow = await fetchWorkflow(bootstrap.workflowId);
 				} else {
 					workflow = await createWorkflow({
-						title: __('Untitled workflow', 'workflow-automate'),
+						title: __('Untitled workflow', 'ai-agent-workflow-automation'),
 						graph: emptyGraph(),
 					});
 
@@ -335,7 +335,7 @@ export default function App() {
 							? error.message
 							: __(
 									'Failed to load the workflow.',
-									'workflow-automate'
+									'ai-agent-workflow-automation'
 								)
 					);
 				}
@@ -428,7 +428,7 @@ export default function App() {
 
 		downloadWorkflowJson(
 			payload,
-			exportFilenameFromTitle(current.title || __('workflow', 'workflow-automate'))
+			exportFilenameFromTitle(current.title || __('workflow', 'ai-agent-workflow-automation'))
 		);
 	}, [workflowStatus]);
 
@@ -448,7 +448,7 @@ export default function App() {
 				!window.confirm(
 					__(
 						'Importing will replace the current workflow on the canvas. Continue?',
-						'workflow-automate'
+						'ai-agent-workflow-automation'
 					)
 				)
 			) {
@@ -486,7 +486,7 @@ export default function App() {
 						? error.message
 						: __(
 								'Failed to import the workflow JSON.',
-								'workflow-automate'
+								'ai-agent-workflow-automation'
 							)
 				);
 			}
@@ -612,7 +612,7 @@ export default function App() {
 							reply ||
 							__(
 								'(Workflow finished with no chat reply. Check the AI Agent output.)',
-								'workflow-automate'
+								'ai-agent-workflow-automation'
 							),
 					},
 				]);
@@ -623,7 +623,7 @@ export default function App() {
 			} catch (error) {
 				const message =
 					error?.message ||
-					__('Chat request failed.', 'workflow-automate');
+					__('Chat request failed.', 'ai-agent-workflow-automation');
 				setChatError(message);
 			} finally {
 				setChatSending(false);
@@ -1383,7 +1383,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'agent_output_parser',
 			category: 'action',
-			label: __('Structured Output Parser', 'workflow-automate'),
+			label: __('Structured Output Parser', 'ai-agent-workflow-automation'),
 			parent_agent_id: agentId,
 			attachment_type: 'output_parser',
 			x: position.x,
@@ -1437,7 +1437,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: nodeTypeDefinition.slug,
 			category: 'action',
-			label: `${nodeTypeDefinition.label} (${__('Fallback', 'workflow-automate')})`,
+			label: `${nodeTypeDefinition.label} (${__('Fallback', 'ai-agent-workflow-automation')})`,
 			parent_agent_id: agentId,
 			attachment_type: 'fallback_chat_model',
 			x: position.x,
@@ -1502,7 +1502,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'simple_memory',
 			category: 'action',
-			label: __('Simple Memory', 'workflow-automate'),
+			label: __('Simple Memory', 'ai-agent-workflow-automation'),
 			parent_agent_id: agentId,
 			attachment_type: 'memory',
 			x: position.x,
@@ -1846,7 +1846,7 @@ export default function App() {
 	if (loading) {
 		return (
 			<div className="aiawa-builder-loading" role="status">
-				{__('Loading…', 'workflow-automate')}
+				{__('Loading…', 'ai-agent-workflow-automation')}
 			</div>
 		);
 	}
@@ -1868,7 +1868,7 @@ export default function App() {
 	const knownTypeSlugs = allTypes.map((type) => type.slug);
 	const triggerNode = graph.nodes.find((item) => item.category === 'trigger');
 	const triggerLabel =
-		triggerNode?.label || __('Trigger', 'workflow-automate');
+		triggerNode?.label || __('Trigger', 'ai-agent-workflow-automation');
 	const hasExistingTrigger = Boolean(triggerNode);
 	const hasChatTrigger =
 		triggerNode?.type === 'chat_message_received_trigger';
@@ -1951,7 +1951,7 @@ export default function App() {
 					sending={chatSending}
 					error={chatError}
 					onSend={handleSendChat}
-					title={triggerNode?.config?.title || __('Chat', 'workflow-automate')}
+					title={triggerNode?.config?.title || __('Chat', 'ai-agent-workflow-automation')}
 					initialMessages={chatInitialMessages}
 				/>
 				</div>

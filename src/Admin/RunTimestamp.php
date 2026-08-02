@@ -53,7 +53,7 @@ class RunTimestamp {
 
 		return sprintf(
 			/* translators: %s: formatted date/time. */
-			__( '%s UTC', 'workflow-automate' ),
+			__( '%s UTC', 'ai-agent-workflow-automation' ),
 			gmdate( $format, $timestamp )
 		);
 	}

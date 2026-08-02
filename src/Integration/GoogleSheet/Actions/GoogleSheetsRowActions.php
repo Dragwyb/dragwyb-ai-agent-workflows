@@ -23,11 +23,11 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Add Row', 'workflow-automate' );
+		return __( 'Google Sheets Add Row', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Appends a row of values to a worksheet.', 'workflow-automate' );
+		return __( 'Appends a row of values to a worksheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -38,7 +38,7 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 			'values'             => $this->valuesField(),
 			'value_input_option' => array(
 				'type'    => 'string',
-				'label'   => __( 'Value input option (USER_ENTERED or RAW)', 'workflow-automate' ),
+				'label'   => __( 'Value input option (USER_ENTERED or RAW)', 'ai-agent-workflow-automation' ),
 				'default' => 'USER_ENTERED',
 			),
 		);
@@ -64,7 +64,7 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 		if ( array() === $values ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -92,11 +92,11 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Update Row', 'workflow-automate' );
+		return __( 'Google Sheets Update Row', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Updates an existing row in a worksheet.', 'workflow-automate' );
+		return __( 'Updates an existing row in a worksheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -106,12 +106,12 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'row_number'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Row number (1-based)', 'workflow-automate' ),
+				'label'    => __( 'Row number (1-based)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'target_range'   => array(
 				'type'    => 'string',
-				'label'   => __( 'Target range (optional, e.g. A5:E5)', 'workflow-automate' ),
+				'label'   => __( 'Target range (optional, e.g. A5:E5)', 'ai-agent-workflow-automation' ),
 				'default' => '',
 			),
 			'values'         => $this->valuesField(),
@@ -138,7 +138,7 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -147,7 +147,7 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -170,11 +170,11 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Append or Update Row', 'workflow-automate' );
+		return __( 'Google Sheets Append or Update Row', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Updates a row when a column value matches, otherwise appends a new row.', 'workflow-automate' );
+		return __( 'Updates a row when a column value matches, otherwise appends a new row.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -184,7 +184,7 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 			'sheet_title'     => $this->sheetTitleField(),
 			'column_to_match' => array(
 				'type'    => 'string',
-				'label'   => __( 'Column to match on (letter or index, e.g. A or 0)', 'workflow-automate' ),
+				'label'   => __( 'Column to match on (letter or index, e.g. A or 0)', 'ai-agent-workflow-automation' ),
 				'default' => 'A',
 			),
 			'values'          => $this->valuesField(),
@@ -211,7 +211,7 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -233,11 +233,11 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Get Row', 'workflow-automate' );
+		return __( 'Google Sheets Get Row', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Retrieves a single row by row number.', 'workflow-automate' );
+		return __( 'Retrieves a single row by row number.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -247,7 +247,7 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'row_number'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Row number (1-based)', 'workflow-automate' ),
+				'label'    => __( 'Row number (1-based)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 		);
@@ -273,7 +273,7 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -294,11 +294,11 @@ final class GoogleSheetsGetAllRowsAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Get All Rows', 'workflow-automate' );
+		return __( 'Google Sheets Get All Rows', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Retrieves all rows from a worksheet.', 'workflow-automate' );
+		return __( 'Retrieves all rows from a worksheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -337,11 +337,11 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Delete Row', 'workflow-automate' );
+		return __( 'Google Sheets Delete Row', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Clears all values in a row.', 'workflow-automate' );
+		return __( 'Clears all values in a row.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -351,7 +351,7 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'row_number'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Row number (1-based)', 'workflow-automate' ),
+				'label'    => __( 'Row number (1-based)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 		);
@@ -377,7 +377,7 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'workflow-automate' ),
+				'error'   => __( 'Row number must be greater than zero.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -398,11 +398,11 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Create Column', 'workflow-automate' );
+		return __( 'Google Sheets Create Column', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Inserts a new column and sets its header name.', 'workflow-automate' );
+		return __( 'Inserts a new column and sets its header name.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -412,12 +412,12 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'column_name'    => array(
 				'type'     => 'string',
-				'label'    => __( 'Column header name', 'workflow-automate' ),
+				'label'    => __( 'Column header name', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'column_index'   => array(
 				'type'    => 'string',
-				'label'   => __( 'Column index (1-based, leave 0 to append)', 'workflow-automate' ),
+				'label'   => __( 'Column index (1-based, leave 0 to append)', 'ai-agent-workflow-automation' ),
 				'default' => '0',
 			),
 		);
@@ -443,7 +443,7 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 		if ( '' === $column_name ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Column name is required.', 'workflow-automate' ),
+				'error'   => __( 'Column name is required.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

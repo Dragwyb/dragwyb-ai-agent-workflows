@@ -65,14 +65,14 @@ class ConnectionFormPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Connection', 'workflow-automate' );
+		return __( 'Connection', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Connection', 'workflow-automate' );
+		return __( 'Connection', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -106,7 +106,7 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'ai-agent-workflow-automation' ) );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which connection to load/create; the admin-post controller this feeds still re-checks capability and nonce on every write.
@@ -120,14 +120,14 @@ class ConnectionFormPage implements AdminPage {
 
 			if ( null === $connection ) {
 				echo '<h1>' . esc_html( $this->pageTitle() ) . '</h1>';
-				echo '<p>' . esc_html__( 'That connection no longer exists.', 'workflow-automate' ) . '</p>';
+				echo '<p>' . esc_html__( 'That connection no longer exists.', 'ai-agent-workflow-automation' ) . '</p>';
 				$this->renderBackLink();
 				echo '</div>';
 
 				return;
 			}
 
-			echo '<h1>' . esc_html__( 'Edit Connection', 'workflow-automate' ) . '</h1>';
+			echo '<h1>' . esc_html__( 'Edit Connection', 'ai-agent-workflow-automation' ) . '</h1>';
 			$this->renderBackLink();
 			$this->renderEditForm( $connection );
 			echo '</div>';
@@ -138,7 +138,7 @@ class ConnectionFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only step-1-to-step-2 selector for this GET-only "choose a type" screen; nothing is written until the real POST form in renderCreateForm() below.
 		$auth_type = isset( $_GET['auth_type'] ) ? sanitize_key( wp_unslash( $_GET['auth_type'] ) ) : '';
 
-		echo '<h1>' . esc_html__( 'Add New Connection', 'workflow-automate' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Add New Connection', 'ai-agent-workflow-automation' ) . '</h1>';
 		$this->renderBackLink();
 
 		if ( in_array( $auth_type, ConnectionAuthTypes::VALID, true ) ) {
@@ -166,7 +166,7 @@ class ConnectionFormPage implements AdminPage {
 		printf(
 			'<p><a href="%1$s">&larr; %2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ) ),
-			esc_html__( 'Back to Connections', 'workflow-automate' )
+			esc_html__( 'Back to Connections', 'ai-agent-workflow-automation' )
 		);
 	}
 
@@ -182,16 +182,16 @@ class ConnectionFormPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-integration">' . esc_html__( 'Integration', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-connection-integration">' . esc_html__( 'Integration', 'ai-agent-workflow-automation' ) . '</label></th><td>';
 		echo '<input type="text" id="aiawa-connection-integration" name="integration_slug" class="regular-text" required="required" />';
-		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'ai-agent-workflow-automation' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'ai-agent-workflow-automation' ) . '</label></th><td>';
 		echo '<input type="text" id="aiawa-connection-label" name="label" class="regular-text" required="required" />';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-auth-type">' . esc_html__( 'Authentication type', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-connection-auth-type">' . esc_html__( 'Authentication type', 'ai-agent-workflow-automation' ) . '</label></th><td>';
 		echo '<select id="aiawa-connection-auth-type" name="auth_type">';
 		foreach ( ConnectionAuthTypes::VALID as $auth_type ) {
 			printf(
@@ -204,7 +204,7 @@ class ConnectionFormPage implements AdminPage {
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
-		submit_button( __( 'Continue', 'workflow-automate' ) );
+		submit_button( __( 'Continue', 'ai-agent-workflow-automation' ) );
 		echo '</form>';
 	}
 
@@ -226,21 +226,21 @@ class ConnectionFormPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-integration">' . esc_html__( 'Integration', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-connection-integration">' . esc_html__( 'Integration', 'ai-agent-workflow-automation' ) . '</label></th><td>';
 		printf(
 			'<input type="text" id="aiawa-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
 			esc_attr( $integration_slug )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'ai-agent-workflow-automation' ) . '</label></th><td>';
 		printf(
 			'<input type="text" id="aiawa-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $label )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'ai-agent-workflow-automation' ) . '</th><td>';
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $auth_type ) ) . '</p>';
 		echo '</td></tr>';
 
@@ -253,7 +253,7 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</tbody></table>';
-		submit_button( __( 'Create Connection', 'workflow-automate' ) );
+		submit_button( __( 'Create Connection', 'ai-agent-workflow-automation' ) );
 		echo '</form>';
 	}
 
@@ -273,15 +273,15 @@ class ConnectionFormPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Integration', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Integration', 'ai-agent-workflow-automation' ) . '</th><td>';
 		echo '<p>' . esc_html( $connection->integrationSlug() ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'ai-agent-workflow-automation' ) . '</th><td>';
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $connection->authType() ) ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'ai-agent-workflow-automation' ) . '</label></th><td>';
 		printf(
 			'<input type="text" id="aiawa-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $connection->label() )
@@ -303,17 +303,17 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</tbody></table>';
-		submit_button( __( 'Save Connection', 'workflow-automate' ) );
+		submit_button( __( 'Save Connection', 'ai-agent-workflow-automation' ) );
 		echo '</form>';
 
-		echo '<h2>' . esc_html__( 'Delete Connection', 'workflow-automate' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Delete Connection', 'ai-agent-workflow-automation' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form aiawa-settings-danger-zone">';
 		echo '<input type="hidden" name="action" value="aiawa_connection_action" />';
 		echo '<input type="hidden" name="op" value="delete" />';
 		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
 		wp_nonce_field( 'aiawa_connection_action_delete_' . $connection->id() );
-		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'workflow-automate' ) . '</p>';
-		submit_button( __( 'Delete Connection', 'workflow-automate' ), 'delete' );
+		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'ai-agent-workflow-automation' ) . '</p>';
+		submit_button( __( 'Delete Connection', 'ai-agent-workflow-automation' ), 'delete' );
 		echo '</form>';
 	}
 
@@ -338,7 +338,7 @@ class ConnectionFormPage implements AdminPage {
 		if ( $configured ) {
 			echo '<p class="description aiawa-connection-current-value">' . sprintf(
 				/* translators: %s: masked or otherwise safe-to-display current value. */
-				esc_html__( 'Currently set: %s', 'workflow-automate' ),
+				esc_html__( 'Currently set: %s', 'ai-agent-workflow-automation' ),
 				'<code>' . esc_html( $current ) . '</code>'
 			) . '</p>';
 		}
@@ -352,7 +352,7 @@ class ConnectionFormPage implements AdminPage {
 		);
 
 		if ( $configured ) {
-			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current value.', 'workflow-automate' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current value.', 'ai-agent-workflow-automation' ) . '</p>';
 		}
 
 		echo '</td></tr>';
@@ -368,7 +368,7 @@ class ConnectionFormPage implements AdminPage {
 		echo wp_kses(
 			sprintf(
 				/* translators: %s: URL to Google Cloud Console credentials page */
-				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'workflow-automate' ),
+				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'ai-agent-workflow-automation' ),
 				esc_url( GoogleOAuthService::GOOGLE_CREDENTIALS_URL )
 			),
 			array(
@@ -390,12 +390,12 @@ class ConnectionFormPage implements AdminPage {
 	private function renderOAuthCallbackRow(): void {
 		$callback = $this->google_oauth->callbackUrl();
 
-		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'ai-agent-workflow-automation' ) . '</th><td>';
 		printf(
 			'<input type="text" class="large-text code" readonly="readonly" value="%s" onclick="this.select();" />',
 			esc_attr( $callback )
 		);
-		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'ai-agent-workflow-automation' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -407,12 +407,12 @@ class ConnectionFormPage implements AdminPage {
 	private function renderOAuthStatusRow( Connection $connection ): void {
 		$connected = $this->google_oauth->isConnected( $connection );
 
-		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'ai-agent-workflow-automation' ) . '</th><td>';
 
 		if ( $connected ) {
-			echo '<p><span class="aiawa-connection-status aiawa-connection-status--verified">' . esc_html__( 'Connected', 'workflow-automate' ) . '</span></p>';
+			echo '<p><span class="aiawa-connection-status aiawa-connection-status--verified">' . esc_html__( 'Connected', 'ai-agent-workflow-automation' ) . '</span></p>';
 		} else {
-			echo '<p><span class="aiawa-connection-status aiawa-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'workflow-automate' ) . '</span></p>';
+			echo '<p><span class="aiawa-connection-status aiawa-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'ai-agent-workflow-automation' ) . '</span></p>';
 		}
 
 		echo '</td></tr>';
@@ -435,13 +435,13 @@ class ConnectionFormPage implements AdminPage {
 			'aiawa_google_oauth_authorize_' . $connection->id()
 		);
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'ai-agent-workflow-automation' ) . '</th><td>';
 		printf(
 			'<a href="%1$s" class="button button-primary">%2$s</a>',
 			esc_url( $url ),
-			esc_html__( 'Connect with Google', 'workflow-automate' )
+			esc_html__( 'Connect with Google', 'ai-agent-workflow-automation' )
 		);
-		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'ai-agent-workflow-automation' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -454,15 +454,15 @@ class ConnectionFormPage implements AdminPage {
 
 		$notices = array(
 			'created_oauth'   => array(
-				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'workflow-automate' ),
+				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'oauth_connected' => array(
-				'message' => __( 'Google account connected successfully.', 'workflow-automate' ),
+				'message' => __( 'Google account connected successfully.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'error'           => array(
-				'message' => __( 'That connection action could not be completed.', 'workflow-automate' ),
+				'message' => __( 'That connection action could not be completed.', 'ai-agent-workflow-automation' ),
 				'type'    => 'error',
 			),
 		);

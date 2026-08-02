@@ -71,17 +71,17 @@ class WebhooksListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'            => '<input type="checkbox" />',
-			'public_url'    => __( 'Public URL', 'workflow-automate' ),
-			'workflow'      => __( 'Workflow', 'workflow-automate' ),
-			'signing'       => __( 'Signing', 'workflow-automate' ),
-			'ip_allow_list' => __( 'IP allow-list', 'workflow-automate' ),
-			'created_at'    => __( 'Created', 'workflow-automate' ),
+			'public_url'    => __( 'Public URL', 'ai-agent-workflow-automation' ),
+			'workflow'      => __( 'Workflow', 'ai-agent-workflow-automation' ),
+			'signing'       => __( 'Signing', 'ai-agent-workflow-automation' ),
+			'ip_allow_list' => __( 'IP allow-list', 'ai-agent-workflow-automation' ),
+			'created_at'    => __( 'Created', 'ai-agent-workflow-automation' ),
 		);
 	}
 
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'workflow-automate' ),
+			'delete' => __( 'Delete', 'ai-agent-workflow-automation' ),
 		);
 	}
 
@@ -123,7 +123,7 @@ class WebhooksListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No webhooks yet.', 'workflow-automate' );
+		esc_html_e( 'No webhooks yet.', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -144,7 +144,7 @@ class WebhooksListTable extends WP_List_Table {
 			$workflow               = $this->workflows->find( $workflow_id, true );
 			$titles[ $workflow_id ] = $workflow
 				? $workflow->title()
-				: __( '(deleted workflow)', 'workflow-automate' );
+				: __( '(deleted workflow)', 'ai-agent-workflow-automation' );
 		}
 
 		return $titles;
@@ -169,7 +169,7 @@ class WebhooksListTable extends WP_List_Table {
 
 	public function filterFields(): array {
 		$options = array(
-			'0' => __( 'All workflows', 'workflow-automate' ),
+			'0' => __( 'All workflows', 'ai-agent-workflow-automation' ),
 		);
 
 		foreach ( $this->workflowFilterOptions as $id => $title ) {
@@ -179,7 +179,7 @@ class WebhooksListTable extends WP_List_Table {
 		return array(
 			array(
 				'name'    => 'workflow_id',
-				'label'   => __( 'Filter by workflow', 'workflow-automate' ),
+				'label'   => __( 'Filter by workflow', 'ai-agent-workflow-automation' ),
 				'value'   => (string) $this->currentWorkflowFilter(),
 				'options' => $options,
 			),
@@ -212,7 +212,7 @@ class WebhooksListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'ai-agent-workflow-automation' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -231,15 +231,15 @@ class WebhooksListTable extends WP_List_Table {
 				$workflow_id = $item->workflowId();
 
 				if ( null === $workflow_id ) {
-					return esc_html__( '(none)', 'workflow-automate' );
+					return esc_html__( '(none)', 'ai-agent-workflow-automation' );
 				}
 
-				return esc_html( $this->workflowTitles[ $workflow_id ] ?? __( '(deleted workflow)', 'workflow-automate' ) );
+				return esc_html( $this->workflowTitles[ $workflow_id ] ?? __( '(deleted workflow)', 'ai-agent-workflow-automation' ) );
 
 			case 'signing':
 				return $item->hasSigningSecret()
-					? esc_html__( 'Required', 'workflow-automate' )
-					: esc_html__( 'Off', 'workflow-automate' );
+					? esc_html__( 'Required', 'ai-agent-workflow-automation' )
+					: esc_html__( 'Off', 'ai-agent-workflow-automation' );
 
 			case 'ip_allow_list':
 				$count = count( $item->ipAllowList() );
@@ -248,11 +248,11 @@ class WebhooksListTable extends WP_List_Table {
 					? esc_html(
 						sprintf(
 						/* translators: %d: number of allowed IPs/CIDRs. */
-							_n( '%d entry', '%d entries', $count, 'workflow-automate' ),
+							_n( '%d entry', '%d entries', $count, 'ai-agent-workflow-automation' ),
 							$count
 						)
 					)
-					: esc_html__( 'Any IP', 'workflow-automate' );
+					: esc_html__( 'Any IP', 'ai-agent-workflow-automation' );
 
 			case 'created_at':
 				return esc_html( RunTimestamp::format( $item->createdAt(), $this->settings ) );
@@ -300,7 +300,7 @@ class WebhooksListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'workflow-automate' ) );
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'ai-agent-workflow-automation' ) );
 	}
 
 	private function currentWorkflowFilter(): int {

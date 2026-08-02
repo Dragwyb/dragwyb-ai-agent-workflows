@@ -57,7 +57,7 @@ class AgentService {
 		if ( array() === $graph_nodes ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Workflow graph is not available for the AI Agent.', 'workflow-automate' ),
+				'error'   => __( 'Workflow graph is not available for the AI Agent.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -82,7 +82,7 @@ class AgentService {
 		$wait_ms      = max( 0, (int) $settings['wait_between_tries_ms'] );
 		$last_result  = array(
 			'success' => false,
-			'error'   => __( 'AI Agent request failed.', 'workflow-automate' ),
+			'error'   => __( 'AI Agent request failed.', 'ai-agent-workflow-automation' ),
 		);
 
 		for ( $attempt = 1; $attempt <= $max_attempts; ++$attempt ) {
@@ -117,7 +117,7 @@ class AgentService {
 		if ( ! AiClientBootstrap::isProviderConfigured( $chat['provider'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'workflow-automate' ),
+				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -294,11 +294,11 @@ class AgentService {
 				if ( is_array( $parsed ) ) {
 					$loop['parsed'] = $parsed;
 				} elseif ( ! empty( $attachments['tools'] ) || ! empty( $loop['tool_calls'] ) ) {
-					$loop['json_parse_warning'] = __( 'Reply was plain text, not JSON (expected when the agent uses tools).', 'workflow-automate' );
+					$loop['json_parse_warning'] = __( 'Reply was plain text, not JSON (expected when the agent uses tools).', 'ai-agent-workflow-automation' );
 				} else {
 					return array(
 						'success'  => false,
-						'error'    => __( 'The agent did not return valid JSON.', 'workflow-automate' ),
+						'error'    => __( 'The agent did not return valid JSON.', 'ai-agent-workflow-automation' ),
 						'response' => $response,
 					);
 				}
@@ -389,7 +389,7 @@ class AgentService {
 			if ( '' === $prompt ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'No prompt configured for the AI Agent.', 'workflow-automate' ),
+					'error'   => __( 'No prompt configured for the AI Agent.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -404,7 +404,7 @@ class AgentService {
 		if ( '' === $prompt ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No chatInput value found from a connected Chat Trigger node.', 'workflow-automate' ),
+				'error'   => __( 'No chatInput value found from a connected Chat Trigger node.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -492,7 +492,7 @@ class AgentService {
 				'response' => '',
 				'output'   => '',
 				'json'     => array( 'output' => '' ),
-				'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ) ),
+				'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'ai-agent-workflow-automation' ) ),
 			);
 
 			if ( 'continue_error_output' === $settings['on_error'] ) {
@@ -732,7 +732,7 @@ class AgentService {
 			if ( empty( $completion['success'] ) ) {
 				return array(
 					'success' => false,
-					'error'   => $completion['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ),
+					'error'   => $completion['error'] ?? __( 'AI Agent request failed.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -741,7 +741,7 @@ class AgentService {
 			if ( ! is_array( $message ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The AI model returned an invalid message.', 'workflow-automate' ),
+					'error'   => __( 'The AI model returned an invalid message.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -778,7 +778,7 @@ class AgentService {
 
 		return array(
 			'success'    => false,
-			'error'      => __( 'Max iterations reached.', 'workflow-automate' ),
+			'error'      => __( 'Max iterations reached.', 'ai-agent-workflow-automation' ),
 			'iterations' => $iteration,
 			'tool_calls' => $this->formatToolCalls( $all_tool_calls ),
 		);
@@ -808,13 +808,13 @@ class AgentService {
 		if ( isset( $seen_calls[ $signature ] ) && is_array( $seen_calls[ $signature ] ) ) {
 			$tool_result = $seen_calls[ $signature ];
 			if ( ! isset( $tool_result['note'] ) ) {
-				$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'workflow-automate' );
+				$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'ai-agent-workflow-automation' );
 			}
 		} elseif ( $created_post_id > 0 && $this->isCreatePostToolName( $function_name ) ) {
 			$tool_result              = array(
 				'error'   => sprintf(
 					/* translators: %d: existing post id */
-					__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'workflow-automate' ),
+					__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'ai-agent-workflow-automation' ),
 					$created_post_id
 				),
 				'post_id' => $created_post_id,
@@ -973,13 +973,13 @@ class AgentService {
 		}
 
 		if ( ! empty( $attachments['tools'] ) ) {
-			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'workflow-automate' );
-			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'workflow-automate' );
-			$parts[] = __( 'Tool usage rules: Read tool results before claiming success. Prefer IDs returned by previous tools. For list tools, use limit/search filters—do not dump entire databases. Omit optional URL fields (images, media) unless you have a real direct URL. If a tool returns a warning, the main action still succeeded—do not create another post/page to “fix” it; report once and finish. Create Post at most once per task; for fixes use Update Post with the returned post_id. Never repeat the same tool call; use the prior result and continue.', 'workflow-automate' );
+			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'ai-agent-workflow-automation' );
+			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'ai-agent-workflow-automation' );
+			$parts[] = __( 'Tool usage rules: Read tool results before claiming success. Prefer IDs returned by previous tools. For list tools, use limit/search filters—do not dump entire databases. Omit optional URL fields (images, media) unless you have a real direct URL. If a tool returns a warning, the main action still succeeded—do not create another post/page to “fix” it; report once and finish. Create Post at most once per task; for fixes use Update Post with the returned post_id. Never repeat the same tool call; use the prior result and continue.', 'ai-agent-workflow-automation' );
 
 			if ( $this->attachmentsIncludePostTools( $attachments['tools'] ) ) {
-				$parts[] = __( 'WordPress page/post design rules: When the user asks for a page, set post_type to "page". For designed/modern/colorful layouts, pass design_sections as a JSON array of sections (types: hero, heading, paragraph, columns, cta, buttons, spacer, separator, group) with colors—do not rely on a single plain paragraph. You may instead put full Gutenberg block markup (<!-- wp:... -->) in content. Omit featured_image unless you have a real direct image URL (not example.com or generic search URLs). Never claim the page was designed unless design_sections or Gutenberg block markup was used.', 'workflow-automate' );
-				$parts[] = __( 'Post type from trigger: If the workflow trigger includes post_type (e.g. page), pass that same post_type to Create/Update Post unless the user explicitly requests a different type. Do not default everything to "post" when the trigger saved a page.', 'workflow-automate' );
+				$parts[] = __( 'WordPress page/post design rules: When the user asks for a page, set post_type to "page". For designed/modern/colorful layouts, pass design_sections as a JSON array of sections (types: hero, heading, paragraph, columns, cta, buttons, spacer, separator, group) with colors—do not rely on a single plain paragraph. You may instead put full Gutenberg block markup (<!-- wp:... -->) in content. Omit featured_image unless you have a real direct image URL (not example.com or generic search URLs). Never claim the page was designed unless design_sections or Gutenberg block markup was used.', 'ai-agent-workflow-automation' );
+				$parts[] = __( 'Post type from trigger: If the workflow trigger includes post_type (e.g. page), pass that same post_type to Create/Update Post unless the user explicitly requests a different type. Do not default everything to "post" when the trigger saved a page.', 'ai-agent-workflow-automation' );
 			}
 		}
 
@@ -990,14 +990,14 @@ class AgentService {
 
 			if ( isset( $parser_resolved['success'] ) && false === $parser_resolved['success'] ) {
 				// Invalid schema is reported at parse time; still prefer JSON-only guidance.
-				$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'workflow-automate' );
+				$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'ai-agent-workflow-automation' );
 			} elseif ( ! empty( $parser_resolved['instructions'] ) ) {
 				$parts[] = (string) $parser_resolved['instructions'];
 			}
 		} elseif ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {
-			$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'workflow-automate' );
+			$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'ai-agent-workflow-automation' );
 		} elseif ( empty( $attachments['tools'] ) ) {
-			$parts[] = __( 'Reply with the final answer as plain text only — a single short string. Never return Python, JavaScript, curl, HTTP examples, markdown code fences, or wrappers. If the user asks for a joke, return only the joke words.', 'workflow-automate' );
+			$parts[] = __( 'Reply with the final answer as plain text only — a single short string. Never return Python, JavaScript, curl, HTTP examples, markdown code fences, or wrappers. If the user asks for a joke, return only the joke words.', 'ai-agent-workflow-automation' );
 		}
 
 		return implode( "\n\n", $parts );
@@ -1083,7 +1083,7 @@ class AgentService {
 				'success'  => false,
 				'error'    => sprintf(
 					/* translators: %s: validation error */
-					__( 'Structured output validation failed: %s', 'workflow-automate' ),
+					__( 'Structured output validation failed: %s', 'ai-agent-workflow-automation' ),
 					(string) ( $parsed['error'] ?? '' )
 				),
 				'response' => $response,
@@ -1113,7 +1113,7 @@ class AgentService {
 		if ( empty( $completion['success'] ) ) {
 			return array(
 				'success'  => false,
-				'error'    => $completion['error'] ?? __( 'Structured output auto-fix request failed.', 'workflow-automate' ),
+				'error'    => $completion['error'] ?? __( 'Structured output auto-fix request failed.', 'ai-agent-workflow-automation' ),
 				'response' => $response,
 			);
 		}
@@ -1127,7 +1127,7 @@ class AgentService {
 				'success'  => false,
 				'error'    => sprintf(
 					/* translators: %s: validation error */
-					__( 'Structured output still invalid after auto-fix: %s', 'workflow-automate' ),
+					__( 'Structured output still invalid after auto-fix: %s', 'ai-agent-workflow-automation' ),
 					(string) ( $fixed_parsed['error'] ?? '' )
 				),
 				'response' => $fixed_reply,
@@ -1166,7 +1166,7 @@ class AgentService {
 		}
 
 		return $message . "\n\n---\n"
-			. __( 'Workflow trigger data:', 'workflow-automate' )
+			. __( 'Workflow trigger data:', 'ai-agent-workflow-automation' )
 			. "\n```json\n"
 			. $trigger_json
 			. "\n```";

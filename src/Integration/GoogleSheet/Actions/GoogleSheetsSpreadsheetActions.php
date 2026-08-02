@@ -23,11 +23,11 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Create Spreadsheet', 'workflow-automate' );
+		return __( 'Google Sheets Create Spreadsheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Creates a new Google spreadsheet. Pass values (and optional header_row) to write post/trigger data into the first sheet tab.', 'workflow-automate' );
+		return __( 'Creates a new Google spreadsheet. Pass values (and optional header_row) to write post/trigger data into the first sheet tab.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -35,21 +35,21 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 			'connection_id' => $this->connectionField(),
 			'title'         => array(
 				'type'           => 'string',
-				'label'          => __( 'Spreadsheet title', 'workflow-automate' ),
-				'description'    => __( 'Name for the new spreadsheet file.', 'workflow-automate' ),
+				'label'          => __( 'Spreadsheet title', 'ai-agent-workflow-automation' ),
+				'description'    => __( 'Name for the new spreadsheet file.', 'ai-agent-workflow-automation' ),
 				'required'       => true,
 				'agent_fillable' => true,
 			),
 			'sheet_title'   => array(
 				'type'           => 'string',
-				'label'          => __( 'First sheet tab name', 'workflow-automate' ),
+				'label'          => __( 'First sheet tab name', 'ai-agent-workflow-automation' ),
 				'default'        => 'Sheet1',
 				'agent_fillable' => true,
 			),
 			'header_row'    => array(
 				'type'           => 'string',
-				'label'          => __( 'Header row', 'workflow-automate' ),
-				'description'    => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'workflow-automate' ),
+				'label'          => __( 'Header row', 'ai-agent-workflow-automation' ),
+				'description'    => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'ai-agent-workflow-automation' ),
 				'agent_fillable' => true,
 			),
 			'values'        => $this->optionalValuesField(),
@@ -70,7 +70,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Spreadsheet title is required.', 'workflow-automate' ),
+				'error'   => __( 'Spreadsheet title is required.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -105,7 +105,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 			if ( empty( $header_result['success'] ) ) {
 				$formatted['header_row_error'] = isset( $header_result['error'] )
 					? (string) $header_result['error']
-					: __( 'Failed to write the header row.', 'workflow-automate' );
+					: __( 'Failed to write the header row.', 'ai-agent-workflow-automation' );
 			}
 		}
 
@@ -120,7 +120,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 		if ( empty( $row_result['success'] ) ) {
 			$formatted['row_error'] = isset( $row_result['error'] )
 				? (string) $row_result['error']
-				: __( 'Spreadsheet was created but the data row could not be written.', 'workflow-automate' );
+				: __( 'Spreadsheet was created but the data row could not be written.', 'ai-agent-workflow-automation' );
 
 			return $formatted;
 		}
@@ -140,11 +140,11 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Find Spreadsheets', 'workflow-automate' );
+		return __( 'Google Sheets Find Spreadsheets', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Searches Google Drive for spreadsheets by name.', 'workflow-automate' );
+		return __( 'Searches Google Drive for spreadsheets by name.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
@@ -152,12 +152,12 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 			'connection_id' => $this->connectionField(),
 			'title'         => array(
 				'type'     => 'string',
-				'label'    => __( 'Search title', 'workflow-automate' ),
+				'label'    => __( 'Search title', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'limit'         => array(
 				'type'    => 'string',
-				'label'   => __( 'Maximum results', 'workflow-automate' ),
+				'label'   => __( 'Maximum results', 'ai-agent-workflow-automation' ),
 				'default' => '10',
 			),
 		);
@@ -177,7 +177,7 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Search title is required.', 'workflow-automate' ),
+				'error'   => __( 'Search title is required.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -194,11 +194,11 @@ final class GoogleSheetsDeleteSpreadsheetAction extends AbstractGoogleSheetsActi
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Delete Spreadsheet', 'workflow-automate' );
+		return __( 'Google Sheets Delete Spreadsheet', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Permanently deletes a Google spreadsheet.', 'workflow-automate' );
+		return __( 'Permanently deletes a Google spreadsheet.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {

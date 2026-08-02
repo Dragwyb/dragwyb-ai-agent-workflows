@@ -49,14 +49,14 @@ class AiModelsService {
 		if ( '' === $provider ) {
 			return array(
 				'options' => array(),
-				'error'   => __( 'Unknown AI provider.', 'workflow-automate' ),
+				'error'   => __( 'Unknown AI provider.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
 		if ( ! AiClientBootstrap::isAvailable() ) {
 			return array(
 				'options'    => array(),
-				'error'      => __( 'WordPress AI Client is not available.', 'workflow-automate' ),
+				'error'      => __( 'WordPress AI Client is not available.', 'ai-agent-workflow-automation' ),
 				'configured' => false,
 			);
 		}
@@ -73,7 +73,7 @@ class AiModelsService {
 		if ( ! AiClientBootstrap::isProviderConfigured( $provider ) ) {
 			return array(
 				'options'    => array(),
-				'error'      => __( 'No API key configured for this provider. Add one in this node.', 'workflow-automate' ),
+				'error'      => __( 'No API key configured for this provider. Add one in this node.', 'ai-agent-workflow-automation' ),
 				'configured' => false,
 			);
 		}
@@ -125,7 +125,7 @@ class AiModelsService {
 
 			$result = array(
 				'options' => $options,
-				'error'   => empty( $options ) ? __( 'No text-generation models returned by the provider.', 'workflow-automate' ) : null,
+				'error'   => empty( $options ) ? __( 'No text-generation models returned by the provider.', 'ai-agent-workflow-automation' ) : null,
 			);
 
 			set_transient( $cache_key, $result, self::CACHE_TTL );

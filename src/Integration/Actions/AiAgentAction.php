@@ -33,33 +33,33 @@ class AiAgentAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'AI Agent', 'workflow-automate' );
+		return __( 'AI Agent', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Reasons over workflow data and calls attached tools (email, HTTP, etc.).', 'workflow-automate' );
+		return __( 'Reasons over workflow data and calls attached tools (email, HTTP, etc.).', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'prompt_source'         => array(
 				'type'    => 'select',
-				'label'   => __( 'Source for Prompt (User Message)', 'workflow-automate' ),
+				'label'   => __( 'Source for Prompt (User Message)', 'ai-agent-workflow-automation' ),
 				'default' => 'define_below',
 				'options' => array(
 					array(
 						'value' => 'connected_chat_trigger',
-						'label' => __( 'Connected Chat Trigger Node', 'workflow-automate' ),
+						'label' => __( 'Connected Chat Trigger Node', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'define_below',
-						'label' => __( 'Define below', 'workflow-automate' ),
+						'label' => __( 'Define below', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),
 			'provider'              => array(
 				'type'    => 'select',
-				'label'   => __( 'AI provider (fallback when no Chat Model is attached)', 'workflow-automate' ),
+				'label'   => __( 'AI provider (fallback when no Chat Model is attached)', 'ai-agent-workflow-automation' ),
 				'default' => 'openai',
 				'options' => array(
 					array(
@@ -90,72 +90,72 @@ class AiAgentAction implements ActionInterface {
 			),
 			'api_credentials'       => array(
 				'type'           => 'ai_credentials',
-				'label'          => __( 'API key (fallback provider)', 'workflow-automate' ),
+				'label'          => __( 'API key (fallback provider)', 'ai-agent-workflow-automation' ),
 				'provider_field' => 'provider',
 			),
 			'model'                 => array(
 				'type'           => 'dynamic_select',
-				'label'          => __( 'AI model (fallback)', 'workflow-automate' ),
+				'label'          => __( 'AI model (fallback)', 'ai-agent-workflow-automation' ),
 				'default'        => 'gpt-4o-mini',
 				'options_source' => 'ai_models',
 				'provider_field' => 'provider',
 			),
 			'system_prompt'         => array(
 				'type'               => 'string',
-				'label'              => __( 'Instructions for the AI', 'workflow-automate' ),
+				'label'              => __( 'Instructions for the AI', 'ai-agent-workflow-automation' ),
 				'supports_variables' => true,
-				'default'            => __( 'You are a workflow assistant. Use tools when needed to complete the task.', 'workflow-automate' ),
+				'default'            => __( 'You are a workflow assistant. Use tools when needed to complete the task.', 'ai-agent-workflow-automation' ),
 			),
 			'prompt'                => array(
 				'type'               => 'string',
-				'label'              => __( 'Prompt (User Message)', 'workflow-automate' ),
+				'label'              => __( 'Prompt (User Message)', 'ai-agent-workflow-automation' ),
 				'supports_variables' => true,
 				'required'           => true,
 			),
 			'require_output_format' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Require Specific Output Format', 'workflow-automate' ),
+				'label'   => __( 'Require Specific Output Format', 'ai-agent-workflow-automation' ),
 				'default' => false,
 			),
 			'clean_output'          => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Clean output (strip markdown code fences)', 'workflow-automate' ),
+				'label'   => __( 'Clean output (strip markdown code fences)', 'ai-agent-workflow-automation' ),
 				'default' => true,
-				'help'    => __( 'When enabled, {{output}} is cleaned for HTTP Request and other nodes. Raw model text stays in {{response}}.', 'workflow-automate' ),
+				'help'    => __( 'When enabled, {{output}} is cleaned for HTTP Request and other nodes. Raw model text stays in {{response}}.', 'ai-agent-workflow-automation' ),
 			),
 			'fallback_enabled'      => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Enable Fallback Model', 'workflow-automate' ),
+				'label'   => __( 'Enable Fallback Model', 'ai-agent-workflow-automation' ),
 				'default' => false,
 			),
 			'max_iterations'        => array(
 				'type'    => 'integer',
-				'label'   => __( 'Max tool iterations', 'workflow-automate' ),
+				'label'   => __( 'Max tool iterations', 'ai-agent-workflow-automation' ),
 				'default' => 5,
 			),
 			'output_format'         => array(
 				'type'    => 'select',
-				'label'   => __( 'Reply format', 'workflow-automate' ),
+				'label'   => __( 'Reply format', 'ai-agent-workflow-automation' ),
 				'default' => 'text',
 				'options' => array(
 					array(
 						'value' => 'text',
-						'label' => __( 'Plain text', 'workflow-automate' ),
+						'label' => __( 'Plain text', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'json',
-						'label' => __( 'JSON', 'workflow-automate' ),
+						'label' => __( 'JSON', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),
 			'options'               => array(
 				'type'    => 'array',
-				'label'   => __( 'Options', 'workflow-automate' ),
+				'label'   => __( 'Options', 'ai-agent-workflow-automation' ),
 				'default' => array(),
 			),
 			'settings'              => array(
 				'type'    => 'object',
-				'label'   => __( 'Settings', 'workflow-automate' ),
+				'label'   => __( 'Settings', 'ai-agent-workflow-automation' ),
 				'default' => array(
 					'always_output_data'    => false,
 					'execute_once'          => false,
@@ -176,7 +176,7 @@ class AiAgentAction implements ActionInterface {
 		if ( '' === $agent_node_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'AI Agent could not resolve its node id.', 'workflow-automate' ),
+				'error'   => __( 'AI Agent could not resolve its node id.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

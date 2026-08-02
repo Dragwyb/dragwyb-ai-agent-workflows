@@ -20,11 +20,11 @@ class OpenRouterChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'OpenRouter Chat', 'workflow-automate' );
+		return __( 'OpenRouter Chat', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to OpenRouter and returns the reply.', 'workflow-automate' );
+		return __( 'Sends a prompt to OpenRouter and returns the reply.', 'ai-agent-workflow-automation' );
 	}
 
 	protected function providerSlug(): string {

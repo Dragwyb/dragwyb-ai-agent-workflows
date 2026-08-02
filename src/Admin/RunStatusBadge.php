@@ -54,17 +54,17 @@ class RunStatusBadge {
 	private static function label( string $status ): string {
 		switch ( $status ) {
 			case WorkflowRun::STATUS_QUEUED:
-				return __( 'Queued', 'workflow-automate' );
+				return __( 'Queued', 'ai-agent-workflow-automation' );
 			case WorkflowRun::STATUS_RUNNING:
-				return __( 'Running', 'workflow-automate' );
+				return __( 'Running', 'ai-agent-workflow-automation' );
 			case WorkflowRun::STATUS_SUCCESS:
-				return __( 'Success', 'workflow-automate' );
+				return __( 'Success', 'ai-agent-workflow-automation' );
 			case WorkflowRun::STATUS_FAILED:
-				return __( 'Failed', 'workflow-automate' );
+				return __( 'Failed', 'ai-agent-workflow-automation' );
 			case WorkflowRun::STATUS_PARTIAL:
-				return __( 'Partial', 'workflow-automate' );
+				return __( 'Partial', 'ai-agent-workflow-automation' );
 			default:
-				return __( 'Unknown', 'workflow-automate' );
+				return __( 'Unknown', 'ai-agent-workflow-automation' );
 		}
 	}
 }

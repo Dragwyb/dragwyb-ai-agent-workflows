@@ -27,37 +27,37 @@ class StructuredOutputParserAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'Structured Output Parser', 'workflow-automate' );
+		return __( 'Structured Output Parser', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Define a JSON structure the AI Agent must return (from example or JSON Schema).', 'workflow-automate' );
+		return __( 'Define a JSON structure the AI Agent must return (from example or JSON Schema).', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'schema_type'            => array(
 				'type'    => 'select',
-				'label'   => __( 'Schema Type', 'workflow-automate' ),
+				'label'   => __( 'Schema Type', 'ai-agent-workflow-automation' ),
 				'default' => 'from_json',
 				'options' => array(
 					array(
 						'value' => 'from_json',
-						'label' => __( 'Generate From JSON Example', 'workflow-automate' ),
+						'label' => __( 'Generate From JSON Example', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'manual',
-						'label' => __( 'Define using JSON Schema', 'workflow-automate' ),
+						'label' => __( 'Define using JSON Schema', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),
 			'json_example'           => array(
 				'type'      => 'string',
-				'label'     => __( 'JSON Example', 'workflow-automate' ),
+				'label'     => __( 'JSON Example', 'ai-agent-workflow-automation' ),
 				'default'   => "{\n  \"state\": \"California\",\n  \"cities\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}",
 				'multiline' => true,
 				'rows'      => 10,
-				'help'      => __( 'All properties will be required. To make them optional, use the JSON Schema schema type instead.', 'workflow-automate' ),
+				'help'      => __( 'All properties will be required. To make them optional, use the JSON Schema schema type instead.', 'ai-agent-workflow-automation' ),
 				'show_when' => array(
 					array(
 						'field'  => 'schema_type',
@@ -67,11 +67,11 @@ class StructuredOutputParserAction implements ActionInterface {
 			),
 			'json_schema'            => array(
 				'type'      => 'string',
-				'label'     => __( 'Input Schema', 'workflow-automate' ),
+				'label'     => __( 'Input Schema', 'ai-agent-workflow-automation' ),
 				'default'   => "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"state\": {\n      \"type\": \"string\"\n    },\n    \"cities\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}",
 				'multiline' => true,
 				'rows'      => 12,
-				'help'      => __( 'Use JSON Schema format. $refs syntax is not supported.', 'workflow-automate' ),
+				'help'      => __( 'Use JSON Schema format. $refs syntax is not supported.', 'ai-agent-workflow-automation' ),
 				'show_when' => array(
 					array(
 						'field'  => 'schema_type',
@@ -81,13 +81,13 @@ class StructuredOutputParserAction implements ActionInterface {
 			),
 			'auto_fix'               => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Auto-Fix Format', 'workflow-automate' ),
+				'label'   => __( 'Auto-Fix Format', 'ai-agent-workflow-automation' ),
 				'default' => true,
-				'help'    => __( 'If the reply does not match the schema, ask the connected Model to fix it once.', 'workflow-automate' ),
+				'help'    => __( 'If the reply does not match the schema, ask the connected Model to fix it once.', 'ai-agent-workflow-automation' ),
 			),
 			'customize_retry_prompt' => array(
 				'type'      => 'boolean',
-				'label'     => __( 'Customize Retry Prompt', 'workflow-automate' ),
+				'label'     => __( 'Customize Retry Prompt', 'ai-agent-workflow-automation' ),
 				'default'   => false,
 				'show_when' => array(
 					array(
@@ -98,11 +98,11 @@ class StructuredOutputParserAction implements ActionInterface {
 			),
 			'retry_prompt'           => array(
 				'type'      => 'string',
-				'label'     => __( 'Retry Prompt', 'workflow-automate' ),
+				'label'     => __( 'Retry Prompt', 'ai-agent-workflow-automation' ),
 				'default'   => '',
 				'multiline' => true,
 				'rows'      => 8,
-				'help'      => __( 'Placeholders: {instructions}, {completion}, {error}', 'workflow-automate' ),
+				'help'      => __( 'Placeholders: {instructions}, {completion}, {error}', 'ai-agent-workflow-automation' ),
 				'show_when' => array(
 					array(
 						'field'  => 'auto_fix',
@@ -168,7 +168,7 @@ class StructuredOutputParserAction implements ActionInterface {
 
 		return array(
 			'success'        => true,
-			'message'        => __( 'Structured Output Parser schema is valid. It runs with the AI Agent; Auto-Fix uses the Model connected under this node.', 'workflow-automate' ),
+			'message'        => __( 'Structured Output Parser schema is valid. It runs with the AI Agent; Auto-Fix uses the Model connected under this node.', 'ai-agent-workflow-automation' ),
 			'schema'         => $resolved['schema'],
 			'auto_fix'       => $auto_fix,
 			'auto_fix_model' => $has_model,

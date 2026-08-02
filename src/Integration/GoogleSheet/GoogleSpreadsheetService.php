@@ -46,7 +46,7 @@ final class GoogleSpreadsheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the spreadsheet payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the spreadsheet payload.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

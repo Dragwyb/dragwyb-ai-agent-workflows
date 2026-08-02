@@ -1,5 +1,5 @@
 {
-    "name": "workflow-automate/ai-providers",
+    "name": "ai-agent-workflow-automation/ai-providers",
     "description": "Vendored AI provider packages for Workflow Automate",
     "type": "library",
     "require": {

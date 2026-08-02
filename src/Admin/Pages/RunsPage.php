@@ -63,14 +63,14 @@ class RunsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Runs', 'workflow-automate' );
+		return __( 'Runs', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Runs', 'workflow-automate' );
+		return __( 'Runs', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class RunsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
@@ -124,13 +124,13 @@ class RunsPage implements AdminPage {
 
 		if ( ! $table->has_items() && ! $has_filters ) {
 			EmptyState::render(
-				__( 'No runs yet', 'workflow-automate' ),
-				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'workflow-automate' ),
+				__( 'No runs yet', 'ai-agent-workflow-automation' ),
+				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'ai-agent-workflow-automation' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-						'label'   => __( 'Go to Workflows', 'workflow-automate' ),
+						'label'   => __( 'Go to Workflows', 'ai-agent-workflow-automation' ),
 						'primary' => true,
 					),
 				)
@@ -193,17 +193,17 @@ class RunsPage implements AdminPage {
 		}
 
 		$workflow = $this->workflows->find( $workflow_id, true );
-		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'workflow-automate' );
+		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'ai-agent-workflow-automation' );
 
 		printf(
 			'<p class="aiawa-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
-				esc_html__( 'Showing runs for: %s', 'workflow-automate' ),
+				esc_html__( 'Showing runs for: %s', 'ai-agent-workflow-automation' ),
 				'<strong>' . esc_html( $name ) . '</strong>'
 			),
 			esc_url( remove_query_arg( 'workflow_id' ) ),
-			esc_html__( 'Clear filter', 'workflow-automate' )
+			esc_html__( 'Clear filter', 'ai-agent-workflow-automation' )
 		);
 	}
 
@@ -216,23 +216,23 @@ class RunsPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'deleted'       => array(
-				'message' => __( 'Run deleted.', 'workflow-automate' ),
+				'message' => __( 'Run deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted'  => array(
-				'message' => __( 'Selected runs deleted.', 'workflow-automate' ),
+				'message' => __( 'Selected runs deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'delete_failed' => array(
-				'message' => __( 'That run could not be deleted.', 'workflow-automate' ),
+				'message' => __( 'That run could not be deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'error',
 			),
 			'action_failed' => array(
-				'message' => __( 'That run action could not be completed.', 'workflow-automate' ),
+				'message' => __( 'That run action could not be completed.', 'ai-agent-workflow-automation' ),
 				'type'    => 'error',
 			),
 			'rerun_failed'  => array(
-				'message' => __( 'That run could not be re-run.', 'workflow-automate' ),
+				'message' => __( 'That run could not be re-run.', 'ai-agent-workflow-automation' ),
 				'type'    => 'error',
 			),
 		);

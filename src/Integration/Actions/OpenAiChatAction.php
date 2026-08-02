@@ -23,11 +23,11 @@ class OpenAiChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'OpenAI Chat', 'workflow-automate' );
+		return __( 'OpenAI Chat', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to OpenAI and returns the reply.', 'workflow-automate' );
+		return __( 'Sends a prompt to OpenAI and returns the reply.', 'ai-agent-workflow-automation' );
 	}
 
 	protected function providerSlug(): string {

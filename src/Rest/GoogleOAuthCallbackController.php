@@ -81,7 +81,7 @@ class GoogleOAuthCallbackController {
 				'error',
 				sprintf(
 					/* translators: %s: Google OAuth error code */
-					__( 'Google authorization was denied or failed (%s).', 'workflow-automate' ),
+					__( 'Google authorization was denied or failed (%s).', 'ai-agent-workflow-automation' ),
 					$error
 				)
 			);
@@ -93,7 +93,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				0,
 				'error',
-				__( 'OAuth state expired or was invalid. Please try connecting again.', 'workflow-automate' )
+				__( 'OAuth state expired or was invalid. Please try connecting again.', 'ai-agent-workflow-automation' )
 			);
 		}
 
@@ -103,7 +103,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				0,
 				'error',
-				__( 'The connection for this authorization no longer exists.', 'workflow-automate' ),
+				__( 'The connection for this authorization no longer exists.', 'ai-agent-workflow-automation' ),
 				$state_payload
 			);
 		}
@@ -117,7 +117,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				$connection->id(),
 				'error',
-				isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to connect to Google.', 'workflow-automate' ),
+				isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to connect to Google.', 'ai-agent-workflow-automation' ),
 				$state_payload
 			);
 		}

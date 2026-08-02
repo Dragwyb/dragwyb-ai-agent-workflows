@@ -60,14 +60,14 @@ class ConnectionsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Connections', 'workflow-automate' );
+		return __( 'Connections', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Connections', 'workflow-automate' );
+		return __( 'Connections', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -101,7 +101,7 @@ class ConnectionsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$table = new ConnectionsListTable( $this->connections, $this->settings );
@@ -112,23 +112,23 @@ class ConnectionsPage implements AdminPage {
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ) ),
-			esc_html__( 'Add New', 'workflow-automate' )
+			esc_html__( 'Add New', 'ai-agent-workflow-automation' )
 		);
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
 
-		echo '<p class="description">' . esc_html__( 'Credentials stored here are encrypted at rest and never displayed in full once saved.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Credentials stored here are encrypted at rest and never displayed in full once saved.', 'ai-agent-workflow-automation' ) . '</p>';
 
 		if ( ! $table->has_items() ) {
 			EmptyState::render(
-				__( 'No connections yet', 'workflow-automate' ),
-				__( 'Store API keys and other credentials here, then pick them from an HTTP Request action in the workflow editor.', 'workflow-automate' ),
+				__( 'No connections yet', 'ai-agent-workflow-automation' ),
+				__( 'Store API keys and other credentials here, then pick them from an HTTP Request action in the workflow editor.', 'ai-agent-workflow-automation' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ),
-						'label'   => __( 'Add connection', 'workflow-automate' ),
+						'label'   => __( 'Add connection', 'ai-agent-workflow-automation' ),
 						'primary' => true,
 					),
 				)
@@ -162,23 +162,23 @@ class ConnectionsPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'created'      => array(
-				'message' => __( 'Connection created.', 'workflow-automate' ),
+				'message' => __( 'Connection created.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'updated'      => array(
-				'message' => __( 'Connection updated.', 'workflow-automate' ),
+				'message' => __( 'Connection updated.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'deleted'      => array(
-				'message' => __( 'Connection deleted.', 'workflow-automate' ),
+				'message' => __( 'Connection deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
-				'message' => __( 'Selected connections deleted.', 'workflow-automate' ),
+				'message' => __( 'Selected connections deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'error'        => array(
-				'message' => __( 'That connection action could not be completed. Double-check the required fields and try again.', 'workflow-automate' ),
+				'message' => __( 'That connection action could not be completed. Double-check the required fields and try again.', 'ai-agent-workflow-automation' ),
 				'type'    => 'error',
 			),
 		);

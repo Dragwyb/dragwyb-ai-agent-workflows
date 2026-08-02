@@ -136,7 +136,7 @@ class AiProvidersController extends WP_REST_Controller {
 		if ( '' === $key ) {
 			return new WP_Error(
 				'aiawa_rest_invalid',
-				__( 'Provider is required.', 'workflow-automate' ),
+				__( 'Provider is required.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}

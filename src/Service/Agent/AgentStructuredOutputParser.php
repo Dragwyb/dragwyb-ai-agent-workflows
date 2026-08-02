@@ -90,7 +90,7 @@ Respond with JSON only — no markdown fences.';
 			if ( '' === $raw ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'JSON Schema is empty on the Structured Output Parser.', 'workflow-automate' ),
+					'error'   => __( 'JSON Schema is empty on the Structured Output Parser.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -99,7 +99,7 @@ Respond with JSON only — no markdown fences.';
 			if ( ! is_array( $decoded ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'Structured Output Parser JSON Schema is invalid JSON.', 'workflow-automate' ),
+					'error'   => __( 'Structured Output Parser JSON Schema is invalid JSON.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -111,7 +111,7 @@ Respond with JSON only — no markdown fences.';
 		if ( '' === $raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'JSON Example is empty on the Structured Output Parser.', 'workflow-automate' ),
+				'error'   => __( 'JSON Example is empty on the Structured Output Parser.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -120,7 +120,7 @@ Respond with JSON only — no markdown fences.';
 		if ( ! is_array( $example ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Structured Output Parser JSON Example is invalid JSON.', 'workflow-automate' ),
+				'error'   => __( 'Structured Output Parser JSON Example is invalid JSON.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -193,7 +193,7 @@ Respond with JSON only — no markdown fences.';
 			$encoded = '{}';
 		}
 
-		return __( 'You must respond with a single JSON value that validates against this JSON Schema. No markdown fences, no commentary.', 'workflow-automate' )
+		return __( 'You must respond with a single JSON value that validates against this JSON Schema. No markdown fences, no commentary.', 'ai-agent-workflow-automation' )
 			. "\n\n"
 			. $encoded;
 	}
@@ -210,7 +210,7 @@ Respond with JSON only — no markdown fences.';
 		if ( null === $data && 'null' !== trim( $raw_response ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Model reply is not valid JSON.', 'workflow-automate' ),
+				'error'   => __( 'Model reply is not valid JSON.', 'ai-agent-workflow-automation' ),
 				'raw'     => $raw_response,
 			);
 		}
@@ -275,7 +275,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected object at %s.', 'workflow-automate' ),
+							__( 'Expected object at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);
@@ -296,7 +296,7 @@ Respond with JSON only — no markdown fences.';
 							'valid' => false,
 							'error' => sprintf(
 								/* translators: 1: property name, 2: JSON path */
-								__( 'Missing required property "%1$s" at %2$s.', 'workflow-automate' ),
+								__( 'Missing required property "%1$s" at %2$s.', 'ai-agent-workflow-automation' ),
 								$key,
 								$path
 							),
@@ -333,7 +333,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected array at %s.', 'workflow-automate' ),
+							__( 'Expected array at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);
@@ -360,7 +360,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected string at %s.', 'workflow-automate' ),
+							__( 'Expected string at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);
@@ -377,7 +377,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected integer at %s.', 'workflow-automate' ),
+							__( 'Expected integer at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);
@@ -394,7 +394,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected number at %s.', 'workflow-automate' ),
+							__( 'Expected number at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);
@@ -411,7 +411,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected boolean at %s.', 'workflow-automate' ),
+							__( 'Expected boolean at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);
@@ -428,7 +428,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected null at %s.', 'workflow-automate' ),
+							__( 'Expected null at %s.', 'ai-agent-workflow-automation' ),
 							$path
 						),
 					);

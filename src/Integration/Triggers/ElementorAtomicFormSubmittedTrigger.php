@@ -41,14 +41,14 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Elementor Atomic Form Submitted', 'workflow-automate' );
+		return __( 'Elementor Atomic Form Submitted', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when an Elementor Pro atomic form is submitted.', 'workflow-automate' );
+		return __( 'Starts the workflow when an Elementor Pro atomic form is submitted.', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -58,12 +58,12 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'select',
-				'label'   => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'ai-agent-workflow-automation' ),
 				'default' => '',
 				'options' => array(
 					array(
 						'value' => '',
-						'label' => __( 'All forms', 'workflow-automate' ),
+						'label' => __( 'All forms', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),

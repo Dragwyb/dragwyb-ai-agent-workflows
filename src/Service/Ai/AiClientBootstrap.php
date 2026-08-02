@@ -284,7 +284,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'aiawa_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'workflow-automate' ),
+				__( 'WordPress AI Client is not available.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -295,7 +295,7 @@ class AiClientBootstrap {
 		if ( '' === $api_key ) {
 			return new WP_Error(
 				'aiawa_ai_missing_key',
-				__( 'No API key configured for this provider. Add an API key in this node.', 'workflow-automate' ),
+				__( 'No API key configured for this provider. Add an API key in this node.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -308,7 +308,7 @@ class AiClientBootstrap {
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'aiawa_ai_auth_failed',
-				__( 'Could not attach API credentials for this provider.', 'workflow-automate' ),
+				__( 'Could not attach API credentials for this provider.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -331,7 +331,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'aiawa_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'workflow-automate' ),
+				__( 'WordPress AI Client is not available.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -342,7 +342,7 @@ class AiClientBootstrap {
 		if ( '' === $provider_id ) {
 			return new WP_Error(
 				'aiawa_ai_unknown_provider',
-				__( 'Unknown AI provider.', 'workflow-automate' ),
+				__( 'Unknown AI provider.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -350,7 +350,7 @@ class AiClientBootstrap {
 		if ( '' === $api_key ) {
 			return new WP_Error(
 				'aiawa_ai_empty_key',
-				__( 'API key is required.', 'workflow-automate' ),
+				__( 'API key is required.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -362,7 +362,7 @@ class AiClientBootstrap {
 				'aiawa_ai_provider_unregistered',
 				sprintf(
 					/* translators: %s: provider id */
-					__( 'AI provider "%s" is not registered.', 'workflow-automate' ),
+					__( 'AI provider "%s" is not registered.', 'ai-agent-workflow-automation' ),
 					$provider_id
 				),
 				array( 'status' => 400 )
@@ -382,7 +382,7 @@ class AiClientBootstrap {
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'aiawa_ai_key_invalid',
-				__( 'It was not possible to connect to the provider using this key.', 'workflow-automate' ),
+				__( 'It was not possible to connect to the provider using this key.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -427,7 +427,7 @@ class AiClientBootstrap {
 			if ( is_wp_error( $response ) ) {
 				return new WP_Error(
 					'aiawa_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'workflow-automate' ),
+					__( 'It was not possible to connect to the provider using this key.', 'ai-agent-workflow-automation' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -436,7 +436,7 @@ class AiClientBootstrap {
 			if ( 200 !== $code ) {
 				return new WP_Error(
 					'aiawa_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'workflow-automate' ),
+					__( 'It was not possible to connect to the provider using this key.', 'ai-agent-workflow-automation' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -455,14 +455,14 @@ class AiClientBootstrap {
 			if ( ! $registry->isProviderConfigured( $provider_id ) ) {
 				return new WP_Error(
 					'aiawa_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'workflow-automate' ),
+					__( 'It was not possible to connect to the provider using this key.', 'ai-agent-workflow-automation' ),
 					array( 'status' => 400 )
 				);
 			}
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'aiawa_ai_key_invalid',
-				__( 'It was not possible to connect to the provider using this key.', 'workflow-automate' ),
+				__( 'It was not possible to connect to the provider using this key.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -488,7 +488,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'aiawa_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'workflow-automate' ),
+				__( 'WordPress AI Client is not available.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -497,7 +497,7 @@ class AiClientBootstrap {
 		if ( '' === $provider_id ) {
 			return new WP_Error(
 				'aiawa_ai_unknown_provider',
-				__( 'Unknown AI provider.', 'workflow-automate' ),
+				__( 'Unknown AI provider.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 400 )
 			);
 		}

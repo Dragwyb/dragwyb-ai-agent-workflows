@@ -85,7 +85,7 @@ export default function useTestFlow(
 					setStatusMessage(
 						__(
 							'Sample captured. You can use existing data to test.',
-							'workflow-automate'
+							'ai-agent-workflow-automation'
 						)
 					);
 
@@ -99,7 +99,7 @@ export default function useTestFlow(
 				setStatusMessage(
 					error && error.message
 						? error.message
-						: __('Could not check listen status.', 'workflow-automate')
+						: __('Could not check listen status.', 'ai-agent-workflow-automation')
 				);
 			}
 		}, POLL_MS);
@@ -118,7 +118,7 @@ export default function useTestFlow(
 			setStatusMessage(
 				__(
 					'Listen timed out. Fire your trigger and try again.',
-					'workflow-automate'
+					'ai-agent-workflow-automation'
 				)
 			);
 		}, LISTEN_TIMEOUT_MS);
@@ -129,7 +129,7 @@ export default function useTestFlow(
 			listenStartedAtRef.current = startedAt || null;
 			setListening(true);
 			setStatusMessage(
-				__('Listening for the next trigger response…', 'workflow-automate')
+				__('Listening for the next trigger response…', 'ai-agent-workflow-automation')
 			);
 			pollUntilCaptured();
 		},
@@ -170,13 +170,13 @@ export default function useTestFlow(
 			setStatusMessage(
 				__(
 					'Add a trigger block first, then listen again.',
-					'workflow-automate'
+					'ai-agent-workflow-automation'
 				)
 			);
 			return;
 		}
 
-		setStatusMessage(__('Saving…', 'workflow-automate'));
+		setStatusMessage(__('Saving…', 'ai-agent-workflow-automation'));
 
 		try {
 			await persistBeforeTest();
@@ -185,7 +185,7 @@ export default function useTestFlow(
 
 			if (!status.listening) {
 				throw new Error(
-					__('Server did not enter listen mode.', 'workflow-automate')
+					__('Server did not enter listen mode.', 'ai-agent-workflow-automation')
 				);
 			}
 
@@ -196,7 +196,7 @@ export default function useTestFlow(
 			setStatusMessage(
 				error && error.message
 					? error.message
-					: __('Could not start listening.', 'workflow-automate')
+					: __('Could not start listening.', 'ai-agent-workflow-automation')
 			);
 		}
 	}, [workflowId, persistBeforeTest, hasTrigger, beginListening]);
@@ -208,7 +208,7 @@ export default function useTestFlow(
 			return;
 		}
 
-		setStatusMessage(__('Running workflow with saved data…', 'workflow-automate'));
+		setStatusMessage(__('Running workflow with saved data…', 'ai-agent-workflow-automation'));
 
 		try {
 			await persistBeforeTest();
@@ -223,7 +223,7 @@ export default function useTestFlow(
 				setStatusMessage(
 					__(
 						'No saved sample for this trigger. Use “Listen new response” first.',
-						'workflow-automate'
+						'ai-agent-workflow-automation'
 					)
 				);
 				return;
@@ -233,19 +233,19 @@ export default function useTestFlow(
 				setStatusMessage(
 					__(
 						'No saved sample yet. Use “Listen new response” first.',
-						'workflow-automate'
+						'ai-agent-workflow-automation'
 					)
 				);
 				return;
 			}
 
 			await runWorkflow(workflowId);
-			setStatusMessage(__('Test run completed.', 'workflow-automate'));
+			setStatusMessage(__('Test run completed.', 'ai-agent-workflow-automation'));
 		} catch (error) {
 			setStatusMessage(
 				error && error.message
 					? error.message
-					: __('Test run failed.', 'workflow-automate')
+					: __('Test run failed.', 'ai-agent-workflow-automation')
 			);
 		}
 	}, [workflowId, persistBeforeTest, getTriggerType]);

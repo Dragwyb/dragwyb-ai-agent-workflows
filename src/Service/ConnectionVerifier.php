@@ -92,7 +92,7 @@ class ConnectionVerifier {
 
 			return array(
 				'success' => false,
-				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'workflow-automate' ),
+				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -229,7 +229,7 @@ class ConnectionVerifier {
 				? (string) $result['error']
 				: sprintf(
 					/* translators: %s: third-party service name */
-					__( 'Could not verify credentials with %s.', 'workflow-automate' ),
+					__( 'Could not verify credentials with %s.', 'ai-agent-workflow-automation' ),
 					$service
 				),
 		);

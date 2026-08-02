@@ -51,14 +51,14 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Workflow Editor', 'workflow-automate' );
+		return __( 'Workflow Editor', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Workflow Editor', 'workflow-automate' );
+		return __( 'Workflow Editor', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -159,7 +159,7 @@ class BuilderPage implements AdminPage {
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
 				'Workflow Automate: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
-				'workflow-automate'
+				'ai-agent-workflow-automation'
 			)
 		);
 	}
@@ -169,7 +169,7 @@ class BuilderPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'ai-agent-workflow-automation' ) );
 		}
 
 		echo '<div class="wrap aiawa-admin-page aiawa-builder-page">';
@@ -193,7 +193,7 @@ class BuilderPage implements AdminPage {
 
 		printf(
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-			esc_html__( 'Workflow imported from JSON.', 'workflow-automate' )
+			esc_html__( 'Workflow imported from JSON.', 'ai-agent-workflow-automation' )
 		);
 	}
 }

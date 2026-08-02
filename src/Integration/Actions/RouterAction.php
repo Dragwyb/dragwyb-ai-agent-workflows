@@ -23,29 +23,29 @@ class RouterAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'Router', 'workflow-automate' );
+		return __( 'Router', 'ai-agent-workflow-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Routes to different steps based on a value.', 'workflow-automate' );
+		return __( 'Routes to different steps based on a value.', 'ai-agent-workflow-automation' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'route_field'            => array(
 				'type'               => 'string',
-				'label'              => __( 'Value to check', 'workflow-automate' ),
+				'label'              => __( 'Value to check', 'ai-agent-workflow-automation' ),
 				'supports_variables' => true,
 				'required'           => true,
 			),
 			'routes'                 => array(
 				'type'    => 'router_routes',
-				'label'   => __( 'Matching rules', 'workflow-automate' ),
+				'label'   => __( 'Matching rules', 'ai-agent-workflow-automation' ),
 				'default' => array(),
 			),
 			'default_branch_node_id' => array(
 				'type'    => 'node_select',
-				'label'   => __( 'Otherwise, run this step', 'workflow-automate' ),
+				'label'   => __( 'Otherwise, run this step', 'ai-agent-workflow-automation' ),
 				'default' => '',
 			),
 		);

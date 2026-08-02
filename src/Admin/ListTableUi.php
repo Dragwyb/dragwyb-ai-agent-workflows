@@ -96,7 +96,7 @@ final class ListTableUi {
 			echo '</select>';
 		}
 
-		submit_button( __( 'Filter', 'workflow-automate' ), 'secondary', 'filter_action', false );
+		submit_button( __( 'Filter', 'ai-agent-workflow-automation' ), 'secondary', 'filter_action', false );
 		echo '</div>';
 	}
 

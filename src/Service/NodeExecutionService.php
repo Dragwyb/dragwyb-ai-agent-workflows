@@ -87,7 +87,7 @@ class NodeExecutionService {
 				'success' => false,
 				'error'   => sprintf(
 					/* translators: %s: node type slug. */
-					__( 'No action node type is registered for "%s". It may belong to a deactivated plugin.', 'workflow-automate' ),
+					__( 'No action node type is registered for "%s". It may belong to a deactivated plugin.', 'ai-agent-workflow-automation' ),
 					$node->nodeType()
 				),
 			);
@@ -110,7 +110,7 @@ class NodeExecutionService {
 		if ( ! is_array( $result ) || ! array_key_exists( 'success', $result ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'The action returned an invalid result.', 'workflow-automate' ),
+				'error'   => __( 'The action returned an invalid result.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

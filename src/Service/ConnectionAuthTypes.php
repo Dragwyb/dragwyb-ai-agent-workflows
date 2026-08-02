@@ -53,14 +53,14 @@ class ConnectionAuthTypes {
 	public static function label( string $auth_type ): string {
 		switch ( $auth_type ) {
 			case self::BASIC:
-				return __( 'Username & Password', 'workflow-automate' );
+				return __( 'Username & Password', 'ai-agent-workflow-automation' );
 			case self::BEARER_TOKEN:
-				return __( 'Bearer Token', 'workflow-automate' );
+				return __( 'Bearer Token', 'ai-agent-workflow-automation' );
 			case self::OAUTH2:
-				return __( 'OAuth 2', 'workflow-automate' );
+				return __( 'OAuth 2', 'ai-agent-workflow-automation' );
 			case self::API_KEY:
 			default:
-				return __( 'API Key', 'workflow-automate' );
+				return __( 'API Key', 'ai-agent-workflow-automation' );
 		}
 	}
 
@@ -76,43 +76,43 @@ class ConnectionAuthTypes {
 			case self::BASIC:
 				return array(
 					'username' => array(
-						'label'  => __( 'Username', 'workflow-automate' ),
+						'label'  => __( 'Username', 'ai-agent-workflow-automation' ),
 						'secret' => false,
 					),
 					'password' => array(
-						'label'  => __( 'Password', 'workflow-automate' ),
+						'label'  => __( 'Password', 'ai-agent-workflow-automation' ),
 						'secret' => true,
 					),
 				);
 			case self::BEARER_TOKEN:
 				return array(
 					'token' => array(
-						'label'  => __( 'Bearer Token', 'workflow-automate' ),
+						'label'  => __( 'Bearer Token', 'ai-agent-workflow-automation' ),
 						'secret' => true,
 					),
 				);
 			case self::OAUTH2:
 				return array(
 					'client_id'     => array(
-						'label'  => __( 'Client ID', 'workflow-automate' ),
+						'label'  => __( 'Client ID', 'ai-agent-workflow-automation' ),
 						'secret' => false,
 					),
 					'client_secret' => array(
-						'label'  => __( 'Client Secret', 'workflow-automate' ),
+						'label'  => __( 'Client Secret', 'ai-agent-workflow-automation' ),
 						'secret' => true,
 					),
 					'access_token'  => array(
-						'label'              => __( 'Access Token', 'workflow-automate' ),
+						'label'              => __( 'Access Token', 'ai-agent-workflow-automation' ),
 						'secret'             => true,
 						'required_on_create' => false,
 					),
 					'refresh_token' => array(
-						'label'              => __( 'Refresh Token', 'workflow-automate' ),
+						'label'              => __( 'Refresh Token', 'ai-agent-workflow-automation' ),
 						'secret'             => true,
 						'required_on_create' => false,
 					),
 					'expires_at'    => array(
-						'label'              => __( 'Token Expires At', 'workflow-automate' ),
+						'label'              => __( 'Token Expires At', 'ai-agent-workflow-automation' ),
 						'secret'             => false,
 						'required_on_create' => false,
 					),
@@ -121,7 +121,7 @@ class ConnectionAuthTypes {
 			default:
 				return array(
 					'api_key' => array(
-						'label'  => __( 'API Key', 'workflow-automate' ),
+						'label'  => __( 'API Key', 'ai-agent-workflow-automation' ),
 						'secret' => true,
 					),
 				);

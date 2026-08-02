@@ -25,7 +25,7 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 	return (
 		<div className="aiawa-builder-config__captured">
 			<div className="aiawa-builder-config__captured-header">
-				<h3>{__('Captured response', 'workflow-automate')}</h3>
+				<h3>{__('Captured response', 'ai-agent-workflow-automation')}</h3>
 				{capturedAt && (
 					<span className="aiawa-builder-config__captured-time">
 						{capturedAt}
@@ -44,7 +44,7 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 				<p className="aiawa-builder-config__captured-empty">
 					{__(
 						'No captured data for this trigger yet. Use Test Flow → Listen new response, then fire the trigger.',
-						'workflow-automate'
+						'ai-agent-workflow-automation'
 					)}
 				</p>
 			)}

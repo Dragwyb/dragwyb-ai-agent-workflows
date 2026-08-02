@@ -31,27 +31,27 @@ final class PluginActionCatalog {
 
 		$definitions[] = array(
 			'slug'          => 'wp_check_plugin_activation_status_action',
-			'label'         => __( 'Check Plugin Activation Status', 'workflow-automate' ),
-			'description'   => __( 'Checks whether a plugin is currently active.', 'workflow-automate' ),
+			'label'         => __( 'Check Plugin Activation Status', 'ai-agent-workflow-automation' ),
+			'description'   => __( 'Checks whether a plugin is currently active.', 'ai-agent-workflow-automation' ),
 			'group'         => 'plugin',
 			'group_label'   => $groups['plugin'],
 			'method'        => 'checkPluginActivationStatus',
 			'method_args'   => array(),
 			'config_schema' => array(
-				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'workflow-automate' ), array( 'required' => true ) ),
+				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
 			),
 		);
 
 		$definitions[] = array(
 			'slug'          => 'wp_activate_plugin_action',
-			'label'         => __( 'Activate Plugin', 'workflow-automate' ),
-			'description'   => __( 'Activates an installed but inactive plugin.', 'workflow-automate' ),
+			'label'         => __( 'Activate Plugin', 'ai-agent-workflow-automation' ),
+			'description'   => __( 'Activates an installed but inactive plugin.', 'ai-agent-workflow-automation' ),
 			'group'         => 'plugin',
 			'group_label'   => $groups['plugin'],
 			'method'        => 'activatePlugin',
 			'method_args'   => array(),
 			'config_schema' => array(
-				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'workflow-automate' ), array( 'required' => true ) ),
+				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'ai-agent-workflow-automation' ), array( 'required' => true ) ),
 			),
 		);
 

@@ -42,14 +42,14 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'When chat message received', 'workflow-automate' );
+		return __( 'When chat message received', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Runs the workflow when a chat message is submitted to this workflow\'s chat URL (same idea as n8n\'s Chat Trigger).', 'workflow-automate' );
+		return __( 'Runs the workflow when a chat message is submitted to this workflow\'s chat URL (same idea as n8n\'s Chat Trigger).', 'ai-agent-workflow-automation' );
 	}
 
 	public function app(): string {
@@ -61,7 +61,7 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	}
 
 	public function groupLabel(): string {
-		return __( 'Chat', 'workflow-automate' );
+		return __( 'Chat', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -71,52 +71,52 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 		return array(
 			'endpoint_id'       => array(
 				'type'        => 'string',
-				'label'       => __( 'Chat endpoint ID', 'workflow-automate' ),
-				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'workflow-automate' ),
+				'label'       => __( 'Chat endpoint ID', 'ai-agent-workflow-automation' ),
+				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'ai-agent-workflow-automation' ),
 				'required'    => true,
 				'default'     => '',
 				'hidden'      => true,
 			),
 			'public'            => array(
 				'type'        => 'boolean',
-				'label'       => __( 'Make chat publicly available', 'workflow-automate' ),
-				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'workflow-automate' ),
+				'label'       => __( 'Make chat publicly available', 'ai-agent-workflow-automation' ),
+				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'ai-agent-workflow-automation' ),
 				'default'     => false,
 			),
 			'title'             => array(
 				'type'    => 'string',
-				'label'   => __( 'Title', 'workflow-automate' ),
-				'default' => __( 'Hi there! 👋', 'workflow-automate' ),
+				'label'   => __( 'Title', 'ai-agent-workflow-automation' ),
+				'default' => __( 'Hi there! 👋', 'ai-agent-workflow-automation' ),
 			),
 			'subtitle'          => array(
 				'type'    => 'string',
-				'label'   => __( 'Subtitle', 'workflow-automate' ),
-				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'workflow-automate' ),
+				'label'   => __( 'Subtitle', 'ai-agent-workflow-automation' ),
+				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'ai-agent-workflow-automation' ),
 			),
 			'input_placeholder' => array(
 				'type'    => 'string',
-				'label'   => __( 'Input placeholder', 'workflow-automate' ),
-				'default' => __( 'Type your question…', 'workflow-automate' ),
+				'label'   => __( 'Input placeholder', 'ai-agent-workflow-automation' ),
+				'default' => __( 'Type your question…', 'ai-agent-workflow-automation' ),
 			),
 			'initial_messages'  => array(
 				'type'        => 'string',
-				'label'       => __( 'Initial message(s)', 'workflow-automate' ),
-				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'workflow-automate' ),
+				'label'       => __( 'Initial message(s)', 'ai-agent-workflow-automation' ),
+				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'ai-agent-workflow-automation' ),
 				'multiline'   => true,
-				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'workflow-automate' ),
+				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'ai-agent-workflow-automation' ),
 			),
 			'response_mode'     => array(
 				'type'    => 'select',
-				'label'   => __( 'Response mode', 'workflow-automate' ),
+				'label'   => __( 'Response mode', 'ai-agent-workflow-automation' ),
 				'default' => 'lastNode',
 				'options' => array(
 					array(
 						'value' => 'lastNode',
-						'label' => __( 'When last node finishes', 'workflow-automate' ),
+						'label' => __( 'When last node finishes', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'immediate',
-						'label' => __( 'Acknowledge immediately (queue run)', 'workflow-automate' ),
+						'label' => __( 'Acknowledge immediately (queue run)', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),

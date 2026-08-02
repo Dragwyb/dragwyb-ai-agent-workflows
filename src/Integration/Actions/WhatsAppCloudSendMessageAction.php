@@ -45,14 +45,14 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'WhatsApp Cloud Send Message', 'workflow-automate' );
+		return __( 'WhatsApp Cloud Send Message', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends a text message via the WhatsApp Cloud API (Meta).', 'workflow-automate' );
+		return __( 'Sends a text message via the WhatsApp Cloud API (Meta).', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -62,23 +62,23 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		return array(
 			'connection_id'   => array(
 				'type'     => 'connection',
-				'label'    => __( 'WhatsApp access token connection', 'workflow-automate' ),
+				'label'    => __( 'WhatsApp access token connection', 'ai-agent-workflow-automation' ),
 				'required' => true,
 				'default'  => 0,
 			),
 			'phone_number_id' => array(
 				'type'     => 'string',
-				'label'    => __( 'Phone number ID (from Meta)', 'workflow-automate' ),
+				'label'    => __( 'Phone number ID (from Meta)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'to'              => array(
 				'type'     => 'string',
-				'label'    => __( 'Recipient phone (digits, country code, no +)', 'workflow-automate' ),
+				'label'    => __( 'Recipient phone (digits, country code, no +)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 			'message'         => array(
 				'type'     => 'string',
-				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'workflow-automate' ),
+				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'ai-agent-workflow-automation' ),
 				'required' => true,
 			),
 		);
@@ -105,21 +105,21 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		if ( '' === $phone_number_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No WhatsApp phone number ID configured.', 'workflow-automate' ),
+				'error'   => __( 'No WhatsApp phone number ID configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
 		if ( '' === $to ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No recipient phone number configured.', 'workflow-automate' ),
+				'error'   => __( 'No recipient phone number configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
 		if ( '' === trim( $message ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No message configured.', 'workflow-automate' ),
+				'error'   => __( 'No message configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -140,7 +140,7 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		if ( ! is_string( $body ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the WhatsApp payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the WhatsApp payload.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

@@ -59,14 +59,14 @@ class HttpRequestAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'HTTP Request', 'workflow-automate' );
+		return __( 'HTTP Request', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an outbound HTTP request to a URL you specify.', 'workflow-automate' );
+		return __( 'Sends an outbound HTTP request to a URL you specify.', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -76,7 +76,7 @@ class HttpRequestAction implements ActionInterface {
 		return array(
 			'method'            => array(
 				'type'    => 'select',
-				'label'   => __( 'Method', 'workflow-automate' ),
+				'label'   => __( 'Method', 'ai-agent-workflow-automation' ),
 				'default' => self::DEFAULT_METHOD,
 				'options' => array(
 					array(
@@ -111,34 +111,34 @@ class HttpRequestAction implements ActionInterface {
 			),
 			'url'               => array(
 				'type'               => 'string',
-				'label'              => __( 'URL', 'workflow-automate' ),
+				'label'              => __( 'URL', 'ai-agent-workflow-automation' ),
 				'required'           => true,
 				'supports_variables' => true,
 			),
 			'connection_id'     => array(
 				'type'    => 'connection',
-				'label'   => __( 'Authentication (optional)', 'workflow-automate' ),
+				'label'   => __( 'Authentication (optional)', 'ai-agent-workflow-automation' ),
 				'default' => 0,
 			),
 			'headers'           => array(
 				'type'    => 'object',
-				'label'   => __( 'Headers', 'workflow-automate' ),
+				'label'   => __( 'Headers', 'ai-agent-workflow-automation' ),
 				'default' => array(),
 			),
 			'allow_unsafe_urls' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Allow local/unsafe URLs', 'workflow-automate' ),
+				'label'   => __( 'Allow local/unsafe URLs', 'ai-agent-workflow-automation' ),
 				'default' => false,
-				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'workflow-automate' ),
+				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'ai-agent-workflow-automation' ),
 			),
 			'send_body'         => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Send Body', 'workflow-automate' ),
+				'label'   => __( 'Send Body', 'ai-agent-workflow-automation' ),
 				'default' => false,
 			),
 			'body_content_type' => array(
 				'type'      => 'select',
-				'label'     => __( 'Body Content Type', 'workflow-automate' ),
+				'label'     => __( 'Body Content Type', 'ai-agent-workflow-automation' ),
 				'default'   => self::DEFAULT_BODY_CONTENT_TYPE,
 				'show_when' => array(
 					array(
@@ -149,21 +149,21 @@ class HttpRequestAction implements ActionInterface {
 				'options'   => array(
 					array(
 						'value' => 'json',
-						'label' => __( 'JSON', 'workflow-automate' ),
+						'label' => __( 'JSON', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'form_urlencoded',
-						'label' => __( 'Form URL Encoded', 'workflow-automate' ),
+						'label' => __( 'Form URL Encoded', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'raw',
-						'label' => __( 'Raw', 'workflow-automate' ),
+						'label' => __( 'Raw', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),
 			'body_specify'      => array(
 				'type'      => 'select',
-				'label'     => __( 'Specify Body', 'workflow-automate' ),
+				'label'     => __( 'Specify Body', 'ai-agent-workflow-automation' ),
 				'default'   => 'json',
 				'show_when' => array(
 					array(
@@ -174,20 +174,20 @@ class HttpRequestAction implements ActionInterface {
 				'options'   => array(
 					array(
 						'value' => 'json',
-						'label' => __( 'Using JSON', 'workflow-automate' ),
+						'label' => __( 'Using JSON', 'ai-agent-workflow-automation' ),
 					),
 					array(
 						'value' => 'fields',
-						'label' => __( 'Using Fields Below', 'workflow-automate' ),
+						'label' => __( 'Using Fields Below', 'ai-agent-workflow-automation' ),
 					),
 				),
 			),
 			'body'              => array(
 				'type'               => 'string',
-				'label'              => __( 'Body', 'workflow-automate' ),
+				'label'              => __( 'Body', 'ai-agent-workflow-automation' ),
 				'default'            => '',
 				'supports_variables' => true,
-				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'workflow-automate' ),
+				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'ai-agent-workflow-automation' ),
 				'show_when'          => array(
 					array(
 						'field'  => 'send_body',
@@ -201,9 +201,9 @@ class HttpRequestAction implements ActionInterface {
 			),
 			'body_parameters'   => array(
 				'type'               => 'key_value',
-				'label'              => __( 'Body Parameters', 'workflow-automate' ),
+				'label'              => __( 'Body Parameters', 'ai-agent-workflow-automation' ),
 				'default'            => array(),
-				'button_label'       => __( 'Add Body Field', 'workflow-automate' ),
+				'button_label'       => __( 'Add Body Field', 'ai-agent-workflow-automation' ),
 				'supports_variables' => true,
 				'show_when'          => array(
 					array(
@@ -228,7 +228,7 @@ class HttpRequestAction implements ActionInterface {
 		if ( '' === $url ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No request URL configured.', 'workflow-automate' ),
+				'error'   => __( 'No request URL configured.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
@@ -485,7 +485,7 @@ class HttpRequestAction implements ActionInterface {
 		$connection = $this->connections->find( $connection_id );
 
 		if ( null === $connection ) {
-			return __( 'The connection configured for this action no longer exists.', 'workflow-automate' );
+			return __( 'The connection configured for this action no longer exists.', 'ai-agent-workflow-automation' );
 		}
 
 		$credentials = $this->connections->credentials( $connection );
@@ -496,7 +496,7 @@ class HttpRequestAction implements ActionInterface {
 				$password = $credentials['password'] ?? null;
 
 				if ( null === $username || null === $password ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'ai-agent-workflow-automation' );
 				}
 
 				$headers['Authorization'] = 'Basic ' . base64_encode( $username . ':' . $password );
@@ -507,7 +507,7 @@ class HttpRequestAction implements ActionInterface {
 				$token = $credentials['token'] ?? null;
 
 				if ( null === $token ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'ai-agent-workflow-automation' );
 				}
 
 				$headers['Authorization'] = 'Bearer ' . $token;
@@ -519,7 +519,7 @@ class HttpRequestAction implements ActionInterface {
 				$api_key = $credentials['api_key'] ?? null;
 
 				if ( null === $api_key ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'ai-agent-workflow-automation' );
 				}
 
 				$headers['Authorization'] = 'Bearer ' . $api_key;

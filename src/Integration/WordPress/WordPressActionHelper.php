@@ -289,11 +289,11 @@ final class WordPressActionHelper {
 	 */
 	public static function insertTerm( string $name, string $taxonomy, array $args = array() ): array {
 		if ( '' === $name ) {
-			return self::fail( __( 'Term name is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term name is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$term = wp_insert_term( $name, $taxonomy, array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } ) );
@@ -315,21 +315,21 @@ final class WordPressActionHelper {
 	 */
 	public static function updateTerm( int $termId, string $taxonomy, array $args ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
-			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
+			return self::fail( __( 'Term not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$args = array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } );
 
 		if ( array() === $args ) {
-			return self::fail( __( 'Nothing to update.', 'workflow-automate' ) );
+			return self::fail( __( 'Nothing to update.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$term = wp_update_term( $termId, $taxonomy, $args );
@@ -348,15 +348,15 @@ final class WordPressActionHelper {
 	 */
 	public static function deleteTerm( int $termId, string $taxonomy, array $args = array() ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
-			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
+			return self::fail( __( 'Term not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$result = wp_delete_term( $termId, $taxonomy, $args );
@@ -366,7 +366,7 @@ final class WordPressActionHelper {
 		}
 
 		if ( ! $result ) {
-			return self::fail( __( 'Failed to delete term.', 'workflow-automate' ) );
+			return self::fail( __( 'Failed to delete term.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return self::ok( array( 'term_id' => $termId ) );
@@ -377,17 +377,17 @@ final class WordPressActionHelper {
 	 */
 	public static function getTerm( int $termId, string $taxonomy ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term id is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$term = get_term( $termId, $taxonomy );
 
 		if ( ! $term || is_wp_error( $term ) ) {
-			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
+			return self::fail( __( 'Term not found.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return self::ok( (array) $term );
@@ -537,7 +537,7 @@ final class WordPressActionHelper {
 		if ( $imageId <= 0 ) {
 			if ( ! filter_var( $imageUrl, FILTER_VALIDATE_URL ) ) {
 				return array(
-					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'workflow-automate' ),
+					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'ai-agent-workflow-automation' ),
 				);
 			}
 
@@ -548,7 +548,7 @@ final class WordPressActionHelper {
 				return array(
 					'warning' => sprintf(
 						/* translators: %s: error message */
-						__( 'Featured image skipped: %s', 'workflow-automate' ),
+						__( 'Featured image skipped: %s', 'ai-agent-workflow-automation' ),
 						$sideloaded->get_error_message()
 					),
 				);
@@ -559,13 +559,13 @@ final class WordPressActionHelper {
 
 		if ( $imageId <= 0 || ! wp_attachment_is_image( $imageId ) ) {
 			return array(
-				'warning' => __( 'Featured image skipped: invalid attachment.', 'workflow-automate' ),
+				'warning' => __( 'Featured image skipped: invalid attachment.', 'ai-agent-workflow-automation' ),
 			);
 		}
 
 		if ( ! set_post_thumbnail( $postId, $imageId ) ) {
 			return array(
-				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'workflow-automate' ),
+				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'ai-agent-workflow-automation' ),
 			);
 		}
 

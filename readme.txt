@@ -29,7 +29,7 @@ Whether you want to trigger actions from a **WooCommerce** order, process data f
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/workflow-automate` directory, or search for "**AI Agent & Workflow Automation Builder**" in the WordPress plugins screen.
+1. Upload the plugin files to the `/wp-content/plugins/ai-agent-workflow-automation` directory, or search for "**AI Agent & Workflow Automation Builder**" in the WordPress plugins screen.
 2. Activate the plugin through the "Plugins" screen in WordPress.
 3. Navigate to the new Automation menu to start building your first **workflow**.
 

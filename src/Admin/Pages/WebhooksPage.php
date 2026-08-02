@@ -59,14 +59,14 @@ class WebhooksPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Webhooks', 'workflow-automate' );
+		return __( 'Webhooks', 'ai-agent-workflow-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Webhooks', 'workflow-automate' );
+		return __( 'Webhooks', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -100,7 +100,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$table = new WebhooksListTable( $this->webhooks, $this->workflows, $this->settings );
@@ -111,27 +111,27 @@ class WebhooksPage implements AdminPage {
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ) ),
-			esc_html__( 'Add New', 'workflow-automate' )
+			esc_html__( 'Add New', 'ai-agent-workflow-automation' )
 		);
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
 
-		echo '<p class="description">' . esc_html__( 'Public endpoints that start a workflow when an external service POSTs to them. Optional HMAC signing and IP allow-lists protect each endpoint.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Public endpoints that start a workflow when an external service POSTs to them. Optional HMAC signing and IP allow-lists protect each endpoint.', 'ai-agent-workflow-automation' ) . '</p>';
 
 		if ( $this->settings->requireWebhookSigning() ) {
-			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'workflow-automate' ) . '</p></div>';
+			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'ai-agent-workflow-automation' ) . '</p></div>';
 		}
 
 		if ( ! $table->has_items() ) {
 			EmptyState::render(
-				__( 'No webhooks yet', 'workflow-automate' ),
-				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'workflow-automate' ),
+				__( 'No webhooks yet', 'ai-agent-workflow-automation' ),
+				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'ai-agent-workflow-automation' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ),
-						'label'   => __( 'Add webhook', 'workflow-automate' ),
+						'label'   => __( 'Add webhook', 'ai-agent-workflow-automation' ),
 						'primary' => true,
 					),
 				)
@@ -162,23 +162,23 @@ class WebhooksPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'created'      => array(
-				'message' => __( 'Webhook created.', 'workflow-automate' ),
+				'message' => __( 'Webhook created.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'updated'      => array(
-				'message' => __( 'Webhook updated.', 'workflow-automate' ),
+				'message' => __( 'Webhook updated.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'deleted'      => array(
-				'message' => __( 'Webhook deleted.', 'workflow-automate' ),
+				'message' => __( 'Webhook deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
-				'message' => __( 'Selected webhooks deleted.', 'workflow-automate' ),
+				'message' => __( 'Selected webhooks deleted.', 'ai-agent-workflow-automation' ),
 				'type'    => 'success',
 			),
 			'error'        => array(
-				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'workflow-automate' ),
+				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'ai-agent-workflow-automation' ),
 				'type'    => 'error',
 			),
 		);

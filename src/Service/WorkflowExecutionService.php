@@ -136,7 +136,7 @@ class WorkflowExecutionService {
 	 */
 	public function run( int $workflow_id, array $trigger_payload = array() ): WorkflowRun {
 		if ( null === $this->workflows->find( $workflow_id ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$run = $this->runs->insert(
@@ -148,7 +148,7 @@ class WorkflowExecutionService {
 		);
 
 		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return $this->executeNodes( $run );
@@ -174,11 +174,11 @@ class WorkflowExecutionService {
 		$original = $this->runs->find( $run_id );
 
 		if ( null === $original ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified run does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified run does not exist.', 'ai-agent-workflow-automation' ) );
 		}
 
 		if ( null === $this->workflows->find( $original->workflowId() ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The workflow this run belongs to no longer exists.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The workflow this run belongs to no longer exists.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$run = $this->runs->insert(
@@ -191,7 +191,7 @@ class WorkflowExecutionService {
 		);
 
 		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to start the re-run.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to start the re-run.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return $this->executeNodes( $run );
@@ -213,7 +213,7 @@ class WorkflowExecutionService {
 	 */
 	public function queue( int $workflow_id, array $trigger_payload = array() ): WorkflowRun {
 		if ( null === $this->workflows->find( $workflow_id ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'ai-agent-workflow-automation' ) );
 		}
 
 		$run = $this->runs->insert(
@@ -225,7 +225,7 @@ class WorkflowExecutionService {
 		);
 
 		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to queue the workflow run.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to queue the workflow run.', 'ai-agent-workflow-automation' ) );
 		}
 
 		return $run;
@@ -277,7 +277,7 @@ class WorkflowExecutionService {
 					'run_id'  => $run->id(),
 					'node_id' => null,
 					'status'  => WorkflowRunLog::STATUS_ERROR,
-					'message' => __( 'The workflow was deleted or trashed before this queued run could execute.', 'workflow-automate' ),
+					'message' => __( 'The workflow was deleted or trashed before this queued run could execute.', 'ai-agent-workflow-automation' ),
 				)
 			);
 
@@ -505,7 +505,7 @@ class WorkflowExecutionService {
 				'status'      => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
 				'input'       => $node->config(),
 				'output'      => $result,
-				'message'     => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'workflow-automate' ) ),
+				'message'     => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'ai-agent-workflow-automation' ) ),
 				'duration_ms' => $duration_ms,
 			)
 		);
@@ -520,7 +520,7 @@ class WorkflowExecutionService {
 		$this->workflows->incrementRunCount( $workflow_id );
 
 		if ( null === $finished ) {
-			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'ai-agent-workflow-automation' ) );
 		}
 
 		do_action( 'aiawa/workflow/after_run', $finished, $trigger_payload );
@@ -667,7 +667,7 @@ class WorkflowExecutionService {
 		$output = array(
 			'success'  => true,
 			'response' => '',
-			'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'workflow-automate' ) ),
+			'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'ai-agent-workflow-automation' ) ),
 		);
 
 		if ( 'continue_error_output' === $on_error ) {

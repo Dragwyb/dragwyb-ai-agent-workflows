@@ -107,7 +107,7 @@ class NodeTypeRegistry {
 			self::class . '::register' . esc_html( ucfirst( $kind ) ),
 			sprintf(
 				/* translators: 1: node type kind (trigger/action), 2: slug. */
-				esc_html__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'workflow-automate' ),
+				esc_html__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'ai-agent-workflow-automation' ),
 				esc_html( $kind ),
 				esc_html( $slug )
 			),

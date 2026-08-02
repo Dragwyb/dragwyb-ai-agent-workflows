@@ -68,10 +68,10 @@ class WorkflowsListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'         => '<input type="checkbox" />',
-			'title'      => __( 'Title', 'workflow-automate' ),
-			'status'     => __( 'Status', 'workflow-automate' ),
-			'run_count'  => __( 'Runs', 'workflow-automate' ),
-			'updated_at' => __( 'Last Updated', 'workflow-automate' ),
+			'title'      => __( 'Title', 'ai-agent-workflow-automation' ),
+			'status'     => __( 'Status', 'ai-agent-workflow-automation' ),
+			'run_count'  => __( 'Runs', 'ai-agent-workflow-automation' ),
+			'updated_at' => __( 'Last Updated', 'ai-agent-workflow-automation' ),
 		);
 	}
 
@@ -81,13 +81,13 @@ class WorkflowsListTable extends WP_List_Table {
 	protected function get_bulk_actions() {
 		if ( 'trash' === $this->currentView() ) {
 			return array(
-				'restore' => __( 'Restore', 'workflow-automate' ),
-				'delete'  => __( 'Delete Permanently', 'workflow-automate' ),
+				'restore' => __( 'Restore', 'ai-agent-workflow-automation' ),
+				'delete'  => __( 'Delete Permanently', 'ai-agent-workflow-automation' ),
 			);
 		}
 
 		return array(
-			'trash' => __( 'Move to Trash', 'workflow-automate' ),
+			'trash' => __( 'Move to Trash', 'ai-agent-workflow-automation' ),
 		);
 	}
 
@@ -150,16 +150,16 @@ class WorkflowsListTable extends WP_List_Table {
 		$view = $this->currentView();
 
 		if ( 'trash' === $view ) {
-			esc_html_e( 'Trash is empty.', 'workflow-automate' );
+			esc_html_e( 'Trash is empty.', 'ai-agent-workflow-automation' );
 			return;
 		}
 
 		if ( 'all' !== $view ) {
-			esc_html_e( 'No workflows match this filter.', 'workflow-automate' );
+			esc_html_e( 'No workflows match this filter.', 'ai-agent-workflow-automation' );
 			return;
 		}
 
-		esc_html_e( 'No workflows yet.', 'workflow-automate' );
+		esc_html_e( 'No workflows yet.', 'ai-agent-workflow-automation' );
 	}
 
 	/**
@@ -187,8 +187,8 @@ class WorkflowsListTable extends WP_List_Table {
 		if ( $item->isTrashed() ) {
 			$title   = '<strong>' . esc_html( $item->title() ) . '</strong>';
 			$actions = array(
-				'restore' => $this->actionForm( 'restore', $item->id(), __( 'Restore', 'workflow-automate' ) ),
-				'delete'  => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'workflow-automate' ) ),
+				'restore' => $this->actionForm( 'restore', $item->id(), __( 'Restore', 'ai-agent-workflow-automation' ) ),
+				'delete'  => $this->actionForm( 'delete', $item->id(), __( 'Delete Permanently', 'ai-agent-workflow-automation' ) ),
 			);
 		} else {
 			$edit_url = $this->editUrl( $item->id() );
@@ -198,18 +198,18 @@ class WorkflowsListTable extends WP_List_Table {
 				esc_html( $item->title() )
 			);
 			$actions  = array(
-				'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
-				'runs'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'workflow-automate' ) ),
-				'export' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->exportUrl( $item->id() ) ), esc_html__( 'Export', 'workflow-automate' ) ),
+				'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'ai-agent-workflow-automation' ) ),
+				'runs'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->runsUrl( $item->id() ) ), esc_html__( 'Runs', 'ai-agent-workflow-automation' ) ),
+				'export' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $this->exportUrl( $item->id() ) ), esc_html__( 'Export', 'ai-agent-workflow-automation' ) ),
 			);
 
 			if ( Workflow::STATUS_ACTIVE === $item->status() ) {
-				$actions['pause'] = $this->actionForm( 'pause', $item->id(), __( 'Pause', 'workflow-automate' ) );
+				$actions['pause'] = $this->actionForm( 'pause', $item->id(), __( 'Pause', 'ai-agent-workflow-automation' ) );
 			} else {
-				$actions['activate'] = $this->actionForm( 'activate', $item->id(), __( 'Activate', 'workflow-automate' ) );
+				$actions['activate'] = $this->actionForm( 'activate', $item->id(), __( 'Activate', 'ai-agent-workflow-automation' ) );
 			}
 
-			$actions['trash'] = $this->actionForm( 'trash', $item->id(), __( 'Trash', 'workflow-automate' ) );
+			$actions['trash'] = $this->actionForm( 'trash', $item->id(), __( 'Trash', 'ai-agent-workflow-automation' ) );
 		}
 
 		return $title . $this->row_actions( $actions );
@@ -225,8 +225,8 @@ class WorkflowsListTable extends WP_List_Table {
 			array(
 				'name'        => 's',
 				'type'        => 'search',
-				'label'       => __( 'Search workflows', 'workflow-automate' ),
-				'placeholder' => __( 'Search by title…', 'workflow-automate' ),
+				'label'       => __( 'Search workflows', 'ai-agent-workflow-automation' ),
+				'placeholder' => __( 'Search by title…', 'ai-agent-workflow-automation' ),
 				'value'       => $this->currentSearch(),
 			),
 		);
@@ -387,26 +387,26 @@ class WorkflowsListTable extends WP_List_Table {
 	private function viewLabel( string $view ): string {
 		switch ( $view ) {
 			case 'draft':
-				return __( 'Draft', 'workflow-automate' );
+				return __( 'Draft', 'ai-agent-workflow-automation' );
 			case 'active':
-				return __( 'Active', 'workflow-automate' );
+				return __( 'Active', 'ai-agent-workflow-automation' );
 			case 'paused':
-				return __( 'Paused', 'workflow-automate' );
+				return __( 'Paused', 'ai-agent-workflow-automation' );
 			case 'trash':
-				return __( 'Trash', 'workflow-automate' );
+				return __( 'Trash', 'ai-agent-workflow-automation' );
 			default:
-				return __( 'All', 'workflow-automate' );
+				return __( 'All', 'ai-agent-workflow-automation' );
 		}
 	}
 
 	private function statusLabel( int $status ): string {
 		switch ( $status ) {
 			case Workflow::STATUS_ACTIVE:
-				return __( 'Active', 'workflow-automate' );
+				return __( 'Active', 'ai-agent-workflow-automation' );
 			case Workflow::STATUS_PAUSED:
-				return __( 'Paused', 'workflow-automate' );
+				return __( 'Paused', 'ai-agent-workflow-automation' );
 			default:
-				return __( 'Draft', 'workflow-automate' );
+				return __( 'Draft', 'ai-agent-workflow-automation' );
 		}
 	}
 

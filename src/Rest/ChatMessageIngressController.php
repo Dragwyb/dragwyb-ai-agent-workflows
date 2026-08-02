@@ -110,7 +110,7 @@ class ChatMessageIngressController {
 
 			return new WP_Error(
 				'aiawa_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'workflow-automate' ),
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -127,7 +127,7 @@ class ChatMessageIngressController {
 
 		return new WP_Error(
 			'aiawa_chat_forbidden',
-			__( 'This chat requires a logged-in WordPress user.', 'workflow-automate' ),
+			__( 'This chat requires a logged-in WordPress user.', 'ai-agent-workflow-automation' ),
 			array( 'status' => 401 )
 		);
 	}
@@ -150,7 +150,7 @@ class ChatMessageIngressController {
 		if ( null === $match ) {
 			return new WP_Error(
 				'aiawa_chat_not_found',
-				__( 'No chat endpoint found for this ID.', 'workflow-automate' ),
+				__( 'No chat endpoint found for this ID.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -188,7 +188,7 @@ class ChatMessageIngressController {
 		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
 			return new WP_Error(
 				'aiawa_chat_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again in a minute.', 'workflow-automate' ),
+				__( 'Rate limit exceeded. Please try again in a minute.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 429 )
 			);
 		}
@@ -198,7 +198,7 @@ class ChatMessageIngressController {
 		if ( null === $match ) {
 			return new WP_Error(
 				'aiawa_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'workflow-automate' ),
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -229,7 +229,7 @@ class ChatMessageIngressController {
 		if ( '' === $payload['chatInput'] ) {
 			return new WP_Error(
 				'aiawa_chat_empty',
-				__( 'chatInput is required.', 'workflow-automate' ),
+				__( 'chatInput is required.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 422 )
 			);
 		}
@@ -245,7 +245,7 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'captured',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Payload captured for Test Flow.', 'workflow-automate' ),
+					'message'   => __( 'Payload captured for Test Flow.', 'ai-agent-workflow-automation' ),
 				)
 			);
 		}
@@ -257,7 +257,7 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'accepted',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Message accepted. The workflow will run in the background.', 'workflow-automate' ),
+					'message'   => __( 'Message accepted. The workflow will run in the background.', 'ai-agent-workflow-automation' ),
 				),
 				202
 			);
@@ -272,7 +272,7 @@ class ChatMessageIngressController {
 			}
 			return new WP_Error(
 				'aiawa_chat_run_failed',
-				__( 'Chat execution failed.', 'workflow-automate' ),
+				__( 'Chat execution failed.', 'ai-agent-workflow-automation' ),
 				array( 'status' => 500 )
 			);
 		}

@@ -1,5 +1,5 @@
 {
-  "name": "workflow-automate",
+  "name": "ai-agent-workflow-automation",
   "private": true,
   "description": "WordPress workflow automation plugin front-end tooling.",
   "scripts": {
