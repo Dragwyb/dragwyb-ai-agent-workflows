@@ -2,14 +2,14 @@
 /**
  * Renders a WorkflowRun status as a small colored badge.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ class RunStatusBadge {
 	 */
 	public static function render( string $status ): string {
 		return sprintf(
-			'<span class="wfa-status-badge wfa-status-badge--%1$s">%2$s</span>',
+			'<span class="dragwyb-af-status-badge dragwyb-af-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);
@@ -54,17 +54,17 @@ class RunStatusBadge {
 	private static function label( string $status ): string {
 		switch ( $status ) {
 			case WorkflowRun::STATUS_QUEUED:
-				return __( 'Queued', 'workflow-automate' );
+				return __( 'Queued', 'dragwyb-agentflow' );
 			case WorkflowRun::STATUS_RUNNING:
-				return __( 'Running', 'workflow-automate' );
+				return __( 'Running', 'dragwyb-agentflow' );
 			case WorkflowRun::STATUS_SUCCESS:
-				return __( 'Success', 'workflow-automate' );
+				return __( 'Success', 'dragwyb-agentflow' );
 			case WorkflowRun::STATUS_FAILED:
-				return __( 'Failed', 'workflow-automate' );
+				return __( 'Failed', 'dragwyb-agentflow' );
 			case WorkflowRun::STATUS_PARTIAL:
-				return __( 'Partial', 'workflow-automate' );
+				return __( 'Partial', 'dragwyb-agentflow' );
 			default:
-				return __( 'Unknown', 'workflow-automate' );
+				return __( 'Unknown', 'dragwyb-agentflow' );
 		}
 	}
 }

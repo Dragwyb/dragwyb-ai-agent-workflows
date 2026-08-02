@@ -2,12 +2,12 @@
 /**
  * Builds / validates structured JSON for AI Agent output parsers.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,7 +59,7 @@ Respond with JSON only — no markdown fences.';
 
 		/** @var array<string, mixed> $schema */
 		$auto_fix = ! array_key_exists( 'auto_fix', $config ) || ! empty( $config['auto_fix'] );
-		$retry      = self::DEFAULT_RETRY_PROMPT;
+		$retry    = self::DEFAULT_RETRY_PROMPT;
 
 		if ( $auto_fix && ! empty( $config['customize_retry_prompt'] ) ) {
 			$custom = isset( $config['retry_prompt'] ) ? trim( (string) $config['retry_prompt'] ) : '';
@@ -71,7 +71,7 @@ Respond with JSON only — no markdown fences.';
 
 		return array(
 			'schema'       => $schema,
-			'auto_fix'    => $auto_fix,
+			'auto_fix'     => $auto_fix,
 			'retry_prompt' => $retry,
 			'instructions' => $this->buildInstructions( $schema ),
 		);
@@ -90,7 +90,7 @@ Respond with JSON only — no markdown fences.';
 			if ( '' === $raw ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'JSON Schema is empty on the Structured Output Parser.', 'workflow-automate' ),
+					'error'   => __( 'JSON Schema is empty on the Structured Output Parser.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -99,7 +99,7 @@ Respond with JSON only — no markdown fences.';
 			if ( ! is_array( $decoded ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'Structured Output Parser JSON Schema is invalid JSON.', 'workflow-automate' ),
+					'error'   => __( 'Structured Output Parser JSON Schema is invalid JSON.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -111,7 +111,7 @@ Respond with JSON only — no markdown fences.';
 		if ( '' === $raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'JSON Example is empty on the Structured Output Parser.', 'workflow-automate' ),
+				'error'   => __( 'JSON Example is empty on the Structured Output Parser.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -120,7 +120,7 @@ Respond with JSON only — no markdown fences.';
 		if ( ! is_array( $example ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Structured Output Parser JSON Example is invalid JSON.', 'workflow-automate' ),
+				'error'   => __( 'Structured Output Parser JSON Example is invalid JSON.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -149,9 +149,9 @@ Respond with JSON only — no markdown fences.';
 			$required   = array();
 
 			foreach ( $value as $key => $child ) {
-				$key_string = (string) $key;
+				$key_string                = (string) $key;
 				$properties[ $key_string ] = $this->schemaFromExample( $child );
-				$required[] = $key_string;
+				$required[]                = $key_string;
 			}
 
 			return array(
@@ -193,7 +193,7 @@ Respond with JSON only — no markdown fences.';
 			$encoded = '{}';
 		}
 
-		return __( 'You must respond with a single JSON value that validates against this JSON Schema. No markdown fences, no commentary.', 'workflow-automate' )
+		return __( 'You must respond with a single JSON value that validates against this JSON Schema. No markdown fences, no commentary.', 'dragwyb-agentflow' )
 			. "\n\n"
 			. $encoded;
 	}
@@ -210,7 +210,7 @@ Respond with JSON only — no markdown fences.';
 		if ( null === $data && 'null' !== trim( $raw_response ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Model reply is not valid JSON.', 'workflow-automate' ),
+				'error'   => __( 'Model reply is not valid JSON.', 'dragwyb-agentflow' ),
 				'raw'     => $raw_response,
 			);
 		}
@@ -275,7 +275,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected object at %s.', 'workflow-automate' ),
+							__( 'Expected object at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -284,7 +284,7 @@ Respond with JSON only — no markdown fences.';
 				$properties = isset( $schema['properties'] ) && is_array( $schema['properties'] )
 					? $schema['properties']
 					: array();
-				$required = isset( $schema['required'] ) && is_array( $schema['required'] )
+				$required   = isset( $schema['required'] ) && is_array( $schema['required'] )
 					? $schema['required']
 					: array();
 
@@ -296,7 +296,7 @@ Respond with JSON only — no markdown fences.';
 							'valid' => false,
 							'error' => sprintf(
 								/* translators: 1: property name, 2: JSON path */
-								__( 'Missing required property "%1$s" at %2$s.', 'workflow-automate' ),
+								__( 'Missing required property "%1$s" at %2$s.', 'dragwyb-agentflow' ),
 								$key,
 								$path
 							),
@@ -322,7 +322,10 @@ Respond with JSON only — no markdown fences.';
 					}
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'array':
 				if ( ! is_array( $data ) || ! $this->isListArray( $data ) ) {
@@ -330,7 +333,7 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected array at %s.', 'workflow-automate' ),
+							__( 'Expected array at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
@@ -346,7 +349,10 @@ Respond with JSON only — no markdown fences.';
 					}
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'string':
 				if ( ! is_string( $data ) ) {
@@ -354,13 +360,16 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected string at %s.', 'workflow-automate' ),
+							__( 'Expected string at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'integer':
 				if ( ! is_int( $data ) && ! ( is_string( $data ) && ctype_digit( $data ) ) ) {
@@ -368,13 +377,16 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected integer at %s.', 'workflow-automate' ),
+							__( 'Expected integer at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'number':
 				if ( ! is_int( $data ) && ! is_float( $data ) && ! is_numeric( $data ) ) {
@@ -382,13 +394,16 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected number at %s.', 'workflow-automate' ),
+							__( 'Expected number at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'boolean':
 				if ( ! is_bool( $data ) ) {
@@ -396,13 +411,16 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected boolean at %s.', 'workflow-automate' ),
+							__( 'Expected boolean at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			case 'null':
 				if ( null !== $data ) {
@@ -410,16 +428,22 @@ Respond with JSON only — no markdown fences.';
 						'valid' => false,
 						'error' => sprintf(
 							/* translators: %s: JSON path */
-							__( 'Expected null at %s.', 'workflow-automate' ),
+							__( 'Expected null at %s.', 'dragwyb-agentflow' ),
 							$path
 						),
 					);
 				}
 
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 
 			default:
-				return array( 'valid' => true, 'error' => '' );
+				return array(
+					'valid' => true,
+					'error' => '',
+				);
 		}
 	}
 

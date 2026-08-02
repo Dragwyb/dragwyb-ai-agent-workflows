@@ -2,17 +2,17 @@
 /**
  * Handles state-changing Settings admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\Pages\SettingsPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin_post.php?action=wfa_settings_action` POST submitted
+ * Receives the `admin_post.php?action=dragwyb_af_settings_action` POST submitted
  * by each of SettingsPage's per-tab forms.
  *
  * One op per form, matching one SettingsService method each, rather than
@@ -38,7 +38,7 @@ class SettingsController {
 	private RunRetentionService $retention;
 
 	public function __construct( SettingsService $settings, RunRetentionService $retention ) {
-		$this->settings = $settings;
+		$this->settings  = $settings;
 		$this->retention = $retention;
 	}
 
@@ -49,7 +49,7 @@ class SettingsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_settings_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_settings_action', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class SettingsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation.
@@ -69,7 +69,7 @@ class SettingsController {
 			$this->redirect( 'general', 'error' );
 		}
 
-		check_admin_referer( 'wfa_settings_action_' . $op );
+		check_admin_referer( 'dragwyb_af_settings_action_' . $op );
 
 		switch ( $op ) {
 			case 'general':
@@ -158,10 +158,10 @@ class SettingsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => SettingsPage::SLUG,
-					'tab' => 'retention',
-					'wfa_notice' => 'purged',
-					'count' => $count,
+					'page'       => SettingsPage::SLUG,
+					'tab'        => 'retention',
+					'dragwyb_af_notice' => 'purged',
+					'count'      => $count,
 				),
 				admin_url( 'admin.php' )
 			)
@@ -181,9 +181,9 @@ class SettingsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => SettingsPage::SLUG,
-					'tab' => $tab,
-					'wfa_notice' => $notice,
+					'page'       => SettingsPage::SLUG,
+					'tab'        => $tab,
+					'dragwyb_af_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)

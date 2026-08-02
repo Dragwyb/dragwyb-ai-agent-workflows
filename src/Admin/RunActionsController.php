@@ -2,22 +2,22 @@
 /**
  * Handles state-changing Run admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunDetailPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=wfa_run_action` POST submitted by
+ * Receives the `admin-post.php?action=dragwyb_af_run_action` POST submitted by
  * RunsListTable's and RunDetailPage's row/page action forms.
  *
  * Same reasoning as WorkflowActionsController for being its own class: the
@@ -45,8 +45,8 @@ class RunActionsController {
 
 	public function __construct( WorkflowExecutionService $executor, WorkflowRunRepository $runs, WorkflowRunLogRepository $runLogs ) {
 		$this->executor = $executor;
-		$this->runs = $runs;
-		$this->runLogs = $runLogs;
+		$this->runs     = $runs;
+		$this->runLogs  = $runLogs;
 	}
 
 	/**
@@ -56,7 +56,7 @@ class RunActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_run_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_run_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleRunsBulkFromList' ), 5 );
 	}
 
@@ -66,7 +66,11 @@ class RunActionsController {
 	 * @return void
 	 */
 	public function maybeHandleRunsBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -90,31 +94,27 @@ class RunActionsController {
 	 */
 	public function handleRunsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['wfa_run_bulk'] ) ) {
+		if ( empty( $_POST['dragwyb_af_run_bulk'] ) ) {
 			return;
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_RUNS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'wfa_run_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_run_bulk_action' ) ) {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( 'delete' !== $bulk_action ) {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
-		$ids = isset( $_POST['runs'] ) && is_array( $_POST['runs'] )
-			? array_map( 'absint', wp_unslash( $_POST['runs'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['runs'] ) && is_array( $_POST['runs'] ) ? array_map( 'absint', wp_unslash( $_POST['runs'] ) ) : array();
 
 		$ids = array_values( array_filter( $ids ) );
 
@@ -135,7 +135,7 @@ class RunActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_RUNS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation and per-id.
@@ -147,7 +147,7 @@ class RunActionsController {
 			$this->redirectToList( 'action_failed' );
 		}
 
-		check_admin_referer( 'wfa_run_action_' . $op . '_' . $run_id );
+		check_admin_referer( 'dragwyb_af_run_action_' . $op . '_' . $run_id );
 
 		switch ( $op ) {
 			case 'rerun':
@@ -216,9 +216,9 @@ class RunActionsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => RunDetailPage::SLUG,
-					'run_id' => $run_id,
-					'wfa_notice' => $notice,
+					'page'       => RunDetailPage::SLUG,
+					'run_id'     => $run_id,
+					'dragwyb_af_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)
@@ -253,7 +253,7 @@ class RunActionsController {
 	 * the request itself is malformed (no specific run to go back to),
 	 * or after a successful delete.
 	 *
-	 * @param string               $notice One of the keys understood by RunsPage::notices().
+	 * @param string                $notice One of the keys understood by RunsPage::notices().
 	 * @param array<string, scalar> $extra  Optional query args to preserve (filters).
 	 *
 	 * @return void
@@ -263,8 +263,8 @@ class RunActionsController {
 			add_query_arg(
 				array_merge(
 					array(
-						'page' => RunsPage::SLUG,
-						'wfa_notice' => $notice,
+						'page'       => RunsPage::SLUG,
+						'dragwyb_af_notice' => $notice,
 					),
 					$extra
 				),

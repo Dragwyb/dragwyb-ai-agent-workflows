@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\Compatible;
+namespace DragwybAgentFlow\AiProviders\Compatible;
 
 use WordPress\AiClient\Messages\Enums\ModalityEnum;
 use WordPress\AiClient\Providers\Http\DTO\Request;
@@ -55,7 +55,7 @@ class CompatibleModelMetadataDirectory extends AbstractOpenAiCompatibleModelMeta
 		$response_data = $response->getData();
 		if ( ! isset( $response_data['data'] ) || ! $response_data['data'] ) {
 			$provider_class = $this->provider_class;
-			throw ResponseException::fromMissingData( $provider_class::metadata()->getName(), 'data' );
+			throw ResponseException::fromMissingData( esc_html( $provider_class::metadata()->getName() ), 'data' );
 		}
 
 		$capabilities = array(

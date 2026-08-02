@@ -2,23 +2,23 @@
 /**
  * Workflows REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Exposes `wfa/v1/workflows` for workflow CRUD, plus a `restore` action for
+ * Exposes `dragwyb_af/v1/workflows` for workflow CRUD, plus a `restore` action for
  * un-trashing a soft-deleted workflow. Every route has an explicit
  * permission callback and a JSON-Schema argument definition; no route ever
  * relies on `__return_true` or skips input validation.
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Node-level endpoints (`workflow_nodes`) are intentionally out of scope
  * for this increment and will be added when the visual builder needs them.
  *
- * A dedicated, paginated `wfa/v1/runs` resource (for the run history UI) is
+ * A dedicated, paginated `dragwyb_af/v1/runs` resource (for the run history UI) is
  * deferred to that later roadmap item; `run_item()` here only exists so the
  * synchronous execution engine (roadmap item 7) is testable/usable before
  * that UI exists, and returns a single run's outcome plus its logs inline
@@ -68,11 +68,11 @@ class WorkflowsController extends WP_REST_Controller {
 		WorkflowExecutionService $executor,
 		ChatMessageService $chat
 	) {
-		$this->namespace = 'wfa/v1';
+		$this->namespace = 'dragwyb_af/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
-		$this->executor = $executor;
-		$this->chat = $chat;
+		$this->executor  = $executor;
+		$this->chat      = $chat;
 	}
 
 	/**
@@ -86,16 +86,16 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base,
 			array(
 				array(
-					'methods' => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_items' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args' => $this->get_collection_params(),
+					'args'                => $this->get_collection_params(),
 				),
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'create_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
-					'args' => $this->getCreateArgs(),
+					'args'                => $this->getCreateArgs(),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -105,39 +105,39 @@ class WorkflowsController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
-				'args' => array(
+				'args'   => array(
 					'id' => array(
-						'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-						'type' => 'integer',
+						'description' => __( 'Unique identifier for the workflow.', 'dragwyb-agentflow' ),
+						'type'        => 'integer',
 					),
 				),
 				array(
-					'methods' => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_item' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'include_trashed' => array(
-							'description' => __( 'Whether to also match a trashed workflow.', 'workflow-automate' ),
-							'type' => 'boolean',
-							'default' => false,
+							'description' => __( 'Whether to also match a trashed workflow.', 'dragwyb-agentflow' ),
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 				),
 				array(
-					'methods' => WP_REST_Server::EDITABLE,
-					'callback' => array( $this, 'update_item' ),
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
 				array(
-					'methods' => WP_REST_Server::DELETABLE,
-					'callback' => array( $this, 'delete_item' ),
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
 					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'force' => array(
-							'description' => __( 'Whether to permanently delete the workflow (and its nodes) instead of moving it to the trash.', 'workflow-automate' ),
-							'type' => 'boolean',
-							'default' => false,
+							'description' => __( 'Whether to permanently delete the workflow (and its nodes) instead of moving it to the trash.', 'dragwyb-agentflow' ),
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 				),
@@ -150,13 +150,13 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/restore',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'restore_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'restore_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'id' => array(
-							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-							'type' => 'integer',
+							'description' => __( 'Unique identifier for the workflow.', 'dragwyb-agentflow' ),
+							'type'        => 'integer',
 						),
 					),
 				),
@@ -168,13 +168,13 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/run',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'run_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'run_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => array(
+					'args'                => array(
 						'id' => array(
-							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-							'type' => 'integer',
+							'description' => __( 'Unique identifier for the workflow.', 'dragwyb-agentflow' ),
+							'type'        => 'integer',
 						),
 					),
 				),
@@ -186,23 +186,23 @@ class WorkflowsController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/chat',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'chat_item' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'chat_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args' => array(
-						'id' => array(
-							'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-							'type' => 'integer',
+					'args'                => array(
+						'id'        => array(
+							'description' => __( 'Unique identifier for the workflow.', 'dragwyb-agentflow' ),
+							'type'        => 'integer',
 						),
 						'chatInput' => array(
-							'description' => __( 'Chat message text (n8n chatInput).', 'workflow-automate' ),
-							'type' => 'string',
-							'required' => true,
+							'description' => __( 'Chat message text (n8n chatInput).', 'dragwyb-agentflow' ),
+							'type'        => 'string',
+							'required'    => true,
 						),
 						'sessionId' => array(
-							'description' => __( 'Optional chat session id.', 'workflow-automate' ),
-							'type' => 'string',
-							'required' => false,
+							'description' => __( 'Optional chat session id.', 'dragwyb-agentflow' ),
+							'type'        => 'string',
+							'required'    => false,
 						),
 					),
 				),
@@ -225,7 +225,7 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	/**
-	 * All routes on this controller require `wfa_manage_workflows`
+	 * All routes on this controller require `dragwyb_af_manage_workflows`
 	 * (administrators and anyone with `manage_options` receive it via
 	 * `Core\Capabilities::filterUserHasCap()`).
 	 *
@@ -234,8 +234,8 @@ class WorkflowsController extends WP_REST_Controller {
 	private function checkPermission() {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'wfa_rest_forbidden',
-				__( 'Sorry, you are not allowed to manage workflows.', 'workflow-automate' ),
+				'dragwyb_af_rest_forbidden',
+				__( 'Sorry, you are not allowed to manage workflows.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -297,8 +297,8 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$args = array(
-			'page' => (int) $request->get_param( 'page' ),
-			'per_page' => (int) $request->get_param( 'per_page' ),
+			'page'            => (int) $request->get_param( 'page' ),
+			'per_page'        => (int) $request->get_param( 'per_page' ),
 			'include_trashed' => (bool) $request->get_param( 'include_trashed' ),
 		);
 
@@ -311,7 +311,7 @@ class WorkflowsController extends WP_REST_Controller {
 		$items = array();
 
 		foreach ( $result['items'] as $workflow ) {
-			$data = $this->prepare_item_for_response( $workflow, $request );
+			$data    = $this->prepare_item_for_response( $workflow, $request );
 			$items[] = $this->prepare_response_for_collection( $data );
 		}
 
@@ -350,15 +350,15 @@ class WorkflowsController extends WP_REST_Controller {
 		try {
 			$workflow = $this->workflows->create(
 				array(
-					'title' => $request->get_param( 'title' ),
-					'graph' => $request->get_param( 'graph' ) ?? array(),
+					'title'    => $request->get_param( 'title' ),
+					'graph'    => $request->get_param( 'graph' ) ?? array(),
 					'settings' => $request->get_param( 'settings' ),
 				)
 			);
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'wfa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'dragwyb_af_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		} catch ( RuntimeException $exception ) {
-			return new WP_Error( 'wfa_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
+			return new WP_Error( 'dragwyb_af_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
 		}
 
 		$response = rest_ensure_response( $this->prepare_item_for_response( $workflow, $request ) );
@@ -393,7 +393,7 @@ class WorkflowsController extends WP_REST_Controller {
 				$workflow = $this->workflows->changeStatus( $id, (int) $request->get_param( 'status' ) );
 			}
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'wfa_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'dragwyb_af_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		}
 
 		if ( null === $workflow ) {
@@ -411,7 +411,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function delete_item( $request ) {
-		$id = (int) $request['id'];
+		$id    = (int) $request['id'];
 		$force = (bool) $request->get_param( 'force' );
 
 		$workflow = $this->workflows->find( $id, true );
@@ -423,12 +423,12 @@ class WorkflowsController extends WP_REST_Controller {
 		$previous = $this->prepare_item_for_response( $workflow, $request );
 
 		if ( ! $this->workflows->delete( $id, $force ) ) {
-			return new WP_Error( 'wfa_rest_cannot_delete', __( 'Failed to delete the workflow.', 'workflow-automate' ), array( 'status' => 500 ) );
+			return new WP_Error( 'dragwyb_af_rest_cannot_delete', __( 'Failed to delete the workflow.', 'dragwyb-agentflow' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(
 			array(
-				'deleted' => true,
+				'deleted'  => true,
 				'previous' => $previous->get_data(),
 			)
 		);
@@ -449,7 +449,7 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		if ( ! $this->workflows->restore( $id ) ) {
-			return new WP_Error( 'wfa_rest_cannot_restore', __( 'Failed to restore the workflow.', 'workflow-automate' ), array( 'status' => 500 ) );
+			return new WP_Error( 'dragwyb_af_rest_cannot_restore', __( 'Failed to restore the workflow.', 'dragwyb-agentflow' ), array( 'status' => 500 ) );
 		}
 
 		$workflow = $this->workflows->find( $id, true );
@@ -476,8 +476,11 @@ class WorkflowsController extends WP_REST_Controller {
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
 		} catch ( \Throwable $exception ) {
-			error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
-			return new WP_Error( 'wfa_rest_run_failed', __( 'Workflow execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST runs.
+				error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
+			}
+			return new WP_Error( 'dragwyb_af_rest_run_failed', __( 'Workflow execution failed.', 'dragwyb-agentflow' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response( $this->serializeRun( $run ) );
@@ -492,7 +495,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function chat_item( $request ) {
-		$id = (int) $request['id'];
+		$id       = (int) $request['id'];
 		$workflow = $this->workflows->find( $id );
 
 		if ( null === $workflow ) {
@@ -500,7 +503,7 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		$has_chat_trigger = false;
-		$graph_nodes = $workflow->graph()['nodes'] ?? array();
+		$graph_nodes      = $workflow->graph()['nodes'] ?? array();
 
 		if ( is_array( $graph_nodes ) ) {
 			foreach ( $graph_nodes as $graph_node ) {
@@ -513,8 +516,8 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( ! $has_chat_trigger ) {
 			return new WP_Error(
-				'wfa_chat_trigger_required',
-				__( 'Add a “When chat message received” trigger to use Chat.', 'workflow-automate' ),
+				'dragwyb_af_chat_trigger_required',
+				__( 'Add a “When chat message received” trigger to use Chat.', 'dragwyb-agentflow' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -523,8 +526,8 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( '' === $chat_input ) {
 			return new WP_Error(
-				'wfa_chat_empty',
-				__( 'chatInput is required.', 'workflow-automate' ),
+				'dragwyb_af_chat_empty',
+				__( 'chatInput is required.', 'dragwyb-agentflow' ),
 				array( 'status' => 422 )
 			);
 		}
@@ -544,8 +547,11 @@ class WorkflowsController extends WP_REST_Controller {
 		} catch ( InvalidArgumentException $exception ) {
 			return $this->notFoundError();
 		} catch ( \Throwable $exception ) {
-			error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
-			return new WP_Error( 'wfa_rest_run_failed', __( 'Chat execution failed.', 'workflow-automate' ), array( 'status' => 500 ) );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST chat runs.
+				error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
+			}
+			return new WP_Error( 'dragwyb_af_rest_run_failed', __( 'Chat execution failed.', 'dragwyb-agentflow' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(
@@ -566,12 +572,12 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private function serializeRun( WorkflowRun $run ): array {
 		return array(
-			'id' => $run->id(),
+			'id'          => $run->id(),
 			'workflow_id' => $run->workflowId(),
-			'status' => $run->status(),
-			'started_at' => null === $run->startedAt() ? null : mysql_to_rfc3339( $run->startedAt() ),
+			'status'      => $run->status(),
+			'started_at'  => null === $run->startedAt() ? null : mysql_to_rfc3339( $run->startedAt() ),
 			'finished_at' => null === $run->finishedAt() ? null : mysql_to_rfc3339( $run->finishedAt() ),
-			'logs' => array_map( array( $this, 'serializeRunLog' ), $this->executor->logsFor( $run->id() ) ),
+			'logs'        => array_map( array( $this, 'serializeRunLog' ), $this->executor->logsFor( $run->id() ) ),
 		);
 	}
 
@@ -582,37 +588,37 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private function serializeRunLog( WorkflowRunLog $log ): array {
 		return array(
-			'node_id' => $log->nodeId(),
-			'status' => $log->status(),
-			'message' => $log->message(),
-			'output' => $log->output(),
+			'node_id'     => $log->nodeId(),
+			'status'      => $log->status(),
+			'message'     => $log->message(),
+			'output'      => $log->output(),
 			'duration_ms' => $log->durationMs(),
 		);
 	}
 
 	/**
-	 * @param Workflow         $item    Domain object to serialize.
-	 * @param WP_REST_Request  $request Full request.
+	 * @param Workflow        $item    Domain object to serialize.
+	 * @param WP_REST_Request $request Full request.
 	 *
 	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$data = array(
-			'id' => $item->id(),
-			'title' => $item->title(),
-			'status' => $item->status(),
+			'id'                 => $item->id(),
+			'title'              => $item->title(),
+			'status'             => $item->status(),
 			'definition_version' => $item->definitionVersion(),
-			'graph' => (object) $item->graph(),
-			'settings' => null === $item->settings() ? null : (object) $item->settings(),
-			'run_count' => $item->runCount(),
-			'is_trashed' => $item->isTrashed(),
-			'created_at' => mysql_to_rfc3339( $item->createdAt() ),
-			'updated_at' => mysql_to_rfc3339( $item->updatedAt() ),
+			'graph'              => (object) $item->graph(),
+			'settings'           => null === $item->settings() ? null : (object) $item->settings(),
+			'run_count'          => $item->runCount(),
+			'is_trashed'         => $item->isTrashed(),
+			'created_at'         => mysql_to_rfc3339( $item->createdAt() ),
+			'updated_at'         => mysql_to_rfc3339( $item->updatedAt() ),
 		);
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data = $this->add_additional_fields_to_object( $data, $request );
-		$data = $this->filter_response_by_context( $data, $context );
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
 
 		$response = rest_ensure_response( $data );
 		$response->add_links( $this->prepareLinks( $item ) );
@@ -627,7 +633,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	private function prepareLinks( Workflow $item ): array {
 		return array(
-			'self' => array(
+			'self'       => array(
 				'href' => rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $item->id() ) ),
 			),
 			'collection' => array(
@@ -640,7 +646,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_Error
 	 */
 	private function notFoundError(): WP_Error {
-		return new WP_Error( 'wfa_rest_not_found', __( 'Workflow not found.', 'workflow-automate' ), array( 'status' => 404 ) );
+		return new WP_Error( 'dragwyb_af_rest_not_found', __( 'Workflow not found.', 'dragwyb-agentflow' ), array( 'status' => 404 ) );
 	}
 
 	/**
@@ -652,72 +658,72 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		$this->schema = array(
-			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => 'workflow',
-			'type' => 'object',
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'workflow',
+			'type'       => 'object',
 			'properties' => array(
-				'id' => array(
-					'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-					'type' => 'integer',
-					'context' => array( 'view', 'edit' ),
-					'readonly' => true,
+				'id'                 => array(
+					'description' => __( 'Unique identifier for the workflow.', 'dragwyb-agentflow' ),
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
-				'title' => array(
-					'description' => __( 'The workflow title.', 'workflow-automate' ),
-					'type' => 'string',
-					'context' => array( 'view', 'edit' ),
-					'required' => true,
+				'title'              => array(
+					'description' => __( 'The workflow title.', 'dragwyb-agentflow' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'required'    => true,
 					'arg_options' => array(
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
-				'status' => array(
-					'description' => __( 'The workflow status (0 = draft, 1 = active, 2 = paused).', 'workflow-automate' ),
-					'type' => 'integer',
-					'enum' => Workflow::VALID_STATUSES,
-					'context' => array( 'view', 'edit' ),
+				'status'             => array(
+					'description' => __( 'The workflow status (0 = draft, 1 = active, 2 = paused).', 'dragwyb-agentflow' ),
+					'type'        => 'integer',
+					'enum'        => Workflow::VALID_STATUSES,
+					'context'     => array( 'view', 'edit' ),
 				),
 				'definition_version' => array(
-					'description' => __( 'Schema version of the stored graph.', 'workflow-automate' ),
-					'type' => 'integer',
-					'context' => array( 'view' ),
-					'readonly' => true,
+					'description' => __( 'Schema version of the stored graph.', 'dragwyb-agentflow' ),
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'graph' => array(
-					'description' => __( 'The builder graph (nodes and connections) as a JSON object.', 'workflow-automate' ),
-					'type' => 'object',
-					'context' => array( 'view', 'edit' ),
+				'graph'              => array(
+					'description' => __( 'The builder graph (nodes and connections) as a JSON object.', 'dragwyb-agentflow' ),
+					'type'        => 'object',
+					'context'     => array( 'view', 'edit' ),
 				),
-				'settings' => array(
-					'description' => __( 'Per-workflow settings.', 'workflow-automate' ),
-					'type' => array( 'object', 'null' ),
-					'context' => array( 'view', 'edit' ),
+				'settings'           => array(
+					'description' => __( 'Per-workflow settings.', 'dragwyb-agentflow' ),
+					'type'        => array( 'object', 'null' ),
+					'context'     => array( 'view', 'edit' ),
 				),
-				'run_count' => array(
-					'description' => __( 'Number of times this workflow has run.', 'workflow-automate' ),
-					'type' => 'integer',
-					'context' => array( 'view' ),
-					'readonly' => true,
+				'run_count'          => array(
+					'description' => __( 'Number of times this workflow has run.', 'dragwyb-agentflow' ),
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'is_trashed' => array(
-					'description' => __( 'Whether the workflow is in the trash.', 'workflow-automate' ),
-					'type' => 'boolean',
-					'context' => array( 'view' ),
-					'readonly' => true,
+				'is_trashed'         => array(
+					'description' => __( 'Whether the workflow is in the trash.', 'dragwyb-agentflow' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'created_at' => array(
-					'description' => __( "The workflow's creation date, in the site's timezone.", 'workflow-automate' ),
-					'type' => 'string',
-					'format' => 'date-time',
-					'context' => array( 'view' ),
-					'readonly' => true,
+				'created_at'         => array(
+					'description' => __( "The workflow's creation date, in the site's timezone.", 'dragwyb-agentflow' ),
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
-				'updated_at' => array(
-					'description' => __( "The workflow's last modification date, in the site's timezone.", 'workflow-automate' ),
-					'type' => 'string',
-					'format' => 'date-time',
-					'context' => array( 'view' ),
-					'readonly' => true,
+				'updated_at'         => array(
+					'description' => __( "The workflow's last modification date, in the site's timezone.", 'dragwyb-agentflow' ),
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view' ),
+					'readonly'    => true,
 				),
 			),
 		);
@@ -730,31 +736,31 @@ class WorkflowsController extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		return array(
-			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
-			'page' => array(
-				'description' => __( 'Current page of the collection.', 'workflow-automate' ),
-				'type' => 'integer',
-				'default' => 1,
-				'minimum' => 1,
+			'context'         => $this->get_context_param( array( 'default' => 'view' ) ),
+			'page'            => array(
+				'description'       => __( 'Current page of the collection.', 'dragwyb-agentflow' ),
+				'type'              => 'integer',
+				'default'           => 1,
+				'minimum'           => 1,
 				'sanitize_callback' => 'absint',
 			),
-			'per_page' => array(
-				'description' => __( 'Maximum number of items to be returned in the result set.', 'workflow-automate' ),
-				'type' => 'integer',
-				'default' => 20,
-				'minimum' => 1,
-				'maximum' => 100,
+			'per_page'        => array(
+				'description'       => __( 'Maximum number of items to be returned in the result set.', 'dragwyb-agentflow' ),
+				'type'              => 'integer',
+				'default'           => 20,
+				'minimum'           => 1,
+				'maximum'           => 100,
 				'sanitize_callback' => 'absint',
 			),
-			'status' => array(
-				'description' => __( 'Limit results to workflows with a specific status.', 'workflow-automate' ),
-				'type' => 'integer',
-				'enum' => Workflow::VALID_STATUSES,
+			'status'          => array(
+				'description' => __( 'Limit results to workflows with a specific status.', 'dragwyb-agentflow' ),
+				'type'        => 'integer',
+				'enum'        => Workflow::VALID_STATUSES,
 			),
 			'include_trashed' => array(
-				'description' => __( 'Whether to include trashed workflows in the results.', 'workflow-automate' ),
-				'type' => 'boolean',
-				'default' => false,
+				'description' => __( 'Whether to include trashed workflows in the results.', 'dragwyb-agentflow' ),
+				'type'        => 'boolean',
+				'default'     => false,
 			),
 		);
 	}

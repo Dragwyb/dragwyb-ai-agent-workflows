@@ -2,17 +2,17 @@
 /**
  * Google Sheets service factory.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
-use WorkflowAutomate\Plugin\Service\ConnectionSecretResolver;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use DragwybAgentFlow\Plugin\Service\ConnectionSecretResolver;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,11 +40,11 @@ final class GoogleSheetsServices {
 			return $token;
 		}
 
-		$http     = new GoogleSheetsHttpClient( (string) $token );
-		$commons  = new GoogleSheetCommons( $http );
-		$rows     = new GoogleRowService( $commons );
-		$sheets   = new GoogleSheetService( $commons );
-		$spreads  = new GoogleSpreadsheetService( $commons );
+		$http    = new GoogleSheetsHttpClient( (string) $token );
+		$commons = new GoogleSheetCommons( $http );
+		$rows    = new GoogleRowService( $commons );
+		$sheets  = new GoogleSheetService( $commons );
+		$spreads = new GoogleSpreadsheetService( $commons );
 
 		return compact( 'commons', 'rows', 'sheets', 'spreads' );
 	}

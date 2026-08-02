@@ -2,12 +2,12 @@
 /**
  * Replaces {{path.to.value}} tokens in action config strings.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,13 +31,13 @@ class ConfigInterpolator {
 	 */
 	private const TRIGGER_FIELD_ALIASES = array(
 		'customer_name' => 'billing_first_name',
-		'first_name' => 'billing_first_name',
-		'name' => 'billing_first_name',
-		'last_name' => 'billing_last_name',
-		'email' => 'billing_email',
-		'order_number' => 'order_id',
-		'amount' => 'total',
-		'order_total' => 'total',
+		'first_name'    => 'billing_first_name',
+		'name'          => 'billing_first_name',
+		'last_name'     => 'billing_last_name',
+		'email'         => 'billing_email',
+		'order_number'  => 'order_id',
+		'amount'        => 'total',
+		'order_total'   => 'total',
 	);
 
 	/**
@@ -99,7 +99,7 @@ class ConfigInterpolator {
 	private function looksLikeJsonTemplate( string $template ): bool {
 		$trimmed = ltrim( $template );
 
-		return str_starts_with( $trimmed, '{' ) || str_starts_with( $trimmed, '[' );
+		return function_exists( 'str_starts_with' ) && str_starts_with( $trimmed, '{' ) || function_exists( 'str_starts_with' ) && str_starts_with( $trimmed, '[' );
 	}
 
 	/**
@@ -172,7 +172,7 @@ class ConfigInterpolator {
 			} elseif ( is_scalar( $value ) ) {
 				$resolved = (string) $value;
 
-				if ( str_contains( $resolved, '<!-- wp:' ) ) {
+				if ( function_exists( 'str_contains' ) && str_contains( $resolved, '<!-- wp:' ) ) {
 					$resolved = TriggerPayloadNormalizer::plainTextFromPostContent( $resolved );
 				}
 
@@ -264,7 +264,7 @@ class ConfigInterpolator {
 			return $value;
 		}
 
-		if ( str_starts_with( $path, 'trigger.' ) ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $path, 'trigger.' ) ) {
 			return null;
 		}
 

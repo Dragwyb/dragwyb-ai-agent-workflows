@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'workflow-automate/plugin',
+        'name' => 'dragwyb-agentflow/plugin',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
         'reference' => 'e306cd31591c1ec9bc3b9653fcfde7d23a05f437',
@@ -147,7 +147,7 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'workflow-automate/plugin' => array(
+        'dragwyb-agentflow/plugin' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
             'reference' => 'e306cd31591c1ec9bc3b9653fcfde7d23a05f437',

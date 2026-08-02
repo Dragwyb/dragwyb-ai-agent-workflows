@@ -2,12 +2,12 @@
 /**
  * WorkflowRun domain entity.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain;
+namespace DragwybAgentFlow\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -82,17 +82,17 @@ class WorkflowRun {
 		?string $finishedAt,
 		string $createdAt
 	) {
-		$this->id = $id;
-		$this->workflowId = $workflowId;
-		$this->parentRunId = $parentRunId;
-		$this->status = $status;
+		$this->id             = $id;
+		$this->workflowId     = $workflowId;
+		$this->parentRunId    = $parentRunId;
+		$this->status         = $status;
 		$this->triggerPayload = $triggerPayload;
-		$this->attempts = $attempts;
-		$this->nextAttemptAt = $nextAttemptAt;
-		$this->claimToken = $claimToken;
-		$this->startedAt = $startedAt;
-		$this->finishedAt = $finishedAt;
-		$this->createdAt = $createdAt;
+		$this->attempts       = $attempts;
+		$this->nextAttemptAt  = $nextAttemptAt;
+		$this->claimToken     = $claimToken;
+		$this->startedAt      = $startedAt;
+		$this->finishedAt     = $finishedAt;
+		$this->createdAt      = $createdAt;
 	}
 
 	/**

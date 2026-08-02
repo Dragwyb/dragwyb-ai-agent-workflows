@@ -2,12 +2,12 @@
 /**
  * OpenRouter Chat Completions action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -20,11 +20,11 @@ class OpenRouterChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'OpenRouter Chat', 'workflow-automate' );
+		return __( 'OpenRouter Chat', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to OpenRouter and returns the reply.', 'workflow-automate' );
+		return __( 'Sends a prompt to OpenRouter and returns the reply.', 'dragwyb-agentflow' );
 	}
 
 	protected function providerSlug(): string {

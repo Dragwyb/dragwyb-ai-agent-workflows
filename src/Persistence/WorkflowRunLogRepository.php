@@ -2,15 +2,15 @@
 /**
  * Workflow run log repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,9 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflow_run_logs` access goes through this class.
+ * All `dragwyb_af_workflow_run_logs` access goes through this class.
  */
 class WorkflowRunLogRepository {
+
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'dragwyb_af_workflow_run_logs';
 
 	/**
 	 * Defensive upper bound on logs fetched for a single run. A legitimate
@@ -33,7 +37,7 @@ class WorkflowRunLogRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'workflow_run_logs' );
+		return esc_sql( Table::name( 'workflow_run_logs' ) );
 	}
 
 	/**
@@ -57,25 +61,29 @@ class WorkflowRunLogRepository {
 		global $wpdb;
 
 		$data = array(
-			'run_id' => (int) $attributes['run_id'],
-			'node_id' => isset( $attributes['node_id'] ) ? (int) $attributes['node_id'] : null,
-			'node_type' => isset( $attributes['node_type'] ) ? (string) $attributes['node_type'] : null,
-			'node_label' => isset( $attributes['node_label'] ) ? (string) $attributes['node_label'] : null,
-			'status' => (string) $attributes['status'],
-			'input_json' => isset( $attributes['input'] ) ? wp_json_encode( $attributes['input'] ) : null,
+			'run_id'      => (int) $attributes['run_id'],
+			'node_id'     => isset( $attributes['node_id'] ) ? (int) $attributes['node_id'] : null,
+			'node_type'   => isset( $attributes['node_type'] ) ? (string) $attributes['node_type'] : null,
+			'node_label'  => isset( $attributes['node_label'] ) ? (string) $attributes['node_label'] : null,
+			'status'      => (string) $attributes['status'],
+			'input_json'  => isset( $attributes['input'] ) ? wp_json_encode( $attributes['input'] ) : null,
 			'output_json' => isset( $attributes['output'] ) ? wp_json_encode( $attributes['output'] ) : null,
-			'message' => isset( $attributes['message'] ) ? (string) $attributes['message'] : null,
+			'message'     => isset( $attributes['message'] ) ? (string) $attributes['message'] : null,
 			'duration_ms' => isset( $attributes['duration_ms'] ) ? (int) $attributes['duration_ms'] : null,
-			'created_at' => current_time( 'mysql', true ),
+			'created_at'  => current_time( 'mysql', true ),
 		);
 
 		$formats = array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
 			return null;
 		}
+
+		// A new row changes the collection findByRun() returns.
+		$this->cacheDelete( $this->runCacheKey( (int) $attributes['run_id'] ) );
 
 		return $this->find( (int) $wpdb->insert_id );
 	}
@@ -90,10 +98,23 @@ class WorkflowRunLogRepository {
 	public function find( int $id ): ?WorkflowRunLog {
 		global $wpdb;
 
-		$table = $this->table();
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
 
-		return $row ? WorkflowRunLog::fromRow( $row ) : null;
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$table = esc_sql($this->table());
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; result is cached above via cacheGet() and below via cacheSet().
+
+		$log = $row ? WorkflowRunLog::fromRow( $row ) : null;
+
+		if ( null !== $log ) {
+			$this->cacheSet( $cache_key, $log );
+		}
+
+		return $log;
 	}
 
 	/**
@@ -106,11 +127,25 @@ class WorkflowRunLogRepository {
 	public function findByRun( int $run_id ): array {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $run_id, self::MAX_LOGS_PER_RUN ) );
+		$cache_key = $this->runCacheKey( $run_id );
+		$cached    = $this->cacheGet( $cache_key );
 
-		return array_map( array( WorkflowRunLog::class, 'fromRow' ), $rows );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$table = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Result is cached above via cacheGet() and below via cacheSet().
+		$rows  = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d", $run_id, self::MAX_LOGS_PER_RUN )
+		);
+
+		$logs = array_map( array( WorkflowRunLog::class, 'fromRow' ), $rows );
+
+		$this->cacheSet( $cache_key, $logs );
+
+		return $logs;
 	}
 
 	/**
@@ -118,6 +153,11 @@ class WorkflowRunLogRepository {
 	 * runs. Used by WorkflowService::delete() when hard-deleting a
 	 * workflow, since there is no SQL-level cascade (see
 	 * CreateWorkflowRunLogsTable migration).
+	 *
+	 * Only the per-run collection caches are invalidated here, not each
+	 * individual log's own id-based cache entry: those rows are gone
+	 * forever, so an orphaned id-keyed cache entry can never be read by
+	 * anything afterward.
 	 *
 	 * @param int[] $run_ids Run ids.
 	 *
@@ -130,13 +170,29 @@ class WorkflowRunLogRepository {
 			return true;
 		}
 
-		$run_ids = array_map( 'intval', $run_ids );
+		$run_ids      = array_map( 'intval', $run_ids );
 		$placeholders = implode( ', ', array_fill( 0, count( $run_ids ), '%d' ) );
-		$table = $this->table();
+		$table        = esc_sql($this->table());
 
-		$sql = "DELETE FROM {$table} WHERE run_id IN ({$placeholders})"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
-		$deleted = $wpdb->query( $wpdb->prepare( $sql, $run_ids ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected per-run collection caches are invalidated below via cacheDelete().
+		$deleted = $wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+
+			$wpdb->prepare( "DELETE FROM {$table} WHERE run_id IN ({$placeholders})", $run_ids )
+		);
+
+		foreach ( $run_ids as $run_id ) {
+			$this->cacheDelete( $this->runCacheKey( $run_id ) );
+		}
 
 		return false !== $deleted;
+	}
+
+	/**
+	 * @param int $run_id Run id.
+	 *
+	 * @return string
+	 */
+	private function runCacheKey( int $run_id ): string {
+		return 'run_' . $run_id;
 	}
 }

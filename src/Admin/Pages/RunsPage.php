@@ -2,22 +2,22 @@
 /**
  * Runs (execution history) admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Admin\RunActionsController;
-use WorkflowAutomate\Plugin\Admin\RunsListTable;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Admin\EmptyState;
+use DragwybAgentFlow\Plugin\Admin\ListTableUi;
+use DragwybAgentFlow\Plugin\Admin\RunActionsController;
+use DragwybAgentFlow\Plugin\Admin\RunsListTable;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunsPage implements AdminPage {
 
-	public const SLUG = 'wfa-runs';
+	public const SLUG = 'dragwyb-af-runs';
 
 	private WorkflowRunRepository $runs;
 
@@ -46,9 +46,9 @@ class RunsPage implements AdminPage {
 	private RunActionsController $runActions;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, SettingsService $settings, RunActionsController $runActions ) {
-		$this->runs = $runs;
-		$this->workflows = $workflows;
-		$this->settings = $settings;
+		$this->runs       = $runs;
+		$this->workflows  = $workflows;
+		$this->settings   = $settings;
 		$this->runActions = $runActions;
 	}
 
@@ -63,14 +63,14 @@ class RunsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Runs', 'workflow-automate' );
+		return __( 'Runs', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Runs', 'workflow-automate' );
+		return __( 'Runs', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -92,10 +92,10 @@ class RunsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -104,13 +104,13 @@ class RunsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -119,18 +119,17 @@ class RunsPage implements AdminPage {
 		$this->renderFilters( $table );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filters.
-		$has_filters = ( isset( $_GET['workflow_id'] ) && absint( wp_unslash( $_GET['workflow_id'] ) ) > 0 )
-			|| ( isset( $_GET['status'] ) && '' !== sanitize_key( wp_unslash( $_GET['status'] ) ) );
+		$has_filters = ( isset( $_GET['workflow_id'] ) && absint( wp_unslash( $_GET['workflow_id'] ) ) > 0 ) || ( isset( $_GET['status'] ) && '' !== sanitize_key( wp_unslash( $_GET['status'] ) ) );
 
 		if ( ! $table->has_items() && ! $has_filters ) {
 			EmptyState::render(
-				__( 'No runs yet', 'workflow-automate' ),
-				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'workflow-automate' ),
+				__( 'No runs yet', 'dragwyb-agentflow' ),
+				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'dragwyb-agentflow' ),
 				array(),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-						'label' => __( 'Go to Workflows', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+						'label'   => __( 'Go to Workflows', 'dragwyb-agentflow' ),
 						'primary' => true,
 					),
 				)
@@ -142,7 +141,7 @@ class RunsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_run_bulk_action', 'wfa_run_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_run_bulk_action', 'dragwyb_af_run_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -161,17 +160,19 @@ class RunsPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter form.
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 
 		if ( '' !== $status ) {
 			printf( '<input type="hidden" name="status" value="%s" />', esc_attr( $status ) );
 		}
 
-		ListTableUi::renderFilterBar(
-			'top',
-			$table->filterFields()
-		);
+		if($table->has_items()) {
+			ListTableUi::renderFilterBar(
+				'top',
+				$table->filterFields()
+			);
+		}
 		echo '</form>';
 	}
 
@@ -191,47 +192,47 @@ class RunsPage implements AdminPage {
 		}
 
 		$workflow = $this->workflows->find( $workflow_id, true );
-		$name = $workflow ? $workflow->title() : __( '(deleted workflow)', 'workflow-automate' );
+		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-agentflow' );
 
 		printf(
-			'<p class="wfa-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
+			'<p class="dragwyb-af-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
-				esc_html__( 'Showing runs for: %s', 'workflow-automate' ),
+				esc_html__( 'Showing runs for: %s', 'dragwyb-agentflow' ),
 				'<strong>' . esc_html( $name ) . '</strong>'
 			),
 			esc_url( remove_query_arg( 'workflow_id' ) ),
-			esc_html__( 'Clear filter', 'workflow-automate' )
+			esc_html__( 'Clear filter', 'dragwyb-agentflow' )
 		);
 	}
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
 	private function notices(): array {
 		return array(
-			'deleted' => array(
-				'message' => __( 'Run deleted.', 'workflow-automate' ),
-				'type' => 'success',
+			'deleted'       => array(
+				'message' => __( 'Run deleted.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'bulk_deleted' => array(
-				'message' => __( 'Selected runs deleted.', 'workflow-automate' ),
-				'type' => 'success',
+			'bulk_deleted'  => array(
+				'message' => __( 'Selected runs deleted.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
 			'delete_failed' => array(
-				'message' => __( 'That run could not be deleted.', 'workflow-automate' ),
-				'type' => 'error',
+				'message' => __( 'That run could not be deleted.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
 			'action_failed' => array(
-				'message' => __( 'That run action could not be completed.', 'workflow-automate' ),
-				'type' => 'error',
+				'message' => __( 'That run action could not be completed.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
-			'rerun_failed' => array(
-				'message' => __( 'That run could not be re-run.', 'workflow-automate' ),
-				'type' => 'error',
+			'rerun_failed'  => array(
+				'message' => __( 'That run could not be re-run.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
 		);
 	}
@@ -241,7 +242,7 @@ class RunsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

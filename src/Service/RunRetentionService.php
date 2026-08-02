@@ -2,15 +2,15 @@
 /**
  * Prunes old, finished workflow runs and their logs.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,7 +33,7 @@ class RunRetentionService {
 	/**
 	 * The WP-Cron hook this service's pruneAccordingToSettings() is bound to.
 	 */
-	public const CRON_HOOK = 'wfa/cron/prune_runs';
+	public const CRON_HOOK = 'dragwyb_af/cron/prune_runs';
 
 	private WorkflowRunRepository $runs;
 
@@ -42,8 +42,8 @@ class RunRetentionService {
 	private SettingsService $settings;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRunLogRepository $runLogs, SettingsService $settings ) {
-		$this->runs = $runs;
-		$this->runLogs = $runLogs;
+		$this->runs     = $runs;
+		$this->runLogs  = $runLogs;
 		$this->settings = $settings;
 	}
 
@@ -71,7 +71,7 @@ class RunRetentionService {
 	 */
 	public function pruneOlderThan( int $days ): int {
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
-		$ids = $this->runs->idsFinishedBefore( $cutoff );
+		$ids    = $this->runs->idsFinishedBefore( $cutoff );
 
 		if ( array() === $ids ) {
 			return 0;

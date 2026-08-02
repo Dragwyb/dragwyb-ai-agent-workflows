@@ -91,28 +91,28 @@ export default function PickerSidebar({
 		kind === 'agent-fallback-chat-model' ||
 		kind === 'parser-chat-model'
 			? kind === 'agent-fallback-chat-model'
-				? __('Select fallback chat model', 'workflow-automate')
+				? __('Select fallback chat model', 'dragwyb-agentflow')
 				: kind === 'parser-chat-model'
-					? __('Select Auto-Fix chat model', 'workflow-automate')
-					: __('Select chat model', 'workflow-automate')
+					? __('Select Auto-Fix chat model', 'dragwyb-agentflow')
+					: __('Select chat model', 'dragwyb-agentflow')
 			: kind === 'agent-tool'
-				? __('Add tool to agent', 'workflow-automate')
+				? __('Add tool to agent', 'dragwyb-agentflow')
 				: kind === 'branch-action'
-					? __('Add step to branch', 'workflow-automate')
+					? __('Add step to branch', 'dragwyb-agentflow')
 					: kind === 'edge-insert' || kind === 'edge-branch-insert'
-						? __('Add step between nodes', 'workflow-automate')
+						? __('Add step between nodes', 'dragwyb-agentflow')
 						: showGroups
-						? __('Choose a group', 'workflow-automate')
+						? __('Choose a group', 'dragwyb-agentflow')
 						: usesGroupedSections
 							? appLabel
-							: __('Choose a node', 'workflow-automate');
+							: __('Choose a node', 'dragwyb-agentflow');
 	const replaceHint =
 		kind === 'trigger' && hasExistingTrigger && !showGroups
-			? __('Selecting a trigger replaces your current one.', 'workflow-automate')
+			? __('Selecting a trigger replaces your current one.', 'dragwyb-agentflow')
 			: kind === 'agent-chat-model'
 				? __(
 					'Pick a provider — configure API key and model on the canvas node.',
-					'workflow-automate'
+					'dragwyb-agentflow'
 				)
 				: '';
 	const showBack = (usesGroups && groupId) || subAppId;
@@ -147,9 +147,9 @@ export default function PickerSidebar({
 					/* translators: %s: plugin name, e.g. WooCommerce */
 					__(
 						'Activate %s to use this trigger.',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					),
-					item.requires_plugin || __('this plugin', 'workflow-automate')
+					item.requires_plugin || __('this plugin', 'dragwyb-agentflow')
 				)
 			: '';
 
@@ -159,8 +159,8 @@ export default function PickerSidebar({
 					type="button"
 					className={
 						isDisabled
-							? 'wfa-builder-picker__item wfa-builder-picker__item--disabled'
-							: 'wfa-builder-picker__item'
+							? 'dragwyb-af-builder-picker__item dragwyb-af-builder-picker__item--disabled'
+							: 'dragwyb-af-builder-picker__item'
 					}
 					onClick={() => handlePick(item)}
 					title={isDisabled ? disabledMessage : item.description}
@@ -168,7 +168,7 @@ export default function PickerSidebar({
 					aria-disabled={isDisabled}
 				>
 					<span
-						className="wfa-builder-picker__item-icon"
+						className="dragwyb-af-builder-picker__item-icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -177,12 +177,12 @@ export default function PickerSidebar({
 					>
 						{meta.icon}
 					</span>
-					<span className="wfa-builder-picker__item-content">
-						<span className="wfa-builder-picker__item-label">
+					<span className="dragwyb-af-builder-picker__item-content">
+						<span className="dragwyb-af-builder-picker__item-label">
 							{getPickerItemLabel(item, itemAppId)}
 						</span>
 						{isDisabled && (
-							<span className="wfa-builder-picker__item-hint">
+							<span className="dragwyb-af-builder-picker__item-hint">
 								{disabledMessage}
 							</span>
 						)}
@@ -194,42 +194,42 @@ export default function PickerSidebar({
 
 	return (
 		<aside
-			className="wfa-builder-picker"
+			className="dragwyb-af-builder-picker"
 			aria-label={title}
 		>
-			<div className="wfa-builder-picker__header">
+			<div className="dragwyb-af-builder-picker__header">
 				{showBack && (
 					<Button
 						variant="link"
-						className="wfa-builder-picker__back"
+						className="dragwyb-af-builder-picker__back"
 						onClick={handleBack}
 					>
-						{__('← Back', 'workflow-automate')}
+						{__('← Back', 'dragwyb-agentflow')}
 					</Button>
 				)}
-				<h2 className="wfa-builder-picker__title">{title}</h2>
+				<h2 className="dragwyb-af-builder-picker__title">{title}</h2>
 				<Button
-					className="wfa-builder-picker__close"
+					className="dragwyb-af-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'workflow-automate')}
+					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
 				/>
 			</div>
 
 			{replaceHint && (
-				<p className="wfa-builder-picker__hint">{replaceHint}</p>
+				<p className="dragwyb-af-builder-picker__hint">{replaceHint}</p>
 			)}
 
 			{showGroups ? (
-				<ul className="wfa-builder-picker__list">
+				<ul className="dragwyb-af-builder-picker__list">
 					{groups.map((group) => (
 						<li key={group.id}>
 							<button
 								type="button"
-								className="wfa-builder-picker__item"
+								className="dragwyb-af-builder-picker__item"
 								onClick={() => setGroupId(group.id)}
 							>
-								<span className="wfa-builder-picker__item-label">
+								<span className="dragwyb-af-builder-picker__item-label">
 									{group.label}
 								</span>
 							</button>
@@ -238,32 +238,32 @@ export default function PickerSidebar({
 				</ul>
 			) : kind === 'agent-tool' ? (
 				<>
-					<div className="wfa-builder-picker__search">
+					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
-							label={__('Search tools', 'workflow-automate')}
+							label={__('Search tools', 'dragwyb-agentflow')}
 							hideLabelFromVision
-							placeholder={__('Search tools…', 'workflow-automate')}
+							placeholder={__('Search tools…', 'dragwyb-agentflow')}
 							value={toolQuery}
 							onChange={setToolQuery}
 						/>
 					</div>
 					{toolSections.length === 0 ? (
-						<p className="wfa-builder-picker__empty">
+						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No tools match your search.',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 						</p>
 					) : (
 						toolSections.map((section) => (
 							<div
 								key={section.id}
-								className="wfa-builder-picker__section"
+								className="dragwyb-af-builder-picker__section"
 							>
-								<h3 className="wfa-builder-picker__section-heading">
+								<h3 className="dragwyb-af-builder-picker__section-heading">
 									{section.label}
 								</h3>
-								<ul className="wfa-builder-picker__list">
+								<ul className="dragwyb-af-builder-picker__list">
 									{section.items.map((item) =>
 										renderItem(item, item.pickerAppId)
 									)}
@@ -274,32 +274,32 @@ export default function PickerSidebar({
 				</>
 			) : usesGroupedSections && groupedItems ? (
 				<>
-					<div className="wfa-builder-picker__search">
+					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
-							label={__('Search actions', 'workflow-automate')}
+							label={__('Search actions', 'dragwyb-agentflow')}
 							hideLabelFromVision
-							placeholder={__('Search actions…', 'workflow-automate')}
+							placeholder={__('Search actions…', 'dragwyb-agentflow')}
 							value={groupedQuery}
 							onChange={setGroupedQuery}
 						/>
 					</div>
 					{groupedItems.length === 0 ? (
-						<p className="wfa-builder-picker__empty">
+						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No actions match your search.',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 						</p>
 					) : (
 						groupedItems.map((group) => (
 							<div
 								key={group.id}
-								className="wfa-builder-picker__section"
+								className="dragwyb-af-builder-picker__section"
 							>
-								<h3 className="wfa-builder-picker__section-heading">
+								<h3 className="dragwyb-af-builder-picker__section-heading">
 									{group.label}
 								</h3>
-								<ul className="wfa-builder-picker__list">
+								<ul className="dragwyb-af-builder-picker__list">
 									{group.items.map((item) =>
 										renderItem(item, metaAppId)
 									)}
@@ -309,7 +309,7 @@ export default function PickerSidebar({
 					)}
 				</>
 			) : (
-				<ul className="wfa-builder-picker__list">
+				<ul className="dragwyb-af-builder-picker__list">
 					{showCommunicationList &&
 						subApps.map((subApp) => (
 							<PickerSubApp
@@ -332,11 +332,11 @@ function PickerSubApp({ subApp, onOpen }) {
 		<li>
 			<button
 				type="button"
-				className="wfa-builder-picker__item wfa-builder-picker__item--subapp"
+				className="dragwyb-af-builder-picker__item dragwyb-af-builder-picker__item--subapp"
 				onClick={onOpen}
 			>
 				<span
-					className="wfa-builder-picker__item-icon"
+					className="dragwyb-af-builder-picker__item-icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -345,12 +345,12 @@ function PickerSubApp({ subApp, onOpen }) {
 				>
 					{meta.icon}
 				</span>
-				<span className="wfa-builder-picker__item-content">
-					<span className="wfa-builder-picker__item-label">
+				<span className="dragwyb-af-builder-picker__item-content">
+					<span className="dragwyb-af-builder-picker__item-label">
 						{subApp.label}
 					</span>
 				</span>
-				<span className="wfa-builder-picker__item-chevron" aria-hidden="true">
+				<span className="dragwyb-af-builder-picker__item-chevron" aria-hidden="true">
 					›
 				</span>
 			</button>

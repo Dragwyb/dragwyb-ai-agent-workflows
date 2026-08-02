@@ -2,15 +2,15 @@
 /**
  * Workflow run repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,9 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflow_runs` access goes through this class.
+ * All `dragwyb_af_workflow_runs` access goes through this class.
  */
 class WorkflowRunRepository {
+
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'dragwyb_af_workflow_runs';
 
 	private const MAX_PER_PAGE = 100;
 
@@ -39,7 +43,7 @@ class WorkflowRunRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'workflow_runs' );
+		return esc_sql( Table::name( 'workflow_runs' ) );
 	}
 
 	/**
@@ -63,24 +67,25 @@ class WorkflowRunRepository {
 		global $wpdb;
 
 		$status = (string) ( $attributes['status'] ?? WorkflowRun::STATUS_QUEUED );
-		$now = current_time( 'mysql', true );
+		$now    = current_time( 'mysql', true );
 
 		$data = array(
-			'workflow_id' => (int) $attributes['workflow_id'],
-			'parent_run_id' => isset( $attributes['parent_run_id'] ) ? (int) $attributes['parent_run_id'] : null,
-			'status' => $status,
+			'workflow_id'          => (int) $attributes['workflow_id'],
+			'parent_run_id'        => isset( $attributes['parent_run_id'] ) ? (int) $attributes['parent_run_id'] : null,
+			'status'               => $status,
 			'trigger_payload_json' => ! empty( $attributes['trigger_payload'] ) ? wp_json_encode( $attributes['trigger_payload'] ) : null,
-			'attempts' => isset( $attributes['attempts'] ) ? max( 1, (int) $attributes['attempts'] ) : 1,
-			'next_attempt_at' => isset( $attributes['next_attempt_at'] ) ? (string) $attributes['next_attempt_at'] : null,
+			'attempts'             => isset( $attributes['attempts'] ) ? max( 1, (int) $attributes['attempts'] ) : 1,
+			'next_attempt_at'      => isset( $attributes['next_attempt_at'] ) ? (string) $attributes['next_attempt_at'] : null,
 			// A queued row has not started yet; its clock starts when
 			// claimBatch() claims it. A row created as `running` (the
 			// synchronous path) starts immediately.
-			'started_at' => WorkflowRun::STATUS_RUNNING === $status ? $now : null,
-			'created_at' => $now,
+			'started_at'           => WorkflowRun::STATUS_RUNNING === $status ? $now : null,
+			'created_at'           => $now,
 		);
 
 		$formats = array( '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -109,19 +114,22 @@ class WorkflowRunRepository {
 			return false;
 		}
 
-		$table = $this->table();
-		$like = '%' . $wpdb->esc_like( $payload_needle ) . '%';
+		$table = esc_sql($this->table());
+		$like  = '%' . $wpdb->esc_like( $payload_needle ) . '%';
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; all values are passed through wpdb->prepare().
-		$sql = "SELECT id FROM {$table}
-			WHERE workflow_id = %d
-				AND status IN ( %s, %s )
-				AND trigger_payload_json LIKE %s
-			LIMIT 1";
-
+		// Intentionally not object-cached: this must always reflect the
+		// live queue state at the instant a new trigger fires, to decide
+		// whether to collapse it into an existing pending run. A cached
+		// answer could let duplicate runs through.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
 		$found = $wpdb->get_var(
 			$wpdb->prepare(
-				$sql,
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+				"SELECT id FROM {$table}
+					WHERE workflow_id = %d
+						AND status IN ( %s, %s )
+						AND trigger_payload_json LIKE %s
+					LIMIT 1",
 				$workflow_id,
 				WorkflowRun::STATUS_QUEUED,
 				WorkflowRun::STATUS_RUNNING,
@@ -161,23 +169,22 @@ class WorkflowRunRepository {
 	public function claimBatch( int $limit, int $stale_after_minutes ): array {
 		global $wpdb;
 
-		$table = $this->table();
-		$now = current_time( 'mysql', true );
-		$claim_token = wp_generate_uuid4();
+		$table        = esc_sql($this->table());
+		$now          = current_time( 'mysql', true );
+		$claim_token  = wp_generate_uuid4();
 		$stale_before = gmdate( 'Y-m-d H:i:s', time() - ( $stale_after_minutes * MINUTE_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; all values are passed through wpdb->prepare() below.
-		$sql = "UPDATE {$table}
-			SET status = %s, claim_token = %s, started_at = %s
-			WHERE
-				( status = %s AND ( next_attempt_at IS NULL OR next_attempt_at <= %s ) )
-				OR ( status = %s AND started_at IS NOT NULL AND started_at <= %s )
-			ORDER BY id ASC
-			LIMIT %d";
-
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. This is a write (atomic claim), not a cacheable read.
 		$wpdb->query(
 			$wpdb->prepare(
-				$sql,
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+				"UPDATE {$table}
+					SET status = %s, claim_token = %s, started_at = %s
+					WHERE
+						( status = %s AND ( next_attempt_at IS NULL OR next_attempt_at <= %s ) )
+						OR ( status = %s AND started_at IS NOT NULL AND started_at <= %s )
+					ORDER BY id ASC
+					LIMIT %d",
 				WorkflowRun::STATUS_RUNNING,
 				$claim_token,
 				$now,
@@ -193,9 +200,21 @@ class WorkflowRunRepository {
 			return array();
 		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$select_sql = "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC";
-		$rows = $wpdb->get_results( $wpdb->prepare( $select_sql, $claim_token ) );
+		// Not object-cached: $claim_token is freshly generated every call,
+		// so this SELECT would always be a guaranteed cache miss anyway.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
+		$rows = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC", $claim_token )
+		);
+
+		// This UPDATE bypassed update()/finish(), so any previously cached
+		// find( $id ) result for a now-claimed row (e.g. still showing
+		// status 'queued') must be evicted here explicitly, or a caller
+		// could read stale data for it until it's next written through.
+		foreach ( $rows as $row ) {
+			$this->cacheDelete( (string) $row->id );
+		}
 
 		return array_map( array( WorkflowRun::class, 'fromRow' ), $rows );
 	}
@@ -213,17 +232,20 @@ class WorkflowRunRepository {
 	public function requeue( int $id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entry is invalidated below via cacheDelete().
 		$updated = $wpdb->update(
 			$this->table(),
 			array(
-				'status' => WorkflowRun::STATUS_QUEUED,
+				'status'      => WorkflowRun::STATUS_QUEUED,
 				'claim_token' => null,
-				'started_at' => null,
+				'started_at'  => null,
 			),
 			array( 'id' => $id ),
 			array( '%s', '%s', '%s' ),
 			array( '%d' )
 		);
+
+		$this->cacheDelete( (string) $id );
 
 		return false !== $updated;
 	}
@@ -239,10 +261,11 @@ class WorkflowRunRepository {
 	public function finish( int $id, string $status ): ?WorkflowRun {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entry is invalidated below via cacheDelete().
 		$updated = $wpdb->update(
 			$this->table(),
 			array(
-				'status' => $status,
+				'status'      => $status,
 				'finished_at' => current_time( 'mysql', true ),
 			),
 			array( 'id' => $id ),
@@ -253,6 +276,8 @@ class WorkflowRunRepository {
 		if ( false === $updated ) {
 			return null;
 		}
+
+		$this->cacheDelete( (string) $id );
 
 		return $this->find( $id );
 	}
@@ -267,10 +292,23 @@ class WorkflowRunRepository {
 	public function find( int $id ): ?WorkflowRun {
 		global $wpdb;
 
-		$table = $this->table();
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
 
-		return $row ? WorkflowRun::fromRow( $row ) : null;
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$table = esc_sql($this->table());
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; result is cached above via cacheGet() and below via cacheSet().
+
+		$run = $row ? WorkflowRun::fromRow( $row ) : null;
+
+		if ( null !== $run ) {
+			$this->cacheSet( $cache_key, $run );
+		}
+
+		return $run;
 	}
 
 	/**
@@ -278,8 +316,8 @@ class WorkflowRunRepository {
 	 * first. Intended for the run history UI (a later roadmap item); the
 	 * execution engine itself only ever needs insert()/finish()/find().
 	 *
-	 * @param int                   $workflow_id Workflow id.
-	 * @param array<string, mixed>  $args        {
+	 * @param int                  $workflow_id Workflow id.
+	 * @param array<string, mixed> $args        {
 	 *     @type int $page     1-indexed page number. Default 1.
 	 *     @type int $per_page Rows per page, clamped to [1, 100]. Default 20.
 	 * }
@@ -289,23 +327,31 @@ class WorkflowRunRepository {
 	public function paginateForWorkflow( int $workflow_id, array $args = array() ): array {
 		global $wpdb;
 
-		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
-		$offset = ( $page - 1 ) * $per_page;
+		$offset   = ( $page - 1 ) * $per_page;
 
-		$table = $this->table();
+		$table = esc_sql($this->table());
 
-		$count_sql = "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $workflow_id ) );
+		// Intentionally not object-cached: see paginateAll()'s docblock —
+		// same reasoning applies to every filtered/paginated list query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
+		$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d", $workflow_id )
+		);
 
-		$list_sql = "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $workflow_id, $per_page, $offset ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it.
+		$rows = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $workflow_id, $per_page, $offset )
+		);
 
 		return array(
-			'items' => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
-			'total' => $total,
-			'page' => $page,
+			'items'    => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
+			'total'    => $total,
+			'page'     => $page,
 			'per_page' => $per_page,
 		);
 	}
@@ -323,53 +369,71 @@ class WorkflowRunRepository {
 	 *     @type int    $per_page    Rows per page, clamped to [1, 100]. Default 20.
 	 * }
 	 *
+	 * Intentionally not object-cached: the result depends on an open-ended
+	 * combination of filters, page, and per_page, so caching it would need
+	 * one cache key per combination, invalidated on nearly every write to
+	 * this table — high complexity for little real hit rate. Only find()
+	 * caches, since a single id has exactly one cache key.
+	 *
 	 * @return array{items: WorkflowRun[], total: int, page: int, per_page: int}
 	 */
 	public function paginateAll( array $args = array() ): array {
 		global $wpdb;
 
-		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
-		$offset = ( $page - 1 ) * $per_page;
+		$offset   = ( $page - 1 ) * $per_page;
 
-		$where = array();
-		$params = array();
+		// `id > %d` is always true (id is an AUTO_INCREMENT primary key
+		// starting at 1); it guarantees $where/$params are never empty so
+		// every query below can go through $wpdb->prepare() unconditionally,
+		// instead of branching between a prepared and an unprepared call.
+		$where  = array( 'id > %d' );
+		$params = array( 0 );
 
 		if ( ! empty( $args['workflow_id'] ) ) {
-			$where[] = 'workflow_id = %d';
+			$where[]  = 'workflow_id = %d';
 			$params[] = (int) $args['workflow_id'];
 		}
 
 		if ( ! empty( $args['status'] ) ) {
-			$where[] = 'status = %s';
+			$where[]  = 'status = %s';
 			$params[] = (string) $args['status'];
 		}
 
-		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
-		$table = $this->table();
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
+		$table     = esc_sql($this->table());
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}";
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginateAll() docblock.
+		$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
+		);
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $where_sql contains only static fragments and placeholders.
-		$list_sql = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d";
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginateAll() docblock.
+		$rows        = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
+			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
+		);
 
 		return array(
-			'items' => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
-			'total' => $total,
-			'page' => $page,
+			'items'    => array_map( array( WorkflowRun::class, 'fromRow' ), $rows ),
+			'total'    => $total,
+			'page'     => $page,
 			'per_page' => $per_page,
 		);
 	}
 
 	/**
 	 * Returns every run id belonging to a workflow, so callers can cascade
-	 * into `wfa_workflow_run_logs` (which is keyed by run id, not workflow
+	 * into `dragwyb_af_workflow_run_logs` (which is keyed by run id, not workflow
 	 * id) before removing the runs themselves.
+	 *
+	 * Not object-cached: this is a one-off cascade-preparation query (hard
+	 * delete of a workflow), not a repeated lookup, so there is nothing to
+	 * amortize.
 	 *
 	 * @param int $workflow_id Workflow id.
 	 *
@@ -378,10 +442,13 @@ class WorkflowRunRepository {
 	public function idsForWorkflow( int $workflow_id ): array {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT id FROM {$table} WHERE workflow_id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$table = esc_sql($this->table());
 
-		return array_map( 'intval', $wpdb->get_col( $wpdb->prepare( $sql, $workflow_id ) ) );
+		return array_map(
+			'intval',
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; not cached, see docblock
+			$wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE workflow_id = %d", $workflow_id ) )
+		);
 	}
 
 	/**
@@ -393,6 +460,10 @@ class WorkflowRunRepository {
 	 * is BackgroundRunner::claimBatch()'s stale-claim recovery's problem
 	 * to solve, not retention's).
 	 *
+	 * Not object-cached: the result depends on the current wall-clock
+	 * cutoff, which is different (or at least newly relevant) on every
+	 * cron tick, so a cached answer would rarely if ever be reused.
+	 *
 	 * @param string $cutoff_gmt MySQL datetime (GMT). Runs finished strictly before this are eligible.
 	 *
 	 * @return int[]
@@ -400,15 +471,21 @@ class WorkflowRunRepository {
 	public function idsFinishedBefore( string $cutoff_gmt ): array {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$table = esc_sql($this->table());
 
-		return array_map( 'intval', $wpdb->get_col( $wpdb->prepare( $sql, $cutoff_gmt, self::MAX_PRUNE_BATCH ) ) );
+		return array_map(
+			'intval',
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see docblock.
+			$wpdb->get_col(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+				$wpdb->prepare( "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d", $cutoff_gmt, self::MAX_PRUNE_BATCH )
+			)
+		);
 	}
 
 	/**
 	 * Permanently removes the given runs. Callers must remove dependent
-	 * `wfa_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
+	 * `dragwyb_af_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
 	 * same cascade-ordering requirement as `deleteByWorkflow()`.
 	 *
 	 * @param int[] $ids Run ids.
@@ -422,13 +499,22 @@ class WorkflowRunRepository {
 			return 0;
 		}
 
-		$ids = array_map( 'intval', $ids );
+		$ids          = array_map( 'intval', $ids );
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-		$table = $this->table();
+		$table        = esc_sql($this->table());
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input; $placeholders contains only "%d" tokens.
-		$sql = "DELETE FROM {$table} WHERE id IN ({$placeholders})";
-		$deleted = $wpdb->query( $wpdb->prepare( $sql, $ids ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected rows' cache entries are invalidated below via cacheDelete().
+		$deleted = $wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $placeholders is escaped
+			$wpdb->prepare( "DELETE FROM {$table} WHERE id IN ({$placeholders})", $ids )
+		);
+
+		// The ids are already known here at no extra cost, unlike
+		// deleteByWorkflow() below, so every affected cache entry is
+		// invalidated individually rather than left as an orphan.
+		foreach ( $ids as $id ) {
+			$this->cacheDelete( (string) $id );
+		}
 
 		return false === $deleted ? 0 : (int) $deleted;
 	}
@@ -436,8 +522,13 @@ class WorkflowRunRepository {
 	/**
 	 * Permanently removes every run belonging to a workflow. Used by
 	 * WorkflowService::delete() when hard-deleting a workflow. Callers must
-	 * remove dependent `wfa_workflow_run_logs` rows first (see
+	 * remove dependent `dragwyb_af_workflow_run_logs` rows first (see
 	 * idsForWorkflow()).
+	 *
+	 * Unlike deleteByIds(), the individual ids aren't known here without an
+	 * extra query; since the rows are gone forever after a hard delete,
+	 * any orphaned per-id cache entries are harmless and are not worth
+	 * that extra query on this rare path.
 	 *
 	 * @param int $workflow_id Workflow id.
 	 *
@@ -446,6 +537,7 @@ class WorkflowRunRepository {
 	public function deleteByWorkflow( int $workflow_id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it. Not cache-invalidated here, see docblock above.
 		$deleted = $wpdb->delete( $this->table(), array( 'workflow_id' => $workflow_id ), array( '%d' ) );
 
 		return false !== $deleted;

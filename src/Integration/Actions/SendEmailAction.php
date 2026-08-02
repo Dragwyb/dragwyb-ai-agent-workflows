@@ -2,15 +2,15 @@
 /**
  * Built-in "Send Email" action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
 use WP_Error;
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,14 +43,14 @@ class SendEmailAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Send Email', 'workflow-automate' );
+		return __( 'Send Email', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an email using the site\'s configured mail delivery method.', 'workflow-automate' );
+		return __( 'Sends an email using the site\'s configured mail delivery method.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -58,24 +58,24 @@ class SendEmailAction implements ActionInterface {
 	 */
 	public function configSchema(): array {
 		return array(
-			'to' => array(
-				'type' => 'string',
-				'label' => __( 'To (comma-separated for multiple recipients)', 'workflow-automate' ),
+			'to'      => array(
+				'type'     => 'string',
+				'label'    => __( 'To (comma-separated for multiple recipients)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'subject' => array(
-				'type' => 'string',
-				'label' => __( 'Subject', 'workflow-automate' ),
+				'type'     => 'string',
+				'label'    => __( 'Subject', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'message' => array(
-				'type' => 'string',
-				'label' => __( 'Message', 'workflow-automate' ),
+				'type'     => 'string',
+				'label'    => __( 'Message', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 			'headers' => array(
-				'type' => 'object',
-				'label' => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'workflow-automate' ),
+				'type'    => 'object',
+				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'dragwyb-agentflow' ),
 				'default' => array(),
 			),
 		);
@@ -90,7 +90,7 @@ class SendEmailAction implements ActionInterface {
 		if ( array() === $recipients ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No valid recipient address configured.', 'workflow-automate' ),
+				'error'   => __( 'No valid recipient address configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -104,7 +104,7 @@ class SendEmailAction implements ActionInterface {
 		// before it returns false. Capturing it here is what turns "it
 		// failed" into a message an operator can actually act on.
 		$captured_error = null;
-		$capture = static function ( $wp_error ) use ( &$captured_error ): void {
+		$capture        = static function ( $wp_error ) use ( &$captured_error ): void {
 			$captured_error = $wp_error;
 		};
 
@@ -115,14 +115,14 @@ class SendEmailAction implements ActionInterface {
 		if ( ! $sent ) {
 			return array(
 				'success' => false,
-				'error' => $captured_error instanceof WP_Error
+				'error'   => $captured_error instanceof WP_Error
 					? $captured_error->get_error_message()
-					: __( 'wp_mail() reported failure for an unknown reason.', 'workflow-automate' ),
+					: __( 'wp_mail() reported failure for an unknown reason.', 'dragwyb-agentflow' ),
 			);
 		}
 
 		return array(
-			'success' => true,
+			'success'    => true,
 			'recipients' => $recipients,
 		);
 	}
@@ -138,7 +138,7 @@ class SendEmailAction implements ActionInterface {
 	 */
 	private function parseRecipients( string $raw ): array {
 		$candidates = array_map( 'trim', explode( ',', $raw ) );
-		$valid = array();
+		$valid      = array();
 
 		foreach ( $candidates as $candidate ) {
 			if ( '' === $candidate ) {

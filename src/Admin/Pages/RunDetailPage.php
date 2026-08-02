@@ -2,26 +2,26 @@
 /**
  * Run detail admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\RunDuration;
-use WorkflowAutomate\Plugin\Admin\RunStatusBadge;
-use WorkflowAutomate\Plugin\Admin\RunTimestamp;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Admin\RunDuration;
+use DragwybAgentFlow\Plugin\Admin\RunStatusBadge;
+use DragwybAgentFlow\Plugin\Admin\RunTimestamp;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
 
-// BuilderPage and RunsPage live in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
+// BuilderPage and RunsPage live in this same namespace (DragwybAgentFlow\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunDetailPage implements AdminPage {
 
-	public const SLUG = 'wfa-run-detail';
+	public const SLUG = 'dragwyb-af-run-detail';
 
 	/**
 	 * Statuses that make sense to re-run — see RunsListTable's own
@@ -57,10 +57,10 @@ class RunDetailPage implements AdminPage {
 	private SettingsService $settings;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowRepository $workflows, WorkflowExecutionService $executor, SettingsService $settings ) {
-		$this->runs = $runs;
+		$this->runs      = $runs;
 		$this->workflows = $workflows;
-		$this->executor = $executor;
-		$this->settings = $settings;
+		$this->executor  = $executor;
+		$this->settings  = $settings;
 	}
 
 	/**
@@ -74,14 +74,14 @@ class RunDetailPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Run Details', 'workflow-automate' );
+		return __( 'Run Details', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Run Details', 'workflow-automate' );
+		return __( 'Run Details', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -103,10 +103,10 @@ class RunDetailPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -115,14 +115,14 @@ class RunDetailPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which run to view.
 		$run_id = isset( $_GET['run_id'] ) ? absint( wp_unslash( $_GET['run_id'] ) ) : 0;
-		$run = $run_id > 0 ? $this->runs->find( $run_id ) : null;
+		$run    = $run_id > 0 ? $this->runs->find( $run_id ) : null;
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -149,7 +149,7 @@ class RunDetailPage implements AdminPage {
 	private function builderUrl( int $workflow_id ): string {
 		return add_query_arg(
 			array(
-				'page' => BuilderPage::SLUG,
+				'page'     => BuilderPage::SLUG,
 				'workflow' => $workflow_id,
 			),
 			admin_url( 'admin.php' )
@@ -164,7 +164,7 @@ class RunDetailPage implements AdminPage {
 	private function detailUrl( int $run_id ): string {
 		return add_query_arg(
 			array(
-				'page' => self::SLUG,
+				'page'   => self::SLUG,
 				'run_id' => $run_id,
 			),
 			admin_url( 'admin.php' )
@@ -177,9 +177,9 @@ class RunDetailPage implements AdminPage {
 	private function renderNotFound(): void {
 		printf(
 			'<p>%1$s</p><p><a href="%2$s">%3$s</a></p>',
-			esc_html__( 'That run could not be found.', 'workflow-automate' ),
+			esc_html__( 'That run could not be found.', 'dragwyb-agentflow' ),
 			esc_url( admin_url( 'admin.php?page=' . RunsPage::SLUG ) ),
-			esc_html__( 'Back to Runs', 'workflow-automate' )
+			esc_html__( 'Back to Runs', 'dragwyb-agentflow' )
 		);
 	}
 
@@ -191,25 +191,25 @@ class RunDetailPage implements AdminPage {
 	private function renderMeta( WorkflowRun $run ): void {
 		$workflow = $this->workflows->find( $run->workflowId(), true );
 
-		echo '<table class="widefat fixed striped wfa-run-meta"><tbody>';
+		echo '<table class="widefat fixed striped dragwyb-af-run-meta"><tbody>';
 
 		$this->renderMetaRow(
-			__( 'Workflow', 'workflow-automate' ),
+			__( 'Workflow', 'dragwyb-agentflow' ),
 			$workflow
 				? sprintf(
 					'<a href="%1$s">%2$s</a>',
 					esc_url( $this->builderUrl( $run->workflowId() ) ),
 					esc_html( $workflow->title() )
 				)
-				: esc_html__( '(deleted workflow)', 'workflow-automate' )
+				: esc_html__( '(deleted workflow)', 'dragwyb-agentflow' )
 		);
 
-		$this->renderMetaRow( __( 'Status', 'workflow-automate' ), RunStatusBadge::render( $run->status() ) );
-		$this->renderMetaRow( __( 'Attempt', 'workflow-automate' ), esc_html( (string) $run->attempts() ) );
+		$this->renderMetaRow( __( 'Status', 'dragwyb-agentflow' ), RunStatusBadge::render( $run->status() ) );
+		$this->renderMetaRow( __( 'Attempt', 'dragwyb-agentflow' ), esc_html( (string) $run->attempts() ) );
 
 		if ( null !== $run->parentRunId() ) {
 			$this->renderMetaRow(
-				__( 'Re-run of', 'workflow-automate' ),
+				__( 'Re-run of', 'dragwyb-agentflow' ),
 				sprintf(
 					'<a href="%1$s">#%2$d</a>',
 					esc_url( $this->detailUrl( $run->parentRunId() ) ),
@@ -219,22 +219,22 @@ class RunDetailPage implements AdminPage {
 		}
 
 		$this->renderMetaRow(
-			__( 'Started', 'workflow-automate' ),
-			$run->startedAt() ? esc_html( RunTimestamp::format( $run->startedAt(), $this->settings->displayTimestampsInUtc() ) ) : esc_html__( 'Not started yet', 'workflow-automate' )
+			__( 'Started', 'dragwyb-agentflow' ),
+			$run->startedAt() ? esc_html( RunTimestamp::format( $run->startedAt(), $this->settings->displayTimestampsInUtc() ) ) : esc_html__( 'Not started yet', 'dragwyb-agentflow' )
 		);
 		$this->renderMetaRow(
-			__( 'Finished', 'workflow-automate' ),
-			$run->finishedAt() ? esc_html( RunTimestamp::format( $run->finishedAt(), $this->settings->displayTimestampsInUtc() ) ) : esc_html__( 'Not finished yet', 'workflow-automate' )
+			__( 'Finished', 'dragwyb-agentflow' ),
+			$run->finishedAt() ? esc_html( RunTimestamp::format( $run->finishedAt(), $this->settings->displayTimestampsInUtc() ) ) : esc_html__( 'Not finished yet', 'dragwyb-agentflow' )
 		);
-		$this->renderMetaRow( __( 'Duration', 'workflow-automate' ), esc_html( RunDuration::forRun( $run ) ) );
+		$this->renderMetaRow( __( 'Duration', 'dragwyb-agentflow' ), esc_html( RunDuration::forRun( $run ) ) );
 
 		if ( in_array( $run->status(), self::RERUNNABLE_STATUSES, true ) ) {
 			$this->renderMetaRow(
-				__( 'Actions', 'workflow-automate' ),
+				__( 'Actions', 'dragwyb-agentflow' ),
 				$this->rerunForm( $run->id() ) . ' ' . $this->deleteForm( $run->id() )
 			);
 		} else {
-			$this->renderMetaRow( __( 'Actions', 'workflow-automate' ), $this->deleteForm( $run->id() ) );
+			$this->renderMetaRow( __( 'Actions', 'dragwyb-agentflow' ), $this->deleteForm( $run->id() ) );
 		}
 
 		echo '</tbody></table>';
@@ -247,7 +247,7 @@ class RunDetailPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderMetaRow( string $label, string $value ): void {
-		printf( '<tr><th scope="row">%1$s</th><td>%2$s</td></tr>', esc_html( $label ), $value );
+		printf( '<tr><th scope="row">%1$s</th><td>%2$s</td></tr>', esc_html( $label ), wp_kses_post( $value ) );
 	}
 
 	/**
@@ -263,8 +263,8 @@ class RunDetailPage implements AdminPage {
 		}
 
 		printf(
-			'<details class="wfa-run-details-block"><summary>%1$s</summary><pre>%2$s</pre></details>',
-			esc_html__( 'Trigger payload', 'workflow-automate' ),
+			'<details class="dragwyb-af-run-details-block"><summary>%1$s</summary><pre>%2$s</pre></details>',
+			esc_html__( 'Trigger payload', 'dragwyb-agentflow' ),
 			esc_html( (string) wp_json_encode( $payload, JSON_PRETTY_PRINT ) )
 		);
 	}
@@ -277,20 +277,20 @@ class RunDetailPage implements AdminPage {
 	private function renderLogs( WorkflowRun $run ): void {
 		$logs = $this->executor->logsFor( $run->id() );
 
-		echo '<h2>' . esc_html__( 'Node log', 'workflow-automate' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Node log', 'dragwyb-agentflow' ) . '</h2>';
 
 		if ( array() === $logs ) {
-			echo '<p>' . esc_html__( 'This run has no node log entries yet.', 'workflow-automate' ) . '</p>';
+			echo '<p>' . esc_html__( 'This run has no node log entries yet.', 'dragwyb-agentflow' ) . '</p>';
 
 			return;
 		}
 
-		echo '<table class="widefat fixed striped wfa-run-logs"><thead><tr>';
-		echo '<th>' . esc_html__( 'Node', 'workflow-automate' ) . '</th>';
-		echo '<th>' . esc_html__( 'Status', 'workflow-automate' ) . '</th>';
-		echo '<th>' . esc_html__( 'Duration', 'workflow-automate' ) . '</th>';
-		echo '<th>' . esc_html__( 'Message', 'workflow-automate' ) . '</th>';
-		echo '<th>' . esc_html__( 'Details', 'workflow-automate' ) . '</th>';
+		echo '<table class="widefat fixed striped dragwyb-af-run-logs"><thead><tr>';
+		echo '<th>' . esc_html__( 'Node', 'dragwyb-agentflow' ) . '</th>';
+		echo '<th>' . esc_html__( 'Status', 'dragwyb-agentflow' ) . '</th>';
+		echo '<th>' . esc_html__( 'Duration', 'dragwyb-agentflow' ) . '</th>';
+		echo '<th>' . esc_html__( 'Message', 'dragwyb-agentflow' ) . '</th>';
+		echo '<th>' . esc_html__( 'Details', 'dragwyb-agentflow' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $logs as $log ) {
@@ -308,7 +308,7 @@ class RunDetailPage implements AdminPage {
 	private function renderLogRow( WorkflowRunLog $log ): void {
 		echo '<tr>';
 		printf( '<td>%s</td>', esc_html( $this->nodeLabel( $log ) ) );
-		printf( '<td>%s</td>', $this->logStatusBadge( $log->status() ) );
+		printf( '<td>%s</td>', wp_kses_post( $this->logStatusBadge( $log->status() ) ) );
 		printf( '<td>%s</td>', esc_html( RunDuration::forNode( $log->durationMs() ) ) );
 		printf( '<td>%s</td>', esc_html( $log->message() ?? '' ) );
 		echo '<td>';
@@ -331,7 +331,7 @@ class RunDetailPage implements AdminPage {
 			return $log->nodeType();
 		}
 
-		return __( '(unknown node)', 'workflow-automate' );
+		return __( '(unknown node)', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -345,16 +345,16 @@ class RunDetailPage implements AdminPage {
 	 */
 	private function logStatusBadge( string $status ): string {
 		$labels = array(
-			WorkflowRunLog::STATUS_SUCCESS => __( 'Success', 'workflow-automate' ),
-			WorkflowRunLog::STATUS_ERROR => __( 'Error', 'workflow-automate' ),
-			WorkflowRunLog::STATUS_SKIPPED => __( 'Skipped', 'workflow-automate' ),
+			WorkflowRunLog::STATUS_SUCCESS => __( 'Success', 'dragwyb-agentflow' ),
+			WorkflowRunLog::STATUS_ERROR   => __( 'Error', 'dragwyb-agentflow' ),
+			WorkflowRunLog::STATUS_SKIPPED => __( 'Skipped', 'dragwyb-agentflow' ),
 		);
 
-		$label = $labels[ $status ] ?? __( 'Unknown', 'workflow-automate' );
-		$slug = array_key_exists( $status, $labels ) ? $status : 'unknown';
+		$label = $labels[ $status ] ?? __( 'Unknown', 'dragwyb-agentflow' );
+		$slug  = array_key_exists( $status, $labels ) ? $status : 'unknown';
 
 		return sprintf(
-			'<span class="wfa-status-badge wfa-status-badge--%1$s">%2$s</span>',
+			'<span class="dragwyb-af-status-badge dragwyb-af-status-badge--%1$s">%2$s</span>',
 			esc_attr( $slug ),
 			esc_html( $label )
 		);
@@ -376,15 +376,15 @@ class RunDetailPage implements AdminPage {
 			return;
 		}
 
-		echo '<details class="wfa-run-details-block"><summary>' . esc_html__( 'View', 'workflow-automate' ) . '</summary>';
+		echo '<details class="dragwyb-af-run-details-block"><summary>' . esc_html__( 'View', 'dragwyb-agentflow' ) . '</summary>';
 
 		if ( null !== $log->input() ) {
-			echo '<p><strong>' . esc_html__( 'Input', 'workflow-automate' ) . '</strong></p>';
+			echo '<p><strong>' . esc_html__( 'Input', 'dragwyb-agentflow' ) . '</strong></p>';
 			echo '<pre>' . esc_html( (string) wp_json_encode( $log->input(), JSON_PRETTY_PRINT ) ) . '</pre>';
 		}
 
 		if ( null !== $log->output() ) {
-			echo '<p><strong>' . esc_html__( 'Output', 'workflow-automate' ) . '</strong></p>';
+			echo '<p><strong>' . esc_html__( 'Output', 'dragwyb-agentflow' ) . '</strong></p>';
 			echo '<pre>' . esc_html( (string) wp_json_encode( $log->output(), JSON_PRETTY_PRINT ) ) . '</pre>';
 		}
 
@@ -405,7 +405,7 @@ class RunDetailPage implements AdminPage {
 		return $this->runActionForm(
 			'rerun',
 			$run_id,
-			__( 'Re-run this workflow', 'workflow-automate' ),
+			__( 'Re-run this workflow', 'dragwyb-agentflow' ),
 			'button button-secondary'
 		);
 	}
@@ -419,7 +419,7 @@ class RunDetailPage implements AdminPage {
 		return $this->runActionForm(
 			'delete',
 			$run_id,
-			__( 'Delete this run', 'workflow-automate' ),
+			__( 'Delete this run', 'dragwyb-agentflow' ),
 			'button button-link-delete',
 			true
 		);
@@ -435,19 +435,19 @@ class RunDetailPage implements AdminPage {
 	 * @return string
 	 */
 	private function runActionForm( string $op, int $run_id, string $label, string $button_class, bool $confirm = false ): string {
-		$nonce_field = wp_nonce_field( 'wfa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$nonce_field  = wp_nonce_field( 'dragwyb_af_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 		$confirm_attr = '';
 
 		if ( $confirm ) {
 			$confirm_attr = sprintf(
 				' onclick="return confirm(%s);"',
-				wp_json_encode( __( 'Delete this run permanently? This cannot be undone.', 'workflow-automate' ) )
+				wp_json_encode( __( 'Delete this run permanently? This cannot be undone.', 'dragwyb-agentflow' ) )
 			);
 		}
 
 		return sprintf(
 			'<form method="post" action="%1$s" style="display:inline-block;margin-right:8px;">'
-				. '<input type="hidden" name="action" value="wfa_run_action" />'
+				. '<input type="hidden" name="action" value="dragwyb_af_run_action" />'
 				. '<input type="hidden" name="op" value="%2$s" />'
 				. '<input type="hidden" name="run_id" value="%3$d" />'
 				. '%4$s'
@@ -465,19 +465,19 @@ class RunDetailPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
 	private function notices(): array {
 		return array(
 			'rerun_started' => array(
-				'message' => __( 'Re-run started below.', 'workflow-automate' ),
-				'type' => 'success',
+				'message' => __( 'Re-run started below.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'rerun_failed' => array(
-				'message' => __( 'That run could not be re-run.', 'workflow-automate' ),
-				'type' => 'error',
+			'rerun_failed'  => array(
+				'message' => __( 'That run could not be re-run.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
 		);
 	}
@@ -487,7 +487,7 @@ class RunDetailPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

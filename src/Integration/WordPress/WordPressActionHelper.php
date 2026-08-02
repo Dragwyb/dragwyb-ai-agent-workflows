@@ -2,12 +2,12 @@
 /**
  * Shared helpers for WordPress workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +25,7 @@ final class WordPressActionHelper {
 	 * triggers do not re-fire on the automation's own output (e.g. a
 	 * translated post created by an agent).
 	 */
-	public const AUTOMATED_META_KEY = '_wfa_automated';
+	public const AUTOMATED_META_KEY = '_dragwyb_af_automated';
 
 	/**
 	 * Builds a successful action result.
@@ -38,7 +38,7 @@ final class WordPressActionHelper {
 	public static function ok( $data = array(), array $extra = array() ): array {
 		$response = array(
 			'success' => true,
-			'data' => $data,
+			'data'    => $data,
 		);
 
 		return array() === $extra ? $response : array_merge( $response, $extra );
@@ -54,7 +54,7 @@ final class WordPressActionHelper {
 	public static function fail( string $error ): array {
 		return array(
 			'success' => false,
-			'error' => $error,
+			'error'   => $error,
 		);
 	}
 
@@ -201,7 +201,7 @@ final class WordPressActionHelper {
 		 *
 		 * @param int $limit Requested limit.
 		 */
-		$limit = (int) apply_filters( 'wfa_wp_list_limit', $limit );
+		$limit = (int) apply_filters( 'dragwyb_af_wp_list_limit', $limit );
 
 		if ( $limit < 1 ) {
 			$limit = self::DEFAULT_LIST_LIMIT;
@@ -211,11 +211,11 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * @param null|string             $postType Post type slug, or null for any.
-	 * @param null|array<int, mixed>  $metaQuery WP_Query meta_query clauses.
-	 * @param null|string             $search    Free-text search term.
-	 * @param string                  $status    Post status (default 'any').
-	 * @param int|null                $limit     Max posts (default DEFAULT_LIST_LIMIT).
+	 * @param null|string            $postType Post type slug, or null for any.
+	 * @param null|array<int, mixed> $metaQuery WP_Query meta_query clauses.
+	 * @param null|string            $search    Free-text search term.
+	 * @param string                 $status    Post status (default 'any').
+	 * @param int|null               $limit     Max posts (default DEFAULT_LIST_LIMIT).
 	 *
 	 * @return \WP_Post[]
 	 */
@@ -252,9 +252,9 @@ final class WordPressActionHelper {
 	 */
 	public static function getComments( ?int $postId = null, ?int $userId = null, ?string $email = null, ?int $limit = null ): array {
 		$args = array(
-			'order'   => 'ASC',
-			'number'  => self::resolveListLimit( $limit ),
-			'status'  => 'approve',
+			'order'  => 'ASC',
+			'number' => self::resolveListLimit( $limit ),
+			'status' => 'approve',
 		);
 
 		if ( ! empty( $postId ) ) {
@@ -289,11 +289,11 @@ final class WordPressActionHelper {
 	 */
 	public static function insertTerm( string $name, string $taxonomy, array $args = array() ): array {
 		if ( '' === $name ) {
-			return self::fail( __( 'Term name is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$term = wp_insert_term( $name, $taxonomy, array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } ) );
@@ -315,21 +315,21 @@ final class WordPressActionHelper {
 	 */
 	public static function updateTerm( int $termId, string $taxonomy, array $args ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
-			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
+			return self::fail( __( 'Term not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$args = array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } );
 
 		if ( array() === $args ) {
-			return self::fail( __( 'Nothing to update.', 'workflow-automate' ) );
+			return self::fail( __( 'Nothing to update.', 'dragwyb-agentflow' ) );
 		}
 
 		$term = wp_update_term( $termId, $taxonomy, $args );
@@ -348,15 +348,15 @@ final class WordPressActionHelper {
 	 */
 	public static function deleteTerm( int $termId, string $taxonomy, array $args = array() ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
-			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
+			return self::fail( __( 'Term not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$result = wp_delete_term( $termId, $taxonomy, $args );
@@ -366,7 +366,7 @@ final class WordPressActionHelper {
 		}
 
 		if ( ! $result ) {
-			return self::fail( __( 'Failed to delete term.', 'workflow-automate' ) );
+			return self::fail( __( 'Failed to delete term.', 'dragwyb-agentflow' ) );
 		}
 
 		return self::ok( array( 'term_id' => $termId ) );
@@ -377,17 +377,17 @@ final class WordPressActionHelper {
 	 */
 	public static function getTerm( int $termId, string $taxonomy ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Term id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'workflow-automate' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$term = get_term( $termId, $taxonomy );
 
 		if ( ! $term || is_wp_error( $term ) ) {
-			return self::fail( __( 'Term not found.', 'workflow-automate' ) );
+			return self::fail( __( 'Term not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return self::ok( (array) $term );
@@ -400,8 +400,8 @@ final class WordPressActionHelper {
 	 */
 	public static function getTerms( ?string $taxonomy = null ): array {
 		$args = array(
-			'taxonomy' => empty( $taxonomy ) ? get_taxonomies( array( 'public' => true ) ) : $taxonomy,
-			'orderby' => 'term_id',
+			'taxonomy'   => empty( $taxonomy ) ? get_taxonomies( array( 'public' => true ) ) : $taxonomy,
+			'orderby'    => 'term_id',
 			'hide_empty' => false,
 		);
 
@@ -430,14 +430,14 @@ final class WordPressActionHelper {
 	 */
 	public static function mapUserFields( array $config ): array {
 		$fields = array(
-			'username' => 'user_login',
-			'email' => 'user_email',
-			'nickname' => 'nickname',
+			'username'     => 'user_login',
+			'email'        => 'user_email',
+			'nickname'     => 'nickname',
 			'display_name' => 'display_name',
-			'first_name' => 'first_name',
-			'last_name' => 'last_name',
-			'user_url' => 'user_url',
-			'description' => 'description',
+			'first_name'   => 'first_name',
+			'last_name'    => 'last_name',
+			'user_url'     => 'user_url',
+			'description'  => 'description',
 		);
 
 		$mapped = array();
@@ -460,18 +460,18 @@ final class WordPressActionHelper {
 	 */
 	public static function mapPostFields( array $config ): array {
 		$fields = array(
-			'post_id' => 'ID',
-			'title' => 'post_title',
-			'content' => 'post_content',
-			'excerpt' => 'post_excerpt',
-			'date' => 'post_date',
-			'date_gmt' => 'post_date_gmt',
-			'slug' => 'post_name',
-			'parent_id' => 'post_parent',
+			'post_id'       => 'ID',
+			'title'         => 'post_title',
+			'content'       => 'post_content',
+			'excerpt'       => 'post_excerpt',
+			'date'          => 'post_date',
+			'date_gmt'      => 'post_date_gmt',
+			'slug'          => 'post_name',
+			'parent_id'     => 'post_parent',
 			'post_password' => 'post_password',
-			'post_type' => 'post_type',
-			'post_status' => 'post_status',
-			'post_author' => 'post_author',
+			'post_type'     => 'post_type',
+			'post_status'   => 'post_status',
+			'post_author'   => 'post_author',
 		);
 
 		$mapped = array();
@@ -498,17 +498,17 @@ final class WordPressActionHelper {
 	 */
 	public static function mapCommentFields( array $config ): array {
 		return array(
-			'comment_post_ID' => isset( $config['post_id'] ) ? (int) $config['post_id'] : 0,
-			'comment_author' => $config['author_name'] ?? '',
+			'comment_post_ID'      => isset( $config['post_id'] ) ? (int) $config['post_id'] : 0,
+			'comment_author'       => $config['author_name'] ?? '',
 			'comment_author_email' => $config['author_email'] ?? '',
-			'comment_author_url' => $config['author_url'] ?? '',
-			'comment_content' => $config['comment'] ?? '',
-			'comment_type' => 'comment',
-			'comment_parent' => isset( $config['parent_id'] ) ? (int) $config['parent_id'] : 0,
-			'comment_author_IP' => '',
-			'comment_agent' => 'Workflow Automate',
-			'comment_date' => gmdate( 'Y-m-d H:i:s' ),
-			'comment_approved' => 1,
+			'comment_author_url'   => $config['author_url'] ?? '',
+			'comment_content'      => $config['comment'] ?? '',
+			'comment_type'         => 'comment',
+			'comment_parent'       => isset( $config['parent_id'] ) ? (int) $config['parent_id'] : 0,
+			'comment_author_IP'    => '',
+			'comment_agent'        => 'Workflow Automate',
+			'comment_date'         => gmdate( 'Y-m-d H:i:s' ),
+			'comment_approved'     => 1,
 		);
 	}
 
@@ -537,7 +537,7 @@ final class WordPressActionHelper {
 		if ( $imageId <= 0 ) {
 			if ( ! filter_var( $imageUrl, FILTER_VALIDATE_URL ) ) {
 				return array(
-					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'workflow-automate' ),
+					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -548,7 +548,7 @@ final class WordPressActionHelper {
 				return array(
 					'warning' => sprintf(
 						/* translators: %s: error message */
-						__( 'Featured image skipped: %s', 'workflow-automate' ),
+						__( 'Featured image skipped: %s', 'dragwyb-agentflow' ),
 						$sideloaded->get_error_message()
 					),
 				);
@@ -559,13 +559,13 @@ final class WordPressActionHelper {
 
 		if ( $imageId <= 0 || ! wp_attachment_is_image( $imageId ) ) {
 			return array(
-				'warning' => __( 'Featured image skipped: invalid attachment.', 'workflow-automate' ),
+				'warning' => __( 'Featured image skipped: invalid attachment.', 'dragwyb-agentflow' ),
 			);
 		}
 
 		if ( ! set_post_thumbnail( $postId, $imageId ) ) {
 			return array(
-				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'workflow-automate' ),
+				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -618,21 +618,21 @@ final class WordPressActionHelper {
 		}
 
 		$data = $user->data ?? $user;
-		$id = isset( $user->ID ) ? (int) $user->ID : 0;
+		$id   = isset( $user->ID ) ? (int) $user->ID : 0;
 
 		return array(
-			'id' => $id,
-			'username' => isset( $data->user_login ) ? (string) $data->user_login : '',
-			'email' => isset( $data->user_email ) ? (string) $data->user_email : '',
+			'id'           => $id,
+			'username'     => isset( $data->user_login ) ? (string) $data->user_login : '',
+			'email'        => isset( $data->user_email ) ? (string) $data->user_email : '',
 			'display_name' => isset( $data->display_name ) ? (string) $data->display_name : '',
-			'nickname' => isset( $user->nickname ) ? (string) $user->nickname : '',
-			'first_name' => isset( $user->first_name ) ? (string) $user->first_name : '',
-			'last_name' => isset( $user->last_name ) ? (string) $user->last_name : '',
-			'user_url' => isset( $data->user_url ) ? (string) $data->user_url : '',
-			'description' => isset( $user->description ) ? (string) $user->description : '',
-			'registered' => isset( $data->user_registered ) ? (string) $data->user_registered : '',
-			'roles' => isset( $user->roles ) && is_array( $user->roles ) ? array_values( $user->roles ) : array(),
-			'avatar_url' => $id > 0 ? (string) get_avatar_url( $id ) : '',
+			'nickname'     => isset( $user->nickname ) ? (string) $user->nickname : '',
+			'first_name'   => isset( $user->first_name ) ? (string) $user->first_name : '',
+			'last_name'    => isset( $user->last_name ) ? (string) $user->last_name : '',
+			'user_url'     => isset( $data->user_url ) ? (string) $data->user_url : '',
+			'description'  => isset( $user->description ) ? (string) $user->description : '',
+			'registered'   => isset( $data->user_registered ) ? (string) $data->user_registered : '',
+			'roles'        => isset( $user->roles ) && is_array( $user->roles ) ? array_values( $user->roles ) : array(),
+			'avatar_url'   => $id > 0 ? (string) get_avatar_url( $id ) : '',
 		);
 	}
 
@@ -643,7 +643,7 @@ final class WordPressActionHelper {
 	 * @return array<string, mixed>
 	 */
 	public static function serializePost( \WP_Post $post, bool $full_content = true ): array {
-		$content = (string) $post->post_content;
+		$content           = (string) $post->post_content;
 		$content_truncated = false;
 
 		if ( ! $full_content && strlen( $content ) > 800 ) {
@@ -654,23 +654,23 @@ final class WordPressActionHelper {
 		$thumb_id = (int) get_post_thumbnail_id( $post );
 
 		return array(
-			'id'                => (int) $post->ID,
-			'title'             => (string) $post->post_title,
-			'content'           => $content,
-			'content_truncated' => $content_truncated,
-			'excerpt'           => (string) $post->post_excerpt,
-			'status'            => (string) $post->post_status,
-			'type'              => (string) $post->post_type,
-			'slug'              => (string) $post->post_name,
-			'date'              => (string) $post->post_date,
-			'date_gmt'          => (string) $post->post_date_gmt,
-			'author'            => (int) $post->post_author,
-			'parent_id'         => (int) $post->post_parent,
-			'permalink'         => (string) get_permalink( $post ),
-			'featured_image_id' => $thumb_id,
-			'featured_image_url'=> $thumb_id > 0 ? (string) wp_get_attachment_url( $thumb_id ) : '',
-			'categories'        => wp_get_post_categories( (int) $post->ID ),
-			'tags'              => wp_get_post_tags( (int) $post->ID, array( 'fields' => 'names' ) ),
+			'id'                 => (int) $post->ID,
+			'title'              => (string) $post->post_title,
+			'content'            => $content,
+			'content_truncated'  => $content_truncated,
+			'excerpt'            => (string) $post->post_excerpt,
+			'status'             => (string) $post->post_status,
+			'type'               => (string) $post->post_type,
+			'slug'               => (string) $post->post_name,
+			'date'               => (string) $post->post_date,
+			'date_gmt'           => (string) $post->post_date_gmt,
+			'author'             => (int) $post->post_author,
+			'parent_id'          => (int) $post->post_parent,
+			'permalink'          => (string) get_permalink( $post ),
+			'featured_image_id'  => $thumb_id,
+			'featured_image_url' => $thumb_id > 0 ? (string) wp_get_attachment_url( $thumb_id ) : '',
+			'categories'         => wp_get_post_categories( (int) $post->ID ),
+			'tags'               => wp_get_post_tags( (int) $post->ID, array( 'fields' => 'names' ) ),
 		);
 	}
 
@@ -719,7 +719,7 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * True when this post was just written by a WFA action (short grace window).
+	 * True when this post was just written by a dragwyb_af action (short grace window).
 	 *
 	 * @param int $post_id Post id.
 	 *
@@ -737,14 +737,14 @@ final class WordPressActionHelper {
 		}
 
 		/**
-		 * Seconds after a WFA create/update during which save_post is ignored
+		 * Seconds after a dragwyb_af create/update during which save_post is ignored
 		 * for that post (prevents immediate echo triggers). After this window,
 		 * human edits of the post may start workflows again.
 		 *
 		 * @param int $seconds Grace period in seconds.
 		 * @param int $post_id Post id.
 		 */
-		$grace = (int) apply_filters( 'wfa_automated_post_grace_seconds', 45, $post_id );
+		$grace = (int) apply_filters( 'dragwyb_af_automated_post_grace_seconds', 45, $post_id );
 
 		if ( $grace < 1 ) {
 			$grace = 45;

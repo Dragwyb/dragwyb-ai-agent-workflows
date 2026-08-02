@@ -23,18 +23,18 @@ export default function FlowEdgeControls({
 
 	return (
 		<div
-			className="wfa-builder-canvas__edge-interactions"
+			className="dragwyb-af-builder-canvas__edge-interactions"
 			aria-hidden={edges.length === 0}
 		>
 			<svg
-				className="wfa-builder-canvas__edge-hits"
+				className="dragwyb-af-builder-canvas__edge-hits"
 				aria-hidden="true"
 				focusable="false"
 			>
 				{edges.map((edge) => (
 					<path
 						key={`hit-${edge.id}`}
-						className="wfa-builder-canvas__edge-hit"
+						className="dragwyb-af-builder-canvas__edge-hit"
 						d={edge.path}
 						fill="none"
 						onClick={(event) => {
@@ -58,7 +58,7 @@ export default function FlowEdgeControls({
 				return (
 					<div
 						key={`toolbar-${edge.id}`}
-						className="wfa-builder-edge-toolbar"
+						className="dragwyb-af-builder-edge-toolbar"
 						style={{
 							left: `${midpoint.x}px`,
 							top: `${midpoint.y}px`,
@@ -67,14 +67,14 @@ export default function FlowEdgeControls({
 					>
 						<button
 							type="button"
-							className="wfa-builder-edge-toolbar__btn wfa-builder-edge-toolbar__btn--add"
+							className="dragwyb-af-builder-edge-toolbar__btn dragwyb-af-builder-edge-toolbar__btn--add"
 							title={__(
 								'Add a step between these nodes',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							aria-label={__(
 								'Add a step between these nodes',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							onClick={() => onInsertOnConnection(edge)}
 						>
@@ -82,18 +82,18 @@ export default function FlowEdgeControls({
 						</button>
 						<button
 							type="button"
-							className="wfa-builder-edge-toolbar__btn wfa-builder-edge-toolbar__btn--delete"
+							className="dragwyb-af-builder-edge-toolbar__btn dragwyb-af-builder-edge-toolbar__btn--delete"
 							title={__(
 								'Delete this connection',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							aria-label={__(
 								'Delete this connection',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							onClick={() => onDeleteConnection(edge)}
 						>
-							{__('×', 'workflow-automate')}
+							{__('×', 'dragwyb-agentflow')}
 						</button>
 					</div>
 				);

@@ -2,12 +2,12 @@
 /**
  * Resolves a bearer/API-key secret from a stored connection.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,7 +39,7 @@ class ConnectionSecretResolver {
 		if ( $connection_id <= 0 ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No connection configured for this action.', 'workflow-automate' ),
+				'error'   => __( 'No connection configured for this action.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -48,7 +48,7 @@ class ConnectionSecretResolver {
 		if ( null === $connection ) {
 			return array(
 				'success' => false,
-				'error' => __( 'The connection configured for this action no longer exists.', 'workflow-automate' ),
+				'error'   => __( 'The connection configured for this action no longer exists.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -56,7 +56,7 @@ class ConnectionSecretResolver {
 			if ( null === $this->google_oauth ) {
 				return array(
 					'success' => false,
-					'error' => __( 'Google OAuth is not available.', 'workflow-automate' ),
+					'error'   => __( 'Google OAuth is not available.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -78,7 +78,7 @@ class ConnectionSecretResolver {
 				if ( null === $token || '' === (string) $token ) {
 					return array(
 						'success' => false,
-						'error' => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' ),
+						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-agentflow' ),
 					);
 				}
 
@@ -91,7 +91,7 @@ class ConnectionSecretResolver {
 				if ( null === $api_key || '' === (string) $api_key ) {
 					return array(
 						'success' => false,
-						'error' => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'workflow-automate' ),
+						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-agentflow' ),
 					);
 				}
 

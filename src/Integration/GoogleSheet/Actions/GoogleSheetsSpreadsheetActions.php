@@ -2,14 +2,14 @@
 /**
  * Spreadsheet-level Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,36 +23,36 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Create Spreadsheet', 'workflow-automate' );
+		return __( 'Google Sheets Create Spreadsheet', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Creates a new Google spreadsheet. Pass values (and optional header_row) to write post/trigger data into the first sheet tab.', 'workflow-automate' );
+		return __( 'Creates a new Google spreadsheet. Pass values (and optional header_row) to write post/trigger data into the first sheet tab.', 'dragwyb-agentflow' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'connection_id' => $this->connectionField(),
-			'title' => array(
-				'type' => 'string',
-				'label' => __( 'Spreadsheet title', 'workflow-automate' ),
-				'description' => __( 'Name for the new spreadsheet file.', 'workflow-automate' ),
-				'required' => true,
+			'title'         => array(
+				'type'           => 'string',
+				'label'          => __( 'Spreadsheet title', 'dragwyb-agentflow' ),
+				'description'    => __( 'Name for the new spreadsheet file.', 'dragwyb-agentflow' ),
+				'required'       => true,
 				'agent_fillable' => true,
 			),
-			'sheet_title' => array(
-				'type' => 'string',
-				'label' => __( 'First sheet tab name', 'workflow-automate' ),
-				'default' => 'Sheet1',
+			'sheet_title'   => array(
+				'type'           => 'string',
+				'label'          => __( 'First sheet tab name', 'dragwyb-agentflow' ),
+				'default'        => 'Sheet1',
 				'agent_fillable' => true,
 			),
-			'header_row' => array(
-				'type' => 'string',
-				'label' => __( 'Header row', 'workflow-automate' ),
-				'description' => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'workflow-automate' ),
+			'header_row'    => array(
+				'type'           => 'string',
+				'label'          => __( 'Header row', 'dragwyb-agentflow' ),
+				'description'    => __( 'Optional comma-separated column headers (e.g. post_title,post_content,post_date).', 'dragwyb-agentflow' ),
 				'agent_fillable' => true,
 			),
-			'values' => $this->optionalValuesField(),
+			'values'        => $this->optionalValuesField(),
 		);
 	}
 
@@ -70,7 +70,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Spreadsheet title is required.', 'workflow-automate' ),
+				'error'   => __( 'Spreadsheet title is required.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -105,7 +105,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 			if ( empty( $header_result['success'] ) ) {
 				$formatted['header_row_error'] = isset( $header_result['error'] )
 					? (string) $header_result['error']
-					: __( 'Failed to write the header row.', 'workflow-automate' );
+					: __( 'Failed to write the header row.', 'dragwyb-agentflow' );
 			}
 		}
 
@@ -120,7 +120,7 @@ final class GoogleSheetsCreateSpreadsheetAction extends AbstractGoogleSheetsActi
 		if ( empty( $row_result['success'] ) ) {
 			$formatted['row_error'] = isset( $row_result['error'] )
 				? (string) $row_result['error']
-				: __( 'Spreadsheet was created but the data row could not be written.', 'workflow-automate' );
+				: __( 'Spreadsheet was created but the data row could not be written.', 'dragwyb-agentflow' );
 
 			return $formatted;
 		}
@@ -140,24 +140,24 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Find Spreadsheets', 'workflow-automate' );
+		return __( 'Google Sheets Find Spreadsheets', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Searches Google Drive for spreadsheets by name.', 'workflow-automate' );
+		return __( 'Searches Google Drive for spreadsheets by name.', 'dragwyb-agentflow' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'connection_id' => $this->connectionField(),
-			'title' => array(
-				'type' => 'string',
-				'label' => __( 'Search title', 'workflow-automate' ),
+			'title'         => array(
+				'type'     => 'string',
+				'label'    => __( 'Search title', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
-			'limit' => array(
-				'type' => 'string',
-				'label' => __( 'Maximum results', 'workflow-automate' ),
+			'limit'         => array(
+				'type'    => 'string',
+				'label'   => __( 'Maximum results', 'dragwyb-agentflow' ),
 				'default' => '10',
 			),
 		);
@@ -177,7 +177,7 @@ final class GoogleSheetsFindSpreadsheetsAction extends AbstractGoogleSheetsActio
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Search title is required.', 'workflow-automate' ),
+				'error'   => __( 'Search title is required.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -194,16 +194,16 @@ final class GoogleSheetsDeleteSpreadsheetAction extends AbstractGoogleSheetsActi
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Delete Spreadsheet', 'workflow-automate' );
+		return __( 'Google Sheets Delete Spreadsheet', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Permanently deletes a Google spreadsheet.', 'workflow-automate' );
+		return __( 'Permanently deletes a Google spreadsheet.', 'dragwyb-agentflow' );
 	}
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 		);
 	}

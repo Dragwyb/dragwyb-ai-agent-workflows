@@ -40,60 +40,60 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 	return (
 		<nav
-			className="wfa-builder-palette"
-			aria-label={__('Node palette', 'workflow-automate')}
+			className="dragwyb-af-builder-palette"
+			aria-label={__('Node palette', 'dragwyb-agentflow')}
 		>
-			<div className="wfa-builder-palette__search">
+			<div className="dragwyb-af-builder-palette__search">
 				<TextControl
-					label={__('Search nodes', 'workflow-automate')}
+					label={__('Search nodes', 'dragwyb-agentflow')}
 					hideLabelFromVision
-					placeholder={__('Search nodes…', 'workflow-automate')}
+					placeholder={__('Search nodes…', 'dragwyb-agentflow')}
 					value={query}
 					onChange={setQuery}
 				/>
 			</div>
 			<PaletteSection
-				title={__('Triggers', 'workflow-automate')}
+				title={__('Triggers', 'dragwyb-agentflow')}
 				apps={triggerApps}
 				kind="trigger"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No triggers match your search.', 'workflow-automate')
-						: __('No triggers are registered.', 'workflow-automate')
+						? __('No triggers match your search.', 'dragwyb-agentflow')
+						: __('No triggers are registered.', 'dragwyb-agentflow')
 				}
 			/>
 			<PaletteSection
-				title={__('Agents', 'workflow-automate')}
+				title={__('Agents', 'dragwyb-agentflow')}
 				apps={agentApps}
 				kind="agent"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No agents match your search.', 'workflow-automate')
-						: __('No agents are registered.', 'workflow-automate')
+						? __('No agents match your search.', 'dragwyb-agentflow')
+						: __('No agents are registered.', 'dragwyb-agentflow')
 				}
 			/>
 			<PaletteSection
-				title={__('Tools', 'workflow-automate')}
+				title={__('Tools', 'dragwyb-agentflow')}
 				apps={toolApps}
 				kind="tool"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No tools match your search.', 'workflow-automate')
-						: __('No tools are registered.', 'workflow-automate')
+						? __('No tools match your search.', 'dragwyb-agentflow')
+						: __('No tools are registered.', 'dragwyb-agentflow')
 				}
 			/>
 			<PaletteSection
-				title={__('Actions', 'workflow-automate')}
+				title={__('Actions', 'dragwyb-agentflow')}
 				apps={actionApps}
 				kind="action"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No actions match your search.', 'workflow-automate')
-						: __('No actions are registered.', 'workflow-automate')
+						? __('No actions match your search.', 'dragwyb-agentflow')
+						: __('No actions are registered.', 'dragwyb-agentflow')
 				}
 			/>
 		</nav>
@@ -102,12 +102,12 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 	return (
-		<div className="wfa-builder-palette__section">
-			<h2 className="wfa-builder-palette__heading">{title}</h2>
+		<div className="dragwyb-af-builder-palette__section">
+			<h2 className="dragwyb-af-builder-palette__heading">{title}</h2>
 			{apps.length === 0 && (
-				<p className="wfa-builder-palette__empty">{emptyMessage}</p>
+				<p className="dragwyb-af-builder-palette__empty">{emptyMessage}</p>
 			)}
-			<ul className="wfa-builder-palette__list">
+			<ul className="dragwyb-af-builder-palette__list">
 				{apps.map((app) => {
 					const meta = getNodeMeta(app.id, kind === 'trigger' ? 'trigger' : 'action');
 					const isDisabled = app.available === false;
@@ -116,9 +116,9 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 							/* translators: %s: plugin name, e.g. WooCommerce */
 							__(
 								'Activate %s to use this trigger.',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							),
-							app.requiresPlugin || __('this plugin', 'workflow-automate')
+							app.requiresPlugin || __('this plugin', 'dragwyb-agentflow')
 						)
 						: '';
 
@@ -128,15 +128,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								type="button"
 								className={
 									isDisabled
-										? 'wfa-builder-palette__item wfa-builder-palette__item--disabled'
-										: 'wfa-builder-palette__item'
+										? 'dragwyb-af-builder-palette__item dragwyb-af-builder-palette__item--disabled'
+										: 'dragwyb-af-builder-palette__item'
 								}
 								onClick={() => onOpenPicker(kind, app.id)}
 								aria-label={app.label}
 								title={isDisabled ? disabledMessage : app.label}
 							>
 								<span
-									className="wfa-builder-palette__item-icon"
+									className="dragwyb-af-builder-palette__item-icon"
 									style={{
 										backgroundColor: meta.bg,
 										color: meta.accent,
@@ -145,15 +145,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								>
 									{meta.icon}
 								</span>
-								<span className="wfa-builder-palette__item-content">
+								<span className="dragwyb-af-builder-palette__item-content">
 									<span
-										className="wfa-builder-palette__item-label"
+										className="dragwyb-af-builder-palette__item-label"
 										aria-hidden="true"
 									>
 										{app.label}
 									</span>
 									{isDisabled && (
-										<span className="wfa-builder-palette__item-hint">
+										<span className="dragwyb-af-builder-palette__item-hint">
 											{disabledMessage}
 										</span>
 									)}

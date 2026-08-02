@@ -2,12 +2,12 @@
 /**
  * Anthropic Claude Messages API action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,11 +23,11 @@ class ClaudeMessagesAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'Anthropic Claude', 'workflow-automate' );
+		return __( 'Anthropic Claude', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to Anthropic Claude and returns the reply.', 'workflow-automate' );
+		return __( 'Sends a prompt to Anthropic Claude and returns the reply.', 'dragwyb-agentflow' );
 	}
 
 	protected function providerSlug(): string {

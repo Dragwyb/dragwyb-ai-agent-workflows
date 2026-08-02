@@ -2,14 +2,14 @@
 /**
  * WPForms submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,14 +33,14 @@ class WpFormsSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'WPForms Submitted', 'workflow-automate' );
+		return __( 'WPForms Submitted', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when a WPForms form is submitted.', 'workflow-automate' );
+		return __( 'Starts the workflow when a WPForms form is submitted.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -49,8 +49,8 @@ class WpFormsSubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'string',
-				'label' => __( 'Form ID (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'string',
+				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
 				'default' => '',
 			),
 		);
@@ -128,12 +128,12 @@ class WpFormsSubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'wpforms',
-			'event' => 'form_submitted',
-			'form_id' => $form_id,
-			'form_title' => $form_title,
-			'entry_id' => is_scalar( $entry_id ) ? (int) $entry_id : 0,
-			'fields' => $field_map,
+			'source'          => 'wpforms',
+			'event'           => 'form_submitted',
+			'form_id'         => $form_id,
+			'form_title'      => $form_title,
+			'entry_id'        => is_scalar( $entry_id ) ? (int) $entry_id : 0,
+			'fields'          => $field_map,
 			'fields_by_label' => $fields_by_label,
 		);
 	}

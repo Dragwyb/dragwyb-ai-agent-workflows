@@ -2,15 +2,15 @@
 /**
  * Creates the workflow runs table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_workflow_runs` holds one row per execution of a workflow. As with
- * `wfa_workflow_nodes`, there is no SQL-level FOREIGN KEY to `wfa_workflows`
+ * `dragwyb_af_workflow_runs` holds one row per execution of a workflow. As with
+ * `dragwyb_af_workflow_nodes`, there is no SQL-level FOREIGN KEY to `dragwyb_af_workflows`
  * because `dbDelta()` does not reliably manage foreign key constraints;
  * cascade-on-delete is instead enforced explicitly in the repository/service
  * layer. See docs/internal/architecture.md §2.3.
@@ -66,9 +66,9 @@ class CreateWorkflowRunsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflow_runs' );
+		$table = esc_sql( Table::name( 'workflow_runs' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; DROP TABLE cannot be parameterized; schema DDL is never a caching candidate.
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 	}
 }

@@ -1,5 +1,5 @@
 {
-  "name": "workflow-automate/plugin",
+  "name": "dragwyb-agentflow/plugin",
   "description": "WordPress workflow automation plugin (scaffolding — identifiers finalized in Phase Two).",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "WorkflowAutomate\\Plugin\\": "src/"
+      "DragwybAgentFlow\\Plugin\\": "src/"
     }
   },
   "scripts": {

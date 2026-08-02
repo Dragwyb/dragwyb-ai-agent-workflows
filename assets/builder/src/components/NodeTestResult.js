@@ -29,10 +29,10 @@ export default function NodeTestResult({
 	if (error) {
 		return (
 			<div
-				className="wfa-builder-config__test-result wfa-builder-config__test-result--error"
+				className="dragwyb-af-builder-config__test-result dragwyb-af-builder-config__test-result--error"
 				role="alert"
 			>
-				<h3>{__('Response', 'workflow-automate')}</h3>
+				<h3>{__('Response', 'dragwyb-agentflow')}</h3>
 				<p>{error}</p>
 			</div>
 		);
@@ -50,62 +50,62 @@ export default function NodeTestResult({
 	const showInput = activeTab === 'input';
 
 	return (
-		<div className="wfa-builder-config__test-result">
-			<div className="wfa-builder-config__test-result-header">
-				<h3>{__('Response', 'workflow-automate')}</h3>
+		<div className="dragwyb-af-builder-config__test-result">
+			<div className="dragwyb-af-builder-config__test-result-header">
+				<h3>{__('Response', 'dragwyb-agentflow')}</h3>
 				<span
 					className={
 						success
-							? 'wfa-builder-config__test-badge wfa-builder-config__test-badge--success'
-							: 'wfa-builder-config__test-badge wfa-builder-config__test-badge--failed'
+							? 'dragwyb-af-builder-config__test-badge dragwyb-af-builder-config__test-badge--success'
+							: 'dragwyb-af-builder-config__test-badge dragwyb-af-builder-config__test-badge--failed'
 					}
 				>
 					{success
-						? __('Success', 'workflow-automate')
-						: __('Failed', 'workflow-automate')}
+						? __('Success', 'dragwyb-agentflow')
+						: __('Failed', 'dragwyb-agentflow')}
 				</span>
 			</div>
 
-			<div className="wfa-test-io wfa-test-io--tabs">
-				<div className="wfa-test-io__tabs" role="tablist">
+			<div className="dragwyb-af-test-io dragwyb-af-test-io--tabs">
+				<div className="dragwyb-af-test-io__tabs" role="tablist">
 					<button
 						type="button"
-						id="wfa-test-tab-input"
+						id="dragwyb-af-test-tab-input"
 						role="tab"
 						className={
 							showInput
-								? 'wfa-test-io__tab wfa-test-io__tab--active'
-								: 'wfa-test-io__tab'
+								? 'dragwyb-af-test-io__tab dragwyb-af-test-io__tab--active'
+								: 'dragwyb-af-test-io__tab'
 						}
 						aria-selected={showInput}
-						aria-controls="wfa-test-tabpanel"
+						aria-controls="dragwyb-af-test-tabpanel"
 						onClick={() => setActiveTab('input')}
 					>
-						{__('Input', 'workflow-automate')}
+						{__('Input', 'dragwyb-agentflow')}
 					</button>
 					<button
 						type="button"
-						id="wfa-test-tab-output"
+						id="dragwyb-af-test-tab-output"
 						role="tab"
 						className={
 							!showInput
-								? 'wfa-test-io__tab wfa-test-io__tab--active'
-								: 'wfa-test-io__tab'
+								? 'dragwyb-af-test-io__tab dragwyb-af-test-io__tab--active'
+								: 'dragwyb-af-test-io__tab'
 						}
 						aria-selected={!showInput}
-						aria-controls="wfa-test-tabpanel"
+						aria-controls="dragwyb-af-test-tabpanel"
 						onClick={() => setActiveTab('output')}
 					>
-						{__('Output', 'workflow-automate')}
+						{__('Output', 'dragwyb-agentflow')}
 					</button>
 				</div>
 
 				<div
-					id="wfa-test-tabpanel"
-					className="wfa-test-io__body"
+					id="dragwyb-af-test-tabpanel"
+					className="dragwyb-af-test-io__body"
 					role="tabpanel"
 					aria-labelledby={
-						showInput ? 'wfa-test-tab-input' : 'wfa-test-tab-output'
+						showInput ? 'dragwyb-af-test-tab-input' : 'dragwyb-af-test-tab-output'
 					}
 				>
 					{showInput ? (

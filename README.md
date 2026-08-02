@@ -44,7 +44,7 @@ A from-scratch WordPress workflow automation plugin. See `CURSOR_INSTRUCTIONS.md
 ## Project structure
 
 ```
-workflow-automate.php   Plugin bootstrap (header, version gate, autoload, activation hooks)
+dragwyb-agentflow.php   Plugin bootstrap (header, version gate, autoload, activation hooks)
 uninstall.php           WordPress-invoked cleanup entry point
 src/
   autoload.php           Fallback PSR-4 autoloader (see "Local setup" above)
@@ -54,8 +54,8 @@ src/
   Domain/Contracts/      Public extension interfaces (TriggerInterface, ActionInterface)
   Persistence/            Repositories wrapping $wpdb access (one per aggregate root)
   Service/               Application services orchestrating domain + persistence (WorkflowService, NodeTypeRegistry, NodeExecutionService, WorkflowExecutionService, BackgroundRunner, SettingsService, RunRetentionService, ConnectionAuthTypes, ConnectionService, WebhookService)
-  Integration/           Built-in trigger/action node types (Triggers/, Actions/: WpHookTrigger, HttpRequestAction, SendEmailAction, WooCommerceOrderCompletedTrigger when WooCommerce is active), registered via wfa/nodes/register (BuiltInNodeTypes); WorkflowTriggerBinder binds active workflows' triggers to WorkflowExecutionService::queue()/run() (per SettingsService::backgroundExecutionEnabled()) on init
-  Rest/                  WP_REST_Controller subclass (WorkflowsController) plus plain route classes (NodeTypesController, ConnectionsController, public WebhookIngressController) + rest_api_init bootstrap (wfa/v1 namespace)
+  Integration/           Built-in trigger/action node types (Triggers/, Actions/: WpHookTrigger, HttpRequestAction, SendEmailAction, WooCommerceOrderCompletedTrigger when WooCommerce is active), registered via dragwyb_af/nodes/register (BuiltInNodeTypes); WorkflowTriggerBinder binds active workflows' triggers to WorkflowExecutionService::queue()/run() (per SettingsService::backgroundExecutionEnabled()) on init
+  Rest/                  WP_REST_Controller subclass (WorkflowsController) plus plain route classes (NodeTypesController, ConnectionsController, public WebhookIngressController) + rest_api_init bootstrap (dragwyb_af/v1 namespace)
   Admin/                 Admin menu bootstrap, AdminPage contract, EmptyState helper, screens, list tables, admin-post handlers (WorkflowActionsController, RunActionsController, SettingsController, ConnectionActionsController, WebhookActionsController), status badge/duration/timestamp display helpers (RunStatusBadge, RunDuration, RunTimestamp, ConnectionStatusBadge)
   Admin/Pages/           WorkflowsPage (list), BuilderPage (visual editor shell), RunsPage (execution history list), RunDetailPage (single run + node log), SettingsPage (General/Retention/Advanced tabs), ConnectionsPage (list), ConnectionFormPage (create/edit), WebhooksPage (list), WebhookFormPage (create/edit)
 assets/
@@ -65,7 +65,7 @@ assets/
 webpack.config.js        Points @wordpress/scripts at assets/builder/src -> assets/builder/build
 docs/
   hooks-reference.md     Public extensibility reference (actions, PHP contracts, capabilities) — authoritative list of shipped extension points
-  rest-api.md            REST API endpoint reference (wfa/v1)
+  rest-api.md            REST API endpoint reference (dragwyb_af/v1)
   integrations.md        Every shipped integration: what it is, and how (or whether) it stores/uses credentials
   internal/              Development-only docs (analysis, architecture, roadmap) — excluded from release builds
 ```

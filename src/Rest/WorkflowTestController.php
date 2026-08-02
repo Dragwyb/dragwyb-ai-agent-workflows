@@ -2,17 +2,17 @@
 /**
  * REST endpoints for builder test-flow listen / status.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WorkflowTestController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private WorkflowService $workflows;
 
@@ -37,9 +37,9 @@ class WorkflowTestController {
 		WorkflowTestListenerService $listener,
 		WorkflowNodeTestService $node_tester
 	) {
-		$this->workflows    = $workflows;
-		$this->listener     = $listener;
-		$this->node_tester  = $node_tester;
+		$this->workflows   = $workflows;
+		$this->listener    = $listener;
+		$this->node_tester = $node_tester;
 	}
 
 	/**
@@ -51,16 +51,16 @@ class WorkflowTestController {
 			'/workflows/(?P<id>[\d]+)/test/listen',
 			array(
 				array(
-					'methods' => WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'start_listen' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'start_listen' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'args' => $this->idArgs(),
+					'args'                => $this->idArgs(),
 				),
 				array(
-					'methods' => WP_REST_Server::DELETABLE,
-					'callback' => array( $this, 'stop_listen' ),
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'stop_listen' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'args' => $this->idArgs(),
+					'args'                => $this->idArgs(),
 				),
 			)
 		);
@@ -69,10 +69,10 @@ class WorkflowTestController {
 			self::API_NAMESPACE,
 			'/workflows/(?P<id>[\d]+)/test/status',
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'get_status' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_status' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
-				'args' => $this->idArgs(),
+				'args'                => $this->idArgs(),
 			)
 		);
 
@@ -80,10 +80,10 @@ class WorkflowTestController {
 			self::API_NAMESPACE,
 			'/workflows/(?P<id>[\d]+)/test/sample',
 			array(
-				'methods' => WP_REST_Server::DELETABLE,
-				'callback' => array( $this, 'clear_sample' ),
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => array( $this, 'clear_sample' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
-				'args' => $this->idArgs(),
+				'args'                => $this->idArgs(),
 			)
 		);
 
@@ -91,21 +91,21 @@ class WorkflowTestController {
 			self::API_NAMESPACE,
 			'/workflows/(?P<id>[\d]+)/test/node',
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'test_node' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'test_node' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
-				'args' => array_merge(
+				'args'                => array_merge(
 					$this->idArgs(),
 					array(
 						'node_id' => array(
-							'description' => __( 'Client-side node id from the workflow graph.', 'workflow-automate' ),
-							'type' => 'string',
-							'required' => true,
+							'description' => __( 'Client-side node id from the workflow graph.', 'dragwyb-agentflow' ),
+							'type'        => 'string',
+							'required'    => true,
 						),
-						'graph' => array(
-							'description' => __( 'Optional unsaved workflow graph (nodes + connections).', 'workflow-automate' ),
-							'type' => 'object',
-							'required' => false,
+						'graph'   => array(
+							'description' => __( 'Optional unsaved workflow graph (nodes + connections).', 'dragwyb-agentflow' ),
+							'type'        => 'object',
+							'required'    => false,
 						),
 					)
 				),
@@ -119,9 +119,9 @@ class WorkflowTestController {
 	private function idArgs(): array {
 		return array(
 			'id' => array(
-				'description' => __( 'Unique identifier for the workflow.', 'workflow-automate' ),
-				'type' => 'integer',
-				'required' => true,
+				'description' => __( 'Unique identifier for the workflow.', 'dragwyb-agentflow' ),
+				'type'        => 'integer',
+				'required'    => true,
 			),
 		);
 	}
@@ -134,8 +134,8 @@ class WorkflowTestController {
 	public function permissions_check( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'wfa_rest_forbidden',
-				__( 'Sorry, you are not allowed to test workflows.', 'workflow-automate' ),
+				'dragwyb_af_rest_forbidden',
+				__( 'Sorry, you are not allowed to test workflows.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -153,8 +153,8 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'wfa_rest_not_found',
-				__( 'Workflow not found.', 'workflow-automate' ),
+				'dragwyb_af_rest_not_found',
+				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -174,8 +174,8 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'wfa_rest_not_found',
-				__( 'Workflow not found.', 'workflow-automate' ),
+				'dragwyb_af_rest_not_found',
+				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -195,8 +195,8 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'wfa_rest_not_found',
-				__( 'Workflow not found.', 'workflow-automate' ),
+				'dragwyb_af_rest_not_found',
+				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -214,8 +214,8 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'wfa_rest_not_found',
-				__( 'Workflow not found.', 'workflow-automate' ),
+				'dragwyb_af_rest_not_found',
+				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -238,16 +238,16 @@ class WorkflowTestController {
 
 		if ( null === $workflow ) {
 			return new WP_Error(
-				'wfa_rest_not_found',
-				__( 'Workflow not found.', 'workflow-automate' ),
+				'dragwyb_af_rest_not_found',
+				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
 
 		if ( '' === $node_id ) {
 			return new WP_Error(
-				'wfa_rest_invalid_param',
-				__( 'A node id is required.', 'workflow-automate' ),
+				'dragwyb_af_rest_invalid_param',
+				__( 'A node id is required.', 'dragwyb-agentflow' ),
 				array( 'status' => 400 )
 			);
 		}

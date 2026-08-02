@@ -2,15 +2,15 @@
 /**
  * Adds background-queue columns to the workflow runs table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `wfa_workflow_runs` (created in roadmap item 7) for background/
+ * Extends `dragwyb_af_workflow_runs` (created in roadmap item 7) for background/
  * queued execution (roadmap item 8), rather than editing
  * `CreateWorkflowRunsTable` in place — that migration already shipped and
  * may have run against a live site, so schema evolution happens through a
@@ -85,12 +85,12 @@ class AddQueueColumnsToWorkflowRunsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflow_runs' );
+		$table = esc_sql( Table::name( 'workflow_runs' ) );
 
 		// Dropping a column that is the sole member of an index (claim_token)
 		// or part of a composite one (status_next_attempt) makes MySQL adjust
 		// or drop that index automatically; no separate DROP INDEX is needed.
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; column names are hardcoded, not user input.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input; column names are hardcoded, not user input; schema DDL is never a caching candidate.
 		$wpdb->query( "ALTER TABLE {$table} DROP COLUMN trigger_payload_json, DROP COLUMN attempts, DROP COLUMN next_attempt_at, DROP COLUMN claim_token" );
 	}
 }

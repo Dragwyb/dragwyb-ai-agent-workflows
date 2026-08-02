@@ -2,15 +2,15 @@
 /**
  * Creates the connections table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_connections` holds one row per stored third-party credential
+ * `dragwyb_af_connections` holds one row per stored third-party credential
  * (roadmap item 11). `credentials_json` is a JSON object of
  * `{field: ciphertext}` pairs — each *value* individually encrypted (see
  * `Core\Encryption`) before the object is ever serialized, not the whole
@@ -65,9 +65,9 @@ class CreateConnectionsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'connections' );
+		$table = esc_sql( Table::name( 'connections' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; DROP TABLE cannot be parameterized; schema DDL is never a caching candidate.
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 	}
 }

@@ -2,12 +2,12 @@
 /**
  * Prefixed options helper.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Options {
 
-	public const PREFIX = 'wfa_option_';
+	public const PREFIX = 'dragwyb_af_option_';
 
 	/**
 	 * Retrieves a plugin option.

@@ -2,66 +2,70 @@
 /**
  * Main plugin bootstrap class.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
-use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
-use WorkflowAutomate\Plugin\Admin\GoogleOAuthStartController;
-use WorkflowAutomate\Plugin\Admin\Menu;
-use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
-use WorkflowAutomate\Plugin\Admin\Pages\SettingsPage;
-use WorkflowAutomate\Plugin\Admin\Pages\WebhookFormPage;
-use WorkflowAutomate\Plugin\Admin\Pages\WebhooksPage;
-use WorkflowAutomate\Plugin\Admin\Pages\WorkflowsPage;
-use WorkflowAutomate\Plugin\Admin\RunActionsController;
-use WorkflowAutomate\Plugin\Admin\SettingsController;
-use WorkflowAutomate\Plugin\Admin\WebhookActionsController;
-use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
-use WorkflowAutomate\Plugin\Database\MigrationRunner;
-use WorkflowAutomate\Plugin\Database\SchemaMigrations;
-use WorkflowAutomate\Plugin\Integration\BuiltInNodeTypes;
-use WorkflowAutomate\Plugin\Integration\WorkflowTriggerBinder;
-use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowNodeRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Rest\RestApi;
-use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
-use WorkflowAutomate\Plugin\Service\Agent\AgentService;
-use WorkflowAutomate\Plugin\Service\Agent\AgentToolExecutor;
-use WorkflowAutomate\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
-use WorkflowAutomate\Plugin\Service\BackgroundRunner;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\ConnectionVerifier;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
-use WorkflowAutomate\Plugin\Service\NodeExecutionService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
-use WorkflowAutomate\Plugin\Provider\PersistenceServiceProvider;
-use WorkflowAutomate\Plugin\Provider\AdminServiceProvider;
-use WorkflowAutomate\Plugin\Provider\RestServiceProvider;
-use WorkflowAutomate\Plugin\Provider\ExecutionServiceProvider;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+use DragwybAgentFlow\Plugin\Admin\ConnectionActionsController;
+use DragwybAgentFlow\Plugin\Admin\GoogleOAuthStartController;
+use DragwybAgentFlow\Plugin\Admin\Menu;
+use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionsPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunDetailPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\SettingsPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\WebhookFormPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\WebhooksPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\WorkflowsPage;
+use DragwybAgentFlow\Plugin\Admin\RunActionsController;
+use DragwybAgentFlow\Plugin\Admin\SettingsController;
+use DragwybAgentFlow\Plugin\Admin\WebhookActionsController;
+use DragwybAgentFlow\Plugin\Admin\WorkflowActionsController;
+use DragwybAgentFlow\Plugin\Database\MigrationRunner;
+use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
+use DragwybAgentFlow\Plugin\Integration\BuiltInNodeTypes;
+use DragwybAgentFlow\Plugin\Integration\WorkflowTriggerBinder;
+use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
+use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Rest\RestApi;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentToolExecutor;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybAgentFlow\Plugin\Service\AiModelsService;
+use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\ConnectionVerifier;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Provider\PersistenceServiceProvider;
+use DragwybAgentFlow\Plugin\Provider\AdminServiceProvider;
+use DragwybAgentFlow\Plugin\Provider\RestServiceProvider;
+use DragwybAgentFlow\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -196,7 +200,7 @@ class Plugin {
 		 *
 		 * @param Container $container The plugin's service container.
 		 */
-		do_action( 'wfa/loaded', $this->container );
+		do_action( 'dragwyb_af/loaded', $this->container );
 	}
 
 	/**
@@ -230,11 +234,11 @@ class Plugin {
 	 * Registers the node type registry and, on `init`, fires the extension
 	 * point that populates it.
 	 *
-	 * The `wfa/nodes/register` action is deliberately fired on `init` rather
+	 * The `dragwyb_af/nodes/register` action is deliberately fired on `init` rather
 	 * than directly from here (this method itself runs during our own
 	 * `plugins_loaded` callback): by `init`, every other plugin's
 	 * `plugins_loaded` callback has already run, so third-party code hooking
-	 * `wfa/nodes/register` from inside its own `plugins_loaded` handler is
+	 * `dragwyb_af/nodes/register` from inside its own `plugins_loaded` handler is
 	 * guaranteed to have registered before this fires. Firing immediately
 	 * here would make that depend on plugin load order.
 	 *
@@ -255,7 +259,7 @@ class Plugin {
 			$this->container->get( AgentAiClient::class )
 		);
 
-		add_action( 'wfa/nodes/register', array( $built_in_node_types, 'register' ) );
+		add_action( 'dragwyb_af/nodes/register', array( $built_in_node_types, 'register' ) );
 
 		add_action(
 			'init',
@@ -268,7 +272,7 @@ class Plugin {
 				 *
 				 * @param NodeTypeRegistry $registry The plugin's node type registry.
 				 */
-				do_action( 'wfa/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
+				do_action( 'dragwyb_af/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
 		);
 	}

@@ -2,16 +2,16 @@
 /**
  * WhatsApp Cloud API send text message action.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\ConnectionSecretResolver;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\ConnectionSecretResolver;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,14 +45,14 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'WhatsApp Cloud Send Message', 'workflow-automate' );
+		return __( 'WhatsApp Cloud Send Message', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends a text message via the WhatsApp Cloud API (Meta).', 'workflow-automate' );
+		return __( 'Sends a text message via the WhatsApp Cloud API (Meta).', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -60,25 +60,25 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 	 */
 	public function configSchema(): array {
 		return array(
-			'connection_id' => array(
-				'type' => 'connection',
-				'label' => __( 'WhatsApp access token connection', 'workflow-automate' ),
+			'connection_id'   => array(
+				'type'     => 'connection',
+				'label'    => __( 'WhatsApp access token connection', 'dragwyb-agentflow' ),
 				'required' => true,
-				'default' => 0,
+				'default'  => 0,
 			),
 			'phone_number_id' => array(
-				'type' => 'string',
-				'label' => __( 'Phone number ID (from Meta)', 'workflow-automate' ),
+				'type'     => 'string',
+				'label'    => __( 'Phone number ID (from Meta)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
-			'to' => array(
-				'type' => 'string',
-				'label' => __( 'Recipient phone (digits, country code, no +)', 'workflow-automate' ),
+			'to'              => array(
+				'type'     => 'string',
+				'label'    => __( 'Recipient phone (digits, country code, no +)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
-			'message' => array(
-				'type' => 'string',
-				'label' => __( 'Message (supports {{trigger.fields.*}} tokens)', 'workflow-automate' ),
+			'message'         => array(
+				'type'     => 'string',
+				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 		);
@@ -105,21 +105,21 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		if ( '' === $phone_number_id ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No WhatsApp phone number ID configured.', 'workflow-automate' ),
+				'error'   => __( 'No WhatsApp phone number ID configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
 		if ( '' === $to ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No recipient phone number configured.', 'workflow-automate' ),
+				'error'   => __( 'No recipient phone number configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
 		if ( '' === trim( $message ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No message configured.', 'workflow-automate' ),
+				'error'   => __( 'No message configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -128,11 +128,11 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		$body = wp_json_encode(
 			array(
 				'messaging_product' => 'whatsapp',
-				'to' => $to,
-				'type' => 'text',
-				'text' => array(
+				'to'                => $to,
+				'type'              => 'text',
+				'text'              => array(
 					'preview_url' => false,
-					'body' => $message,
+					'body'        => $message,
 				),
 			)
 		);
@@ -140,7 +140,7 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		if ( ! is_string( $body ) ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Failed to encode the WhatsApp payload.', 'workflow-automate' ),
+				'error'   => __( 'Failed to encode the WhatsApp payload.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -149,10 +149,10 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 			array(
 				'timeout' => self::TIMEOUT_SECONDS,
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'  => 'application/json',
 					'Authorization' => 'Bearer ' . $token,
 				),
-				'body' => $body,
+				'body'    => $body,
 			)
 		);
 

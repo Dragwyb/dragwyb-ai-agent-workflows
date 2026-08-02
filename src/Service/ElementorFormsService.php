@@ -2,14 +2,14 @@
 /**
  * Lists Elementor Pro forms for builder config fields.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
+use DragwybAgentFlow\Plugin\Integration\IntegrationTriggerCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ final class ElementorFormsService {
 		$options = array(
 			array(
 				'value' => '',
-				'label' => __( 'All forms', 'workflow-automate' ),
+				'label' => __( 'All forms', 'dragwyb-agentflow' ),
 			),
 		);
 
@@ -50,7 +50,7 @@ final class ElementorFormsService {
 		$options = array(
 			array(
 				'value' => '',
-				'label' => __( 'All forms', 'workflow-automate' ),
+				'label' => __( 'All forms', 'dragwyb-agentflow' ),
 			),
 		);
 
@@ -68,7 +68,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorAtomicFormsActive() ) {
 			return array(
 				'options' => array(),
-				'error' => __( 'Elementor Pro atomic forms are not available.', 'workflow-automate' ),
+				'error'   => __( 'Elementor Pro atomic forms are not available.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -78,7 +78,7 @@ final class ElementorFormsService {
 		);
 
 		if ( array() === $result['options'] ) {
-			$result['error'] = __( 'No Elementor atomic forms were found on this site.', 'workflow-automate' );
+			$result['error'] = __( 'No Elementor atomic forms were found on this site.', 'dragwyb-agentflow' );
 		}
 
 		return $result;
@@ -91,7 +91,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorProActive() ) {
 			return array(
 				'options' => array(),
-				'error' => __( 'Elementor Pro is not active.', 'workflow-automate' ),
+				'error'   => __( 'Elementor Pro is not active.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -106,7 +106,7 @@ final class ElementorFormsService {
 		);
 
 		if ( array() === $result['options'] ) {
-			$result['error'] = __( 'No Elementor forms were found on this site.', 'workflow-automate' );
+			$result['error'] = __( 'No Elementor forms were found on this site.', 'dragwyb-agentflow' );
 		}
 
 		return $result;
@@ -128,8 +128,8 @@ final class ElementorFormsService {
 			return array(
 				'success' => false,
 				'error'   => $atomic
-					? __( 'No Elementor atomic form was found for the variable picker.', 'workflow-automate' )
-					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'workflow-automate' ),
+					? __( 'No Elementor atomic form was found for the variable picker.', 'dragwyb-agentflow' )
+					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -252,12 +252,12 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param array<int|string, mixed>             $elements
-	 * @param int                                  $post_id
-	 * @param string                               $preferred_form_id
-	 * @param callable(array<string, mixed>): bool $matches_element
+	 * @param array<int|string, mixed>               $elements
+	 * @param int                                    $post_id
+	 * @param string                                 $preferred_form_id
+	 * @param callable(array<string, mixed>): bool   $matches_element
 	 * @param callable(array<string, mixed>): string $resolve_form_name
-	 * @param bool                                 $atomic
+	 * @param bool                                   $atomic
 	 *
 	 * @return array{form_id: string, form_name: string, post_id: int, field_ids: array<int, string>, field_labels: array<string, string>}|null
 	 */
@@ -287,7 +287,7 @@ final class ElementorFormsService {
 				$form_name = $resolve_form_name( $settings );
 
 				if ( '' === $form_name ) {
-					$form_name = __( 'Untitled Form', 'workflow-automate' );
+					$form_name = __( 'Untitled Form', 'dragwyb-agentflow' );
 				}
 
 				$parsed = $atomic
@@ -466,7 +466,7 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param callable(array<string, mixed>): bool $matches_element
+	 * @param callable(array<string, mixed>): bool   $matches_element
 	 * @param callable(array<string, mixed>): string $resolve_form_name
 	 *
 	 * @return array{options: array<int, array{value: string, label: string, url?: string, pages?: array<int, array{label: string, url: string}>}>, error: string|null}
@@ -542,14 +542,14 @@ final class ElementorFormsService {
 			if ( count( $page_titles ) > 1 ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: comma-separated page titles */
-					__( '%1$s (%2$s)', 'workflow-automate' ),
+					__( '%1$s (%2$s)', 'dragwyb-agentflow' ),
 					$entry['form_name'],
 					implode( ', ', $page_titles )
 				);
 			} elseif ( 1 === count( $page_titles ) ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: page title */
-					__( '%1$s — %2$s', 'workflow-automate' ),
+					__( '%1$s — %2$s', 'dragwyb-agentflow' ),
 					$entry['form_name'],
 					$page_titles[0]
 				);
@@ -576,7 +576,7 @@ final class ElementorFormsService {
 			);
 
 			if ( array() !== $page_links ) {
-				$option['url']  = $page_links[0]['url'];
+				$option['url']   = $page_links[0]['url'];
 				$option['pages'] = $page_links;
 			}
 
@@ -592,7 +592,7 @@ final class ElementorFormsService {
 
 		return array(
 			'options' => $options,
-			'error' => null,
+			'error'   => null,
 		);
 	}
 
@@ -687,7 +687,7 @@ final class ElementorFormsService {
 			return array();
 		}
 
-		$settings = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
+		$settings     = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
 		$component_id = 0;
 
 		if ( isset( $settings['component_instance']['value']['component_id']['value'] ) ) {
@@ -790,12 +790,12 @@ final class ElementorFormsService {
 	}
 
 	/**
-	 * @param array<int|string, mixed> $elements
-	 * @param int                      $post_id
-	 * @param string                   $post_title
+	 * @param array<int|string, mixed>                                                                                                   $elements
+	 * @param int                                                                                                                        $post_id
+	 * @param string                                                                                                                     $post_title
 	 * @param array<string, array{form_name: string, label: string, pages: array<int, array{title: string, url: string, post_id: int}>}> $forms_by_id
-	 * @param callable(array<string, mixed>): bool   $matches_element
-	 * @param callable(array<string, mixed>): string $resolve_form_name
+	 * @param callable(array<string, mixed>): bool                                                                                       $matches_element
+	 * @param callable(array<string, mixed>): string                                                                                     $resolve_form_name
 	 *
 	 * @return void
 	 */
@@ -823,14 +823,14 @@ final class ElementorFormsService {
 				$form_name = $resolve_form_name( $settings );
 
 				if ( '' === $form_name ) {
-					$form_name = __( 'Untitled Form', 'workflow-automate' );
+					$form_name = __( 'Untitled Form', 'dragwyb-agentflow' );
 				}
 
 				if ( ! isset( $forms_by_id[ $form_id ] ) ) {
 					$forms_by_id[ $form_id ] = array(
 						'form_name' => $form_name,
-						'label' => $form_name,
-						'pages' => array(),
+						'label'     => $form_name,
+						'pages'     => array(),
 					);
 				}
 
@@ -844,7 +844,7 @@ final class ElementorFormsService {
 				}
 
 				if ( ! $already_listed ) {
-					$page_url = get_permalink( $post_id );
+					$page_url                           = get_permalink( $post_id );
 					$forms_by_id[ $form_id ]['pages'][] = array(
 						'title'   => $post_title,
 						'url'     => is_string( $page_url ) ? $page_url : '',

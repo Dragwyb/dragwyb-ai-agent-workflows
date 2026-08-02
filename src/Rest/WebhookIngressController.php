@@ -2,14 +2,14 @@
 /**
  * Public inbound-webhook ingress REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -27,18 +27,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * services that cannot hold a WP cookie — and is instead:
  *
  * - an unguessable `public_id` UUID in the URL,
- * - an optional per-webhook HMAC signing secret (`X-WFA-Signature`),
+ * - an optional per-webhook HMAC signing secret (`X-dragwyb-af-Signature`),
  * - an optional per-webhook IP allow-list,
  * - a site-wide "require signing" setting (see SettingsService).
  *
  * This is the one intentional `__return_true`-style permission callback
- * in the plugin; every other REST route still requires a `wfa_*` capability
+ * in the plugin; every other REST route still requires a `dragwyb_af_*` capability
  * (with `manage_options` as a fallback — see `Core\Capabilities`).
  * Documented in `docs/rest-api.md` and `docs/integrations.md`.
  */
 class WebhookIngressController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private const ROUTE = '/webhooks/(?P<public_id>[0-9a-fA-F-]{36})';
 
@@ -58,13 +58,13 @@ class WebhookIngressController {
 			self::API_NAMESPACE,
 			self::ROUTE,
 			array(
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'receive' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'receive' ),
 				'permission_callback' => '__return_true',
-				'args' => array(
+				'args'                => array(
 					'public_id' => array(
-						'type' => 'string',
-						'required' => true,
+						'type'              => 'string',
+						'required'          => true,
 						'validate_callback' => static function ( $value ): bool {
 							return is_string( $value ) && (bool) preg_match( '/^[0-9a-fA-F-]{36}$/', $value );
 						},
@@ -85,14 +85,14 @@ class WebhookIngressController {
 
 		if ( ! $this->checkRateLimit( $public_id, $client_ip ) ) {
 			return new WP_Error(
-				'wfa_webhook_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again later.', 'workflow-automate' ),
+				'dragwyb_af_webhook_rate_limit_exceeded',
+				__( 'Rate limit exceeded. Please try again later.', 'dragwyb-agentflow' ),
 				array( 'status' => 429 )
 			);
 		}
 
 		$raw_body  = (string) $request->get_body();
-		$signature = (string) $request->get_header( 'x-wfa-signature' );
+		$signature = (string) $request->get_header( 'x-dragwyb-af-signature' );
 
 		$result = $this->webhooks->ingest( $public_id, $raw_body, $client_ip, $signature );
 
@@ -114,7 +114,7 @@ class WebhookIngressController {
 	 * @return bool True if allowed, false if exceeded.
 	 */
 	private function checkRateLimit( string $public_id, string $client_ip ): bool {
-		$transient_key = 'wfa_wh_rl_' . md5( $client_ip . '|' . $public_id );
+		$transient_key = 'dragwyb_af_wh_rl_' . md5( $client_ip . '|' . $public_id );
 		$count         = (int) get_transient( $transient_key );
 
 		if ( $count >= 60 ) {

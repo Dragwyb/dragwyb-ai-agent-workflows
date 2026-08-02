@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Workflow admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\BuilderPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Service\WorkflowImportExport;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Service\WorkflowImportExport;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=wfa_workflow_action` POST submitted
+ * Receives the `admin-post.php?action=dragwyb_af_workflow_action` POST submitted
  * by WorkflowsListTable's row-action forms (trash/restore/delete).
  *
  * Deliberately its own class rather than logic inlined into `WorkflowsPage`
@@ -46,7 +46,7 @@ class WorkflowActionsController {
 	 * @param string          $redirectSlug Menu slug (see AdminPage::slug()) to redirect back to after handling.
 	 */
 	public function __construct( WorkflowService $workflows, string $redirectSlug ) {
-		$this->workflows = $workflows;
+		$this->workflows    = $workflows;
 		$this->redirectSlug = $redirectSlug;
 	}
 
@@ -58,9 +58,9 @@ class WorkflowActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_workflow_action', array( $this, 'handle' ) );
-		add_action( 'admin_post_wfa_workflow_import', array( $this, 'handleImport' ) );
-		add_action( 'admin_post_wfa_workflow_export', array( $this, 'handleExport' ) );
+		add_action( 'admin_post_dragwyb_af_workflow_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_workflow_import', array( $this, 'handleImport' ) );
+		add_action( 'admin_post_dragwyb_af_workflow_export', array( $this, 'handleExport' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleWorkflowsBulkFromList' ), 5 );
 	}
 
@@ -70,7 +70,11 @@ class WorkflowActionsController {
 	 * @return void
 	 */
 	public function maybeHandleWorkflowsBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -91,7 +95,7 @@ class WorkflowActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation and per-id.
@@ -103,7 +107,7 @@ class WorkflowActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'wfa_workflow_action_' . $op . '_' . $workflow_id );
+		check_admin_referer( 'dragwyb_af_workflow_action_' . $op . '_' . $workflow_id );
 
 		$success = $this->perform( $op, $workflow_id );
 
@@ -117,16 +121,17 @@ class WorkflowActionsController {
 	 */
 	public function handleImport(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		check_admin_referer( 'wfa_workflow_import' );
+		check_admin_referer( 'dragwyb_af_workflow_import' );
 
-		if ( empty( $_FILES['wfa_workflow_json'] ) || ! is_array( $_FILES['wfa_workflow_json'] ) ) {
+		if ( empty( $_FILES['dragwyb_af_workflow_json'] ) || ! is_array( $_FILES['dragwyb_af_workflow_json'] ) ) {
 			$this->redirect( 'import_error' );
 		}
 
-		$file  = $_FILES['wfa_workflow_json'];
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- manual sanitization is performed below
+		$file  = $_FILES['dragwyb_af_workflow_json'];
 		$error = isset( $file['error'] ) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
 
 		if ( UPLOAD_ERR_OK !== $error ) {
@@ -168,7 +173,7 @@ class WorkflowActionsController {
 				array(
 					'page'       => BuilderPage::SLUG,
 					'workflow'   => $workflow->id(),
-					'wfa_notice' => 'imported',
+					'dragwyb_af_notice' => 'imported',
 				),
 				admin_url( 'admin.php' )
 			)
@@ -183,7 +188,7 @@ class WorkflowActionsController {
 	 */
 	public function handleExport(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below.
@@ -193,7 +198,7 @@ class WorkflowActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'wfa_workflow_export_' . $workflow_id );
+		check_admin_referer( 'dragwyb_af_workflow_export_' . $workflow_id );
 
 		$workflow = $this->workflows->find( $workflow_id );
 
@@ -226,31 +231,27 @@ class WorkflowActionsController {
 	 */
 	public function handleWorkflowsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['wfa_workflow_bulk'] ) ) {
+		if ( empty( $_POST['dragwyb_af_workflow_bulk'] ) ) {
 			return;
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'wfa_workflow_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_workflow_bulk_action' ) ) {
 			$this->redirect( 'error', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( ! in_array( $bulk_action, self::ALLOWED_OPS, true ) ) {
 			$this->redirect( 'error', $this->bulkRedirectArgs() );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
-		$ids = isset( $_POST['workflows'] ) && is_array( $_POST['workflows'] )
-			? array_map( 'absint', wp_unslash( $_POST['workflows'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['workflows'] ) && is_array( $_POST['workflows'] ) ? array_map( 'absint', wp_unslash( $_POST['workflows'] ) ) : array();
 
 		$ids = array_values( array_filter( $ids ) );
 
@@ -356,7 +357,7 @@ class WorkflowActionsController {
 				array_merge(
 					array(
 						'page'       => $this->redirectSlug,
-						'wfa_notice' => $notice,
+						'dragwyb_af_notice' => $notice,
 					),
 					$extra
 				),

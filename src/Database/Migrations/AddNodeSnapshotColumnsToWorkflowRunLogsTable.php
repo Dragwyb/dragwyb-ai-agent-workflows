@@ -2,15 +2,15 @@
 /**
  * Adds node-type/label snapshot columns to the workflow run logs table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `wfa_workflow_run_logs` (created in roadmap item 7) for the
+ * Extends `dragwyb_af_workflow_run_logs` (created in roadmap item 7) for the
  * history UI shipped in roadmap item 9, additively — same reasoning as
  * `AddQueueColumnsToWorkflowRunsTable` from item 8: the original migration
  * already shipped, so schema evolution happens through a new migration.
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * `WorkflowExecutionService::executeNodes()` and never updated afterwards
  * — the log row becomes fully self-contained for display purposes, the
  * same way `input_json` already snapshots the node's configuration at run
- * time rather than pointing back at `wfa_workflow_nodes.config_json`.
+ * time rather than pointing back at `dragwyb_af_workflow_nodes.config_json`.
  */
 class AddNodeSnapshotColumnsToWorkflowRunLogsTable extends Migration {
 
@@ -75,9 +75,9 @@ class AddNodeSnapshotColumnsToWorkflowRunLogsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflow_run_logs' );
+		$table = esc_sql( Table::name( 'workflow_run_logs' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; column names are hardcoded, not user input.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input; column names are hardcoded, not user input; schema DDL is never a caching candidate.
 		$wpdb->query( "ALTER TABLE {$table} DROP COLUMN node_type, DROP COLUMN node_label" );
 	}
 }

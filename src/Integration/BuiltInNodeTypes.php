@@ -2,38 +2,38 @@
 /**
  * Registers the plugin's own built-in node types.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration;
+namespace DragwybAgentFlow\Plugin\Integration;
 
-use WorkflowAutomate\Plugin\Integration\Actions\AiAgentAction;
-use WorkflowAutomate\Plugin\Integration\Actions\ClaudeMessagesAction;
-use WorkflowAutomate\Plugin\Integration\Actions\ConditionAction;
-use WorkflowAutomate\Plugin\Integration\Actions\GeminiGenerateContentAction;
-use WorkflowAutomate\Plugin\Integration\Actions\HttpRequestAction;
-use WorkflowAutomate\Plugin\Integration\Actions\DeepSeekChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\GroqChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\OpenAiChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\OpenRouterChatAction;
-use WorkflowAutomate\Plugin\Integration\Actions\RouterAction;
-use WorkflowAutomate\Plugin\Integration\Actions\SendEmailAction;
-use WorkflowAutomate\Plugin\Integration\Actions\SlackIncomingWebhookAction;
-use WorkflowAutomate\Plugin\Integration\Actions\StructuredOutputParserAction;
-use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
-use WorkflowAutomate\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
-use WorkflowAutomate\Plugin\Integration\Triggers\CatalogHookTrigger;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionRegistrar;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
-use WorkflowAutomate\Plugin\Service\Agent\AgentService;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Integration\Actions\AiAgentAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\ClaudeMessagesAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\ConditionAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\GeminiGenerateContentAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\HttpRequestAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\DeepSeekChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\GroqChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\OpenAiChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\OpenRouterChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\RouterAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\SendEmailAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\SlackIncomingWebhookAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\StructuredOutputParserAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
+use DragwybAgentFlow\Plugin\Integration\Triggers\CatalogHookTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionRegistrar;
+use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Listens on the public `wfa/nodes/register` action to add this plugin's
+ * Listens on the public `dragwyb_af/nodes/register` action to add this plugin's
  * own built-in trigger/action node types.
  *
  * Optional co-plugin integrations are registered only when that plugin is

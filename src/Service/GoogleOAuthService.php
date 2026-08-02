@@ -2,16 +2,16 @@
 /**
  * Google OAuth 2.0 authorization and token lifecycle.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use RuntimeException;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +56,7 @@ class GoogleOAuthService {
 	 * OAuth redirect URI registered in Google Cloud Console.
 	 */
 	public function callbackUrl(): string {
-		return rest_url( 'wfa/v1/oauth/google/callback' );
+		return rest_url( 'dragwyb_af/v1/oauth/google/callback' );
 	}
 
 	/**
@@ -87,7 +87,7 @@ class GoogleOAuthService {
 
 		if ( '' === $client_id ) {
 			throw new RuntimeException(
-				esc_html__( 'Client ID is missing. Save your Google OAuth credentials first.', 'workflow-automate' )
+				esc_html__( 'Client ID is missing. Save your Google OAuth credentials first.', 'dragwyb-agentflow' )
 			);
 		}
 
@@ -96,22 +96,22 @@ class GoogleOAuthService {
 			$this->stateTransientKey( $state ),
 			array(
 				'connection_id' => $connection->id(),
-				'user_id' => get_current_user_id(),
-				'return_url' => $this->sanitizeReturnUrl( $return_url ),
-				'node_id' => sanitize_text_field( $node_id ),
+				'user_id'       => get_current_user_id(),
+				'return_url'    => $this->sanitizeReturnUrl( $return_url ),
+				'node_id'       => sanitize_text_field( $node_id ),
 			),
 			self::STATE_TTL_SECONDS
 		);
 
 		return add_query_arg(
 			array(
-				'client_id' => $client_id,
-				'redirect_uri' => $this->callbackUrl(),
+				'client_id'     => $client_id,
+				'redirect_uri'  => $this->callbackUrl(),
 				'response_type' => 'code',
-				'scope' => implode( ' ', self::SCOPES ),
-				'access_type' => 'offline',
-				'prompt' => 'consent',
-				'state' => $state,
+				'scope'         => implode( ' ', self::SCOPES ),
+				'access_type'   => 'offline',
+				'prompt'        => 'consent',
+				'state'         => $state,
 			),
 			self::AUTHORIZE_URL
 		);
@@ -146,9 +146,9 @@ class GoogleOAuthService {
 
 		return array(
 			'connection_id' => $connection_id,
-			'user_id' => $user_id,
-			'return_url' => isset( $payload['return_url'] ) ? (string) $payload['return_url'] : '',
-			'node_id' => isset( $payload['node_id'] ) ? (string) $payload['node_id'] : '',
+			'user_id'       => $user_id,
+			'return_url'    => isset( $payload['return_url'] ) ? (string) $payload['return_url'] : '',
+			'node_id'       => isset( $payload['node_id'] ) ? (string) $payload['node_id'] : '',
 		);
 	}
 
@@ -163,7 +163,7 @@ class GoogleOAuthService {
 		if ( '' === $code ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Google did not return an authorization code.', 'workflow-automate' ),
+				'error'   => __( 'Google did not return an authorization code.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -174,7 +174,7 @@ class GoogleOAuthService {
 		if ( '' === $client_id || '' === $client_secret ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Client ID and Client Secret are required before connecting to Google.', 'workflow-automate' ),
+				'error'   => __( 'Client ID and Client Secret are required before connecting to Google.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -185,12 +185,12 @@ class GoogleOAuthService {
 				'headers' => array(
 					'Content-Type' => 'application/x-www-form-urlencoded',
 				),
-				'body' => array(
-					'code' => $code,
-					'client_id' => $client_id,
+				'body'    => array(
+					'code'          => $code,
+					'client_id'     => $client_id,
 					'client_secret' => $client_secret,
-					'redirect_uri' => $this->callbackUrl(),
-					'grant_type' => 'authorization_code',
+					'redirect_uri'  => $this->callbackUrl(),
+					'grant_type'    => 'authorization_code',
 				),
 			)
 		);
@@ -207,7 +207,7 @@ class GoogleOAuthService {
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
 			return array(
 				'success' => false,
-				'error' => __( 'This connection is not a Google OAuth connection.', 'workflow-automate' ),
+				'error'   => __( 'This connection is not a Google OAuth connection.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -224,7 +224,7 @@ class GoogleOAuthService {
 		if ( '' === $refresh ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Google access token expired. Reconnect this connection in Connections.', 'workflow-automate' ),
+				'error'   => __( 'Google access token expired. Reconnect this connection in Connections.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -234,7 +234,7 @@ class GoogleOAuthService {
 		if ( '' === $client_id || '' === $client_secret ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Google OAuth client credentials are missing.', 'workflow-automate' ),
+				'error'   => __( 'Google OAuth client credentials are missing.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -245,11 +245,11 @@ class GoogleOAuthService {
 				'headers' => array(
 					'Content-Type' => 'application/x-www-form-urlencoded',
 				),
-				'body' => array(
-					'client_id' => $client_id,
+				'body'    => array(
+					'client_id'     => $client_id,
 					'client_secret' => $client_secret,
 					'refresh_token' => $refresh,
-					'grant_type' => 'refresh_token',
+					'grant_type'    => 'refresh_token',
 				),
 			)
 		);
@@ -259,7 +259,7 @@ class GoogleOAuthService {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to refresh the Google access token.', 'workflow-automate' ),
+				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to refresh the Google access token.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -268,7 +268,7 @@ class GoogleOAuthService {
 		if ( null === $updated ) {
 			return array(
 				'success' => false,
-				'error' => __( 'The connection no longer exists.', 'workflow-automate' ),
+				'error'   => __( 'The connection no longer exists.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -278,7 +278,7 @@ class GoogleOAuthService {
 		if ( '' === $token ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Unable to read the refreshed Google access token.', 'workflow-automate' ),
+				'error'   => __( 'Unable to read the refreshed Google access token.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -296,9 +296,9 @@ class GoogleOAuthService {
 		if ( empty( $result['success'] ) || ! is_array( $result['response'] ?? null ) ) {
 			return array(
 				'success' => false,
-				'error' => isset( $result['error'] )
+				'error'   => isset( $result['error'] )
 					? (string) $result['error']
-					: __( 'Google OAuth token request failed.', 'workflow-automate' ),
+					: __( 'Google OAuth token request failed.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -310,7 +310,7 @@ class GoogleOAuthService {
 		if ( '' === $access_token ) {
 			return array(
 				'success' => false,
-				'error' => __( 'Google did not return an access token.', 'workflow-automate' ),
+				'error'   => __( 'Google did not return an access token.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -326,7 +326,7 @@ class GoogleOAuthService {
 		} catch ( RuntimeException $exception ) {
 			return array(
 				'success' => false,
-				'error' => $exception->getMessage(),
+				'error'   => $exception->getMessage(),
 			);
 		}
 
@@ -334,7 +334,7 @@ class GoogleOAuthService {
 	}
 
 	private function stateTransientKey( string $state ): string {
-		return 'wfa_google_oauth_' . md5( $state );
+		return 'dragwyb_af_google_oauth_' . md5( $state );
 	}
 
 	private function sanitizeReturnUrl( string $return_url ): string {

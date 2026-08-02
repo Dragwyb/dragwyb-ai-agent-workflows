@@ -2,18 +2,18 @@
 /**
  * Public chat-message ingress REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ChatMessageIngressController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private const ROUTE = '/chat/(?P<endpoint_id>[0-9a-fA-F-]{36})';
 
@@ -109,8 +109,8 @@ class ChatMessageIngressController {
 			}
 
 			return new WP_Error(
-				'wfa_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'workflow-automate' ),
+				'dragwyb_af_chat_not_found',
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -126,8 +126,8 @@ class ChatMessageIngressController {
 		}
 
 		return new WP_Error(
-			'wfa_chat_forbidden',
-			__( 'This chat requires a logged-in WordPress user.', 'workflow-automate' ),
+			'dragwyb_af_chat_forbidden',
+			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-agentflow' ),
 			array( 'status' => 401 )
 		);
 	}
@@ -149,8 +149,8 @@ class ChatMessageIngressController {
 
 		if ( null === $match ) {
 			return new WP_Error(
-				'wfa_chat_not_found',
-				__( 'No chat endpoint found for this ID.', 'workflow-automate' ),
+				'dragwyb_af_chat_not_found',
+				__( 'No chat endpoint found for this ID.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -187,8 +187,8 @@ class ChatMessageIngressController {
 
 		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
 			return new WP_Error(
-				'wfa_chat_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again in a minute.', 'workflow-automate' ),
+				'dragwyb_af_chat_rate_limit_exceeded',
+				__( 'Rate limit exceeded. Please try again in a minute.', 'dragwyb-agentflow' ),
 				array( 'status' => 429 )
 			);
 		}
@@ -197,8 +197,8 @@ class ChatMessageIngressController {
 
 		if ( null === $match ) {
 			return new WP_Error(
-				'wfa_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'workflow-automate' ),
+				'dragwyb_af_chat_not_found',
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -228,8 +228,8 @@ class ChatMessageIngressController {
 
 		if ( '' === $payload['chatInput'] ) {
 			return new WP_Error(
-				'wfa_chat_empty',
-				__( 'chatInput is required.', 'workflow-automate' ),
+				'dragwyb_af_chat_empty',
+				__( 'chatInput is required.', 'dragwyb-agentflow' ),
 				array( 'status' => 422 )
 			);
 		}
@@ -245,19 +245,20 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'captured',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Payload captured for Test Flow.', 'workflow-automate' ),
+					'message'   => __( 'Payload captured for Test Flow.', 'dragwyb-agentflow' ),
 				)
 			);
 		}
 
 		if ( 'immediate' === $response_mode ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- dynamic hookname is 'dragwyb_af_chat_message_received'.
 			do_action( ChatMessageReceivedTrigger::HOOK, $payload );
 
 			return new WP_REST_Response(
 				array(
 					'status'    => 'accepted',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Message accepted. The workflow will run in the background.', 'workflow-automate' ),
+					'message'   => __( 'Message accepted. The workflow will run in the background.', 'dragwyb-agentflow' ),
 				),
 				202
 			);
@@ -266,10 +267,13 @@ class ChatMessageIngressController {
 		try {
 			$run = $this->executor->run( $workflow_id, $payload );
 		} catch ( \Throwable $exception ) {
-			error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed chat ingress runs.
+				error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
+			}
 			return new WP_Error(
-				'wfa_chat_run_failed',
-				__( 'Chat execution failed.', 'workflow-automate' ),
+				'dragwyb_af_chat_run_failed',
+				__( 'Chat execution failed.', 'dragwyb-agentflow' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -292,8 +296,10 @@ class ChatMessageIngressController {
 	 * @return bool True if allowed, false if limit exceeded.
 	 */
 	private function checkRateLimit( string $endpoint_id ): bool {
-		$ip            = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
-		$transient_key = 'wfa_chat_rl_' . md5( $ip . '|' . $endpoint_id );
+		$ip = isset( $_SERVER['REMOTE_ADDR'] )
+			? sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) )
+			: '127.0.0.1';
+		$transient_key = 'dragwyb_af_chat_rl_' . md5( $ip . '|' . $endpoint_id );
 		$count         = (int) get_transient( $transient_key );
 
 		if ( $count >= 30 ) {

@@ -2,15 +2,15 @@
 /**
  * Builds LLM tool schemas from attached workflow action nodes.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -158,7 +158,7 @@ class AgentToolSchemaBuilder {
 				continue;
 			}
 
-			$label = (string) ( $field_def['label'] ?? $field_key );
+			$label       = (string) ( $field_def['label'] ?? $field_key );
 			$description = isset( $field_def['description'] ) && is_string( $field_def['description'] ) && '' !== trim( $field_def['description'] )
 				? trim( $field_def['description'] )
 				: $label;
@@ -256,19 +256,19 @@ class AgentToolSchemaBuilder {
 		$parts = array( $description );
 
 		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
-			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'workflow-automate' );
+			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-agentflow' );
 		}
 
 		if ( 'post_type' === $field_key ) {
-			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'workflow-automate' );
+			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-agentflow' );
 		}
 
 		if ( 'array' === $field_type ) {
-			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'workflow-automate' );
+			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-agentflow' );
 		}
 
 		if ( 'key_value' === $field_type ) {
-			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'workflow-automate' );
+			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-agentflow' );
 		}
 
 		if ( array_key_exists( $field_key, $config ) && ! $this->configValueIsEmpty( $config[ $field_key ] ) ) {
@@ -276,7 +276,7 @@ class AgentToolSchemaBuilder {
 			if ( is_scalar( $default ) ) {
 				$parts[] = sprintf(
 					/* translators: %s: current default value */
-					__( 'Current node default: %s. You may override this value.', 'workflow-automate' ),
+					__( 'Current node default: %s. You may override this value.', 'dragwyb-agentflow' ),
 					(string) $default
 				);
 			}

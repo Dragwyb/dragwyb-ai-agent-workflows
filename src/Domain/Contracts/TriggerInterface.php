@@ -2,12 +2,12 @@
 /**
  * Trigger node type contract.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain\Contracts;
+namespace DragwybAgentFlow\Plugin\Domain\Contracts;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * when that happens" rather than "run now and return a result."
  *
  * Public extension point: third-party code implements this interface and
- * registers an instance via the `wfa/nodes/register` action (see
+ * registers an instance via the `dragwyb_af/nodes/register` action (see
  * `docs/hooks-reference.md`).
  */
 interface TriggerInterface extends NodeTypeInterface {

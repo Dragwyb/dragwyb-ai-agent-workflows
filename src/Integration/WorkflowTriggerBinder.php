@@ -2,21 +2,21 @@
 /**
  * Binds active workflows' triggers to their real-world event sources.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration;
+namespace DragwybAgentFlow\Plugin\Integration;
 
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * not recommended otherwise.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
- * rather than the `wfa_workflow_nodes` table: binding must happen as early
+ * rather than the `dragwyb_af_workflow_nodes` table: binding must happen as early
  * as possible in the request (see Core\Plugin::registerExecutionEngine()),
  * before WorkflowExecutionService ever gets a chance to lazily sync that
  * table, so `graph_json` — the builder's own always-current source of
@@ -84,10 +84,10 @@ class WorkflowTriggerBinder {
 	private TriggerReentrancyGuard $trigger_guard;
 
 	public function __construct( WorkflowService $workflows, NodeTypeRegistry $registry, WorkflowExecutionService $executor, SettingsService $settings, WorkflowTestListenerService $test_listener, TriggerReentrancyGuard $trigger_guard ) {
-		$this->workflows = $workflows;
-		$this->registry = $registry;
-		$this->executor = $executor;
-		$this->settings = $settings;
+		$this->workflows     = $workflows;
+		$this->registry      = $registry;
+		$this->executor      = $executor;
+		$this->settings      = $settings;
 		$this->test_listener = $test_listener;
 		$this->trigger_guard = $trigger_guard;
 	}
@@ -102,7 +102,7 @@ class WorkflowTriggerBinder {
 
 		$active = $this->workflows->list(
 			array(
-				'status' => Workflow::STATUS_ACTIVE,
+				'status'   => Workflow::STATUS_ACTIVE,
 				'per_page' => self::MAX_ACTIVE_WORKFLOWS,
 			)
 		);
@@ -142,7 +142,7 @@ class WorkflowTriggerBinder {
 			return;
 		}
 
-		$workflow_id = $workflow->id();
+		$workflow_id   = $workflow->id();
 		$trigger_bound = false;
 
 		foreach ( $graph_nodes as $graph_node ) {
@@ -176,7 +176,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Mid-write: any WFA create/update/delete is still on the stack.
+					// Mid-write: any dragwyb_af create/update/delete is still on the stack.
 					if ( $this->trigger_guard->isWriting() ) {
 						return;
 					}
@@ -186,7 +186,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Entity was created by a previous WFA action (translated post,
+					// Entity was created by a previous dragwyb_af action (translated post,
 					// auto-user, auto-comment, etc.) — do not start another loop.
 					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
 						return;

@@ -2,12 +2,12 @@
 /**
  * Connection domain entity.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain;
+namespace DragwybAgentFlow\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -66,14 +66,14 @@ class Connection {
 		string $createdAt,
 		string $updatedAt
 	) {
-		$this->id = $id;
-		$this->integrationSlug = $integrationSlug;
-		$this->authType = $authType;
-		$this->label = $label;
+		$this->id                   = $id;
+		$this->integrationSlug      = $integrationSlug;
+		$this->authType             = $authType;
+		$this->label                = $label;
 		$this->encryptedCredentials = $encryptedCredentials;
-		$this->status = $status;
-		$this->createdAt = $createdAt;
-		$this->updatedAt = $updatedAt;
+		$this->status               = $status;
+		$this->createdAt            = $createdAt;
+		$this->updatedAt            = $updatedAt;
 	}
 
 	/**

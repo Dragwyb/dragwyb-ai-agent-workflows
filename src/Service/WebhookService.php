@@ -2,19 +2,19 @@
 /**
  * Webhook application service.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Encryption;
-use WorkflowAutomate\Plugin\Domain\Webhook;
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Persistence\WebhookRepository;
+use DragwybAgentFlow\Plugin\Core\Encryption;
+use DragwybAgentFlow\Plugin\Domain\Webhook;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
 use WP_Error;
 
 // Prevent direct file access.
@@ -31,12 +31,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * established for connection credentials.
  *
  * Signature scheme (documented in `docs/integrations.md`): callers send
- * `X-WFA-Signature: sha256=<hex>` where `<hex>` is
+ * `X-dragwyb-af-Signature: sha256=<hex>` where `<hex>` is
  * `hash_hmac( 'sha256', <raw request body>, <signing secret> )`.
  */
 class WebhookService {
 
-	public const SIGNATURE_HEADER = 'X-WFA-Signature';
+	public const SIGNATURE_HEADER = 'X-dragwyb-af-Signature';
 
 	private WebhookRepository $webhooks;
 
@@ -52,10 +52,10 @@ class WebhookService {
 		WorkflowExecutionService $executor,
 		SettingsService $settings
 	) {
-		$this->webhooks = $webhooks;
+		$this->webhooks  = $webhooks;
 		$this->workflows = $workflows;
-		$this->executor = $executor;
-		$this->settings = $settings;
+		$this->executor  = $executor;
+		$this->settings  = $settings;
 	}
 
 	/**
@@ -74,10 +74,10 @@ class WebhookService {
 		$workflow = $this->workflows->find( $workflow_id );
 
 		if ( null === $workflow ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-agentflow' ) );
 		}
 
-		$ip_allow_list = $this->normalizeIpAllowList( $ip_allow_list );
+		$ip_allow_list  = $this->normalizeIpAllowList( $ip_allow_list );
 		$signing_secret = null === $signing_secret ? '' : trim( $signing_secret );
 
 		// Site-wide "require signing" means every webhook must have a
@@ -88,20 +88,20 @@ class WebhookService {
 		// shows the last 4 characters). The form documents that the
 		// field is required when the setting is on.
 		if ( '' === $signing_secret && $this->settings->requireWebhookSigning() ) {
-			throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'dragwyb-agentflow' ) );
 		}
 
 		$webhook = $this->webhooks->insert(
 			array(
-				'workflow_id' => $workflow_id,
-				'public_id' => wp_generate_uuid4(),
+				'workflow_id'    => $workflow_id,
+				'public_id'      => wp_generate_uuid4(),
 				'signing_secret' => '' === $signing_secret ? '' : Encryption::encrypt( $signing_secret ),
-				'ip_allow_list' => $ip_allow_list,
+				'ip_allow_list'  => $ip_allow_list,
 			)
 		);
 
 		if ( null === $webhook ) {
-			throw new RuntimeException( esc_html__( 'Failed to create the webhook.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to create the webhook.', 'dragwyb-agentflow' ) );
 		}
 
 		return $webhook;
@@ -130,26 +130,26 @@ class WebhookService {
 		$webhook = $this->webhooks->find( $id );
 
 		if ( null === $webhook ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified webhook does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified webhook does not exist.', 'dragwyb-agentflow' ) );
 		}
 
 		$workflow = $this->workflows->find( $workflow_id );
 
 		if ( null === $workflow ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-agentflow' ) );
 		}
 
-		$ip_allow_list = $this->normalizeIpAllowList( $ip_allow_list );
+		$ip_allow_list  = $this->normalizeIpAllowList( $ip_allow_list );
 		$signing_secret = null === $signing_secret ? '' : trim( $signing_secret );
 
 		$attributes = array(
-			'workflow_id' => $workflow_id,
+			'workflow_id'   => $workflow_id,
 			'ip_allow_list' => $ip_allow_list,
 		);
 
 		if ( $clear_signing_secret ) {
 			if ( $this->settings->requireWebhookSigning() ) {
-				throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'workflow-automate' ) );
+				throw new InvalidArgumentException( esc_html__( 'A signing secret is required by site settings.', 'dragwyb-agentflow' ) );
 			}
 
 			$attributes['signing_secret'] = '';
@@ -160,7 +160,7 @@ class WebhookService {
 		$updated = $this->webhooks->update( $id, $attributes );
 
 		if ( null === $updated ) {
-			throw new RuntimeException( esc_html__( 'Failed to update the webhook.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to update the webhook.', 'dragwyb-agentflow' ) );
 		}
 
 		return $updated;
@@ -212,7 +212,7 @@ class WebhookService {
 	 * @return string
 	 */
 	public function publicUrl( Webhook $webhook ): string {
-		return rest_url( 'wfa/v1/webhooks/' . $webhook->publicId() );
+		return rest_url( 'dragwyb_af/v1/webhooks/' . $webhook->publicId() );
 	}
 
 	/**
@@ -227,7 +227,7 @@ class WebhookService {
 		if ( ! $webhook->hasSigningSecret() ) {
 			return array(
 				'configured' => false,
-				'display' => '',
+				'display'    => '',
 			);
 		}
 
@@ -236,13 +236,13 @@ class WebhookService {
 		if ( null === $plaintext ) {
 			return array(
 				'configured' => true,
-				'display' => __( '(unable to decrypt — please re-enter this value)', 'workflow-automate' ),
+				'display'    => __( '(unable to decrypt — please re-enter this value)', 'dragwyb-agentflow' ),
 			);
 		}
 
 		return array(
 			'configured' => true,
-			'display' => self::mask( $plaintext ),
+			'display'    => self::mask( $plaintext ),
 		);
 	}
 
@@ -254,7 +254,7 @@ class WebhookService {
 	 * @param string $public_id         UUID from the URL.
 	 * @param string $raw_body          Exact request body bytes (needed for HMAC).
 	 * @param string $client_ip         Caller IP (typically REMOTE_ADDR).
-	 * @param string $signature_header  Value of the X-WFA-Signature header, or ''.
+	 * @param string $signature_header  Value of the X-dragwyb-af-Signature header, or ''.
 	 *
 	 * @return array{run_id: int, status: string, queued: bool}|WP_Error
 	 */
@@ -263,16 +263,16 @@ class WebhookService {
 
 		if ( null === $webhook ) {
 			return new WP_Error(
-				'wfa_webhook_not_found',
-				__( 'Webhook not found.', 'workflow-automate' ),
+				'dragwyb_af_webhook_not_found',
+				__( 'Webhook not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
 		}
 
 		if ( ! $this->isIpAllowed( $client_ip, $webhook->ipAllowList() ) ) {
 			return new WP_Error(
-				'wfa_webhook_ip_denied',
-				__( 'Request IP is not allowed for this webhook.', 'workflow-automate' ),
+				'dragwyb_af_webhook_ip_denied',
+				__( 'Request IP is not allowed for this webhook.', 'dragwyb-agentflow' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -282,8 +282,8 @@ class WebhookService {
 		if ( $requires_signature ) {
 			if ( ! $webhook->hasSigningSecret() ) {
 				return new WP_Error(
-					'wfa_webhook_signing_required',
-					__( 'This webhook has no signing secret configured, but site settings require one.', 'workflow-automate' ),
+					'dragwyb_af_webhook_signing_required',
+					__( 'This webhook has no signing secret configured, but site settings require one.', 'dragwyb-agentflow' ),
 					array( 'status' => 403 )
 				);
 			}
@@ -292,16 +292,16 @@ class WebhookService {
 
 			if ( null === $secret || '' === $secret ) {
 				return new WP_Error(
-					'wfa_webhook_signing_unavailable',
-					__( 'Unable to verify this webhook\'s signature.', 'workflow-automate' ),
+					'dragwyb_af_webhook_signing_unavailable',
+					__( 'Unable to verify this webhook\'s signature.', 'dragwyb-agentflow' ),
 					array( 'status' => 500 )
 				);
 			}
 
 			if ( ! $this->signatureIsValid( $raw_body, $secret, $signature_header ) ) {
 				return new WP_Error(
-					'wfa_webhook_invalid_signature',
-					__( 'Invalid webhook signature.', 'workflow-automate' ),
+					'dragwyb_af_webhook_invalid_signature',
+					__( 'Invalid webhook signature.', 'dragwyb-agentflow' ),
 					array( 'status' => 401 )
 				);
 			}
@@ -311,8 +311,8 @@ class WebhookService {
 
 		if ( null === $workflow_id ) {
 			return new WP_Error(
-				'wfa_webhook_unlinked',
-				__( 'This webhook is not linked to a workflow.', 'workflow-automate' ),
+				'dragwyb_af_webhook_unlinked',
+				__( 'This webhook is not linked to a workflow.', 'dragwyb-agentflow' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -321,8 +321,8 @@ class WebhookService {
 
 		if ( null === $workflow || Workflow::STATUS_ACTIVE !== $workflow->status() ) {
 			return new WP_Error(
-				'wfa_webhook_workflow_inactive',
-				__( 'The workflow linked to this webhook is not active.', 'workflow-automate' ),
+				'dragwyb_af_webhook_workflow_inactive',
+				__( 'The workflow linked to this webhook is not active.', 'dragwyb-agentflow' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -349,8 +349,8 @@ class WebhookService {
 			);
 		} catch ( InvalidArgumentException | RuntimeException $e ) {
 			return new WP_Error(
-				'wfa_webhook_run_failed',
-				__( 'The workflow could not be started.', 'workflow-automate' ),
+				'dragwyb_af_webhook_run_failed',
+				__( 'The workflow could not be started.', 'dragwyb-agentflow' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -378,7 +378,7 @@ class WebhookService {
 			}
 
 			if ( preg_match( '/^(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})$/', $entry, $matches ) ) {
-				$ip = $matches[1];
+				$ip     = $matches[1];
 				$prefix = (int) $matches[2];
 
 				if ( false !== filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) && $prefix >= 0 && $prefix <= 32 ) {
@@ -433,9 +433,9 @@ class WebhookService {
 			return false;
 		}
 
-		$prefix = (int) $matches[2];
-		$mask = $prefix > 0 ? ( ~0 << ( 32 - $prefix ) ) : 0;
-		$ip_long = ip2long( $ip );
+		$prefix       = (int) $matches[2];
+		$mask         = $prefix > 0 ? ( ~0 << ( 32 - $prefix ) ) : 0;
+		$ip_long      = ip2long( $ip );
 		$network_long = ip2long( $matches[1] );
 
 		if ( false === $ip_long || false === $network_long ) {
@@ -474,14 +474,14 @@ class WebhookService {
 	 */
 	private function buildPayload( string $raw_body, string $client_ip ): array {
 		$decoded = json_decode( $raw_body, true );
-		$body = ( JSON_ERROR_NONE === json_last_error() && ( is_array( $decoded ) || is_object( $decoded ) ) )
+		$body    = ( JSON_ERROR_NONE === json_last_error() && ( is_array( $decoded ) || is_object( $decoded ) ) )
 			? $decoded
 			: array( 'raw' => $raw_body );
 
 		return array(
-			'source' => 'webhook',
+			'source'    => 'webhook',
 			'client_ip' => $client_ip,
-			'body' => $body,
+			'body'      => $body,
 		);
 	}
 

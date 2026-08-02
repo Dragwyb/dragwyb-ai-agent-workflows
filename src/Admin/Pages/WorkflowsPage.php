@@ -2,23 +2,23 @@
 /**
  * Workflows admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Admin\WorkflowActionsController;
-use WorkflowAutomate\Plugin\Admin\WorkflowsListTable;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\SettingsService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Admin\EmptyState;
+use DragwybAgentFlow\Plugin\Admin\ListTableUi;
+use DragwybAgentFlow\Plugin\Admin\WorkflowActionsController;
+use DragwybAgentFlow\Plugin\Admin\WorkflowsListTable;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 
-// BuilderPage lives in this same namespace (WorkflowAutomate\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
+// BuilderPage lives in this same namespace (DragwybAgentFlow\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,7 +39,7 @@ class WorkflowsPage implements AdminPage {
 	 * instantiated `WorkflowsPage` (see `BuilderPage::SLUG` for the same
 	 * pattern used in reverse, for the "Add New"/"Edit" links below).
 	 */
-	public const SLUG = 'wfa-dashboard';
+	public const SLUG = 'dragwyb-af-dashboard';
 
 	private WorkflowService $workflows;
 
@@ -48,8 +48,8 @@ class WorkflowsPage implements AdminPage {
 	private WorkflowActionsController $workflowActions;
 
 	public function __construct( WorkflowService $workflows, SettingsService $settings, WorkflowActionsController $workflowActions ) {
-		$this->workflows = $workflows;
-		$this->settings = $settings;
+		$this->workflows       = $workflows;
+		$this->settings        = $settings;
 		$this->workflowActions = $workflowActions;
 	}
 
@@ -64,14 +64,14 @@ class WorkflowsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Workflows', 'workflow-automate' );
+		return __( 'Workflows', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Workflows', 'workflow-automate' );
+		return __( 'Workflows', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -93,10 +93,10 @@ class WorkflowsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -105,20 +105,22 @@ class WorkflowsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
 		$table = new WorkflowsListTable( $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . BuilderPage::SLUG ) ),
-			esc_html__( 'Add New', 'workflow-automate' )
+			esc_html__( 'Add New', 'dragwyb-agentflow' )
 		);
-		$this->renderImportButton();
+		if($table->has_items()) {
+			$this->renderImportButton();
+		}
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
@@ -128,17 +130,17 @@ class WorkflowsPage implements AdminPage {
 		// simply empty.
 		if ( $this->shouldShowFirstWorkflowGuide( $table ) ) {
 			EmptyState::render(
-				__( 'Create your first workflow', 'workflow-automate' ),
-				__( 'Workflows automate work for you: a trigger starts a run, then one or more actions do the work.', 'workflow-automate' ),
+				__( 'Create your first workflow', 'dragwyb-agentflow' ),
+				__( 'Workflows automate work for you: a trigger starts a run, then one or more actions do the work.', 'dragwyb-agentflow' ),
 				array(
-					__( 'Open the editor and add a trigger (for example a WordPress hook or an inbound webhook).', 'workflow-automate' ),
-					__( 'Add an action (send email, HTTP request, and more).', 'workflow-automate' ),
-					__( 'Save, then set the workflow to Active so it can run automatically.', 'workflow-automate' ),
+					__( 'Open the editor and add a trigger (for example a WordPress hook or an inbound webhook).', 'dragwyb-agentflow' ),
+					__( 'Add an action (send email, HTTP request, and more).', 'dragwyb-agentflow' ),
+					__( 'Save, then set the workflow to Active so it can run automatically.', 'dragwyb-agentflow' ),
 				),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . BuilderPage::SLUG ),
-						'label' => __( 'Create workflow', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . BuilderPage::SLUG ),
+						'label'   => __( 'Create workflow', 'dragwyb-agentflow' ),
 						'primary' => true,
 					),
 				)
@@ -146,7 +148,7 @@ class WorkflowsPage implements AdminPage {
 
 			// Keep the status views (especially Trash) reachable when the
 			// "all" list is empty but trashed workflows still exist.
-			echo '<form method="get" class="wfa-list-table-filters-form">';
+			echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
 			printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 			$table->views();
 			echo '</form>';
@@ -155,7 +157,7 @@ class WorkflowsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view selector.
 		$view = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
@@ -167,7 +169,7 @@ class WorkflowsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_workflow_bulk_action', 'wfa_workflow_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_workflow_bulk_action', 'dragwyb_af_workflow_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -197,44 +199,44 @@ class WorkflowsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg. Kept as literal `__()` calls (rather than a
+	 * `?dragwyb_af_notice=` query arg. Kept as literal `__()` calls (rather than a
 	 * class constant) so i18n string-extraction tooling can find them.
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
 	private function notices(): array {
 		return array(
-			'trashed' => array(
-				'message' => __( 'Workflow moved to Trash.', 'workflow-automate' ),
-				'type' => 'success',
+			'trashed'      => array(
+				'message' => __( 'Workflow moved to Trash.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'restored' => array(
-				'message' => __( 'Workflow restored.', 'workflow-automate' ),
-				'type' => 'success',
+			'restored'     => array(
+				'message' => __( 'Workflow restored.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'deleted' => array(
-				'message' => __( 'Workflow permanently deleted.', 'workflow-automate' ),
-				'type' => 'success',
+			'deleted'      => array(
+				'message' => __( 'Workflow permanently deleted.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'activated' => array(
-				'message' => __( 'Workflow activated. It will run when its trigger fires.', 'workflow-automate' ),
-				'type' => 'success',
+			'activated'    => array(
+				'message' => __( 'Workflow activated. It will run when its trigger fires.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'paused' => array(
-				'message' => __( 'Workflow paused. Triggers will not start new runs until it is activated again.', 'workflow-automate' ),
-				'type' => 'success',
+			'paused'       => array(
+				'message' => __( 'Workflow paused. Triggers will not start new runs until it is activated again.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'imported' => array(
-				'message' => __( 'Workflow imported from JSON.', 'workflow-automate' ),
-				'type' => 'success',
+			'imported'     => array(
+				'message' => __( 'Workflow imported from JSON.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
 			'import_error' => array(
-				'message' => __( 'Could not import that JSON file. Use a Workflow Automate export (not an n8n file).', 'workflow-automate' ),
-				'type' => 'error',
+				'message' => __( 'Could not import that JSON file. Use a Workflow Automate export (not an n8n file).', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
-			'error' => array(
-				'message' => __( 'That workflow action could not be completed.', 'workflow-automate' ),
-				'type' => 'error',
+			'error'        => array(
+				'message' => __( 'That workflow action could not be completed.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
 		);
 	}
@@ -245,32 +247,32 @@ class WorkflowsPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderImportButton(): void {
-		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-workflow-import-form page-title-action">';
-		echo '<input type="hidden" name="action" value="wfa_workflow_import" />';
-		wp_nonce_field( 'wfa_workflow_import' );
-		echo '<label class="wfa-workflow-import-form__label">';
-		echo '<span class="screen-reader-text">' . esc_html__( 'Import workflow JSON', 'workflow-automate' ) . '</span>';
-		echo '<span aria-hidden="true">' . esc_html__( 'Import', 'workflow-automate' ) . '</span>';
-		echo '<input type="file" name="wfa_workflow_json" accept="application/json,.json" class="wfa-workflow-import-form__input" required />';
+		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-workflow-import-form page-title-action">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_workflow_import" />';
+		wp_nonce_field( 'dragwyb_af_workflow_import' );
+		echo '<label class="dragwyb-af-workflow-import-form__label">';
+		echo '<span class="screen-reader-text">' . esc_html__( 'Import workflow JSON', 'dragwyb-agentflow' ) . '</span>';
+		echo '<span aria-hidden="true">' . esc_html__( 'Import', 'dragwyb-agentflow' ) . '</span>';
+		echo '<input type="file" name="dragwyb_af_workflow_json" accept="application/json,.json" class="dragwyb-af-workflow-import-form__input" required />';
 		echo '</label>';
-		echo '<button type="submit" class="wfa-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'workflow-automate' ) . '</button>';
+		echo '<button type="submit" class="dragwyb-af-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'dragwyb-agentflow' ) . '</button>';
 		echo '</form>';
 
 		// Auto-submit when a file is chosen so the Import control feels like a single click.
 		echo '<script>';
-		echo '(function(){var f=document.querySelector(".wfa-workflow-import-form");if(!f)return;var i=f.querySelector(".wfa-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();';
+		echo '(function(){var f=document.querySelector(".dragwyb-af-workflow-import-form");if(!f)return;var i=f.querySelector(".dragwyb-af-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();';
 		echo '</script>';
 	}
 
 	/**
-	 * Prints an admin notice for the read-only `?wfa_notice=` query arg, if
+	 * Prints an admin notice for the read-only `?dragwyb_af_notice=` query arg, if
 	 * it matches one of the allow-listed keys from self::notices().
 	 *
 	 * @return void
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

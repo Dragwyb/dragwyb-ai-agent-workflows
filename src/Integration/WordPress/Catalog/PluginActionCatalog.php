@@ -2,12 +2,12 @@
 /**
  * Plugin management catalog definitions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress\Catalog;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress\Catalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,28 +30,28 @@ final class PluginActionCatalog {
 		$definitions = array();
 
 		$definitions[] = array(
-			'slug' => 'wp_check_plugin_activation_status_action',
-			'label' => __( 'Check Plugin Activation Status', 'workflow-automate' ),
-			'description' => __( 'Checks whether a plugin is currently active.', 'workflow-automate' ),
-			'group' => 'plugin',
-			'group_label' => $groups['plugin'],
-			'method' => 'checkPluginActivationStatus',
-			'method_args' => array(),
+			'slug'          => 'wp_check_plugin_activation_status_action',
+			'label'         => __( 'Check Plugin Activation Status', 'dragwyb-agentflow' ),
+			'description'   => __( 'Checks whether a plugin is currently active.', 'dragwyb-agentflow' ),
+			'group'         => 'plugin',
+			'group_label'   => $groups['plugin'],
+			'method'        => 'checkPluginActivationStatus',
+			'method_args'   => array(),
 			'config_schema' => array(
-				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'workflow-automate' ), array( 'required' => true ) ),
+				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'dragwyb-agentflow' ), array( 'required' => true ) ),
 			),
 		);
 
 		$definitions[] = array(
-			'slug' => 'wp_activate_plugin_action',
-			'label' => __( 'Activate Plugin', 'workflow-automate' ),
-			'description' => __( 'Activates an installed but inactive plugin.', 'workflow-automate' ),
-			'group' => 'plugin',
-			'group_label' => $groups['plugin'],
-			'method' => 'activatePlugin',
-			'method_args' => array(),
+			'slug'          => 'wp_activate_plugin_action',
+			'label'         => __( 'Activate Plugin', 'dragwyb-agentflow' ),
+			'description'   => __( 'Activates an installed but inactive plugin.', 'dragwyb-agentflow' ),
+			'group'         => 'plugin',
+			'group_label'   => $groups['plugin'],
+			'method'        => 'activatePlugin',
+			'method_args'   => array(),
 			'config_schema' => array(
-				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'workflow-automate' ), array( 'required' => true ) ),
+				'plugin_file' => $field( 'string', __( 'Plugin File (e.g. akismet/akismet.php)', 'dragwyb-agentflow' ), array( 'required' => true ) ),
 			),
 		);
 

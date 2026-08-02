@@ -2,15 +2,15 @@
 /**
  * Creates the workflows table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_workflows` holds one row per workflow: its builder graph, status,
+ * `dragwyb_af_workflows` holds one row per workflow: its builder graph, status,
  * and lightweight run-count/soft-delete bookkeeping. See
  * docs/internal/architecture.md §2.3 for the full column rationale.
  */
@@ -62,9 +62,9 @@ class CreateWorkflowsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflows' );
+		$table = esc_sql( Table::name( 'workflows' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; DROP TABLE cannot be parameterized; schema DDL is never a caching candidate.
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 	}
 }

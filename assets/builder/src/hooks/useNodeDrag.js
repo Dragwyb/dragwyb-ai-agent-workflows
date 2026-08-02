@@ -49,7 +49,7 @@ export function useNodeDrag({ nodeId, x, y, onMove, onSelect, linkConnectMode = 
 			originX: x,
 			originY: y,
 			moved: false,
-			zoom: getCanvasZoom(target.closest('.wfa-builder-canvas')),
+			zoom: getCanvasZoom(target.closest('.dragwyb-af-builder-canvas')),
 		};
 
 		const handlePointerMove = (moveEvent) => {

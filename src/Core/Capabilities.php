@@ -2,12 +2,12 @@
 /**
  * Plugin capability definitions and role wiring.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,11 +29,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *    already has `manage_options`, so a custom role that has
  *    `manage_options` but not our explicit caps still works, and so
  *    administrators keep access even if a role editor strips the
- *    explicit `wfa_*` entries.
+ *    explicit `dragwyb_af_*` entries.
  *
  * Callers should check the granular caps (`MANAGE_WORKFLOWS`, etc.) via
  * `current_user_can()` — never `manage_options` directly — so a user
- * granted only `wfa_manage_runs` is correctly limited to the Runs
+ * granted only `dragwyb_af_manage_runs` is correctly limited to the Runs
  * screens.
  */
 class Capabilities {
@@ -42,17 +42,17 @@ class Capabilities {
 	 * Can see the top-level plugin menu. Implied by any granular cap
 	 * (and by `manage_options`) via filterUserHasCap().
 	 */
-	public const ACCESS = 'wfa_access';
+	public const ACCESS = 'dragwyb_af_access';
 
-	public const MANAGE_WORKFLOWS = 'wfa_manage_workflows';
+	public const MANAGE_WORKFLOWS = 'dragwyb_af_manage_workflows';
 
-	public const MANAGE_RUNS = 'wfa_manage_runs';
+	public const MANAGE_RUNS = 'dragwyb_af_manage_runs';
 
-	public const MANAGE_CONNECTIONS = 'wfa_manage_connections';
+	public const MANAGE_CONNECTIONS = 'dragwyb_af_manage_connections';
 
-	public const MANAGE_WEBHOOKS = 'wfa_manage_webhooks';
+	public const MANAGE_WEBHOOKS = 'dragwyb_af_manage_webhooks';
 
-	public const MANAGE_SETTINGS = 'wfa_manage_settings';
+	public const MANAGE_SETTINGS = 'dragwyb_af_manage_settings';
 
 	/**
 	 * Every capability this plugin owns, including ACCESS.
@@ -131,7 +131,7 @@ class Capabilities {
 	/**
 	 * Layers plugin capabilities on top of `manage_options`, and grants
 	 * ACCESS whenever the user has any granular plugin cap (so a role
-	 * given only `wfa_manage_runs` still sees the top-level menu).
+	 * given only `dragwyb_af_manage_runs` still sees the top-level menu).
 	 *
 	 * @param array<string, bool> $allcaps Caps the user already has.
 	 * @param string[]            $caps    Primitive caps being checked (unused).

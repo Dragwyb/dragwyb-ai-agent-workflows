@@ -2,25 +2,25 @@
 /**
  * REST API bootstrap.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Container;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
-use WorkflowAutomate\Plugin\Service\WebhookService;
-use WorkflowAutomate\Plugin\Service\WorkflowExecutionService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
-use WorkflowAutomate\Plugin\Service\WorkflowNodeTestService;
-use WorkflowAutomate\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Service\AiModelsService;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

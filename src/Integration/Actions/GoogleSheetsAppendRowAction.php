@@ -2,14 +2,14 @@
 /**
  * Google Sheets append row action (legacy slug).
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,23 +27,23 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Append Row', 'workflow-automate' );
+		return __( 'Google Sheets Append Row', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Appends a row of values to a Google Sheet.', 'workflow-automate' );
+		return __( 'Appends a row of values to a Google Sheet.', 'dragwyb-agentflow' );
 	}
 
 	public function configSchema(): array {
 		return array(
-			'connection_id' => $this->connectionField(),
+			'connection_id'  => $this->connectionField(),
 			'spreadsheet_id' => $this->spreadsheetIdField(),
-			'range' => array(
-				'type' => 'string',
-				'label' => __( 'Range / tab (e.g. Sheet1!A1)', 'workflow-automate' ),
+			'range'          => array(
+				'type'    => 'string',
+				'label'   => __( 'Range / tab (e.g. Sheet1!A1)', 'dragwyb-agentflow' ),
 				'default' => 'Sheet1!A1',
 			),
-			'values' => $this->valuesField(),
+			'values'         => $this->valuesField(),
 		);
 	}
 
@@ -67,7 +67,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error' => __( 'No row values configured.', 'workflow-automate' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -94,7 +94,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 			return 'Sheet1';
 		}
 
-		if ( str_contains( $range, '!' ) ) {
+		if ( function_exists( 'str_contains' ) && str_contains( $range, '!' ) ) {
 			return explode( '!', $range )[0];
 		}
 

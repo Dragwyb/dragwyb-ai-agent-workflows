@@ -22,8 +22,8 @@ export default function MemorySubNode({
 	return (
 		<div
 			className={[
-				'wfa-memory-node',
-				selected ? 'wfa-memory-node--selected' : '',
+				'dragwyb-af-memory-node',
+				selected ? 'dragwyb-af-memory-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -33,12 +33,12 @@ export default function MemorySubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="wfa-memory-node__input-dot" aria-hidden="true" />
-			<span className="wfa-memory-node__icon" aria-hidden="true">
+			<span className="dragwyb-af-memory-node__input-dot" aria-hidden="true" />
+			<span className="dragwyb-af-memory-node__icon" aria-hidden="true">
 				🧠
 			</span>
-			<span className="wfa-memory-node__label">
-				{node.label || __('Simple Memory', 'workflow-automate')}
+			<span className="dragwyb-af-memory-node__label">
+				{node.label || __('Simple Memory', 'dragwyb-agentflow')}
 			</span>
 		</div>
 	);

@@ -2,14 +2,14 @@
 /**
  * Renders a Connection status as a small colored badge.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Shared between ConnectionsListTable and a future connection detail view.
- * Reuses the same `.wfa-status-badge` CSS classes RunStatusBadge already
+ * Reuses the same `.dragwyb-af-status-badge` CSS classes RunStatusBadge already
  * introduced (roadmap item 9) rather than a second color palette.
  */
 class ConnectionStatusBadge {
@@ -32,7 +32,7 @@ class ConnectionStatusBadge {
 	 */
 	public static function render( int $status ): string {
 		return sprintf(
-			'<span class="wfa-status-badge wfa-status-badge--%1$s">%2$s</span>',
+			'<span class="dragwyb-af-status-badge dragwyb-af-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);
@@ -62,11 +62,11 @@ class ConnectionStatusBadge {
 	private static function label( int $status ): string {
 		switch ( $status ) {
 			case Connection::STATUS_VERIFIED:
-				return __( 'Verified', 'workflow-automate' );
+				return __( 'Verified', 'dragwyb-agentflow' );
 			case Connection::STATUS_FAILED:
-				return __( 'Failed', 'workflow-automate' );
+				return __( 'Failed', 'dragwyb-agentflow' );
 			default:
-				return __( 'Not yet verified', 'workflow-automate' );
+				return __( 'Not yet verified', 'dragwyb-agentflow' );
 		}
 	}
 }

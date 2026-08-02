@@ -124,66 +124,66 @@ export default function AgentConfigPanel({
 	const canExecute = validationErrors.length === 0;
 
 	return (
-		<div className="wfa-agent-config">
-			<div className="wfa-agent-config__tabs">
+		<div className="dragwyb-af-agent-config">
+			<div className="dragwyb-af-agent-config__tabs">
 				<button
 					type="button"
 					className={
 						activeTab === 'parameters'
-							? 'wfa-agent-config__tab wfa-agent-config__tab--active'
-							: 'wfa-agent-config__tab'
+							? 'dragwyb-af-agent-config__tab dragwyb-af-agent-config__tab--active'
+							: 'dragwyb-af-agent-config__tab'
 					}
 					onClick={() => setActiveTab('parameters')}
 				>
-					{__('Parameters', 'workflow-automate')}
+					{__('Parameters', 'dragwyb-agentflow')}
 				</button>
 				<button
 					type="button"
 					className={
 						activeTab === 'settings'
-							? 'wfa-agent-config__tab wfa-agent-config__tab--active'
-							: 'wfa-agent-config__tab'
+							? 'dragwyb-af-agent-config__tab dragwyb-af-agent-config__tab--active'
+							: 'dragwyb-af-agent-config__tab'
 					}
 					onClick={() => setActiveTab('settings')}
 				>
-					{__('Settings', 'workflow-automate')}
+					{__('Settings', 'dragwyb-agentflow')}
 				</button>
 				<Button
 					variant="primary"
-					className="wfa-agent-config__execute"
+					className="dragwyb-af-agent-config__execute"
 					onClick={onExecuteStep}
 					isBusy={testing}
 					disabled={testing || !canExecute}
 				>
-					{__('Execute step', 'workflow-automate')}
+					{__('Execute step', 'dragwyb-agentflow')}
 				</Button>
 			</div>
 
 			{activeTab === 'parameters' && (
-				<div className="wfa-agent-config__panel">
+				<div className="dragwyb-af-agent-config__panel">
 					{!bannerDismissed && (
-						<div className="wfa-agent-config__banner" role="note">
-							<span className="wfa-agent-config__banner-icon" aria-hidden="true">
+						<div className="dragwyb-af-agent-config__banner" role="note">
+							<span className="dragwyb-af-agent-config__banner-icon" aria-hidden="true">
 								i
 							</span>
-							<p className="wfa-agent-config__banner-text">
+							<p className="dragwyb-af-agent-config__banner-text">
 								{__(
 									'Tip: Get a feel for agents with our quick',
-									'workflow-automate'
+									'dragwyb-agentflow'
 								)}{' '}
 								<a
 									href={TUTORIAL_URL}
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{__('tutorial', 'workflow-automate')}
+									{__('tutorial', 'dragwyb-agentflow')}
 								</a>
 								.
 							</p>
 							<button
 								type="button"
-								className="wfa-agent-config__banner-close"
-								aria-label={__('Dismiss tip', 'workflow-automate')}
+								className="dragwyb-af-agent-config__banner-close"
+								aria-label={__('Dismiss tip', 'dragwyb-agentflow')}
 								onClick={() => {
 									dismissAgentTutorial();
 									setBannerDismissed(true);
@@ -197,19 +197,19 @@ export default function AgentConfigPanel({
 					<SelectControl
 						label={__(
 							'Source for Prompt (User Message)',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						value={config.prompt_source}
 						options={[
 							{
 								label: __(
 									'Connected Chat Trigger Node',
-									'workflow-automate'
+									'dragwyb-agentflow'
 								),
 								value: PROMPT_SOURCE_CHAT_TRIGGER,
 							},
 							{
-								label: __('Define below', 'workflow-automate'),
+								label: __('Define below', 'dragwyb-agentflow'),
 								value: PROMPT_SOURCE_DEFINE,
 							},
 						]}
@@ -217,27 +217,27 @@ export default function AgentConfigPanel({
 					/>
 
 					{config.prompt_source === PROMPT_SOURCE_CHAT_TRIGGER ? (
-						<p className="wfa-agent-config__help">
+						<p className="dragwyb-af-agent-config__help">
 							{__(
 								'Looks for an input field called chatInput from a directly connected Chat Trigger node. The prompt textarea is hidden while this source is selected.',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							{!hasChatTrigger && (
-								<span className="wfa-builder-config__field-error">
+								<span className="dragwyb-af-builder-config__field-error">
 									{' '}
 									{__(
 										'No trigger is connected to this agent yet.',
-										'workflow-automate'
+										'dragwyb-agentflow'
 									)}
 								</span>
 							)}
 						</p>
 					) : (
-						<div className="wfa-builder-config__field">
+						<div className="dragwyb-af-builder-config__field">
 							<TokenField
 								label={__(
 									'Prompt (User Message)',
-									'workflow-automate'
+									'dragwyb-agentflow'
 								)}
 								value={config.prompt}
 								variableSources={variableSources}
@@ -245,7 +245,7 @@ export default function AgentConfigPanel({
 								onChange={(value) => onChangeConfig('prompt', value)}
 							/>
 							{validationByField.prompt && (
-								<p className="wfa-builder-config__field-error">
+								<p className="dragwyb-af-builder-config__field-error">
 									{validationByField.prompt}
 								</p>
 							)}
@@ -255,7 +255,7 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Require Specific Output Format',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						checked={config.require_output_format}
 						onChange={(checked) =>
@@ -264,21 +264,21 @@ export default function AgentConfigPanel({
 					/>
 
 					{config.require_output_format && (
-						<div className="wfa-agent-config__notice wfa-agent-config__notice--warning">
+						<div className="dragwyb-af-agent-config__notice dragwyb-af-agent-config__notice--warning">
 							{attachments.outputParser
 								? __(
 										'Output Parser connected. Click it on the canvas to edit the JSON example or schema.',
-										'workflow-automate'
+										'dragwyb-agentflow'
 								  )
 								: __(
 										'Connect an Output Parser node on the canvas to specify the output format you require.',
-										'workflow-automate'
+										'dragwyb-agentflow'
 								  )}
 						</div>
 					)}
 
 					{validationByField.output_parser && (
-						<p className="wfa-builder-config__field-error">
+						<p className="dragwyb-af-builder-config__field-error">
 							{validationByField.output_parser}
 						</p>
 					)}
@@ -286,11 +286,11 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Clean output (strip markdown)',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						help={__(
 							'Removes ``` code fences from {{output}} so HTTP Request gets plain text. Raw reply stays in {{response}}.',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						checked={config.clean_output}
 						onChange={(checked) =>
@@ -299,7 +299,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Enable Fallback Model', 'workflow-automate')}
+						label={__('Enable Fallback Model', 'dragwyb-agentflow')}
 						checked={config.fallback_enabled}
 						onChange={(checked) =>
 							onChangeConfig('fallback_enabled', checked)
@@ -307,28 +307,28 @@ export default function AgentConfigPanel({
 					/>
 
 					{config.fallback_enabled && (
-						<div className="wfa-agent-config__notice wfa-agent-config__notice--info">
+						<div className="dragwyb-af-agent-config__notice dragwyb-af-agent-config__notice--info">
 							{__(
 								'Connect an additional language model on the canvas to use it as a fallback if the main model fails.',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 						</div>
 					)}
 
 					{validationByField.fallback_chat_model && (
-						<p className="wfa-builder-config__field-error">
+						<p className="dragwyb-af-builder-config__field-error">
 							{validationByField.fallback_chat_model}
 						</p>
 					)}
 
-					<div className="wfa-agent-config__options">
-						<h3 className="wfa-agent-config__options-title">
-							{__('Options', 'workflow-automate')}
+					<div className="dragwyb-af-agent-config__options">
+						<h3 className="dragwyb-af-agent-config__options-title">
+							{__('Options', 'dragwyb-agentflow')}
 						</h3>
 
 						{config.options.length === 0 ? (
-							<p className="wfa-agent-config__options-empty">
-								{__('No properties', 'workflow-automate')}
+							<p className="dragwyb-af-agent-config__options-empty">
+								{__('No properties', 'dragwyb-agentflow')}
 							</p>
 						) : (
 							config.options.map((optionId) => {
@@ -344,7 +344,7 @@ export default function AgentConfigPanel({
 									return (
 										<div
 											key={optionId}
-											className="wfa-agent-config__option-row"
+											className="dragwyb-af-agent-config__option-row"
 										>
 											<TokenField
 												label={optionMeta.label}
@@ -360,7 +360,7 @@ export default function AgentConfigPanel({
 												isDestructive
 												onClick={() => removeOption(optionId)}
 											>
-												{__('Remove', 'workflow-automate')}
+												{__('Remove', 'dragwyb-agentflow')}
 											</Button>
 										</div>
 									);
@@ -370,7 +370,7 @@ export default function AgentConfigPanel({
 									return (
 										<div
 											key={optionId}
-											className="wfa-agent-config__option-row"
+											className="dragwyb-af-agent-config__option-row"
 										>
 											<TextControl
 												label={optionMeta.label}
@@ -390,7 +390,7 @@ export default function AgentConfigPanel({
 												isDestructive
 												onClick={() => removeOption(optionId)}
 											>
-												{__('Remove', 'workflow-automate')}
+												{__('Remove', 'dragwyb-agentflow')}
 											</Button>
 										</div>
 									);
@@ -400,22 +400,22 @@ export default function AgentConfigPanel({
 							})
 						)}
 
-						<div className="wfa-agent-config__add-option-wrap">
+						<div className="dragwyb-af-agent-config__add-option-wrap">
 							<Button
 								variant="secondary"
-								className="wfa-agent-config__add-option"
+								className="dragwyb-af-agent-config__add-option"
 								onClick={() => setOptionsMenuOpen((open) => !open)}
 								disabled={availableOptions.length === 0}
 							>
-								{__('Add Option', 'workflow-automate')}
+								{__('Add Option', 'dragwyb-agentflow')}
 							</Button>
 							{optionsMenuOpen && availableOptions.length > 0 && (
-								<div className="wfa-agent-config__add-option-menu">
+								<div className="dragwyb-af-agent-config__add-option-menu">
 									{availableOptions.map((option) => (
 										<button
 											key={option.id}
 											type="button"
-											className="wfa-agent-config__add-option-item"
+											className="dragwyb-af-agent-config__add-option-item"
 											onClick={() => addOption(option.id)}
 										>
 											{option.label}
@@ -429,9 +429,9 @@ export default function AgentConfigPanel({
 			)}
 
 			{activeTab === 'settings' && (
-				<div className="wfa-agent-config__panel">
+				<div className="dragwyb-af-agent-config__panel">
 					<ToggleControl
-						label={__('Always Output Data', 'workflow-automate')}
+						label={__('Always Output Data', 'dragwyb-agentflow')}
 						checked={config.settings.always_output_data}
 						onChange={(checked) =>
 							patchSettings({ always_output_data: checked })
@@ -439,7 +439,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Execute Once', 'workflow-automate')}
+						label={__('Execute Once', 'dragwyb-agentflow')}
 						checked={config.settings.execute_once}
 						onChange={(checked) =>
 							patchSettings({ execute_once: checked })
@@ -447,7 +447,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Retry On Fail', 'workflow-automate')}
+						label={__('Retry On Fail', 'dragwyb-agentflow')}
 						checked={config.settings.retry_on_fail}
 						onChange={(checked) =>
 							patchSettings({ retry_on_fail: checked })
@@ -457,7 +457,7 @@ export default function AgentConfigPanel({
 					{config.settings.retry_on_fail && (
 						<>
 							<TextControl
-								label={__('Max. Tries', 'workflow-automate')}
+								label={__('Max. Tries', 'dragwyb-agentflow')}
 								type="number"
 								min={1}
 								max={10}
@@ -471,7 +471,7 @@ export default function AgentConfigPanel({
 							<TextControl
 								label={__(
 									'Wait Between Tries (ms)',
-									'workflow-automate'
+									'dragwyb-agentflow'
 								)}
 								type="number"
 								min={0}
@@ -489,21 +489,21 @@ export default function AgentConfigPanel({
 					)}
 
 					<SelectControl
-						label={__('On Error', 'workflow-automate')}
+						label={__('On Error', 'dragwyb-agentflow')}
 						value={config.settings.on_error}
 						options={[
 							{
-								label: __('Stop Workflow', 'workflow-automate'),
+								label: __('Stop Workflow', 'dragwyb-agentflow'),
 								value: ON_ERROR_STOP,
 							},
 							{
-								label: __('Continue', 'workflow-automate'),
+								label: __('Continue', 'dragwyb-agentflow'),
 								value: ON_ERROR_CONTINUE,
 							},
 							{
 								label: __(
 									'Continue using Error Output',
-									'workflow-automate'
+									'dragwyb-agentflow'
 								),
 								value: ON_ERROR_ERROR_OUTPUT,
 							},
@@ -512,7 +512,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<TextareaControl
-						label={__('Notes', 'workflow-automate')}
+						label={__('Notes', 'dragwyb-agentflow')}
 						value={config.settings.notes}
 						onChange={(value) => patchSettings({ notes: value })}
 					/>
@@ -520,7 +520,7 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Display Note in Flow?',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						checked={config.settings.display_note_in_flow}
 						onChange={(checked) =>
@@ -528,10 +528,10 @@ export default function AgentConfigPanel({
 						}
 					/>
 
-					<p className="wfa-agent-config__version">
+					<p className="dragwyb-af-agent-config__version">
 						{__(
 							'AI Agent node version',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}{' '}
 						{AI_AGENT_VERSION}
 					</p>
@@ -569,7 +569,7 @@ function AgentConnectorRow({
 	const connectors = [
 		{
 			id: 'chat_model',
-			label: __('Chat Model', 'workflow-automate'),
+			label: __('Chat Model', 'dragwyb-agentflow'),
 			required: true,
 			connected: attachments.chatModel,
 			onAdd: onAddChatModel,
@@ -577,13 +577,13 @@ function AgentConnectorRow({
 		},
 		{
 			id: 'memory',
-			label: __('Memory', 'workflow-automate'),
+			label: __('Memory', 'dragwyb-agentflow'),
 			connected: attachments.memory,
 			onAdd: onAddMemory,
 		},
 		{
 			id: 'tool',
-			label: __('Tool', 'workflow-automate'),
+			label: __('Tool', 'dragwyb-agentflow'),
 			connected: attachments.tools?.length > 0 ? attachments.tools[0] : null,
 			toolCount: attachments.tools?.length || 0,
 			onAdd: onAddTool,
@@ -593,7 +593,7 @@ function AgentConnectorRow({
 	if (fallbackEnabled) {
 		connectors.push({
 			id: 'fallback_chat_model',
-			label: __('Fallback Chat Model', 'workflow-automate'),
+			label: __('Fallback Chat Model', 'dragwyb-agentflow'),
 			required: true,
 			connected: attachments.fallbackChatModel,
 			onAdd: onAddFallbackModel,
@@ -604,7 +604,7 @@ function AgentConnectorRow({
 	if (requireOutputFormat) {
 		connectors.splice(1, 0, {
 			id: 'output_parser',
-			label: __('Output Parser', 'workflow-automate'),
+			label: __('Output Parser', 'dragwyb-agentflow'),
 			required: true,
 			connected: attachments.outputParser,
 			onAdd: onAddOutputParser,
@@ -613,7 +613,7 @@ function AgentConnectorRow({
 	}
 
 	return (
-		<div className="wfa-agent-config__connectors">
+		<div className="dragwyb-af-agent-config__connectors">
 			{connectors.map((connector) => (
 				<AgentConnectorSlot
 					key={connector.id}
@@ -629,21 +629,21 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 	const { connected, label, required, onAdd, error, toolCount } = connector;
 
 	return (
-		<div className="wfa-agent-config__connector">
-			<span className="wfa-agent-config__connector-label">
+		<div className="dragwyb-af-agent-config__connector">
+			<span className="dragwyb-af-agent-config__connector-label">
 				{label}
 				{required ? (
-					<span className="wfa-agent-config__connector-required">*</span>
+					<span className="dragwyb-af-agent-config__connector-required">*</span>
 				) : null}
 			</span>
 			{connected ? (
 				<button
 					type="button"
-					className="wfa-agent-config__connector-chip"
+					className="dragwyb-af-agent-config__connector-chip"
 					onClick={() => onSelectNode(connected.id)}
 				>
 					<ConnectorIcon node={connected} />
-					<span className="wfa-agent-config__connector-chip-label">
+					<span className="dragwyb-af-agent-config__connector-chip-label">
 						{connected.label || connected.type}
 						{toolCount > 1 ? ` (+${toolCount - 1})` : ''}
 					</span>
@@ -651,15 +651,15 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 			) : (
 				<button
 					type="button"
-					className="wfa-agent-config__connector-add"
+					className="dragwyb-af-agent-config__connector-add"
 					onClick={onAdd}
-					aria-label={__('Add connection', 'workflow-automate')}
+					aria-label={__('Add connection', 'dragwyb-agentflow')}
 				>
 					+
 				</button>
 			)}
 			{error ? (
-				<span className="wfa-agent-config__connector-error">{error}</span>
+				<span className="dragwyb-af-agent-config__connector-error">{error}</span>
 			) : null}
 		</div>
 	);
@@ -672,7 +672,7 @@ function ConnectorIcon({ node }) {
 
 		return (
 			<span
-				className="wfa-agent-config__connector-icon"
+				className="dragwyb-af-agent-config__connector-icon"
 				style={{ backgroundColor: meta.bg, color: meta.accent }}
 			>
 				{meta.icon}
@@ -682,7 +682,7 @@ function ConnectorIcon({ node }) {
 
 	if (node.attachment_type === 'memory') {
 		return (
-			<span className="wfa-agent-config__connector-icon wfa-agent-config__connector-icon--muted">
+			<span className="dragwyb-af-agent-config__connector-icon dragwyb-af-agent-config__connector-icon--muted">
 				M
 			</span>
 		);
@@ -690,14 +690,14 @@ function ConnectorIcon({ node }) {
 
 	if (node.attachment_type === 'output_parser') {
 		return (
-			<span className="wfa-agent-config__connector-icon wfa-agent-config__connector-icon--parser">
+			<span className="dragwyb-af-agent-config__connector-icon dragwyb-af-agent-config__connector-icon--parser">
 				{'{ }'}
 			</span>
 		);
 	}
 
 	return (
-		<span className="wfa-agent-config__connector-icon wfa-agent-config__connector-icon--tool">
+		<span className="dragwyb-af-agent-config__connector-icon dragwyb-af-agent-config__connector-icon--tool">
 			T
 		</span>
 	);

@@ -2,14 +2,14 @@
 /**
  * Service provider contract.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace DragwybAgentFlow\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Core\Container;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

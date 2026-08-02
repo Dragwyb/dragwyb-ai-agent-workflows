@@ -41,11 +41,11 @@ export default function AgentNodeCard({
 	};
 
 	const classNames = [
-		'wfa-builder-node',
-		'wfa-builder-node--agent',
-		selected ? 'wfa-builder-node--selected' : '',
-		hasUnknownType ? 'wfa-builder-node--unknown' : '',
-		isLinkTarget ? 'wfa-builder-node--link-target' : '',
+		'dragwyb-af-builder-node',
+		'dragwyb-af-builder-node--agent',
+		selected ? 'dragwyb-af-builder-node--selected' : '',
+		hasUnknownType ? 'dragwyb-af-builder-node--unknown' : '',
+		isLinkTarget ? 'dragwyb-af-builder-node--link-target' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -67,17 +67,17 @@ export default function AgentNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<div
-				className="wfa-agent-node__main"
+				className="dragwyb-af-agent-node__main"
 				style={{ minHeight: `${AGENT_BODY_HEIGHT}px` }}
 			>
 				<span
-					className="wfa-builder-node__handle wfa-builder-node__handle--input"
+					className="dragwyb-af-builder-node__handle dragwyb-af-builder-node__handle--input"
 					aria-hidden="true"
 				/>
 
-				<div className="wfa-builder-node__body">
+				<div className="dragwyb-af-builder-node__body">
 					<span
-						className="wfa-builder-node__icon"
+						className="dragwyb-af-builder-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -86,10 +86,10 @@ export default function AgentNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="wfa-builder-node__text">
-						<span className="wfa-builder-node__label">{node.label}</span>
-						<span className="wfa-builder-node__subtitle">
-							{__('AI Agent', 'workflow-automate')}
+					<div className="dragwyb-af-builder-node__text">
+						<span className="dragwyb-af-builder-node__label">{node.label}</span>
+						<span className="dragwyb-af-builder-node__subtitle">
+							{__('AI Agent', 'dragwyb-agentflow')}
 						</span>
 					</div>
 				</div>
@@ -97,14 +97,14 @@ export default function AgentNodeCard({
 				{canStartFlowConnection && onStartFlowConnectionDrag && (
 					<button
 						type="button"
-						className="wfa-builder-node__output-port wfa-builder-node__output-port--side"
+						className="dragwyb-af-builder-node__output-port dragwyb-af-builder-node__output-port--side"
 						title={__(
 							'Drag to the next step to connect',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						aria-label={__(
 							'Drag to the next step to connect',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						onPointerDown={(event) => {
 							stopPointer(event);
@@ -115,22 +115,22 @@ export default function AgentNodeCard({
 			</div>
 
 			<div
-				className="wfa-agent-node__ports"
+				className="dragwyb-af-agent-node__ports"
 				style={{ minHeight: `${AGENT_PORTS_HEIGHT}px` }}
 			>
-				<div className="wfa-agent-node__port">
-					<span className="wfa-agent-node__port-label">
-						{__('Chat Model', 'workflow-automate')}
-						<span className="wfa-agent-node__required">*</span>
+				<div className="dragwyb-af-agent-node__port">
+					<span className="dragwyb-af-agent-node__port-label">
+						{__('Chat Model', 'dragwyb-agentflow')}
+						<span className="dragwyb-af-agent-node__required">*</span>
 					</span>
 					{hasChatModel ? (
 						<button
 							type="button"
-							className="wfa-agent-node__port-dot wfa-agent-node__port-dot--ok wfa-agent-node__port-dot--link"
-							title={__('Open chat model settings', 'workflow-automate')}
+							className="dragwyb-af-agent-node__port-dot dragwyb-af-agent-node__port-dot--ok dragwyb-af-agent-node__port-dot--link"
+							title={__('Open chat model settings', 'dragwyb-agentflow')}
 							aria-label={__(
 								'Open chat model settings',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -143,14 +143,14 @@ export default function AgentNodeCard({
 					) : (
 						<button
 							type="button"
-							className="wfa-agent-node__add-port"
+							className="dragwyb-af-agent-node__add-port"
 							aria-label={__(
 								'Add chat model to agent',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							title={__(
 								'Select OpenAI, Gemini, Claude, OpenRouter, Groq, or DeepSeek',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -163,21 +163,21 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="wfa-agent-node__port">
-					<span className="wfa-agent-node__port-label">
-						{__('Memory', 'workflow-automate')}
+				<div className="dragwyb-af-agent-node__port">
+					<span className="dragwyb-af-agent-node__port-label">
+						{__('Memory', 'dragwyb-agentflow')}
 					</span>
 					{hasMemory ? (
 						<span
-							className="wfa-agent-node__port-dot wfa-agent-node__port-dot--ok"
-							title={__('Memory connected', 'workflow-automate')}
+							className="dragwyb-af-agent-node__port-dot dragwyb-af-agent-node__port-dot--ok"
+							title={__('Memory connected', 'dragwyb-agentflow')}
 						/>
 					) : (
 						<button
 							type="button"
-							className="wfa-agent-node__add-port wfa-agent-node__add-port--muted"
-							aria-label={__('Add memory to agent', 'workflow-automate')}
-							title={__('Add simple memory', 'workflow-automate')}
+							className="dragwyb-af-agent-node__add-port dragwyb-af-agent-node__add-port--muted"
+							aria-label={__('Add memory to agent', 'dragwyb-agentflow')}
+							title={__('Add simple memory', 'dragwyb-agentflow')}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -189,17 +189,17 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="wfa-agent-node__port wfa-agent-node__port--tool">
-					<span className="wfa-agent-node__port-label">
-						{__('Tool', 'workflow-automate')}
+				<div className="dragwyb-af-agent-node__port dragwyb-af-agent-node__port--tool">
+					<span className="dragwyb-af-agent-node__port-label">
+						{__('Tool', 'dragwyb-agentflow')}
 					</span>
 					<button
 						type="button"
-						className="wfa-agent-node__add-port"
-						aria-label={__('Add tool to agent', 'workflow-automate')}
+						className="dragwyb-af-agent-node__add-port"
+						aria-label={__('Add tool to agent', 'dragwyb-agentflow')}
 						title={__(
 							'Add an action as an agent tool',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 						onPointerDown={stopPointer}
 						onClick={(event) => {

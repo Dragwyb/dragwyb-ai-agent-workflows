@@ -2,14 +2,14 @@
 /**
  * Elementor Pro form submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,14 +44,14 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Elementor Form Submitted', 'workflow-automate' );
+		return __( 'Elementor Form Submitted', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when an Elementor Pro form is submitted.', 'workflow-automate' );
+		return __( 'Starts the workflow when an Elementor Pro form is submitted.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -60,13 +60,13 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'select',
-				'label' => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'select',
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
 				'default' => '',
 				'options' => array(
 					array(
 						'value' => '',
-						'label' => __( 'All forms', 'workflow-automate' ),
+						'label' => __( 'All forms', 'dragwyb-agentflow' ),
 					),
 				),
 			),
@@ -163,12 +163,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'elementor',
-			'event' => 'form_submitted',
-			'form_name' => $form_name,
-			'form_id' => $form_id,
+			'source'       => 'elementor',
+			'event'        => 'form_submitted',
+			'form_name'    => $form_name,
+			'form_id'      => $form_id,
 			'form_post_id' => $form_post_id,
-			'fields' => $fields,
+			'fields'       => $fields,
 		);
 	}
 }

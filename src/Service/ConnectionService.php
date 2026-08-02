@@ -2,18 +2,18 @@
 /**
  * Connection application service.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Core\Encryption;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Persistence\ConnectionRepository;
+use DragwybAgentFlow\Plugin\Core\Encryption;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,36 +57,36 @@ class ConnectionService {
 	 */
 	public function create( string $integration_slug, string $auth_type, string $label, array $field_values ): Connection {
 		$integration_slug = sanitize_key( $integration_slug );
-		$label = trim( sanitize_text_field( $label ) );
+		$label            = trim( sanitize_text_field( $label ) );
 
 		if ( ! in_array( $auth_type, ConnectionAuthTypes::VALID, true ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Unrecognized authentication type.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'Unrecognized authentication type.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $integration_slug ) {
-			throw new InvalidArgumentException( esc_html__( 'An integration is required.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'An integration is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $label ) {
-			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$encrypted = array();
 		$plaintext = array();
 
 		foreach ( ConnectionAuthTypes::fields( $auth_type ) as $field => $meta ) {
-			$value = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
+			$value    = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
 			$required = ConnectionAuthTypes::isRequiredOnCreate( $auth_type, $field );
 
 			if ( $required && '' === $value ) {
-				throw new InvalidArgumentException( esc_html__( 'All fields are required to create a connection.', 'workflow-automate' ) );
+				throw new InvalidArgumentException( esc_html__( 'All fields are required to create a connection.', 'dragwyb-agentflow' ) );
 			}
 
 			if ( '' === $value ) {
 				continue;
 			}
 
-			$plaintext[ $field ]  = $value;
+			$plaintext[ $field ] = $value;
 			$encrypted[ $field ] = Encryption::encrypt( $value );
 		}
 
@@ -95,15 +95,15 @@ class ConnectionService {
 		$connection = $this->connections->insert(
 			array(
 				'integration_slug' => $integration_slug,
-				'auth_type' => $auth_type,
-				'label' => $label,
-				'credentials' => $encrypted,
-				'status' => $status,
+				'auth_type'        => $auth_type,
+				'label'            => $label,
+				'credentials'      => $encrypted,
+				'status'           => $status,
 			)
 		);
 
 		if ( null === $connection ) {
-			throw new RuntimeException( esc_html__( 'Failed to create the connection.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to create the connection.', 'dragwyb-agentflow' ) );
 		}
 
 		return $connection;
@@ -134,18 +134,18 @@ class ConnectionService {
 		$connection = $this->connections->find( $id );
 
 		if ( null === $connection ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified connection does not exist.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified connection does not exist.', 'dragwyb-agentflow' ) );
 		}
 
 		$label = trim( sanitize_text_field( $label ) );
 
 		if ( '' === $label ) {
-			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'workflow-automate' ) );
+			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$encrypted = $connection->encryptedCredentials();
-		$plaintext   = array();
-		$rotated     = false;
+		$plaintext = array();
+		$rotated   = false;
 
 		foreach ( ConnectionAuthTypes::fields( $connection->authType() ) as $field => $meta ) {
 			$value = isset( $field_values[ $field ] ) ? trim( (string) $field_values[ $field ] ) : '';
@@ -153,16 +153,16 @@ class ConnectionService {
 			if ( '' !== $value ) {
 				$encrypted[ $field ] = Encryption::encrypt( $value );
 				$plaintext[ $field ] = $value;
-				$rotated               = true;
+				$rotated             = true;
 				continue;
 			}
 
-			$existing = isset( $encrypted[ $field ] ) ? Encryption::decrypt( (string) $encrypted[ $field ] ) : null;
+			$existing            = isset( $encrypted[ $field ] ) ? Encryption::decrypt( (string) $encrypted[ $field ] ) : null;
 			$plaintext[ $field ] = null === $existing ? '' : (string) $existing;
 		}
 
 		$attributes = array(
-			'label' => $label,
+			'label'       => $label,
 			'credentials' => $encrypted,
 		);
 
@@ -180,7 +180,7 @@ class ConnectionService {
 		);
 
 		if ( null === $updated ) {
-			throw new RuntimeException( esc_html__( 'Failed to update the connection.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to update the connection.', 'dragwyb-agentflow' ) );
 		}
 
 		return $updated;
@@ -228,14 +228,14 @@ class ConnectionService {
 		$connection = $this->connections->find( $id );
 
 		if ( null === $connection ) {
-			throw new RuntimeException( esc_html__( 'The specified connection does not exist.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'The specified connection does not exist.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
-			throw new RuntimeException( esc_html__( 'OAuth tokens can only be stored on OAuth connections.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'OAuth tokens can only be stored on OAuth connections.', 'dragwyb-agentflow' ) );
 		}
 
-		$encrypted = $connection->encryptedCredentials();
+		$encrypted                  = $connection->encryptedCredentials();
 		$encrypted['access_token']  = Encryption::encrypt( $access_token );
 		$encrypted['refresh_token'] = '' !== $refresh_token ? Encryption::encrypt( $refresh_token ) : ( $encrypted['refresh_token'] ?? '' );
 		$encrypted['expires_at']    = Encryption::encrypt( (string) $expires_at );
@@ -251,12 +251,12 @@ class ConnectionService {
 			$id,
 			array(
 				'credentials' => $encrypted,
-				'status' => $status,
+				'status'      => $status,
 			)
 		);
 
 		if ( null === $updated ) {
-			throw new RuntimeException( esc_html__( 'Failed to store OAuth tokens.', 'workflow-automate' ) );
+			throw new RuntimeException( esc_html__( 'Failed to store OAuth tokens.', 'dragwyb-agentflow' ) );
 		}
 
 		return $updated;
@@ -294,18 +294,18 @@ class ConnectionService {
 	 */
 	public function displayCredentials( Connection $connection ): array {
 		$encrypted = $connection->encryptedCredentials();
-		$result = array();
+		$result    = array();
 
 		foreach ( ConnectionAuthTypes::fields( $connection->authType() ) as $field => $meta ) {
 			$ciphertext = isset( $encrypted[ $field ] ) ? (string) $encrypted[ $field ] : '';
 			$configured = '' !== $ciphertext;
-			$display = '';
+			$display    = '';
 
 			if ( $configured ) {
 				$plaintext = Encryption::decrypt( $ciphertext );
 
 				if ( null === $plaintext ) {
-					$display = __( '(unable to decrypt — please re-enter this value)', 'workflow-automate' );
+					$display = __( '(unable to decrypt — please re-enter this value)', 'dragwyb-agentflow' );
 				} elseif ( ! empty( $meta['secret'] ) ) {
 					$display = self::mask( $plaintext );
 				} else {
@@ -314,10 +314,10 @@ class ConnectionService {
 			}
 
 			$result[ $field ] = array(
-				'label' => $meta['label'],
-				'secret' => ! empty( $meta['secret'] ),
+				'label'      => $meta['label'],
+				'secret'     => ! empty( $meta['secret'] ),
 				'configured' => $configured,
-				'display' => $display,
+				'display'    => $display,
 			);
 		}
 
@@ -373,9 +373,9 @@ class ConnectionService {
 		if ( empty( $result['success'] ) ) {
 			$message = isset( $result['error'] ) && '' !== $result['error']
 				? (string) $result['error']
-				: __( 'Credential verification failed. Check the API key or token and try again.', 'workflow-automate' );
+				: __( 'Credential verification failed. Check the API key or token and try again.', 'dragwyb-agentflow' );
 
-			throw new InvalidArgumentException( $message );
+			throw new InvalidArgumentException( esc_html( $message ) );
 		}
 
 		return Connection::STATUS_VERIFIED;
@@ -395,7 +395,7 @@ class ConnectionService {
 				continue;
 			}
 
-			$decrypted = Encryption::decrypt( (string) $ciphertext );
+			$decrypted       = Encryption::decrypt( (string) $ciphertext );
 			$plain[ $field ] = null === $decrypted ? '' : (string) $decrypted;
 		}
 

@@ -64,58 +64,58 @@ export default function ChatPanel({
 			  }));
 
 	return (
-		<aside className="wfa-builder-chat" aria-label={__('Chat', 'workflow-automate')}>
-			<div className="wfa-builder-chat__header">
+		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-agentflow')}>
+			<div className="dragwyb-af-builder-chat__header">
 				<div>
-					<strong>{title || __('Chat', 'workflow-automate')}</strong>
-					<p className="wfa-builder-chat__subtitle">
+					<strong>{title || __('Chat', 'dragwyb-agentflow')}</strong>
+					<p className="dragwyb-af-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						)}
 					</p>
 				</div>
 				<Button isSmall isSecondary onClick={onClose}>
-					{__('Close', 'workflow-automate')}
+					{__('Close', 'dragwyb-agentflow')}
 				</Button>
 			</div>
 
-			<div className="wfa-builder-chat__messages" ref={listRef}>
+			<div className="dragwyb-af-builder-chat__messages" ref={listRef}>
 				{displayMessages.map((message) => (
 					<div
 						key={message.id}
-						className={`wfa-builder-chat__bubble wfa-builder-chat__bubble--${message.role}`}
+						className={`dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--${message.role}`}
 					>
 						{message.content}
 					</div>
 				))}
 				{sending && (
-					<div className="wfa-builder-chat__bubble wfa-builder-chat__bubble--assistant wfa-builder-chat__bubble--pending">
-						{__('Thinking…', 'workflow-automate')}
+					<div className="dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--assistant dragwyb-af-builder-chat__bubble--pending">
+						{__('Thinking…', 'dragwyb-agentflow')}
 					</div>
 				)}
 			</div>
 
 			{error && (
-				<p className="wfa-builder-chat__error" role="alert">
+				<p className="dragwyb-af-builder-chat__error" role="alert">
 					{error}
 				</p>
 			)}
 
-			<form className="wfa-builder-chat__composer" onSubmit={handleSubmit}>
+			<form className="dragwyb-af-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
-					label={__('Message', 'workflow-automate')}
+					label={__('Message', 'dragwyb-agentflow')}
 					hideLabelFromVision
 					value={draft}
 					onChange={setDraft}
-					placeholder={__('Type a message…', 'workflow-automate')}
+					placeholder={__('Type a message…', 'dragwyb-agentflow')}
 					rows={2}
 					disabled={sending}
 				/>
 				<Button isPrimary type="submit" disabled={sending || !draft.trim()}>
 					{sending
-						? __('Sending…', 'workflow-automate')
-						: __('Send', 'workflow-automate')}
+						? __('Sending…', 'dragwyb-agentflow')
+						: __('Send', 'dragwyb-agentflow')}
 				</Button>
 			</form>
 		</aside>

@@ -2,14 +2,14 @@
 /**
  * WP-Cron-driven background execution worker.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,14 +29,14 @@ class BackgroundRunner {
 	/**
 	 * The WP-Cron hook this worker's processBatch() is bound to.
 	 */
-	public const CRON_HOOK = 'wfa/cron/process_queue';
+	public const CRON_HOOK = 'dragwyb_af/cron/process_queue';
 
 	/**
 	 * The custom cron_schedules key registered for that hook. WordPress
 	 * ships nothing finer-grained than hourly, so a custom schedule is
 	 * required for timely queue draining — see registerCronSchedule().
 	 */
-	public const CRON_SCHEDULE = 'wfa_every_minute';
+	public const CRON_SCHEDULE = 'dragwyb_af_every_minute';
 
 	/**
 	 * Maximum runs claimed per cron tick. Kept modest because a single
@@ -67,7 +67,7 @@ class BackgroundRunner {
 	private WorkflowExecutionService $executor;
 
 	public function __construct( WorkflowRunRepository $runs, WorkflowExecutionService $executor ) {
-		$this->runs = $runs;
+		$this->runs     = $runs;
 		$this->executor = $executor;
 	}
 
@@ -83,7 +83,7 @@ class BackgroundRunner {
 	public static function registerCronSchedule( array $schedules ): array {
 		$schedules[ self::CRON_SCHEDULE ] = array(
 			'interval' => MINUTE_IN_SECONDS,
-			'display' => __( 'Every minute (Workflow Automate queue)', 'workflow-automate' ),
+			'display'  => __( 'Every minute (Workflow Automate queue)', 'dragwyb-agentflow' ),
 		);
 
 		return $schedules;
@@ -97,7 +97,7 @@ class BackgroundRunner {
 	 */
 	public function processBatch(): void {
 		$started_at = microtime( true );
-		$claimed = $this->runs->claimBatch( self::BATCH_SIZE, self::STALE_CLAIM_MINUTES );
+		$claimed    = $this->runs->claimBatch( self::BATCH_SIZE, self::STALE_CLAIM_MINUTES );
 
 		foreach ( $claimed as $index => $run ) {
 			if ( ( microtime( true ) - $started_at ) > self::TIME_BUDGET_SECONDS ) {

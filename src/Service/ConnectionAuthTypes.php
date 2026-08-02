@@ -2,12 +2,12 @@
 /**
  * Built-in connection authentication type definitions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,11 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Defines the credential-field shape for each supported `auth_type`.
  *
  * This is a small, fixed lookup table rather than a `NodeTypeRegistry`-style
- * hook-based registry (compare `wfa/nodes/register`). Nothing yet consumes
+ * hook-based registry (compare `dragwyb_af/nodes/register`). Nothing yet consumes
  * an auth type beyond what's built in here — no real third-party
  * integration exists until roadmap item 12 — so an extension point would
  * be speculative surface with nothing to exercise it, the same reasoning
- * that already deferred `wfa/integrations/register` (see
+ * that already deferred `dragwyb_af/integrations/register` (see
  * `docs/internal/architecture.md` §2.6). OAuth2 is deliberately not one of
  * the built-in types yet either: it needs a redirect/callback flow and
  * token refresh handling that this item's scope (storage + encryption)
@@ -53,14 +53,14 @@ class ConnectionAuthTypes {
 	public static function label( string $auth_type ): string {
 		switch ( $auth_type ) {
 			case self::BASIC:
-				return __( 'Username & Password', 'workflow-automate' );
+				return __( 'Username & Password', 'dragwyb-agentflow' );
 			case self::BEARER_TOKEN:
-				return __( 'Bearer Token', 'workflow-automate' );
+				return __( 'Bearer Token', 'dragwyb-agentflow' );
 			case self::OAUTH2:
-				return __( 'OAuth 2', 'workflow-automate' );
+				return __( 'OAuth 2', 'dragwyb-agentflow' );
 			case self::API_KEY:
 			default:
-				return __( 'API Key', 'workflow-automate' );
+				return __( 'API Key', 'dragwyb-agentflow' );
 		}
 	}
 
@@ -76,44 +76,44 @@ class ConnectionAuthTypes {
 			case self::BASIC:
 				return array(
 					'username' => array(
-						'label' => __( 'Username', 'workflow-automate' ),
+						'label'  => __( 'Username', 'dragwyb-agentflow' ),
 						'secret' => false,
 					),
 					'password' => array(
-						'label' => __( 'Password', 'workflow-automate' ),
+						'label'  => __( 'Password', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 				);
 			case self::BEARER_TOKEN:
 				return array(
 					'token' => array(
-						'label' => __( 'Bearer Token', 'workflow-automate' ),
+						'label'  => __( 'Bearer Token', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 				);
 			case self::OAUTH2:
 				return array(
-					'client_id' => array(
-						'label' => __( 'Client ID', 'workflow-automate' ),
+					'client_id'     => array(
+						'label'  => __( 'Client ID', 'dragwyb-agentflow' ),
 						'secret' => false,
 					),
 					'client_secret' => array(
-						'label' => __( 'Client Secret', 'workflow-automate' ),
+						'label'  => __( 'Client Secret', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
-					'access_token' => array(
-						'label' => __( 'Access Token', 'workflow-automate' ),
-						'secret' => true,
+					'access_token'  => array(
+						'label'              => __( 'Access Token', 'dragwyb-agentflow' ),
+						'secret'             => true,
 						'required_on_create' => false,
 					),
 					'refresh_token' => array(
-						'label' => __( 'Refresh Token', 'workflow-automate' ),
-						'secret' => true,
+						'label'              => __( 'Refresh Token', 'dragwyb-agentflow' ),
+						'secret'             => true,
 						'required_on_create' => false,
 					),
-					'expires_at' => array(
-						'label' => __( 'Token Expires At', 'workflow-automate' ),
-						'secret' => false,
+					'expires_at'    => array(
+						'label'              => __( 'Token Expires At', 'dragwyb-agentflow' ),
+						'secret'             => false,
 						'required_on_create' => false,
 					),
 				);
@@ -121,7 +121,7 @@ class ConnectionAuthTypes {
 			default:
 				return array(
 					'api_key' => array(
-						'label' => __( 'API Key', 'workflow-automate' ),
+						'label'  => __( 'API Key', 'dragwyb-agentflow' ),
 						'secret' => true,
 					),
 				);

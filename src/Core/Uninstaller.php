@@ -2,14 +2,14 @@
 /**
  * Plugin uninstall handler.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
-use WorkflowAutomate\Plugin\Database\SchemaMigrations;
+use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

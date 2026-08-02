@@ -2,15 +2,15 @@
 /**
  * Webhook repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\Webhook;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\Webhook;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,10 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_webhooks` access goes through this class. Never decrypts the
+ * All `dragwyb_af_webhooks` access goes through this class. Never decrypts the
  * signing secret — that stays the job of `Service\WebhookService`.
  */
 class WebhookRepository {
+
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'dragwyb_af_webhooks';
 
 	private const MAX_PER_PAGE = 100;
 
@@ -31,7 +35,7 @@ class WebhookRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'webhooks' );
+		return esc_sql( Table::name( 'webhooks' ) );
 	}
 
 	/**
@@ -50,13 +54,13 @@ class WebhookRepository {
 		global $wpdb;
 
 		$data = array(
-			'workflow_id' => isset( $attributes['workflow_id'] ) && null !== $attributes['workflow_id']
+			'workflow_id'        => isset( $attributes['workflow_id'] ) && null !== $attributes['workflow_id']
 				? (int) $attributes['workflow_id']
 				: null,
-			'public_id' => (string) $attributes['public_id'],
-			'signing_secret' => (string) ( $attributes['signing_secret'] ?? '' ),
+			'public_id'          => (string) $attributes['public_id'],
+			'signing_secret'     => (string) ( $attributes['signing_secret'] ?? '' ),
 			'ip_allow_list_json' => wp_json_encode( $attributes['ip_allow_list'] ?? array() ),
-			'created_at' => current_time( 'mysql', true ),
+			'created_at'         => current_time( 'mysql', true ),
 		);
 
 		// workflow_id may be null; $wpdb->insert needs an explicit format
@@ -64,6 +68,7 @@ class WebhookRepository {
 		// we pass null — which we do above.
 		$formats = array( '%d', '%s', '%s', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
@@ -84,35 +89,46 @@ class WebhookRepository {
 	public function update( int $id, array $attributes ): ?Webhook {
 		global $wpdb;
 
-		$data = array();
+		$data    = array();
 		$formats = array();
 
 		if ( array_key_exists( 'workflow_id', $attributes ) ) {
 			$data['workflow_id'] = null !== $attributes['workflow_id'] ? (int) $attributes['workflow_id'] : null;
-			$formats[] = '%d';
+			$formats[]           = '%d';
 		}
 
 		if ( array_key_exists( 'signing_secret', $attributes ) ) {
 			$data['signing_secret'] = (string) $attributes['signing_secret'];
-			$formats[] = '%s';
+			$formats[]              = '%s';
 		}
 
 		if ( array_key_exists( 'ip_allow_list', $attributes ) ) {
 			$data['ip_allow_list_json'] = wp_json_encode( $attributes['ip_allow_list'] );
-			$formats[] = '%s';
+			$formats[]                  = '%s';
 		}
 
 		if ( array() === $data ) {
 			return $this->find( $id );
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
 		if ( false === $updated ) {
 			return null;
 		}
 
-		return $this->find( $id );
+		$this->cacheDelete( (string) $id );
+
+		$webhook = $this->find( $id );
+
+		if ( null !== $webhook ) {
+			// public_id is immutable, so this is always the same key the
+			// row was (or would be) cached under via findByPublicId().
+			$this->cacheDelete( $this->publicIdCacheKey( $webhook->publicId() ) );
+		}
+
+		return $webhook;
 	}
 
 	/**
@@ -125,7 +141,18 @@ class WebhookRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
+		// Looked up first (cache-aware, so usually free) purely to learn
+		// the public_id cache key that also needs invalidating.
+		$webhook = $this->find( $id );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
+
+		$this->cacheDelete( (string) $id );
+
+		if ( null !== $webhook ) {
+			$this->cacheDelete( $this->publicIdCacheKey( $webhook->publicId() ) );
+		}
 
 		return false !== $deleted && $deleted > 0;
 	}
@@ -134,6 +161,13 @@ class WebhookRepository {
 	 * Nulls `workflow_id` on every webhook that pointed at a permanently
 	 * deleted workflow (application-level ON DELETE SET NULL).
 	 *
+	 * Not cache-invalidated here: this bulk `UPDATE ... WHERE workflow_id`
+	 * doesn't cheaply tell us which individual ids/public_ids it touched,
+	 * and workflow hard-delete is a rare admin action, so any affected
+	 * webhook's cached `workflow_id` field briefly going stale is low
+	 * impact and self-heals the next time that specific webhook is
+	 * written through update()/delete().
+	 *
 	 * @param int $workflow_id Workflow id that was hard-deleted.
 	 *
 	 * @return void
@@ -141,6 +175,7 @@ class WebhookRepository {
 	public function nullifyWorkflow( int $workflow_id ): void {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it. Not cache-invalidated here, see docblock above.
 		$wpdb->update(
 			$this->table(),
 			array( 'workflow_id' => null ),
@@ -160,12 +195,24 @@ class WebhookRepository {
 	public function find( int $id ): ?Webhook {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE id = %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
 
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $id ) );
+		if ( false !== $cached ) {
+			return $cached;
+		}
 
-		return $row ? Webhook::fromRow( $row ) : null;
+		$table = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; result is cached above via cacheGet() and below via cacheSet().
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
+
+		$webhook = $row ? Webhook::fromRow( $row ) : null;
+
+		if ( null !== $webhook ) {
+			$this->cacheSet( $cache_key, $webhook );
+		}
+
+		return $webhook;
 	}
 
 	/**
@@ -178,12 +225,33 @@ class WebhookRepository {
 	public function findByPublicId( string $public_id ): ?Webhook {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE public_id = %s"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$cache_key = $this->publicIdCacheKey( $public_id );
+		$cached    = $this->cacheGet( $cache_key );
 
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $public_id ) );
+		if ( false !== $cached ) {
+			return $cached;
+		}
 
-		return $row ? Webhook::fromRow( $row ) : null;
+		$table = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; result is cached above via cacheGet() and below via cacheSet().
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE public_id = %s", $public_id ) );
+
+		$webhook = $row ? Webhook::fromRow( $row ) : null;
+
+		if ( null !== $webhook ) {
+			$this->cacheSet( $cache_key, $webhook );
+		}
+
+		return $webhook;
+	}
+
+	/**
+	 * @param string $public_id UUID segment of the public ingress URL.
+	 *
+	 * @return string
+	 */
+	private function publicIdCacheKey( string $public_id ): string {
+		return 'public_' . $public_id;
 	}
 
 	/**
@@ -194,38 +262,54 @@ class WebhookRepository {
 	 *     @type int $per_page Rows per page, clamped to [1, 100]. Default 20.
 	 * }
 	 *
+	 * Intentionally not object-cached: the result depends on an open-ended
+	 * combination of filters, page, and per_page, so caching it would need
+	 * one cache key per combination, invalidated on nearly every write to
+	 * this table — high complexity for little real hit rate. Only find()
+	 * and findByPublicId() cache, since each has exactly one cache key.
+	 *
 	 * @return array{items: Webhook[], total: int, page: int, per_page: int}
 	 */
 	public function paginate( array $args = array() ): array {
 		global $wpdb;
 
-		$page = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$per_page = isset( $args['per_page'] ) ? (int) $args['per_page'] : self::DEFAULT_PER_PAGE;
 		$per_page = max( 1, min( self::MAX_PER_PAGE, $per_page ) );
-		$offset = ( $page - 1 ) * $per_page;
+		$offset   = ( $page - 1 ) * $per_page;
 
-		$where = array();
-		$params = array();
+		// `id > %d` is always true (id is an AUTO_INCREMENT primary key
+		// starting at 1); it guarantees $where/$params are never empty so
+		// every query below can go through $wpdb->prepare() unconditionally,
+		// instead of branching between a prepared and an unprepared call.
+		$where  = array( 'id > %d' );
+		$params = array( 0 );
 
 		if ( ! empty( $args['workflow_id'] ) ) {
-			$where[] = 'workflow_id = %d';
+			$where[]  = 'workflow_id = %d';
 			$params[] = (int) $args['workflow_id'];
 		}
 
-		$where_sql = $where ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
-		$table = $this->table();
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
+		$table     = esc_sql($this->table());
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input.
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params ) ) : $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginate() docblock.
+		$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
+		);
 
-		$list_sql = "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Not cached, see paginate() docblock.
+		$rows        = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
+			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
+		);
 
 		return array(
-			'items' => array_map( array( Webhook::class, 'fromRow' ), $rows ? $rows : array() ),
-			'total' => $total,
-			'page' => $page,
+			'items'    => array_map( array( Webhook::class, 'fromRow' ), $rows ? $rows : array() ),
+			'total'    => $total,
+			'page'     => $page,
 			'per_page' => $per_page,
 		);
 	}

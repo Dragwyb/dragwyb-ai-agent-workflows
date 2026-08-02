@@ -174,39 +174,39 @@ export default function TestDataTree({ title, data, embedded = false }) {
 		<div
 			className={
 				embedded
-					? 'wfa-test-io__panel wfa-test-io__panel--embedded'
-					: 'wfa-test-io__panel'
+					? 'dragwyb-af-test-io__panel dragwyb-af-test-io__panel--embedded'
+					: 'dragwyb-af-test-io__panel'
 			}
 		>
 			{!embedded && title && (
-				<h4 className="wfa-test-io__panel-title">{title}</h4>
+				<h4 className="dragwyb-af-test-io__panel-title">{title}</h4>
 			)}
 
 			{!hasData ? (
-				<p className="wfa-test-io__empty">
-					{__('No data', 'workflow-automate')}
+				<p className="dragwyb-af-test-io__empty">
+					{__('No data', 'dragwyb-agentflow')}
 				</p>
 			) : (
-				<div className="wfa-test-io__tree-wrap">
-					<ul className="wfa-test-io__tree">
-						<li className="wfa-test-io__branch">
+				<div className="dragwyb-af-test-io__tree-wrap">
+					<ul className="dragwyb-af-test-io__tree">
+						<li className="dragwyb-af-test-io__branch">
 							<button
 								type="button"
-								className="wfa-test-io__branch-btn"
+								className="dragwyb-af-test-io__branch-btn"
 								aria-expanded
 								disabled
 							>
-								<span className="wfa-test-io__chevron">▾</span>
-								<span className="wfa-test-io__branch-label">root</span>
-								<span className="wfa-test-io__count">
+								<span className="dragwyb-af-test-io__chevron">▾</span>
+								<span className="dragwyb-af-test-io__branch-label">root</span>
+								<span className="dragwyb-af-test-io__count">
 									{sprintf(
 										/* translators: %d: number of fields */
-										__('%d items', 'workflow-automate'),
+										__('%d items', 'dragwyb-agentflow'),
 										itemCount
 									)}
 								</span>
 							</button>
-							<ul className="wfa-test-io__tree wfa-test-io__tree--nested">
+							<ul className="dragwyb-af-test-io__tree dragwyb-af-test-io__tree--nested">
 								{(tree.children || []).map((child) => (
 									<ReadOnlyBranch key={child.id} node={child} depth={0} />
 								))}
@@ -234,17 +234,17 @@ function ReadOnlyBranch({ node, depth }) {
 		const rawValue = node.value;
 
 		return (
-			<li className="wfa-test-io__leaf">
+			<li className="dragwyb-af-test-io__leaf">
 				<div
-					className={`wfa-test-io__field${isResponse ? ' wfa-test-io__field--response' : ''}`}
+					className={`dragwyb-af-test-io__field${isResponse ? ' dragwyb-af-test-io__field--response' : ''}`}
 					style={{ paddingLeft: `${8 + depth * 14}px` }}
 				>
-					<span className="wfa-test-io__key">{fieldKey}</span>
-					<span className="wfa-test-io__colon">:</span>
+					<span className="dragwyb-af-test-io__key">{fieldKey}</span>
+					<span className="dragwyb-af-test-io__colon">:</span>
 					{isResponse && typeof rawValue === 'string' ? (
-						<pre className="wfa-test-io__response">{rawValue}</pre>
+						<pre className="dragwyb-af-test-io__response">{rawValue}</pre>
 					) : (
-						<span className="wfa-test-io__value">
+						<span className="dragwyb-af-test-io__value">
 							{formatScalarValue(rawValue)}
 						</span>
 					)}
@@ -260,26 +260,26 @@ function ReadOnlyBranch({ node, depth }) {
 	const childCount = children.length;
 
 	return (
-		<li className="wfa-test-io__branch">
+		<li className="dragwyb-af-test-io__branch">
 			<button
 				type="button"
-				className="wfa-test-io__branch-btn"
+				className="dragwyb-af-test-io__branch-btn"
 				style={{ paddingLeft: `${8 + depth * 14}px` }}
 				onClick={() => setOpen(!open)}
 				aria-expanded={open}
 			>
-				<span className="wfa-test-io__chevron">{open ? '▾' : '▸'}</span>
-				<span className="wfa-test-io__branch-label">{node.label}</span>
-				<span className="wfa-test-io__count">
+				<span className="dragwyb-af-test-io__chevron">{open ? '▾' : '▸'}</span>
+				<span className="dragwyb-af-test-io__branch-label">{node.label}</span>
+				<span className="dragwyb-af-test-io__count">
 					{sprintf(
 						/* translators: %d: number of nested fields */
-						__('%d items', 'workflow-automate'),
+						__('%d items', 'dragwyb-agentflow'),
 						childCount
 					)}
 				</span>
 			</button>
 			{open && (
-				<ul className="wfa-test-io__tree wfa-test-io__tree--nested">
+				<ul className="dragwyb-af-test-io__tree dragwyb-af-test-io__tree--nested">
 					{children.map((child) => (
 						<ReadOnlyBranch
 							key={child.id}

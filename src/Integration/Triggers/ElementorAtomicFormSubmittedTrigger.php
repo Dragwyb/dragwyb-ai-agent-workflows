@@ -2,14 +2,14 @@
 /**
  * Elementor Pro atomic form submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,14 +41,14 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Elementor Atomic Form Submitted', 'workflow-automate' );
+		return __( 'Elementor Atomic Form Submitted', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when an Elementor Pro atomic form is submitted.', 'workflow-automate' );
+		return __( 'Starts the workflow when an Elementor Pro atomic form is submitted.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -57,13 +57,13 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'select',
-				'label' => __( 'Form (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'select',
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
 				'default' => '',
 				'options' => array(
 					array(
 						'value' => '',
-						'label' => __( 'All forms', 'workflow-automate' ),
+						'label' => __( 'All forms', 'dragwyb-agentflow' ),
 					),
 				),
 			),
@@ -118,8 +118,18 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			return \Elementor\Utils::get_super_global_value( $_POST, $key );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return $_POST[ $key ] ?? null;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing, 
+		$value = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : null;
+
+		if ( is_string( $value ) ) {
+			return sanitize_text_field( $value );
+		}
+
+		if ( is_array( $value ) ) {
+			return array_map( 'sanitize_text_field', wp_unslash( $value ) );
+		}
+
+		return $value;
 	}
 
 	/**
@@ -135,9 +145,9 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			return null;
 		}
 
-		$fields           = array();
-		$fields_by_label  = array();
-		$field_metadata   = array();
+		$fields          = array();
+		$fields_by_label = array();
+		$field_metadata  = array();
 
 		foreach ( $form_fields as $field ) {
 			if ( ! is_array( $field ) ) {
@@ -154,7 +164,7 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			$type  = sanitize_text_field( $field['type'] ?? 'text' );
 
 			if ( is_array( $value ) ) {
-				$sanitized = array_map( 'sanitize_text_field', $value );
+				$sanitized     = array_map( 'sanitize_text_field', $value );
 				$fields[ $id ] = implode( ', ', $sanitized );
 			} elseif ( 'textarea' === $type ) {
 				$fields[ $id ] = sanitize_textarea_field( (string) $value );
@@ -173,8 +183,8 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 				: null;
 
 			$field_metadata[ $id ] = array(
-				'label' => $label,
-				'type' => $type,
+				'label'   => $label,
+				'type'    => $type,
 				'options' => is_array( $options ) ? $options : null,
 			);
 		}
@@ -194,16 +204,16 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'elementor-atomic',
-			'event' => 'atomic_form_submitted',
-			'form_name' => $form_name,
-			'form_id' => $form_id,
-			'form_post_id' => (string) $post_id,
-			'fields' => $fields,
+			'source'          => 'elementor-atomic',
+			'event'           => 'atomic_form_submitted',
+			'form_name'       => $form_name,
+			'form_id'         => $form_id,
+			'form_post_id'    => (string) $post_id,
+			'fields'          => $fields,
 			'fields_by_label' => $fields_by_label,
-			'field_metadata' => $field_metadata,
-			'referer_title' => $referer_title,
-			'referrer' => $referrer,
+			'field_metadata'  => $field_metadata,
+			'referer_title'   => $referer_title,
+			'referrer'        => $referrer,
 		);
 	}
 

@@ -2,7 +2,7 @@
  * Portable workflow JSON helpers (n8n-style import/export).
  */
 
-export const WORKFLOW_JSON_FORMAT = 'workflow-automate';
+export const WORKFLOW_JSON_FORMAT = 'dragwyb-agentflow';
 export const WORKFLOW_JSON_VERSION = 1;
 
 const TRANSIENT_SETTING_KEYS = [

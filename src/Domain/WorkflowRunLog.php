@@ -2,12 +2,12 @@
 /**
  * WorkflowRunLog domain entity.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain;
+namespace DragwybAgentFlow\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,17 +71,17 @@ class WorkflowRunLog {
 		?int $durationMs,
 		string $createdAt
 	) {
-		$this->id = $id;
-		$this->runId = $runId;
-		$this->nodeId = $nodeId;
-		$this->nodeType = $nodeType;
-		$this->nodeLabel = $nodeLabel;
-		$this->status = $status;
-		$this->input = $input;
-		$this->output = $output;
-		$this->message = $message;
+		$this->id         = $id;
+		$this->runId      = $runId;
+		$this->nodeId     = $nodeId;
+		$this->nodeType   = $nodeType;
+		$this->nodeLabel  = $nodeLabel;
+		$this->status     = $status;
+		$this->input      = $input;
+		$this->output     = $output;
+		$this->message    = $message;
 		$this->durationMs = $durationMs;
-		$this->createdAt = $createdAt;
+		$this->createdAt  = $createdAt;
 	}
 
 	/**

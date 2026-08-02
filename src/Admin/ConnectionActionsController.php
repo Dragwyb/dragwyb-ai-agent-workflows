@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Connection admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionsPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionsPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=wfa_connection_action` POST
+ * Receives the `admin-post.php?action=dragwyb_af_connection_action` POST
  * submitted by ConnectionFormPage's create/edit forms and
  * ConnectionsListTable's/ConnectionFormPage's delete forms.
  *
@@ -55,7 +55,7 @@ class ConnectionActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_connection_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_connection_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleConnectionsBulkFromList' ), 5 );
 	}
 
@@ -65,7 +65,11 @@ class ConnectionActionsController {
 	 * @return void
 	 */
 	public function maybeHandleConnectionsBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -86,7 +90,7 @@ class ConnectionActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation (and per-id for update/delete).
@@ -97,7 +101,7 @@ class ConnectionActionsController {
 		}
 
 		if ( 'create' === $op ) {
-			check_admin_referer( 'wfa_connection_action_create' );
+			check_admin_referer( 'dragwyb_af_connection_action_create' );
 			$this->handleCreate();
 
 			return;
@@ -110,7 +114,7 @@ class ConnectionActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'wfa_connection_action_' . $op . '_' . $id );
+		check_admin_referer( 'dragwyb_af_connection_action_' . $op . '_' . $id );
 
 		if ( 'update' === $op ) {
 			$this->handleUpdate( $id );
@@ -142,9 +146,9 @@ class ConnectionActionsController {
 			wp_safe_redirect(
 				add_query_arg(
 					array(
-						'page' => ConnectionFormPage::SLUG,
+						'page'       => ConnectionFormPage::SLUG,
 						'connection' => $connection->id(),
-						'wfa_notice' => 'created_oauth',
+						'dragwyb_af_notice' => 'created_oauth',
 					),
 					admin_url( 'admin.php' )
 				)
@@ -191,31 +195,27 @@ class ConnectionActionsController {
 	 */
 	public function handleConnectionsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['wfa_connection_bulk'] ) ) {
+		if ( empty( $_POST['dragwyb_af_connection_bulk'] ) ) {
 			return;
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'wfa_connection_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_connection_bulk_action' ) ) {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( 'delete' !== $bulk_action ) {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
-		$ids = isset( $_POST['connections'] ) && is_array( $_POST['connections'] )
-			? array_map( 'absint', wp_unslash( $_POST['connections'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['connections'] ) && is_array($_POST['connections'] ) ? array_map( 'absint', wp_unslash( $_POST['connections'] ) ) : array();
 
 		foreach ( array_filter( $ids ) as $id ) {
 			$this->connections->delete( $id );
@@ -235,7 +235,7 @@ class ConnectionActionsController {
 	 * @return array<string,string>
 	 */
 	private function extractCredentialValues(): array {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in handle().
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nonce already verified in verifyBulkNonce() & manual sanitization is performed below
 		$raw = isset( $_POST['credential'] ) && is_array( $_POST['credential'] ) ? wp_unslash( $_POST['credential'] ) : array();
 
 		$values = array();
@@ -257,12 +257,12 @@ class ConnectionActionsController {
 	 */
 	private function redirect( string $notice, string $detail = '' ): void {
 		$args = array(
-			'page' => ConnectionsPage::SLUG,
-			'wfa_notice' => $notice,
+			'page'       => ConnectionsPage::SLUG,
+			'dragwyb_af_notice' => $notice,
 		);
 
 		if ( '' !== $detail ) {
-			$args['wfa_error'] = $detail;
+			$args['dragwyb_af_error'] = $detail;
 		}
 
 		wp_safe_redirect(

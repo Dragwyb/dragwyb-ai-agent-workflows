@@ -2,12 +2,12 @@
 /**
  * Optional trigger grouping for the builder palette.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain\Contracts;
+namespace DragwybAgentFlow\Plugin\Domain\Contracts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

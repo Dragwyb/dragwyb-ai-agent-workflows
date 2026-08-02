@@ -2,17 +2,17 @@
 /**
  * Plugin activation handler.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
-use WorkflowAutomate\Plugin\Database\MigrationRunner;
-use WorkflowAutomate\Plugin\Database\SchemaMigrations;
-use WorkflowAutomate\Plugin\Service\BackgroundRunner;
-use WorkflowAutomate\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Database\MigrationRunner;
+use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
+use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,11 +38,11 @@ class Activator {
 		$requirements = Requirements::check();
 
 		if ( is_wp_error( $requirements ) ) {
-			deactivate_plugins( WFA_PLUGIN_BASENAME );
+			deactivate_plugins( DRAGWYB_AF_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
-				esc_html__( 'Plugin activation error', 'workflow-automate' ),
+				esc_html__( 'Plugin activation error', 'dragwyb-agentflow' ),
 				array( 'back_link' => true )
 			);
 		}
@@ -55,7 +55,7 @@ class Activator {
 			Options::add( 'installed_at', time(), true );
 		}
 
-		Options::update( 'db_version', WFA_VERSION );
+		Options::update( 'db_version', DRAGWYB_AF_VERSION );
 
 		self::scheduleBackgroundQueue();
 		self::scheduleRetentionPruning();

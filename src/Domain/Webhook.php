@@ -2,12 +2,12 @@
 /**
  * Webhook domain entity.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain;
+namespace DragwybAgentFlow\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -52,12 +52,12 @@ class Webhook {
 		array $ipAllowList,
 		string $createdAt
 	) {
-		$this->id = $id;
-		$this->workflowId = $workflowId;
-		$this->publicId = $publicId;
+		$this->id                     = $id;
+		$this->workflowId             = $workflowId;
+		$this->publicId               = $publicId;
 		$this->encryptedSigningSecret = $encryptedSigningSecret;
-		$this->ipAllowList = $ipAllowList;
-		$this->createdAt = $createdAt;
+		$this->ipAllowList            = $ipAllowList;
+		$this->createdAt              = $createdAt;
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Webhook {
 			? (int) $row->workflow_id
 			: null;
 
-		$decoded = json_decode( (string) $row->ip_allow_list_json, true );
+		$decoded       = json_decode( (string) $row->ip_allow_list_json, true );
 		$ip_allow_list = array();
 
 		if ( is_array( $decoded ) ) {

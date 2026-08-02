@@ -2,14 +2,14 @@
 /**
  * LLM client backed by WordPress AI Client (prompt + tools).
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\Messages\DTO\Message;
 use WordPress\AiClient\Messages\DTO\MessagePart;
 use WordPress\AiClient\Messages\Enums\MessageRoleEnum;
@@ -31,7 +31,7 @@ class AgentAiClient {
 	/**
 	 * Run a chat completion (optionally with tools) via the WP AI Client.
 	 *
-	 * @param string            $provider      WFA provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * @param string            $provider      dragwyb_af provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 * @param string            $model         Model id.
 	 * @param array<int, mixed> $messages      OpenAI-style messages.
 	 * @param array<int, mixed> $tools         OpenAI-style tool schemas.
@@ -49,7 +49,7 @@ class AgentAiClient {
 		if ( ! AiClientBootstrap::isAvailable() ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'WordPress AI Client is not available.', 'workflow-automate' ),
+				'error'   => __( 'WordPress AI Client is not available.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -68,7 +68,7 @@ class AgentAiClient {
 				'success' => false,
 				'error'   => sprintf(
 					/* translators: %s: provider name */
-					__( 'No API key configured for %s. Add an API key in this node.', 'workflow-automate' ),
+					__( 'No API key configured for %s. Add an API key in this node.', 'dragwyb-agentflow' ),
 					$provider_id
 				),
 			);
@@ -80,7 +80,13 @@ class AgentAiClient {
 			$system_instr = $converted['system'];
 			$decls        = $this->toFunctionDeclarations( $tools );
 
-			$builder = wp_ai_client_prompt( $ai_messages );
+			$builder = AiClientBootstrap::createPromptBuilder( $ai_messages );
+			if ( null === $builder ) {
+				return array(
+					'success' => false,
+					'error'   => __( 'The WordPress AI Client is not available on this site.', 'dragwyb-agentflow' ),
+				);
+			}
 			$builder->using_provider( $provider_id );
 			$builder->using_model_preference( array( $provider_id, $model ) );
 
@@ -104,7 +110,7 @@ class AgentAiClient {
 			if ( ! $result instanceof GenerativeAiResult ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The AI client returned an unexpected result.', 'workflow-automate' ),
+					'error'   => __( 'The AI client returned an unexpected result.', 'dragwyb-agentflow' ),
 				);
 			}
 
@@ -120,7 +126,7 @@ class AgentAiClient {
 	/**
 	 * Simple text completion helper for chat actions.
 	 *
-	 * @param string $provider      WFA provider slug.
+	 * @param string $provider      dragwyb_af provider slug.
 	 * @param string $model         Model id.
 	 * @param string $prompt        User prompt.
 	 * @param string $system_prompt Optional system prompt.
@@ -145,7 +151,7 @@ class AgentAiClient {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => $result['error'] ?? __( 'AI request failed.', 'workflow-automate' ),
+				'error'   => $result['error'] ?? __( 'AI request failed.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -300,7 +306,7 @@ class AgentAiClient {
 			}
 
 			$description = (string) ( $fn['description'] ?? '' );
-			$parameters   = isset( $fn['parameters'] ) && is_array( $fn['parameters'] ) ? $fn['parameters'] : null;
+			$parameters  = isset( $fn['parameters'] ) && is_array( $fn['parameters'] ) ? $fn['parameters'] : null;
 
 			$decls[] = new FunctionDeclaration( $name, $description, $parameters );
 		}
@@ -337,7 +343,7 @@ class AgentAiClient {
 					if ( null === $call ) {
 						continue;
 					}
-					$args = $call->getArgs();
+					$args         = $call->getArgs();
 					$tool_calls[] = array(
 						'id'       => (string) ( $call->getId() ?? wp_generate_uuid4() ),
 						'type'     => 'function',

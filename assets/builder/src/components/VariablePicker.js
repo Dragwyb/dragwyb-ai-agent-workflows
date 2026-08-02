@@ -83,15 +83,15 @@ export default function VariablePicker({
 
 	return (
 		<div
-			className={`wfa-variable-picker${embedded ? ' wfa-variable-picker--embedded' : ''}${popover ? ' wfa-variable-picker--popover' : ''}`}
+			className={`dragwyb-af-variable-picker${embedded ? ' dragwyb-af-variable-picker--embedded' : ''}${popover ? ' dragwyb-af-variable-picker--popover' : ''}`}
 		>
 			{!popover && (
-				<div className="wfa-variable-picker__header">
-					<h3>{__('Variables', 'workflow-automate')}</h3>
+				<div className="dragwyb-af-variable-picker__header">
+					<h3>{__('Variables', 'dragwyb-agentflow')}</h3>
 					{!embedded && (
 						<Button
 							icon="no-alt"
-							label={__('Close', 'workflow-automate')}
+							label={__('Close', 'dragwyb-agentflow')}
 							onClick={onClose}
 						/>
 					)}
@@ -99,11 +99,11 @@ export default function VariablePicker({
 			)}
 
 			{showSearch && (
-				<div className="wfa-variable-picker__search">
+				<div className="dragwyb-af-variable-picker__search">
 					<input
 						type="search"
-						className="wfa-variable-picker__search-input"
-						placeholder={__('Search variables…', 'workflow-automate')}
+						className="dragwyb-af-variable-picker__search-input"
+						placeholder={__('Search variables…', 'dragwyb-agentflow')}
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
 					/>
@@ -111,24 +111,24 @@ export default function VariablePicker({
 			)}
 
 			{!hasData ? (
-				<p className="wfa-variable-picker__empty">
+				<p className="dragwyb-af-variable-picker__empty">
 					{__(
 						'No variables yet. Listen for trigger data or add steps above this node.',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			) : (
 				filteredSources.map((source) => (
-					<div key={source.id} className="wfa-variable-picker__source-block">
-						<div className="wfa-variable-picker__source">
-							<span className="wfa-variable-picker__source-badge">
+					<div key={source.id} className="dragwyb-af-variable-picker__source-block">
+						<div className="dragwyb-af-variable-picker__source">
+							<span className="dragwyb-af-variable-picker__source-badge">
 								{source.badge}
 							</span>
-							<span className="wfa-variable-picker__source-label">
+							<span className="dragwyb-af-variable-picker__source-label">
 								{source.label}
 							</span>
 						</div>
-						<ul className="wfa-variable-picker__tree">
+						<ul className="dragwyb-af-variable-picker__tree">
 							{(source.tree.children || []).map((child) => (
 								<TreeBranch
 									key={`${source.id}-${child.id}`}
@@ -161,10 +161,10 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 
 	if (node.isLeaf) {
 		return (
-			<li className="wfa-variable-picker__leaf">
+			<li className="dragwyb-af-variable-picker__leaf">
 				<button
 					type="button"
-					className="wfa-variable-picker__leaf-btn"
+					className="dragwyb-af-variable-picker__leaf-btn"
 					style={{ paddingLeft: `${8 + depth * 14}px` }}
 					onClick={() => onSelect(node.token, node.path)}
 					title={
@@ -173,13 +173,13 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 							: node.token
 					}
 				>
-					<span className="wfa-variable-picker__pill">
+					<span className="dragwyb-af-variable-picker__pill">
 						{node.id.endsWith('.__all__')
 							? node.label
 							: pathToDisplayLabel(node.path, nodeLabels)}
 					</span>
 					{node.preview && (
-						<span className="wfa-variable-picker__preview">
+						<span className="dragwyb-af-variable-picker__preview">
 							{node.preview}
 						</span>
 					)}
@@ -193,19 +193,19 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 	}
 
 	return (
-		<li className="wfa-variable-picker__branch">
+		<li className="dragwyb-af-variable-picker__branch">
 			<button
 				type="button"
-				className="wfa-variable-picker__branch-btn"
+				className="dragwyb-af-variable-picker__branch-btn"
 				style={{ paddingLeft: `${8 + depth * 14}px` }}
 				onClick={() => setOpen(!open)}
 				aria-expanded={open}
 			>
-				<span className="wfa-variable-picker__chevron">{open ? '▾' : '▸'}</span>
-				<span className="wfa-variable-picker__branch-label">{node.label}</span>
+				<span className="dragwyb-af-variable-picker__chevron">{open ? '▾' : '▸'}</span>
+				<span className="dragwyb-af-variable-picker__branch-label">{node.label}</span>
 			</button>
 			{open && (
-				<ul className="wfa-variable-picker__tree wfa-variable-picker__tree--nested">
+				<ul className="dragwyb-af-variable-picker__tree dragwyb-af-variable-picker__tree--nested">
 					{children.map((child) => (
 						<TreeBranch
 							key={child.id}

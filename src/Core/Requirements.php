@@ -2,12 +2,12 @@
 /**
  * Runtime environment requirement checks.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,25 +38,25 @@ class Requirements {
 
 		$errors = new \WP_Error();
 
-		if ( version_compare( PHP_VERSION, WFA_MIN_PHP_VERSION, '<' ) ) {
+		if ( version_compare( PHP_VERSION, DRAGWYB_AF_MIN_PHP_VERSION, '<' ) ) {
 			$errors->add(
-				'wfa_php_version',
+				'dragwyb_af_php_version',
 				sprintf(
 					/* translators: 1: required PHP version, 2: current PHP version. */
-					__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s.', 'workflow-automate' ),
-					WFA_MIN_PHP_VERSION,
+					__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s.', 'dragwyb-agentflow' ),
+					DRAGWYB_AF_MIN_PHP_VERSION,
 					PHP_VERSION
 				)
 			);
 		}
 
-		if ( isset( $wp_version ) && version_compare( $wp_version, WFA_MIN_WP_VERSION, '<' ) ) {
+		if ( isset( $wp_version ) && version_compare( $wp_version, DRAGWYB_AF_MIN_WP_VERSION, '<' ) ) {
 			$errors->add(
-				'wfa_wp_version',
+				'dragwyb_af_wp_version',
 				sprintf(
 					/* translators: 1: required WordPress version, 2: current WordPress version. */
-					__( 'Workflow Automate requires WordPress %1$s or higher. Your site is running WordPress %2$s.', 'workflow-automate' ),
-					WFA_MIN_WP_VERSION,
+					__( 'Workflow Automate requires WordPress %1$s or higher. Your site is running WordPress %2$s.', 'dragwyb-agentflow' ),
+					DRAGWYB_AF_MIN_WP_VERSION,
 					$wp_version
 				)
 			);
@@ -64,8 +64,8 @@ class Requirements {
 
 		if ( ! Encryption::isAvailable() ) {
 			$errors->add(
-				'wfa_openssl_missing',
-				__( 'Workflow Automate requires the PHP openssl extension (used to encrypt stored connection credentials) to be enabled.', 'workflow-automate' )
+				'dragwyb_af_openssl_missing',
+				__( 'Workflow Automate requires the PHP openssl extension (used to encrypt stored connection credentials) to be enabled.', 'dragwyb-agentflow' )
 			);
 		}
 

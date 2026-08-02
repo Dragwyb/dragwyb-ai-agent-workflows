@@ -2,14 +2,14 @@
 /**
  * Live credential verification for stored connections.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Calls each integration's real API with the submitted credentials before a
  * connection is saved. AI providers use in-builder API keys (Connectors on WP 7+,
- * AI Client credentials option below WP 7) instead of WFA Connections, so they
+ * AI Client credentials option below WP 7) instead of dragwyb_af Connections, so they
  * are not verified here.
  */
 class ConnectionVerifier {
@@ -43,11 +43,11 @@ class ConnectionVerifier {
 	 * @var array<string, string>
 	 */
 	private const ALIASES = array(
-		'telegram' => 'telegram_send_message_action',
-		'whatsapp' => 'whatsapp_cloud_send_message_action',
+		'telegram'       => 'telegram_send_message_action',
+		'whatsapp'       => 'whatsapp_cloud_send_message_action',
 		'whatsapp_cloud' => 'whatsapp_cloud_send_message_action',
-		'google_sheets' => 'google_sheets_append_row_action',
-		'sheets' => 'google_sheets_append_row_action',
+		'google_sheets'  => 'google_sheets_append_row_action',
+		'sheets'         => 'google_sheets_append_row_action',
 	);
 
 	/**
@@ -92,7 +92,7 @@ class ConnectionVerifier {
 
 			return array(
 				'success' => false,
-				'error' => __( 'Credentials are incomplete — cannot verify this connection.', 'workflow-automate' ),
+				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -225,11 +225,11 @@ class ConnectionVerifier {
 
 		return array(
 			'success' => false,
-			'error' => isset( $result['error'] )
+			'error'   => isset( $result['error'] )
 				? (string) $result['error']
 				: sprintf(
 					/* translators: %s: third-party service name */
-					__( 'Could not verify credentials with %s.', 'workflow-automate' ),
+					__( 'Could not verify credentials with %s.', 'dragwyb-agentflow' ),
 					$service
 				),
 		);

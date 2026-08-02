@@ -2,33 +2,33 @@
 /**
  * Registers all Google Sheets workflow actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\GoogleSheet;
+namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateColumnAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSpreadsheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSpreadsheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAddRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAppendOrUpdateRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsClearSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCopySheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsExportSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSheetAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSpreadsheetsAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetAllRowsAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetRowAction;
-use WorkflowAutomate\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsUpdateRowAction;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateColumnAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSpreadsheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteRowAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSpreadsheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAddRowAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAppendOrUpdateRowAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsClearSheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCopySheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsExportSheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSheetAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSpreadsheetsAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetAllRowsAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetRowAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsUpdateRowAction;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

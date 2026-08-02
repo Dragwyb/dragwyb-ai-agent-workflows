@@ -2,16 +2,16 @@
 /**
  * Executes an AI Agent tool call against a workflow action node.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
-use WorkflowAutomate\Plugin\Service\ConfigInterpolator;
-use WorkflowAutomate\Plugin\Service\NodeExecutionService;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Service\ConfigInterpolator;
+use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -50,7 +50,7 @@ class AgentToolExecutor {
 			return array(
 				'error' => sprintf(
 					/* translators: %s: tool function name */
-					__( 'Unrecognized tool name "%s".', 'workflow-automate' ),
+					__( 'Unrecognized tool name "%s".', 'dragwyb-agentflow' ),
 					$tool_name
 				),
 			);
@@ -75,7 +75,7 @@ class AgentToolExecutor {
 
 		if ( empty( $result['success'] ) ) {
 			return array(
-				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'The tool action failed.', 'workflow-automate' ),
+				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'The tool action failed.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -140,8 +140,8 @@ class AgentToolExecutor {
 		if ( is_string( $value ) ) {
 			$trimmed = trim( $value );
 			// JSON array/object encoded as a string.
-			if ( ( str_starts_with( $trimmed, '[' ) && str_ends_with( $trimmed, ']' ) )
-				|| ( str_starts_with( $trimmed, '{' ) && str_ends_with( $trimmed, '}' ) ) ) {
+			if ( ( function_exists( 'str_starts_with' ) && function_exists( 'str_ends_with' ) && str_starts_with( $trimmed, '[' ) && str_ends_with( $trimmed, ']' ) )
+				|| ( function_exists( 'str_starts_with' ) && function_exists( 'str_ends_with' ) && str_starts_with( $trimmed, '{' ) && str_ends_with( $trimmed, '}' ) ) ) {
 				$decoded = json_decode( $trimmed, true );
 				if ( is_array( $decoded ) ) {
 					return $this->normalizeArgumentValue( $decoded );

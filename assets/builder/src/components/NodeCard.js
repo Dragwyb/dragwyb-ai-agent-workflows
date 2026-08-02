@@ -122,23 +122,23 @@ export default function NodeCard({
 		);
 	};
 
-	const classNames = ['wfa-builder-node'];
+	const classNames = ['dragwyb-af-builder-node'];
 	if (selected) {
-		classNames.push('wfa-builder-node--selected');
+		classNames.push('dragwyb-af-builder-node--selected');
 	}
 	if (hasUnknownType) {
-		classNames.push('wfa-builder-node--unknown');
+		classNames.push('dragwyb-af-builder-node--unknown');
 	}
 	if (isLinkTarget) {
-		classNames.push('wfa-builder-node--link-target');
+		classNames.push('dragwyb-af-builder-node--link-target');
 	}
 
 	const ariaLabel = [
 		node.label || node.type,
 		node.category === 'trigger'
-			? __('Trigger', 'workflow-automate')
-			: __('Action', 'workflow-automate'),
-		selected ? __('selected', 'workflow-automate') : '',
+			? __('Trigger', 'dragwyb-agentflow')
+			: __('Action', 'dragwyb-agentflow'),
+		selected ? __('selected', 'dragwyb-agentflow') : '',
 	]
 		.filter(Boolean)
 		.join(', ');
@@ -161,12 +161,12 @@ export default function NodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="wfa-builder-node__handle wfa-builder-node__handle--top"
+				className="dragwyb-af-builder-node__handle dragwyb-af-builder-node__handle--top"
 				aria-hidden="true"
 			/>
-			<div className="wfa-builder-node__body">
+			<div className="dragwyb-af-builder-node__body">
 				<span
-					className="wfa-builder-node__icon"
+					className="dragwyb-af-builder-node__icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -175,30 +175,30 @@ export default function NodeCard({
 				>
 					{meta.icon}
 				</span>
-				<div className="wfa-builder-node__text">
-					<span className="wfa-builder-node__label" aria-hidden="true">
+				<div className="dragwyb-af-builder-node__text">
+					<span className="dragwyb-af-builder-node__label" aria-hidden="true">
 						{node.label}
 					</span>
-					<span className="wfa-builder-node__subtitle" aria-hidden="true">
+					<span className="dragwyb-af-builder-node__subtitle" aria-hidden="true">
 						{meta.categoryLabel}
 					</span>
 				</div>
 			</div>
 			<span
-				className="wfa-builder-node__handle wfa-builder-node__handle--bottom"
+				className="dragwyb-af-builder-node__handle dragwyb-af-builder-node__handle--bottom"
 				aria-hidden="true"
 			/>
 			{canStartFlowConnection && onStartFlowConnectionDrag && (
 				<button
 					type="button"
-					className="wfa-builder-node__output-port"
+					className="dragwyb-af-builder-node__output-port"
 					title={__(
 						'Drag to the next step to connect',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					)}
 					aria-label={__(
 						'Drag to the next step to connect',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					)}
 					onPointerDown={(event) => {
 						stopPointer(event);

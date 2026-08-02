@@ -2,18 +2,18 @@
 /**
  * Catalog-defined WordPress hook trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
-use WorkflowAutomate\Plugin\Service\TriggerPayloadNormalizer;
-use WorkflowAutomate\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybAgentFlow\Plugin\Service\TriggerPayloadNormalizer;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -41,10 +41,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		$hook = (string) ( $this->definition['hook_name'] ?? '' );
 
 		if ( self::isPostContentHook( $hook ) ) {
-			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'workflow-automate' );
+			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'dragwyb-agentflow' );
 		}
 
-		return __( 'Starts the workflow when this WordPress event fires.', 'workflow-automate' );
+		return __( 'Starts the workflow when this WordPress event fires.', 'dragwyb-agentflow' );
 	}
 
 	public function group(): string {
@@ -56,35 +56,35 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 	}
 
 	public function app(): string {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public function configSchema(): array {
 		$schema = array(
-			'hook_name' => array(
-				'type' => 'string',
+			'hook_name'     => array(
+				'type'    => 'string',
 				'default' => (string) $this->definition['hook_name'],
-				'hidden' => true,
+				'hidden'  => true,
 			),
-			'priority' => array(
-				'type' => 'integer',
+			'priority'      => array(
+				'type'    => 'integer',
 				'default' => (int) ( $this->definition['priority'] ?? 10 ),
-				'hidden' => true,
+				'hidden'  => true,
 			),
 			'accepted_args' => array(
-				'type' => 'integer',
+				'type'    => 'integer',
 				'default' => (int) ( $this->definition['accepted_args'] ?? 1 ),
-				'hidden' => true,
+				'hidden'  => true,
 			),
 		);
 
 		if ( self::isPostContentHook( (string) $this->definition['hook_name'] ) ) {
 			$schema['post_types'] = array(
 				'type'        => 'string',
-				'label'       => __( 'Post Types', 'workflow-automate' ),
+				'label'       => __( 'Post Types', 'dragwyb-agentflow' ),
 				'default'     => '',
-				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'workflow-automate' ),
-				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'workflow-automate' ),
+				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'dragwyb-agentflow' ),
+				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'dragwyb-agentflow' ),
 			);
 		}
 
@@ -104,7 +104,7 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		$hooks = array( $hook_name );
 
 		// Also listen on save_post_{type} so page (and filtered CPT) editor
-		 // saves are never missed if something interferes with generic save_post.
+		// saves are never missed if something interferes with generic save_post.
 		if ( 'save_post' === $hook_name ) {
 			foreach ( self::extraSavePostTypeHooks( $config ) as $type_hook ) {
 				$hooks[] = $type_hook;
@@ -139,7 +139,7 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 	 * @return array<int, string>
 	 */
 	private static function extraSavePostTypeHooks( array $config ): array {
-		$raw = $config['post_types'] ?? '';
+		$raw   = $config['post_types'] ?? '';
 		$types = is_array( $raw )
 			? array_values(
 				array_filter(
@@ -206,16 +206,16 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 	 */
 	private static function shouldIgnorePostEvent( string $hook_name, array $args, array $config = array() ): bool {
 		static $post_hooks = array(
-			'save_post'            => true,
-			'wp_insert_post'       => true,
-			'wp_after_insert_post' => true,
-			'post_updated'         => true,
+			'save_post'              => true,
+			'wp_insert_post'         => true,
+			'wp_after_insert_post'   => true,
+			'post_updated'           => true,
 			'transition_post_status' => true,
-			'wp_trash_post'        => true,
-			'untrash_post'         => true,
-			'before_delete_post'   => true,
-			'delete_post'          => true,
-			'deleted_post'         => true,
+			'wp_trash_post'          => true,
+			'untrash_post'           => true,
+			'before_delete_post'     => true,
+			'delete_post'            => true,
+			'deleted_post'           => true,
 		);
 
 		if ( ! isset( $post_hooks[ $hook_name ] ) ) {

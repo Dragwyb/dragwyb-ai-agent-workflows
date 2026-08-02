@@ -2,19 +2,19 @@
 /**
  * Registers REST endpoints & feature integrations against the container.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Provider;
+namespace DragwybAgentFlow\Plugin\Provider;
 
-use WorkflowAutomate\Plugin\Core\Container;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
-use WorkflowAutomate\Plugin\Service\AiModelsService;
-use WorkflowAutomate\Plugin\Service\ChatMessageService;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Service\AiModelsService;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

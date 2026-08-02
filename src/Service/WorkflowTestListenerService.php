@@ -2,14 +2,14 @@
 /**
  * Test-flow listener: capture trigger payloads while building a workflow.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -69,7 +69,7 @@ class WorkflowTestListenerService {
 		$this->patchSettings(
 			$workflow_id,
 			array(
-				'test_listen_active' => true,
+				'test_listen_active'     => true,
 				'test_listen_started_at' => gmdate( 'Y-m-d H:i:s' ),
 			)
 		);
@@ -98,9 +98,9 @@ class WorkflowTestListenerService {
 	 */
 	public function capturePayload( int $workflow_id, array $payload, ?string $trigger_type = null ): void {
 		$patch = array(
-			'sample_payload' => $payload,
+			'sample_payload'             => $payload,
 			'sample_payload_captured_at' => gmdate( 'Y-m-d H:i:s' ),
-			'test_listen_active' => false,
+			'test_listen_active'         => false,
 		);
 
 		if ( null !== $trigger_type && '' !== $trigger_type ) {
@@ -190,7 +190,7 @@ class WorkflowTestListenerService {
 			return 'elementor-atomic' === $source;
 		}
 
-		if ( str_starts_with( $trigger_type, 'woocommerce_' ) && 'woocommerce' === $source ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $trigger_type, 'woocommerce_' ) && 'woocommerce' === $source ) {
 			return true;
 		}
 
@@ -202,7 +202,7 @@ class WorkflowTestListenerService {
 			return 'wpforms' === $source;
 		}
 
-		if ( str_starts_with( $trigger_type, 'wp_' ) && 'wordpress' === $source ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $trigger_type, 'wp_' ) && 'WordPress' === $source ) {
 			return true;
 		}
 
@@ -218,12 +218,12 @@ class WorkflowTestListenerService {
 		$settings = $this->settingsFor( $workflow_id );
 
 		return array(
-			'listening' => ! empty( $settings['test_listen_active'] ),
-			'has_sample' => ! empty( $settings['sample_payload'] ),
-			'sample_payload' => $settings['sample_payload'] ?? null,
+			'listening'                   => ! empty( $settings['test_listen_active'] ),
+			'has_sample'                  => ! empty( $settings['sample_payload'] ),
+			'sample_payload'              => $settings['sample_payload'] ?? null,
 			'sample_payload_trigger_type' => $settings['sample_payload_trigger_type'] ?? null,
-			'captured_at' => $settings['sample_payload_captured_at'] ?? null,
-			'started_at' => $settings['test_listen_started_at'] ?? null,
+			'captured_at'                 => $settings['sample_payload_captured_at'] ?? null,
+			'started_at'                  => $settings['test_listen_started_at'] ?? null,
 		);
 	}
 

@@ -2,14 +2,14 @@
 /**
  * Formats run/node execution durations for display.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,7 +28,7 @@ class RunDuration {
 	 * timestamps (both stored in GMT — see WorkflowRun — so a plain
 	 * strtotime() diff is safe without any timezone conversion).
 	 *
-	 * Precision is whole seconds only: `wfa_workflow_runs` timestamps come
+	 * Precision is whole seconds only: `dragwyb_af_workflow_runs` timestamps come
 	 * from current_time( 'mysql', true ), which has no sub-second
 	 * resolution. Good enough for a history list; not a substitute for the
 	 * per-node millisecond timings already shown in the run detail view.
@@ -39,7 +39,7 @@ class RunDuration {
 	 */
 	public static function forRun( WorkflowRun $run ): string {
 		if ( null === $run->startedAt() || null === $run->finishedAt() ) {
-			return __( '—', 'workflow-automate' );
+			return __( '—', 'dragwyb-agentflow' );
 		}
 
 		$seconds = max( 0, strtotime( $run->finishedAt() . ' UTC' ) - strtotime( $run->startedAt() . ' UTC' ) );
@@ -57,13 +57,13 @@ class RunDuration {
 	 */
 	public static function forNode( ?int $duration_ms ): string {
 		if ( null === $duration_ms ) {
-			return __( '—', 'workflow-automate' );
+			return __( '—', 'dragwyb-agentflow' );
 		}
 
 		if ( $duration_ms < 1000 ) {
 			return sprintf(
 				/* translators: %d: duration in milliseconds. */
-				__( '%d ms', 'workflow-automate' ),
+				__( '%d ms', 'dragwyb-agentflow' ),
 				$duration_ms
 			);
 		}
@@ -80,17 +80,17 @@ class RunDuration {
 		if ( $seconds < 60 ) {
 			return sprintf(
 				/* translators: %d: duration in seconds. */
-				_n( '%d second', '%d seconds', $seconds, 'workflow-automate' ),
+				_n( '%d second', '%d seconds', $seconds, 'dragwyb-agentflow' ),
 				$seconds
 			);
 		}
 
-		$minutes = (int) floor( $seconds / 60 );
+		$minutes   = (int) floor( $seconds / 60 );
 		$remaining = $seconds % 60;
 
 		return sprintf(
 			/* translators: 1: minutes, 2: seconds. */
-			__( '%1$dm %2$ds', 'workflow-automate' ),
+			__( '%1$dm %2$ds', 'dragwyb-agentflow' ),
 			$minutes,
 			$remaining
 		);

@@ -2,18 +2,18 @@
 /**
  * Handles state-changing Webhook admin actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use WorkflowAutomate\Plugin\Admin\Pages\WebhooksPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Admin\Pages\WebhooksPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=wfa_webhook_action` POST submitted
+ * Receives the `admin-post.php?action=dragwyb_af_webhook_action` POST submitted
  * by WebhookFormPage's create/edit forms and WebhooksListTable's delete
  * forms. Same capability/nonce/allow-list shape as
  * ConnectionActionsController.
@@ -40,7 +40,7 @@ class WebhookActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_wfa_webhook_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_webhook_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleWebhooksBulkFromList' ), 5 );
 	}
 
@@ -50,7 +50,11 @@ class WebhookActionsController {
 	 * @return void
 	 */
 	public function maybeHandleWebhooksBulkFromList(): void {
-		if ( ! is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) )
+			: '';
+
+		if ( ! is_admin() || 'POST' !== $request_method ) {
 			return;
 		}
 
@@ -69,7 +73,7 @@ class WebhookActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WEBHOOKS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation (and per-id for update/delete).
@@ -80,7 +84,7 @@ class WebhookActionsController {
 		}
 
 		if ( 'create' === $op ) {
-			check_admin_referer( 'wfa_webhook_action_create' );
+			check_admin_referer( 'dragwyb_af_webhook_action_create' );
 			$this->handleCreate();
 
 			return;
@@ -93,7 +97,7 @@ class WebhookActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'wfa_webhook_action_' . $op . '_' . $id );
+		check_admin_referer( 'dragwyb_af_webhook_action_' . $op . '_' . $id );
 
 		if ( 'update' === $op ) {
 			$this->handleUpdate( $id );
@@ -158,31 +162,27 @@ class WebhookActionsController {
 	 */
 	public function handleWebhooksBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['wfa_webhook_bulk'] ) ) {
+		if ( empty( $_POST['dragwyb_af_webhook_bulk'] ) ) {
 			return;
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_WEBHOOKS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'workflow-automate' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'wfa_webhook_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_webhook_bulk_action' ) ) {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
-		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2']
-			? sanitize_key( wp_unslash( $_POST['action2'] ) )
-			: ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$bulk_action = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : ( isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '' );
 
 		if ( 'delete' !== $bulk_action ) {
 			$this->redirect( 'error' );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above.
-		$ids = isset( $_POST['webhooks'] ) && is_array( $_POST['webhooks'] )
-			? array_map( 'absint', wp_unslash( $_POST['webhooks'] ) )
-			: array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce().
+		$ids = isset( $_POST['webhooks'] ) && is_array( $_POST['webhooks'] ) ? array_map( 'absint', wp_unslash( $_POST['webhooks'] ) ) : array();
 
 		foreach ( array_filter( $ids ) as $id ) {
 			$this->webhooks->delete( $id );
@@ -214,8 +214,8 @@ class WebhookActionsController {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page' => WebhooksPage::SLUG,
-					'wfa_notice' => $notice,
+					'page'       => WebhooksPage::SLUG,
+					'dragwyb_af_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)

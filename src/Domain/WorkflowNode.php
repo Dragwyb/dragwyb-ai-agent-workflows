@@ -2,12 +2,12 @@
 /**
  * WorkflowNode domain entity.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain;
+namespace DragwybAgentFlow\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -52,14 +52,14 @@ class WorkflowNode {
 		string $createdAt,
 		string $updatedAt
 	) {
-		$this->id = $id;
-		$this->workflowId = $workflowId;
+		$this->id           = $id;
+		$this->workflowId   = $workflowId;
 		$this->clientNodeId = $clientNodeId;
-		$this->nodeType = $nodeType;
-		$this->label = $label;
-		$this->config = $config;
-		$this->createdAt = $createdAt;
-		$this->updatedAt = $updatedAt;
+		$this->nodeType     = $nodeType;
+		$this->label        = $label;
+		$this->config       = $config;
+		$this->createdAt    = $createdAt;
+		$this->updatedAt    = $updatedAt;
 	}
 
 	/**

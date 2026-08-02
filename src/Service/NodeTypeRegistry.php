@@ -2,15 +2,15 @@
 /**
  * Node type registry.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Deliberately a plain PHP collection with no WordPress hook knowledge of
  * its own: something else (Plugin::registerNodeTypes()) is responsible for
- * firing the `wfa/nodes/register` action that populates it, so this class
+ * firing the `dragwyb_af/nodes/register` action that populates it, so this class
  * stays trivially unit-testable.
  */
 class NodeTypeRegistry {
@@ -102,15 +102,16 @@ class NodeTypeRegistry {
 	 * @return void
 	 */
 	private function warnOnDuplicate( string $slug, string $kind ): void {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- _doing_it_wrong is for developer notices only.
 		_doing_it_wrong(
-			self::class . '::register' . ucfirst( $kind ),
+			self::class . '::register' . esc_html( ucfirst( $kind ) ),
 			sprintf(
 				/* translators: 1: node type kind (trigger/action), 2: slug. */
-				__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'workflow-automate' ),
-				$kind,
-				$slug
+				esc_html__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'dragwyb-agentflow' ),
+				esc_html( $kind ),
+				esc_html( $slug )
 			),
-			WFA_VERSION
+			esc_html( DRAGWYB_AF_VERSION )
 		);
 	}
 }

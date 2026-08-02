@@ -48,48 +48,48 @@ export default function BranchConnectSidebar({
 
 	return (
 		<aside
-			className="wfa-builder-picker wfa-builder-picker--branch-connect"
-			aria-label={__('Connect branch to node', 'workflow-automate')}
+			className="dragwyb-af-builder-picker dragwyb-af-builder-picker--branch-connect"
+			aria-label={__('Connect branch to node', 'dragwyb-agentflow')}
 		>
-			<div className="wfa-builder-picker__header">
-				<h2 className="wfa-builder-picker__title">
-					{__('Connect branch', 'workflow-automate')}
+			<div className="dragwyb-af-builder-picker__header">
+				<h2 className="dragwyb-af-builder-picker__title">
+					{__('Connect branch', 'dragwyb-agentflow')}
 				</h2>
 				<Button
-					className="wfa-builder-picker__close"
+					className="dragwyb-af-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'workflow-automate')}
+					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
 				/>
 			</div>
 
-			<p className="wfa-builder-picker__hint">
+			<p className="dragwyb-af-builder-picker__hint">
 				{__(
 					'Choose any step on the canvas for',
-					'workflow-automate'
+					'dragwyb-agentflow'
 				)}{' '}
 				<strong>{branchLabel}</strong>
 			</p>
 
-			<div className="wfa-builder-picker__search">
+			<div className="dragwyb-af-builder-picker__search">
 				<TextControl
-					label={__('Search nodes', 'workflow-automate')}
+					label={__('Search nodes', 'dragwyb-agentflow')}
 					hideLabelFromVision
-					placeholder={__('Search nodes…', 'workflow-automate')}
+					placeholder={__('Search nodes…', 'dragwyb-agentflow')}
 					value={query}
 					onChange={setQuery}
 				/>
 			</div>
 
 			{filtered.length === 0 ? (
-				<p className="wfa-builder-picker__empty">
+				<p className="dragwyb-af-builder-picker__empty">
 					{__(
 						'No steps on the canvas yet. Add an AI Agent or action first.',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			) : (
-				<ul className="wfa-builder-picker__list">
+				<ul className="dragwyb-af-builder-picker__list">
 					{filtered.map((node) => {
 						const meta = getNodeMeta(node.type, node.category);
 						const isCurrent = node.id === currentTargetId;
@@ -100,13 +100,13 @@ export default function BranchConnectSidebar({
 									type="button"
 									className={
 										isCurrent
-											? 'wfa-builder-picker__item wfa-builder-picker__item--selected'
-											: 'wfa-builder-picker__item'
+											? 'dragwyb-af-builder-picker__item dragwyb-af-builder-picker__item--selected'
+											: 'dragwyb-af-builder-picker__item'
 									}
 									onClick={() => onSelect(node.id)}
 								>
 									<span
-										className="wfa-builder-picker__item-icon"
+										className="dragwyb-af-builder-picker__item-icon"
 										style={{
 											backgroundColor: meta.bg,
 											color: meta.accent,
@@ -115,23 +115,23 @@ export default function BranchConnectSidebar({
 									>
 										{meta.icon}
 									</span>
-									<span className="wfa-builder-picker__item-content">
-										<span className="wfa-builder-picker__item-label">
+									<span className="dragwyb-af-builder-picker__item-content">
+										<span className="dragwyb-af-builder-picker__item-label">
 											{node.label || node.type}
 										</span>
-										<span className="wfa-builder-picker__item-hint">
+										<span className="dragwyb-af-builder-picker__item-hint">
 											{node.type === 'ai_agent_action'
-												? __('AI Agent', 'workflow-automate')
+												? __('AI Agent', 'dragwyb-agentflow')
 												: node.type === 'condition_action'
-													? __('Condition', 'workflow-automate')
+													? __('Condition', 'dragwyb-agentflow')
 													: node.type === 'router_action'
-														? __('Router', 'workflow-automate')
-														: __('Action', 'workflow-automate')}
+														? __('Router', 'dragwyb-agentflow')
+														: __('Action', 'dragwyb-agentflow')}
 										</span>
 									</span>
 									{isCurrent && (
-										<span className="wfa-builder-picker__item-badge">
-											{__('Connected', 'workflow-automate')}
+										<span className="dragwyb-af-builder-picker__item-badge">
+											{__('Connected', 'dragwyb-agentflow')}
 										</span>
 									)}
 								</button>

@@ -2,18 +2,18 @@
 /**
  * Implements every WordPress workflow action's business logic.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\Service\CommentWordPressService;
-use WorkflowAutomate\Plugin\Integration\WordPress\Service\PluginWordPressService;
-use WorkflowAutomate\Plugin\Integration\WordPress\Service\PostWordPressService;
-use WorkflowAutomate\Plugin\Integration\WordPress\Service\TaxonomyWordPressService;
-use WorkflowAutomate\Plugin\Integration\WordPress\Service\UserWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\CommentWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\PluginWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\PostWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\TaxonomyWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\UserWordPressService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,11 +40,11 @@ final class WordPressServices {
 		?TaxonomyWordPressService $taxonomies = null,
 		?PluginWordPressService $plugins = null
 	) {
-		$this->users = $users ?? new UserWordPressService();
-		$this->posts = $posts ?? new PostWordPressService();
-		$this->comments = $comments ?? new CommentWordPressService();
+		$this->users      = $users ?? new UserWordPressService();
+		$this->posts      = $posts ?? new PostWordPressService();
+		$this->comments   = $comments ?? new CommentWordPressService();
 		$this->taxonomies = $taxonomies ?? new TaxonomyWordPressService();
-		$this->plugins = $plugins ?? new PluginWordPressService();
+		$this->plugins    = $plugins ?? new PluginWordPressService();
 	}
 
 	// -----------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\AiProviders\Compatible;
+namespace DragwybAgentFlow\AiProviders\Compatible;
 
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;
@@ -56,7 +56,7 @@ abstract class AbstractCompatibleApiProvider extends AbstractApiProvider {
 		}
 
 		throw new RuntimeException(
-			'Unsupported model capabilities: ' . implode( ', ', $capabilities )
+			'Unsupported model capabilities: ' . implode( ', ', esc_html( $capabilities ) )
 		);
 	}
 

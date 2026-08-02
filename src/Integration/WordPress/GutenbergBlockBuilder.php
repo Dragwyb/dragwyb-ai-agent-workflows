@@ -2,12 +2,12 @@
 /**
  * Builds Gutenberg block markup from structured design sections.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -221,7 +221,7 @@ class GutenbergBlockBuilder {
 			. implode( "\n", $column_blocks )
 			. "\n</div>\n<!-- /wp:columns -->";
 
-		return "<!-- wp:group -->\n<div class=\"" . esc_attr( $wrapper_class ) . "\"" . $wrapper_style . ">\n"
+		return "<!-- wp:group -->\n<div class=\"" . esc_attr( $wrapper_class ) . '"' . $wrapper_style . ">\n"
 			. $inner
 			. "\n</div>\n<!-- /wp:group -->";
 	}
@@ -232,7 +232,7 @@ class GutenbergBlockBuilder {
 	private static function ctaSection( array $section ): string {
 		$heading     = (string) ( $section['heading'] ?? $section['title'] ?? '' );
 		$text        = (string) ( $section['text'] ?? '' );
-		$button_text = (string) ( $section['button_text'] ?? __( 'Learn more', 'workflow-automate' ) );
+		$button_text = (string) ( $section['button_text'] ?? __( 'Learn more', 'dragwyb-agentflow' ) );
 		$button_url  = (string) ( $section['button_url'] ?? '#' );
 		$background  = self::sanitizeColor( (string) ( $section['background'] ?? '#f97316' ) );
 		$text_color  = self::sanitizeColor( (string) ( $section['text_color'] ?? '#ffffff' ) );

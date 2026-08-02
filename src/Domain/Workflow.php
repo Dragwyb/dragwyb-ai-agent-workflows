@@ -2,12 +2,12 @@
 /**
  * Workflow domain entity.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Domain;
+namespace DragwybAgentFlow\Plugin\Domain;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -77,16 +77,16 @@ class Workflow {
 		string $createdAt,
 		string $updatedAt
 	) {
-		$this->id = $id;
-		$this->title = $title;
-		$this->status = $status;
+		$this->id                = $id;
+		$this->title             = $title;
+		$this->status            = $status;
 		$this->definitionVersion = $definitionVersion;
-		$this->graph = $graph;
-		$this->settings = $settings;
-		$this->runCount = $runCount;
-		$this->deletedAt = $deletedAt;
-		$this->createdAt = $createdAt;
-		$this->updatedAt = $updatedAt;
+		$this->graph             = $graph;
+		$this->settings          = $settings;
+		$this->runCount          = $runCount;
+		$this->deletedAt         = $deletedAt;
+		$this->createdAt         = $createdAt;
+		$this->updatedAt         = $updatedAt;
 	}
 
 	/**

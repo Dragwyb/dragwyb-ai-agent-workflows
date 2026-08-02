@@ -2,14 +2,14 @@
 /**
  * Contact Form 7 submission trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,14 +33,14 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Contact Form 7 Submitted', 'workflow-automate' );
+		return __( 'Contact Form 7 Submitted', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'workflow-automate' );
+		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -49,8 +49,8 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	public function configSchema(): array {
 		return array(
 			'form_id' => array(
-				'type' => 'string',
-				'label' => __( 'Form ID (optional — leave empty for all forms)', 'workflow-automate' ),
+				'type'    => 'string',
+				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
 				'default' => '',
 			),
 		);
@@ -121,11 +121,11 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 		}
 
 		return array(
-			'source' => 'contact-form-7',
-			'event' => 'form_submitted',
-			'form_id' => $form_id,
+			'source'     => 'contact-form-7',
+			'event'      => 'form_submitted',
+			'form_id'    => $form_id,
 			'form_title' => $form_title,
-			'fields' => $fields,
+			'fields'     => $fields,
 		);
 	}
 }

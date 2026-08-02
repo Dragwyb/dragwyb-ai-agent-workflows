@@ -2,15 +2,15 @@
 /**
  * Router tool — branch workflow based on a field value.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\ContextPathResolver;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\ContextPathResolver;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,29 +23,29 @@ class RouterAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'Router', 'workflow-automate' );
+		return __( 'Router', 'dragwyb-agentflow' );
 	}
 
 	public function description(): string {
-		return __( 'Routes to different steps based on a value.', 'workflow-automate' );
+		return __( 'Routes to different steps based on a value.', 'dragwyb-agentflow' );
 	}
 
 	public function configSchema(): array {
 		return array(
-			'route_field' => array(
-				'type' => 'string',
-				'label' => __( 'Value to check', 'workflow-automate' ),
+			'route_field'            => array(
+				'type'               => 'string',
+				'label'              => __( 'Value to check', 'dragwyb-agentflow' ),
 				'supports_variables' => true,
-				'required' => true,
+				'required'           => true,
 			),
-			'routes' => array(
-				'type' => 'router_routes',
-				'label' => __( 'Matching rules', 'workflow-automate' ),
+			'routes'                 => array(
+				'type'    => 'router_routes',
+				'label'   => __( 'Matching rules', 'dragwyb-agentflow' ),
 				'default' => array(),
 			),
 			'default_branch_node_id' => array(
-				'type' => 'node_select',
-				'label' => __( 'Otherwise, run this step', 'workflow-automate' ),
+				'type'    => 'node_select',
+				'label'   => __( 'Otherwise, run this step', 'dragwyb-agentflow' ),
 				'default' => '',
 			),
 		);
@@ -80,9 +80,9 @@ class RouterAction implements ActionInterface {
 		}
 
 		return array(
-			'success' => true,
-			'matched_route' => $matched_route,
-			'field_value' => $value_str,
+			'success'        => true,
+			'matched_route'  => $matched_route,
+			'field_value'    => $value_str,
 			'branch_node_id' => $matched_node_id,
 		);
 	}

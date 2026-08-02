@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress User, Role, and Capability actions.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\WordPress\Service;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress\Service;
 
-use WorkflowAutomate\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,44 +54,44 @@ final class UserWordPressService {
 	}
 
 	public function createUser( array $config ): array {
-		$email = WordPressActionHelper::str( $config, 'email' );
+		$email    = WordPressActionHelper::str( $config, 'email' );
 		$username = WordPressActionHelper::str( $config, 'username' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'Email is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Email is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $username ) {
-			return WordPressActionHelper::fail( __( 'Username is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Username is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( get_user_by( 'email', $email ) ) {
-			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'dragwyb-agentflow' ) );
 		}
 
 		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
-		$password = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
+		$password     = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
 
 		if ( '' === $password ) {
-			return WordPressActionHelper::fail( __( 'Password is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Password is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' === $userRole ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$editableRoles = get_editable_roles();
 		if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
-			return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'dragwyb-agentflow' ) );
 		}
 
 		$userData = WordPressActionHelper::mapUserFields( $config );
 		$userData['user_login'] = $username;
 		$userData['user_email'] = $email;
-		$userData['user_pass'] = $password;
-		$userData['role'] = $userRole;
+		$userData['user_pass']  = $password;
+		$userData['role']       = $userRole;
 
 		$marker = static function ( int $id ): void {
 			WordPressActionHelper::markAutomatedUser( $id );
@@ -121,7 +121,7 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'user_id' => $userId,
-				'user' => $this->fetchUserInfo( $userId ),
+				'user'    => $this->fetchUserInfo( $userId ),
 			)
 		);
 	}
@@ -130,14 +130,14 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
-		$userData = WordPressActionHelper::mapUserFields( $config );
+		$userData       = WordPressActionHelper::mapUserFields( $config );
 		$userData['ID'] = $userId;
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
@@ -145,7 +145,7 @@ final class UserWordPressService {
 		if ( '' !== $userRole ) {
 			$editableRoles = get_editable_roles();
 			if ( ! isset( $editableRoles[ $userRole ] ) || ( 'administrator' === $userRole && ! current_user_can( 'promote_users' ) ) ) {
-				return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'Invalid or unauthorized user role.', 'dragwyb-agentflow' ) );
 			}
 			$userData['role'] = $userRole;
 		}
@@ -169,35 +169,35 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'user_id' => $userId,
-				'user' => $this->fetchUserInfo( $userId ),
+				'user'    => $this->fetchUserInfo( $userId ),
 			)
 		);
 	}
 
 	public function deleteUser( array $config ): array {
-		$useEmail = WordPressActionHelper::bool( $config, 'use_email' );
-		$userId = WordPressActionHelper::int( $config, 'user_id' );
-		$userEmail = WordPressActionHelper::str( $config, 'user_email' );
+		$useEmail       = WordPressActionHelper::bool( $config, 'use_email' );
+		$userId         = WordPressActionHelper::int( $config, 'user_id' );
+		$userEmail      = WordPressActionHelper::str( $config, 'user_email' );
 		$reassignUserId = WordPressActionHelper::int( $config, 'reassign_user_id' );
 
 		if ( $useEmail ) {
 			if ( '' === $userEmail ) {
-				return WordPressActionHelper::fail( __( 'User email is required.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-agentflow' ) );
 			}
 
 			$user = get_user_by( 'email', $userEmail );
 
 			if ( ! $user ) {
-				return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 			}
 
 			$userId = (int) $user->ID;
 		} elseif ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		WordPressActionHelper::ensureMediaIncludes();
@@ -205,7 +205,7 @@ final class UserWordPressService {
 		$result = wp_delete_user( $userId, $reassignUserId > 0 ? $reassignUserId : null );
 
 		if ( ! $result ) {
-			return WordPressActionHelper::fail( __( 'Failed to delete user.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Failed to delete user.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'user_id' => $userId ) );
@@ -227,13 +227,13 @@ final class UserWordPressService {
 		$role = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' === $role ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok(
 			$this->fetchUsers(
 				array(
-					'role' => $role,
+					'role'    => $role,
 					'orderby' => 'ID',
 				)
 			)
@@ -244,13 +244,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$user = $this->fetchUserInfo( $userId );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -260,34 +260,34 @@ final class UserWordPressService {
 		$email = WordPressActionHelper::str( $config, 'user_email' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'User email is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$user = $this->fetchUserByField( 'email', $email );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
 	}
 
 	public function getUserByField( array $config ): array {
-		$fieldKey = WordPressActionHelper::str( $config, 'field_key' );
+		$fieldKey   = WordPressActionHelper::str( $config, 'field_key' );
 		$fieldValue = WordPressActionHelper::str( $config, 'field_value' );
 
 		if ( '' === $fieldKey ) {
-			return WordPressActionHelper::fail( __( 'Field is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Field is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $fieldValue ) {
-			return WordPressActionHelper::fail( __( 'Field value is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Field value is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$user = $this->fetchUserByField( $fieldKey, $fieldValue );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -297,34 +297,34 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$metadata = $this->fetchUserMeta( $userId );
 
 		if ( empty( $metadata ) ) {
-			return WordPressActionHelper::fail( __( 'User metadata not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User metadata not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( $metadata );
 	}
 
 	public function getUserMetadataByMetaKey( array $config ): array {
-		$userId = WordPressActionHelper::int( $config, 'user_id' );
+		$userId  = WordPressActionHelper::int( $config, 'user_id' );
 		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $metaKey ) {
-			return WordPressActionHelper::fail( __( 'Meta key is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$metadata = $this->fetchUserMeta( $userId, $metaKey, true );
 
 		if ( '' === $metadata ) {
-			return WordPressActionHelper::fail( __( 'User metadata not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User metadata not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( array( $metaKey => $metadata ) );
@@ -334,11 +334,11 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$metadataMap = WordPressActionHelper::keyValue( $config, 'metadata' );
@@ -347,7 +347,7 @@ final class UserWordPressService {
 			$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 			if ( '' === $metaKey ) {
-				return WordPressActionHelper::fail( __( 'Metadata is required.', 'workflow-automate' ) );
+				return WordPressActionHelper::fail( __( 'Metadata is required.', 'dragwyb-agentflow' ) );
 			}
 
 			$metadataMap[ $metaKey ] = $config['meta_value'] ?? '';
@@ -359,36 +359,36 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'user_id' => $userId,
+				'user_id'  => $userId,
 				'metadata' => $this->fetchUserMeta( $userId ),
 			)
 		);
 	}
 
 	public function createRole( array $config ): array {
-		$roleName = WordPressActionHelper::str( $config, 'role_name' );
+		$roleName        = WordPressActionHelper::str( $config, 'role_name' );
 		$roleDisplayName = WordPressActionHelper::str( $config, 'role_display_name' );
-		$capabilities = WordPressActionHelper::parseCapabilities( $config['role_capabilities'] ?? array() );
+		$capabilities    = WordPressActionHelper::parseCapabilities( $config['role_capabilities'] ?? array() );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( '' === $roleDisplayName ) {
-			return WordPressActionHelper::fail( __( 'Role display name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role display name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$role = add_role( $roleName, $roleDisplayName, $capabilities );
 
 		if ( null === $role ) {
-			return WordPressActionHelper::fail( __( 'Role already exists.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role already exists.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok(
 			array(
-				'role_name' => $roleName,
+				'role_name'         => $roleName,
 				'role_display_name' => $roleDisplayName,
-				'capabilities' => $role->capabilities,
+				'capabilities'      => $role->capabilities,
 			)
 		);
 	}
@@ -397,11 +397,11 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( ! wp_roles()->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-agentflow' ) );
 		}
 
 		remove_role( $roleName );
@@ -413,19 +413,19 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$roles = WordPressActionHelper::parseList( $config['user_role'] ?? array() );
 
 		if ( array() === $roles ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-agentflow' ) );
 		}
 
 		if ( $update ) {
@@ -443,7 +443,7 @@ final class UserWordPressService {
 		return WordPressActionHelper::ok(
 			array(
 				'user_id' => $userId,
-				'roles' => array_values( $user->roles ),
+				'roles'   => array_values( $user->roles ),
 			)
 		);
 	}
@@ -455,7 +455,7 @@ final class UserWordPressService {
 	}
 
 	public function getAllCapabilities(): array {
-		$wpRoles = wp_roles();
+		$wpRoles      = wp_roles();
 		$capabilities = array();
 
 		if ( $wpRoles ) {
@@ -473,13 +473,13 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$wpRoles = wp_roles();
 
 		if ( ! $wpRoles || ! $wpRoles->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$role = $wpRoles->get_role( $roleName );
@@ -491,25 +491,25 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$wpRoles = wp_roles();
 
 		if ( ! $wpRoles || ! $wpRoles->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$role = $wpRoles->get_role( $roleName );
 
 		if ( ! $role ) {
-			return WordPressActionHelper::fail( __( 'Role object unavailable.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Role object unavailable.', 'dragwyb-agentflow' ) );
 		}
 
 		$capabilities = WordPressActionHelper::parseList( $config['role_capabilities'] ?? array() );
 
 		if ( array() === $capabilities ) {
-			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'dragwyb-agentflow' ) );
 		}
 
 		foreach ( $capabilities as $cap ) {
@@ -522,7 +522,7 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'role_name' => $roleName,
+				'role_name'    => $roleName,
 				'capabilities' => $role->capabilities,
 			)
 		);
@@ -532,13 +532,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		return WordPressActionHelper::ok( $user->allcaps );
@@ -548,19 +548,19 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-agentflow' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-agentflow' ) );
 		}
 
 		$capabilities = WordPressActionHelper::parseList( $config['role_capabilities'] ?? array() );
 
 		if ( array() === $capabilities ) {
-			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'workflow-automate' ) );
+			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'dragwyb-agentflow' ) );
 		}
 
 		foreach ( $capabilities as $cap ) {
@@ -573,7 +573,7 @@ final class UserWordPressService {
 
 		return WordPressActionHelper::ok(
 			array(
-				'user_id' => $userId,
+				'user_id'      => $userId,
 				'capabilities' => $user->allcaps,
 			)
 		);

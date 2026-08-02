@@ -2,14 +2,14 @@
 /**
  * Global plugin settings.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Core\Options;
+use DragwybAgentFlow\Plugin\Core\Options;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,9 +62,9 @@ class SettingsService {
 	 */
 	private function defaults(): array {
 		return array(
-			'on_node_failure' => self::ON_FAILURE_STOP,
-			'display_timestamps_in_utc' => false,
-			'retention_days' => self::DEFAULT_RETENTION_DAYS,
+			'on_node_failure'              => self::ON_FAILURE_STOP,
+			'display_timestamps_in_utc'    => false,
+			'retention_days'               => self::DEFAULT_RETENTION_DAYS,
 			'background_execution_enabled' => true,
 			'require_webhook_signing' => true,
 		);
@@ -147,8 +147,8 @@ class SettingsService {
 	 * @return void
 	 */
 	public function updateGeneral( string $on_node_failure, bool $display_timestamps_in_utc ): void {
-		$current = $this->all();
-		$current['on_node_failure'] = in_array( $on_node_failure, self::VALID_ON_FAILURE, true ) ? $on_node_failure : self::ON_FAILURE_STOP;
+		$current                              = $this->all();
+		$current['on_node_failure']           = in_array( $on_node_failure, self::VALID_ON_FAILURE, true ) ? $on_node_failure : self::ON_FAILURE_STOP;
 		$current['display_timestamps_in_utc'] = $display_timestamps_in_utc;
 
 		Options::update( self::OPTION_NAME, $current );
@@ -160,7 +160,7 @@ class SettingsService {
 	 * @return void
 	 */
 	public function updateRetentionDays( int $days ): void {
-		$current = $this->all();
+		$current                   = $this->all();
 		$current['retention_days'] = max( self::MIN_RETENTION_DAYS, min( self::MAX_RETENTION_DAYS, $days ) );
 
 		Options::update( self::OPTION_NAME, $current );
@@ -172,7 +172,7 @@ class SettingsService {
 	 * @return void
 	 */
 	public function updateBackgroundExecutionEnabled( bool $background_execution_enabled ): void {
-		$current = $this->all();
+		$current                                 = $this->all();
 		$current['background_execution_enabled'] = $background_execution_enabled;
 
 		Options::update( self::OPTION_NAME, $current );
@@ -184,7 +184,7 @@ class SettingsService {
 	 * @return void
 	 */
 	public function updateRequireWebhookSigning( bool $require_webhook_signing ): void {
-		$current = $this->all();
+		$current                            = $this->all();
 		$current['require_webhook_signing'] = $require_webhook_signing;
 
 		Options::update( self::OPTION_NAME, $current );

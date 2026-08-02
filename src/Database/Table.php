@@ -2,12 +2,12 @@
 /**
  * Table naming helper.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database;
+namespace DragwybAgentFlow\Plugin\Database;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Table {
 
-	public const PREFIX = 'wfa_';
+	public const PREFIX = 'dragwyb_af_';
 
 	/**
 	 * Builds the fully-qualified, `$wpdb`-prefixed table name.

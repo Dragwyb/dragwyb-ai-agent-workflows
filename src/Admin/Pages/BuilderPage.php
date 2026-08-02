@@ -2,16 +2,16 @@
 /**
  * Workflow builder admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class BuilderPage implements AdminPage {
 	 * needing an instantiated `BuilderPage` (see `WorkflowsPage::SLUG` for
 	 * the same pattern used in reverse, for this page's back-to-list link).
 	 */
-	public const SLUG = 'wfa-builder';
+	public const SLUG = 'dragwyb-af-builder';
 
 	/**
 	 * {@inheritDoc}
@@ -51,14 +51,14 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Workflow Editor', 'workflow-automate' );
+		return __( 'Workflow Editor', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Workflow Editor', 'workflow-automate' );
+		return __( 'Workflow Editor', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -79,7 +79,7 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function enqueueAssets(): void {
-		$asset_file = WFA_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
+		$asset_file = DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			// The React app hasn't been built (e.g. a git checkout without
@@ -90,24 +90,24 @@ class BuilderPage implements AdminPage {
 			return;
 		}
 
-		$asset = require $asset_file;
+		$asset   = require $asset_file;
 		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
 		// Bust browser caches when the built bundle changes on disk.
-		$built_js = WFA_PLUGIN_DIR . 'assets/builder/build/index.js';
+		$built_js = DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/index.js';
 		if ( file_exists( $built_js ) ) {
 			$version = (string) filemtime( $built_js );
 		}
 
 		wp_enqueue_style(
-			'wfa-builder-font',
+			'dragwyb-af-builder-font',
 			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
 			array(),
-			null
+			DRAGWYB_AF_VERSION
 		);
 
 		wp_enqueue_script(
-			'wfa-builder',
-			WFA_PLUGIN_URL . 'assets/builder/build/index.js',
+			'dragwyb-af-builder',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
 			$version,
 			true
@@ -116,19 +116,19 @@ class BuilderPage implements AdminPage {
 		// wp-scripts' MiniCssExtractPlugin config names the extracted
 		// stylesheet "style-{entry}.css" (plus an auto-generated
 		// "-rtl.css" companion), not "{entry}.css".
-		if ( file_exists( WFA_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
+		if ( file_exists( DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
 			wp_enqueue_style(
-				'wfa-builder',
-				WFA_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components', 'wfa-builder-font' ),
+				'dragwyb-af-builder',
+				DRAGWYB_AF_PLUGIN_URL . 'assets/builder/build/style-index.css',
+				array( 'wp-components', 'dragwyb-af-builder-font' ),
 				$version
 			);
-			wp_style_add_data( 'wfa-builder', 'rtl', 'replace' );
+			wp_style_add_data( 'dragwyb-af-builder', 'rtl', 'replace' );
 		}
 
 		wp_add_inline_script(
-			'wfa-builder',
-			'var wfaBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
+			'dragwyb-af-builder',
+			'var dragwybAFBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
 			'before'
 		);
 	}
@@ -141,13 +141,13 @@ class BuilderPage implements AdminPage {
 		$workflow_id = isset( $_GET['workflow'] ) ? absint( wp_unslash( $_GET['workflow'] ) ) : 0;
 
 		return array(
-			'workflowId' => $workflow_id,
+			'workflowId'             => $workflow_id,
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
-			'listUrl' => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-			'connectionsUrl' => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
-			'aiCredentialsUrl' => \WorkflowAutomate\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
-			'googleCredentialsUrl' => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
-			'googleOAuthCallbackUrl' => rest_url( 'wfa/v1/oauth/google/callback' ),
+			'listUrl'                => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
+			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
+			'aiCredentialsUrl'       => \DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
+			'googleOAuthCallbackUrl' => rest_url( 'dragwyb_af/v1/oauth/google/callback' ),
 		);
 	}
 
@@ -159,7 +159,7 @@ class BuilderPage implements AdminPage {
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
 				'Workflow Automate: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
-				'workflow-automate'
+				'dragwyb-agentflow'
 			)
 		);
 	}
@@ -169,12 +169,12 @@ class BuilderPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
-		echo '<div class="wrap wfa-admin-page wfa-builder-page">';
+		echo '<div class="wrap dragwyb-af-admin-page dragwyb-af-builder-page">';
 		$this->renderImportNotice();
-		echo '<div id="wfa-builder-root"></div>';
+		echo '<div id="dragwyb-af-builder-root"></div>';
 		echo '</div>';
 	}
 
@@ -185,7 +185,7 @@ class BuilderPage implements AdminPage {
 	 */
 	private function renderImportNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 
 		if ( 'imported' !== $key ) {
 			return;
@@ -193,7 +193,7 @@ class BuilderPage implements AdminPage {
 
 		printf(
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-			esc_html__( 'Workflow imported from JSON.', 'workflow-automate' )
+			esc_html__( 'Workflow imported from JSON.', 'dragwyb-agentflow' )
 		);
 	}
 }

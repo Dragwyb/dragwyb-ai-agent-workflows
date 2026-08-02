@@ -2,15 +2,15 @@
 /**
  * Shared AI chat action backed by WordPress AI Client.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionInterface;
-use WorkflowAutomate\Plugin\Service\Agent\AgentAiClient;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,7 +34,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 	abstract public function description(): string;
 
 	/**
-	 * WFA provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * dragwyb_af provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 */
 	abstract protected function providerSlug(): string;
 
@@ -44,25 +44,25 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		return array(
 			'api_credentials' => array(
 				'type'     => 'ai_credentials',
-				'label'    => __( 'API key', 'workflow-automate' ),
+				'label'    => __( 'API key', 'dragwyb-agentflow' ),
 				'provider' => $this->providerSlug(),
 			),
-			'model' => array(
-				'type'            => 'dynamic_select',
-				'label'           => __( 'Model', 'workflow-automate' ),
-				'default'         => $this->defaultModel(),
-				'options_source'  => 'ai_models',
-				'provider_field'  => 'provider',
-				'provider'        => $this->providerSlug(),
+			'model'           => array(
+				'type'           => 'dynamic_select',
+				'label'          => __( 'Model', 'dragwyb-agentflow' ),
+				'default'        => $this->defaultModel(),
+				'options_source' => 'ai_models',
+				'provider_field' => 'provider',
+				'provider'       => $this->providerSlug(),
 			),
-			'system_prompt' => array(
+			'system_prompt'   => array(
 				'type'    => 'string',
-				'label'   => __( 'System prompt (optional)', 'workflow-automate' ),
+				'label'   => __( 'System prompt (optional)', 'dragwyb-agentflow' ),
 				'default' => '',
 			),
-			'prompt' => array(
+			'prompt'          => array(
 				'type'     => 'string',
-				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'workflow-automate' ),
+				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-agentflow' ),
 				'required' => true,
 			),
 		);
@@ -76,7 +76,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		if ( '' === $prompt ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No prompt configured.', 'workflow-automate' ),
+				'error'   => __( 'No prompt configured.', 'dragwyb-agentflow' ),
 			);
 		}
 

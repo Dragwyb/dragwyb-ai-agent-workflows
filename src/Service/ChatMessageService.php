@@ -2,18 +2,18 @@
 /**
  * Resolves chat-trigger workflows and extracts chat replies from runs.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use WorkflowAutomate\Plugin\Domain\Workflow;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Domain\WorkflowRunLog;
-use WorkflowAutomate\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,15 +2,15 @@
 /**
  * Workflow node repository.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use WorkflowAutomate\Plugin\Database\Table;
-use WorkflowAutomate\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,9 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `wfa_workflow_nodes` access goes through this class.
+ * All `dragwyb_af_workflow_nodes` access goes through this class.
  */
 class WorkflowNodeRepository {
+
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'dragwyb_af_workflow_nodes';
 
 	/**
 	 * Defensive upper bound on nodes fetched for a single workflow. A
@@ -33,7 +37,7 @@ class WorkflowNodeRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'workflow_nodes' );
+		return esc_sql( Table::name( 'workflow_nodes' ) );
 	}
 
 	/**
@@ -55,22 +59,26 @@ class WorkflowNodeRepository {
 		$now = current_time( 'mysql', true );
 
 		$data = array(
-			'workflow_id' => (int) $attributes['workflow_id'],
+			'workflow_id'    => (int) $attributes['workflow_id'],
 			'client_node_id' => (string) $attributes['client_node_id'],
-			'node_type' => (string) $attributes['node_type'],
-			'label' => isset( $attributes['label'] ) ? (string) $attributes['label'] : null,
-			'config_json' => isset( $attributes['config'] ) ? wp_json_encode( $attributes['config'] ) : null,
-			'created_at' => $now,
-			'updated_at' => $now,
+			'node_type'      => (string) $attributes['node_type'],
+			'label'          => isset( $attributes['label'] ) ? (string) $attributes['label'] : null,
+			'config_json'    => isset( $attributes['config'] ) ? wp_json_encode( $attributes['config'] ) : null,
+			'created_at'     => $now,
+			'updated_at'     => $now,
 		);
 
 		$formats = array( '%d', '%s', '%s', '%s', '%s', '%s', '%s' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table; no WP API exists for it.
 		$inserted = $wpdb->insert( $this->table(), $data, $formats );
 
 		if ( false === $inserted ) {
 			return null;
 		}
+
+		// A new row changes the collection findByWorkflow() returns.
+		$this->cacheDelete( $this->workflowCacheKey( (int) $attributes['workflow_id'] ) );
 
 		return $this->find( (int) $wpdb->insert_id );
 	}
@@ -78,30 +86,30 @@ class WorkflowNodeRepository {
 	/**
 	 * Updates an existing node row. Only the provided keys are touched.
 	 *
-	 * @param int                   $id         Node id.
-	 * @param array<string, mixed>  $attributes Any of: label, config, node_type.
+	 * @param int                  $id         Node id.
+	 * @param array<string, mixed> $attributes Any of: label, config, node_type.
 	 *
 	 * @return WorkflowNode|null Null if the node does not exist or the update failed.
 	 */
 	public function update( int $id, array $attributes ): ?WorkflowNode {
 		global $wpdb;
 
-		$data = array();
+		$data    = array();
 		$formats = array();
 
 		if ( array_key_exists( 'node_type', $attributes ) ) {
 			$data['node_type'] = (string) $attributes['node_type'];
-			$formats[] = '%s';
+			$formats[]         = '%s';
 		}
 
 		if ( array_key_exists( 'label', $attributes ) ) {
 			$data['label'] = null === $attributes['label'] ? null : (string) $attributes['label'];
-			$formats[] = '%s';
+			$formats[]     = '%s';
 		}
 
 		if ( array_key_exists( 'config', $attributes ) ) {
 			$data['config_json'] = null === $attributes['config'] ? null : wp_json_encode( $attributes['config'] );
-			$formats[] = '%s';
+			$formats[]           = '%s';
 		}
 
 		if ( array() === $data ) {
@@ -109,15 +117,26 @@ class WorkflowNodeRepository {
 		}
 
 		$data['updated_at'] = current_time( 'mysql', true );
-		$formats[] = '%s';
+		$formats[]          = '%s';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$updated = $wpdb->update( $this->table(), $data, array( 'id' => $id ), $formats, array( '%d' ) );
 
 		if ( false === $updated ) {
 			return null;
 		}
 
-		return $this->find( $id );
+		$this->cacheDelete( (string) $id );
+
+		$node = $this->find( $id );
+
+		if ( null !== $node ) {
+			// The node's own fields changed, so any cached findByWorkflow()
+			// collection containing it is now stale too.
+			$this->cacheDelete( $this->workflowCacheKey( $node->workflowId() ) );
+		}
+
+		return $node;
 	}
 
 	/**
@@ -130,10 +149,23 @@ class WorkflowNodeRepository {
 	public function find( int $id ): ?WorkflowNode {
 		global $wpdb;
 
-		$table = $this->table();
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
 
-		return $row ? WorkflowNode::fromRow( $row ) : null;
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$table = esc_sql($this->table());
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; result is cached above via cacheGet() and below via cacheSet().
+
+		$node = $row ? WorkflowNode::fromRow( $row ) : null;
+
+		if ( null !== $node ) {
+			$this->cacheSet( $cache_key, $node );
+		}
+
+		return $node;
 	}
 
 	/**
@@ -146,11 +178,25 @@ class WorkflowNodeRepository {
 	public function findByWorkflow( int $workflow_id ): array {
 		global $wpdb;
 
-		$table = $this->table();
-		$sql = "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $workflow_id, self::MAX_NODES_PER_WORKFLOW ) );
+		$cache_key = $this->workflowCacheKey( $workflow_id );
+		$cached    = $this->cacheGet( $cache_key );
 
-		return array_map( array( WorkflowNode::class, 'fromRow' ), $rows );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$table = esc_sql($this->table());
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table; no WP API exists for it. Result is cached above via cacheGet() and below via cacheSet().
+		$rows  = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d", $workflow_id, self::MAX_NODES_PER_WORKFLOW )
+		);
+
+		$nodes = array_map( array( WorkflowNode::class, 'fromRow' ), $rows );
+
+		$this->cacheSet( $cache_key, $nodes );
+
+		return $nodes;
 	}
 
 	/**
@@ -163,7 +209,18 @@ class WorkflowNodeRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
+		// Looked up first (cache-aware, so usually free) purely to learn
+		// which findByWorkflow() collection cache needs invalidating.
+		$node = $this->find( $id );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the affected row's cache entries are invalidated below via cacheDelete().
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
+
+		$this->cacheDelete( (string) $id );
+
+		if ( null !== $node ) {
+			$this->cacheDelete( $this->workflowCacheKey( $node->workflowId() ) );
+		}
 
 		return false !== $deleted && $deleted > 0;
 	}
@@ -173,6 +230,12 @@ class WorkflowNodeRepository {
 	 * WorkflowService::delete() when hard-deleting a workflow, since there
 	 * is no SQL-level cascade (see CreateWorkflowNodesTable migration).
 	 *
+	 * Only the collection cache is invalidated here, not each individual
+	 * node's own id-based cache entry: fetching every affected id first
+	 * just for cache hygiene isn't worth it on this rare hard-delete path,
+	 * since those rows are gone forever and nothing user-visible can read
+	 * them stale afterward.
+	 *
 	 * @param int $workflow_id Workflow id.
 	 *
 	 * @return bool
@@ -180,8 +243,20 @@ class WorkflowNodeRepository {
 	public function deleteByWorkflow( int $workflow_id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table write; no WP API exists for it, and the collection cache is invalidated below via cacheDelete().
 		$deleted = $wpdb->delete( $this->table(), array( 'workflow_id' => $workflow_id ), array( '%d' ) );
 
+		$this->cacheDelete( $this->workflowCacheKey( $workflow_id ) );
+
 		return false !== $deleted;
+	}
+
+	/**
+	 * @param int $workflow_id Workflow id.
+	 *
+	 * @return string
+	 */
+	private function workflowCacheKey( int $workflow_id ): string {
+		return 'workflow_' . $workflow_id;
 	}
 }

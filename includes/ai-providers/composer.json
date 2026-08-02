@@ -1,5 +1,5 @@
 {
-    "name": "workflow-automate/ai-providers",
+    "name": "dragwyb-agentflow/ai-providers",
     "description": "Vendored AI provider packages for Workflow Automate",
     "type": "library",
     "require": {
@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "WorkflowAutomate\\AiProviders\\": "src/"
+            "DragwybAgentFlow\\AiProviders\\": "src/"
         }
     },
     "config": {

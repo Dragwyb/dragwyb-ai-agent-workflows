@@ -2,21 +2,21 @@
 /**
  * Connections admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Admin\ConnectionActionsController;
-use WorkflowAutomate\Plugin\Admin\ConnectionsListTable;
-use WorkflowAutomate\Plugin\Admin\EmptyState;
-use WorkflowAutomate\Plugin\Admin\ListTableUi;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Admin\ConnectionActionsController;
+use DragwybAgentFlow\Plugin\Admin\ConnectionsListTable;
+use DragwybAgentFlow\Plugin\Admin\EmptyState;
+use DragwybAgentFlow\Plugin\Admin\ListTableUi;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ConnectionsPage implements AdminPage {
 
-	public const SLUG = 'wfa-connections';
+	public const SLUG = 'dragwyb-af-connections';
 
 	private ConnectionService $connections;
 
@@ -44,8 +44,8 @@ class ConnectionsPage implements AdminPage {
 	private ConnectionActionsController $connectionActions;
 
 	public function __construct( ConnectionService $connections, SettingsService $settings, ConnectionActionsController $connectionActions ) {
-		$this->connections = $connections;
-		$this->settings = $settings;
+		$this->connections       = $connections;
+		$this->settings          = $settings;
 		$this->connectionActions = $connectionActions;
 	}
 
@@ -60,14 +60,14 @@ class ConnectionsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Connections', 'workflow-automate' );
+		return __( 'Connections', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Connections', 'workflow-automate' );
+		return __( 'Connections', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -89,10 +89,10 @@ class ConnectionsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -101,34 +101,34 @@ class ConnectionsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
 		$table = new ConnectionsListTable( $this->connections, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ) ),
-			esc_html__( 'Add New', 'workflow-automate' )
+			esc_html__( 'Add New', 'dragwyb-agentflow' )
 		);
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
 
-		echo '<p class="description">' . esc_html__( 'Credentials stored here are encrypted at rest and never displayed in full once saved.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Credentials stored here are encrypted at rest and never displayed in full once saved.', 'dragwyb-agentflow' ) . '</p>';
 
 		if ( ! $table->has_items() ) {
 			EmptyState::render(
-				__( 'No connections yet', 'workflow-automate' ),
-				__( 'Store API keys and other credentials here, then pick them from an HTTP Request action in the workflow editor.', 'workflow-automate' ),
+				__( 'No connections yet', 'dragwyb-agentflow' ),
+				__( 'Store API keys and other credentials here, then pick them from an HTTP Request action in the workflow editor.', 'dragwyb-agentflow' ),
 				array(),
 				array(
 					array(
-						'url' => admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ),
-						'label' => __( 'Add connection', 'workflow-automate' ),
+						'url'     => admin_url( 'admin.php?page=' . ConnectionFormPage::SLUG ),
+						'label'   => __( 'Add connection', 'dragwyb-agentflow' ),
 						'primary' => true,
 					),
 				)
@@ -138,12 +138,12 @@ class ConnectionsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="wfa-list-table-filters-form">';
+		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
 
-		ListTableUi::openBulkForm( $this->slug(), 'wfa_connection_bulk_action', 'wfa_connection_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_connection_bulk_action', 'dragwyb_af_connection_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -155,31 +155,31 @@ class ConnectionsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?wfa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
 	private function notices(): array {
 		return array(
-			'created' => array(
-				'message' => __( 'Connection created.', 'workflow-automate' ),
-				'type' => 'success',
+			'created'      => array(
+				'message' => __( 'Connection created.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'updated' => array(
-				'message' => __( 'Connection updated.', 'workflow-automate' ),
-				'type' => 'success',
+			'updated'      => array(
+				'message' => __( 'Connection updated.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'deleted' => array(
-				'message' => __( 'Connection deleted.', 'workflow-automate' ),
-				'type' => 'success',
+			'deleted'      => array(
+				'message' => __( 'Connection deleted.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
-				'message' => __( 'Selected connections deleted.', 'workflow-automate' ),
-				'type' => 'success',
+				'message' => __( 'Selected connections deleted.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'error' => array(
-				'message' => __( 'That connection action could not be completed. Double-check the required fields and try again.', 'workflow-automate' ),
-				'type' => 'error',
+			'error'        => array(
+				'message' => __( 'That connection action could not be completed. Double-check the required fields and try again.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
 		);
 	}
@@ -189,7 +189,7 @@ class ConnectionsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {
@@ -200,7 +200,7 @@ class ConnectionsPage implements AdminPage {
 			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',
 			esc_attr( $notices[ $key ]['type'] ),
 			esc_html( $notices[ $key ]['message'] ),
-			$this->noticeDetailHtml()
+			wp_kses_post( $this->noticeDetailHtml() )
 		);
 	}
 
@@ -209,7 +209,7 @@ class ConnectionsPage implements AdminPage {
 	 */
 	private function noticeDetailHtml(): string {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail from a prior redirect.
-		$detail = isset( $_GET['wfa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['wfa_error'] ) ) : '';
+		$detail = isset( $_GET['dragwyb_af_error'] ) ? sanitize_text_field( wp_unslash( $_GET['dragwyb_af_error'] ) ) : '';
 
 		if ( '' === $detail ) {
 			return '';

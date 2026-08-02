@@ -2,12 +2,12 @@
 /**
  * Base migration contract.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database;
+namespace DragwybAgentFlow\Plugin\Database;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -127,10 +127,10 @@ export default function ConditionNodeCard({
 	};
 
 	const classNames = [
-		'wfa-builder-node',
-		'wfa-builder-node--condition',
-		selected ? 'wfa-builder-node--selected' : '',
-		hasUnknownType ? 'wfa-builder-node--unknown' : '',
+		'dragwyb-af-builder-node',
+		'dragwyb-af-builder-node--condition',
+		selected ? 'dragwyb-af-builder-node--selected' : '',
+		hasUnknownType ? 'dragwyb-af-builder-node--unknown' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -140,48 +140,48 @@ export default function ConditionNodeCard({
 			activeBranchDrag?.conditionNodeId === node.id &&
 			activeBranchDrag?.branchId === branchId;
 		const targetLabel = targetId
-			? nodesById[targetId]?.label || __('Connected', 'workflow-automate')
+			? nodesById[targetId]?.label || __('Connected', 'dragwyb-agentflow')
 			: '';
 
 		return (
-			<div className="wfa-condition-node__row-port">
+			<div className="dragwyb-af-condition-node__row-port">
 				{targetId && (
-					<span className="wfa-condition-node__link-chip" title={targetLabel}>
+					<span className="dragwyb-af-condition-node__link-chip" title={targetLabel}>
 						→ {targetLabel}
 					</span>
 				)}
 				{targetId && (
 					<Button
 						variant="link"
-						className="wfa-condition-node__row-btn wfa-condition-node__row-btn--danger"
+						className="dragwyb-af-condition-node__row-btn dragwyb-af-condition-node__row-btn--danger"
 						onPointerDown={stopPointer}
 						onClick={(event) => {
 							event.stopPropagation();
 							onDisconnectBranch(node.id, branchId);
 						}}
 					>
-						{__('×', 'workflow-automate')}
+						{__('×', 'dragwyb-agentflow')}
 					</Button>
 				)}
 				<button
 					type="button"
 					className={
 						targetId
-							? 'wfa-condition-node__port-dot wfa-condition-node__port-dot--connected'
+							? 'dragwyb-af-condition-node__port-dot dragwyb-af-condition-node__port-dot--connected'
 							: isDragging
-								? 'wfa-condition-node__port-dot wfa-condition-node__port-dot--dragging'
-								: 'wfa-condition-node__port-dot'
+								? 'dragwyb-af-condition-node__port-dot dragwyb-af-condition-node__port-dot--dragging'
+								: 'dragwyb-af-condition-node__port-dot'
 					}
 					data-branch-id={branchId}
 					title={__(
 						'Drag this port to any step on the canvas (each condition can connect to a different step)',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					)}
 					aria-label={sprintf(
 						/* translators: %s: condition branch label */
 						__(
 							'Drag to connect branch: %s',
-							'workflow-automate'
+							'dragwyb-agentflow'
 						),
 						branchLabel
 					)}
@@ -202,41 +202,41 @@ export default function ConditionNodeCard({
 
 		const branchId = row.id;
 		const targetId = row.node_id || '';
-		const branchLabel = row.label || __('Untitled Condition', 'workflow-automate');
+		const branchLabel = row.label || __('Untitled Condition', 'dragwyb-agentflow');
 
 		return (
-			<div key={branchId} className="wfa-condition-node__row">
-				<div className="wfa-condition-node__row-main">
-					<span className="wfa-condition-node__row-index">
+			<div key={branchId} className="dragwyb-af-condition-node__row">
+				<div className="dragwyb-af-condition-node__row-main">
+					<span className="dragwyb-af-condition-node__row-index">
 						{index + 1}
 					</span>
-					<span className="wfa-condition-node__row-label">
+					<span className="dragwyb-af-condition-node__row-label">
 						{branchLabel}
 					</span>
 				</div>
 				{row && (
-					<div className="wfa-condition-node__row-tools">
+					<div className="dragwyb-af-condition-node__row-tools">
 						<Button
 							variant="link"
-							className="wfa-condition-node__row-btn"
+							className="dragwyb-af-condition-node__row-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
 								onSelect(node.id);
 							}}
 						>
-							{__('Edit', 'workflow-automate')}
+							{__('Edit', 'dragwyb-agentflow')}
 						</Button>
 						<Button
 							variant="link"
-							className="wfa-condition-node__row-btn wfa-condition-node__row-btn--danger"
+							className="dragwyb-af-condition-node__row-btn dragwyb-af-condition-node__row-btn--danger"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
 								onRemoveCondition(node.id, row.id);
 							}}
 						>
-							{__('Remove', 'workflow-automate')}
+							{__('Remove', 'dragwyb-agentflow')}
 						</Button>
 					</div>
 				)}
@@ -266,14 +266,14 @@ export default function ConditionNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="wfa-condition-node__input-dot"
+				className="dragwyb-af-condition-node__input-dot"
 				aria-hidden="true"
 			/>
 
-			<div className="wfa-condition-node__card">
-				<div className="wfa-condition-node__header">
+			<div className="dragwyb-af-condition-node__card">
+				<div className="dragwyb-af-condition-node__header">
 					<span
-						className="wfa-condition-node__icon"
+						className="dragwyb-af-condition-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -282,47 +282,47 @@ export default function ConditionNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="wfa-condition-node__header-text">
-						<span className="wfa-condition-node__title">
-							{__('Condition', 'workflow-automate')}
+					<div className="dragwyb-af-condition-node__header-text">
+						<span className="dragwyb-af-condition-node__title">
+							{__('Condition', 'dragwyb-agentflow')}
 						</span>
-						<span className="wfa-condition-node__subtitle">
+						<span className="dragwyb-af-condition-node__subtitle">
 							{__(
 								'Each orange port connects to a different step — drag one port per branch',
-								'workflow-automate'
+								'dragwyb-agentflow'
 							)}
 						</span>
 					</div>
 				</div>
 
-				<div className="wfa-condition-node__body">
+				<div className="dragwyb-af-condition-node__body">
 					{displayRows.map((row, index) => (
 						<div key={row?.id || `row-${index}`}>
 							{renderBranchRow(row, index)}
 							{index < displayRows.length - 1 && (
-								<div className="wfa-condition-node__add-between">
+								<div className="dragwyb-af-condition-node__add-between">
 									<span
-										className="wfa-condition-node__add-line"
+										className="dragwyb-af-condition-node__add-line"
 										aria-hidden="true"
 									/>
 									<button
 										type="button"
-										className="wfa-condition-node__add-btn"
+										className="dragwyb-af-condition-node__add-btn"
 										onPointerDown={stopPointer}
 										onClick={(event) => {
 											event.stopPropagation();
 											onAddCondition(node.id, index + 1);
 										}}
-										title={__('Add condition', 'workflow-automate')}
+										title={__('Add condition', 'dragwyb-agentflow')}
 										aria-label={__(
 											'Add condition',
-											'workflow-automate'
+											'dragwyb-agentflow'
 										)}
 									>
 										+
 									</button>
 									<span
-										className="wfa-condition-node__add-line"
+										className="dragwyb-af-condition-node__add-line"
 										aria-hidden="true"
 									/>
 								</div>
@@ -330,41 +330,41 @@ export default function ConditionNodeCard({
 						</div>
 					))}
 
-					<div className="wfa-condition-node__add-between">
+					<div className="dragwyb-af-condition-node__add-between">
 						<span
-							className="wfa-condition-node__add-line"
+							className="dragwyb-af-condition-node__add-line"
 							aria-hidden="true"
 						/>
 						<button
 							type="button"
-							className="wfa-condition-node__add-btn"
+							className="dragwyb-af-condition-node__add-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
 								onAddCondition(node.id, rows.length);
 							}}
-							title={__('Add condition', 'workflow-automate')}
-							aria-label={__('Add condition', 'workflow-automate')}
+							title={__('Add condition', 'dragwyb-agentflow')}
+							aria-label={__('Add condition', 'dragwyb-agentflow')}
 						>
 							+
 						</button>
 						<span
-							className="wfa-condition-node__add-line"
+							className="dragwyb-af-condition-node__add-line"
 							aria-hidden="true"
 						/>
 					</div>
 
-					<div className="wfa-condition-node__row wfa-condition-node__row--default">
-						<div className="wfa-condition-node__row-main">
-							<span className="wfa-condition-node__row-index">∅</span>
-							<span className="wfa-condition-node__row-label">
-								{__('No Condition Matched', 'workflow-automate')}
+					<div className="dragwyb-af-condition-node__row dragwyb-af-condition-node__row--default">
+						<div className="dragwyb-af-condition-node__row-main">
+							<span className="dragwyb-af-condition-node__row-index">∅</span>
+							<span className="dragwyb-af-condition-node__row-label">
+								{__('No Condition Matched', 'dragwyb-agentflow')}
 							</span>
 						</div>
 						{renderBranchPort(
 							'default',
 							defaultTargetId,
-							__('No Condition Matched', 'workflow-automate')
+							__('No Condition Matched', 'dragwyb-agentflow')
 						)}
 					</div>
 				</div>

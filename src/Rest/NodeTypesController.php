@@ -2,21 +2,21 @@
 /**
  * Node types REST controller.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Contracts\ActionGroupInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\NodeTypeInterface;
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerGroupInterface;
-use WorkflowAutomate\Plugin\Integration\IntegrationTriggerCatalog;
-use WorkflowAutomate\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use WorkflowAutomate\Plugin\Service\ElementorFormsService;
-use WorkflowAutomate\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionGroupInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\NodeTypeInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybAgentFlow\Plugin\Integration\IntegrationTriggerCatalog;
+use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -30,13 +30,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Exposes the server-side `NodeTypeRegistry` (item 5) to the builder's node
  * palette. Read-only by design — node types are registered in PHP via the
- * `wfa/nodes/register` action, never created/edited over HTTP — so this is
+ * `dragwyb_af/nodes/register` action, never created/edited over HTTP — so this is
  * a plain class rather than a `WP_REST_Controller` subclass: there is no
  * CRUD/schema-derivation machinery to inherit for a single GET route.
  */
 class NodeTypesController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private const ROUTE = '/node-types';
 
@@ -59,10 +59,10 @@ class NodeTypesController {
 			self::API_NAMESPACE,
 			self::ROUTE,
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getItems' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'getItems' ),
 				'permission_callback' => array( $this, 'permissionsCheck' ),
-				'args' => array(),
+				'args'                => array(),
 			)
 		);
 
@@ -70,18 +70,18 @@ class NodeTypesController {
 			self::API_NAMESPACE,
 			'/trigger-sample-schema',
 			array(
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'getTriggerSampleSchema' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'getTriggerSampleSchema' ),
 				'permission_callback' => array( $this, 'permissionsCheck' ),
-				'args' => array(
+				'args'                => array(
 					'trigger_type' => array(
-						'type' => 'string',
+						'type'     => 'string',
 						'required' => true,
 					),
-					'form_id' => array(
-						'type' => 'string',
+					'form_id'      => array(
+						'type'     => 'string',
 						'required' => false,
-						'default' => '',
+						'default'  => '',
 					),
 				),
 			)
@@ -96,8 +96,8 @@ class NodeTypesController {
 	public function permissionsCheck( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'wfa_rest_forbidden',
-				__( 'Sorry, you are not allowed to view node types.', 'workflow-automate' ),
+				'dragwyb_af_rest_forbidden',
+				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -140,7 +140,7 @@ class NodeTypesController {
 		return rest_ensure_response(
 			array(
 				'triggers' => $serialized_triggers,
-				'actions' => array_map( array( $this, 'serialize' ), $this->registry->actions() ),
+				'actions'  => array_map( array( $this, 'serialize' ), $this->registry->actions() ),
 			)
 		);
 	}
@@ -161,8 +161,8 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'wfa_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
+					'dragwyb_af_trigger_sample_unavailable',
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-agentflow' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -180,8 +180,8 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'wfa_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'workflow-automate' ) ),
+					'dragwyb_af_trigger_sample_unavailable',
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-agentflow' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -195,8 +195,8 @@ class NodeTypesController {
 		}
 
 		return new WP_Error(
-			'wfa_trigger_sample_unsupported',
-			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'workflow-automate' ),
+			'dragwyb_af_trigger_sample_unsupported',
+			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-agentflow' ),
 			array( 'status' => 400 )
 		);
 	}
@@ -209,17 +209,17 @@ class NodeTypesController {
 	private function serialize( NodeTypeInterface $node_type ): array {
 		$schema = $node_type->configSchema();
 		$data   = array(
-			'slug' => $node_type->slug(),
-			'label' => $node_type->label(),
-			'description' => $node_type->description(),
-			'config_schema' => $schema,
+			'slug'           => $node_type->slug(),
+			'label'          => $node_type->label(),
+			'description'    => $node_type->description(),
+			'config_schema'  => $schema,
 			'default_config' => $this->defaultConfigFromSchema( $schema ),
-			'available' => true,
+			'available'      => true,
 		);
 
 		if ( $node_type instanceof TriggerGroupInterface || $node_type instanceof ActionGroupInterface ) {
-			$data['app'] = $node_type->app();
-			$data['group'] = $node_type->group();
+			$data['app']         = $node_type->app();
+			$data['group']       = $node_type->group();
 			$data['group_label'] = $node_type->groupLabel();
 		}
 
@@ -297,13 +297,13 @@ class NodeTypesController {
 		$schema = $node_type->configSchema();
 
 		$data = array(
-			'slug' => $node_type->slug(),
-			'label' => $node_type->label(),
-			'description' => $node_type->description(),
-			'config_schema' => $schema,
-			'default_config' => $this->defaultConfigFromSchema( $schema ),
-			'app' => $app,
-			'available' => false,
+			'slug'            => $node_type->slug(),
+			'label'           => $node_type->label(),
+			'description'     => $node_type->description(),
+			'config_schema'   => $schema,
+			'default_config'  => $this->defaultConfigFromSchema( $schema ),
+			'app'             => $app,
+			'available'       => false,
 			'requires_plugin' => $requires_plugin,
 		);
 
@@ -331,9 +331,9 @@ class NodeTypesController {
 	}
 
 	/**
-	 * @param array<string, mixed>                                              $data
+	 * @param array<string, mixed>                                                                $data
 	 * @param array{options: array<int, array{value: string, label: string}>, error: string|null} $form_result
-	 * @param array<int, array{value: string, label: string}>                   $options
+	 * @param array<int, array{value: string, label: string}>                                     $options
 	 *
 	 * @return void
 	 */

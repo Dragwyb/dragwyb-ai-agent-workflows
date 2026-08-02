@@ -2,19 +2,19 @@
 /**
  * Connection create/edit admin page.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use WorkflowAutomate\Plugin\Admin\AdminPage;
-use WorkflowAutomate\Plugin\Core\Capabilities;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ConnectionFormPage implements AdminPage {
 
-	public const SLUG = 'wfa-connection-form';
+	public const SLUG = 'dragwyb-af-connection-form';
 
 	private ConnectionService $connections;
 
@@ -65,14 +65,14 @@ class ConnectionFormPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Connection', 'workflow-automate' );
+		return __( 'Connection', 'dragwyb-agentflow' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Connection', 'workflow-automate' );
+		return __( 'Connection', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -94,10 +94,10 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'wfa-admin',
-			WFA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			WFA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -106,13 +106,13 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'workflow-automate' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which connection to load/create; the admin-post controller this feeds still re-checks capability and nonce on every write.
 		$id = isset( $_GET['connection'] ) ? absint( wp_unslash( $_GET['connection'] ) ) : 0;
 
-		echo '<div class="wrap wfa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		$this->renderNotice();
 
 		if ( $id > 0 ) {
@@ -120,14 +120,14 @@ class ConnectionFormPage implements AdminPage {
 
 			if ( null === $connection ) {
 				echo '<h1>' . esc_html( $this->pageTitle() ) . '</h1>';
-				echo '<p>' . esc_html__( 'That connection no longer exists.', 'workflow-automate' ) . '</p>';
+				echo '<p>' . esc_html__( 'That connection no longer exists.', 'dragwyb-agentflow' ) . '</p>';
 				$this->renderBackLink();
 				echo '</div>';
 
 				return;
 			}
 
-			echo '<h1>' . esc_html__( 'Edit Connection', 'workflow-automate' ) . '</h1>';
+			echo '<h1>' . esc_html__( 'Edit Connection', 'dragwyb-agentflow' ) . '</h1>';
 			$this->renderBackLink();
 			$this->renderEditForm( $connection );
 			echo '</div>';
@@ -138,7 +138,7 @@ class ConnectionFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only step-1-to-step-2 selector for this GET-only "choose a type" screen; nothing is written until the real POST form in renderCreateForm() below.
 		$auth_type = isset( $_GET['auth_type'] ) ? sanitize_key( wp_unslash( $_GET['auth_type'] ) ) : '';
 
-		echo '<h1>' . esc_html__( 'Add New Connection', 'workflow-automate' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Add New Connection', 'dragwyb-agentflow' ) . '</h1>';
 		$this->renderBackLink();
 
 		if ( in_array( $auth_type, ConnectionAuthTypes::VALID, true ) ) {
@@ -166,7 +166,7 @@ class ConnectionFormPage implements AdminPage {
 		printf(
 			'<p><a href="%1$s">&larr; %2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ) ),
-			esc_html__( 'Back to Connections', 'workflow-automate' )
+			esc_html__( 'Back to Connections', 'dragwyb-agentflow' )
 		);
 	}
 
@@ -177,22 +177,22 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderChooseTypeForm(): void {
-		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '" class="wfa-settings-form">';
+		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '" class="dragwyb-af-settings-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( self::SLUG ) );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="wfa-connection-integration">' . esc_html__( 'Integration', 'workflow-automate' ) . '</label></th><td>';
-		echo '<input type="text" id="wfa-connection-integration" name="integration_slug" class="regular-text" required="required" />';
-		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'workflow-automate' ) . '</p>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<input type="text" id="dragwyb-af-connection-integration" name="integration_slug" class="regular-text" required="required" />';
+		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'dragwyb-agentflow' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="wfa-connection-label">' . esc_html__( 'Label', 'workflow-automate' ) . '</label></th><td>';
-		echo '<input type="text" id="wfa-connection-label" name="label" class="regular-text" required="required" />';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" required="required" />';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="wfa-connection-auth-type">' . esc_html__( 'Authentication type', 'workflow-automate' ) . '</label></th><td>';
-		echo '<select id="wfa-connection-auth-type" name="auth_type">';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<select id="dragwyb-af-connection-auth-type" name="auth_type">';
 		foreach ( ConnectionAuthTypes::VALID as $auth_type ) {
 			printf(
 				'<option value="%1$s">%2$s</option>',
@@ -204,7 +204,7 @@ class ConnectionFormPage implements AdminPage {
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
-		submit_button( __( 'Continue', 'workflow-automate' ) );
+		submit_button( __( 'Continue', 'dragwyb-agentflow' ) );
 		echo '</form>';
 	}
 
@@ -218,29 +218,29 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderCreateForm( string $auth_type, string $integration_slug, string $label ): void {
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
-		echo '<input type="hidden" name="action" value="wfa_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="create" />';
 		echo '<input type="hidden" name="auth_type" value="' . esc_attr( $auth_type ) . '" />';
-		wp_nonce_field( 'wfa_connection_action_create' );
+		wp_nonce_field( 'dragwyb_af_connection_action_create' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="wfa-connection-integration">' . esc_html__( 'Integration', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="wfa-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragwyb-af-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
 			esc_attr( $integration_slug )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="wfa-connection-label">' . esc_html__( 'Label', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="wfa-connection-label" name="label" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $label )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'dragwyb-agentflow' ) . '</th><td>';
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $auth_type ) ) . '</p>';
 		echo '</td></tr>';
 
@@ -253,7 +253,7 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</tbody></table>';
-		submit_button( __( 'Create Connection', 'workflow-automate' ) );
+		submit_button( __( 'Create Connection', 'dragwyb-agentflow' ) );
 		echo '</form>';
 	}
 
@@ -263,25 +263,27 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderEditForm( Connection $connection ): void {
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form">';
-		echo '<input type="hidden" name="action" value="wfa_connection_action" />';
+		$connection_id = (int) $connection->id();
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
-		printf( '<input type="hidden" name="connection_id" value="%d" />', $connection->id() );
-		wp_nonce_field( 'wfa_connection_action_update_' . $connection->id() );
+		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
+		wp_nonce_field( 'dragwyb_af_connection_action_update_' . $connection->id() );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Integration', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</th><td>';
 		echo '<p>' . esc_html( $connection->integrationSlug() ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'dragwyb-agentflow' ) . '</th><td>';
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $connection->authType() ) ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="wfa-connection-label">' . esc_html__( 'Label', 'workflow-automate' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="wfa-connection-label" name="label" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $connection->label() )
 		);
 		echo '</td></tr>';
@@ -301,17 +303,17 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</tbody></table>';
-		submit_button( __( 'Save Connection', 'workflow-automate' ) );
+		submit_button( __( 'Save Connection', 'dragwyb-agentflow' ) );
 		echo '</form>';
 
-		echo '<h2>' . esc_html__( 'Delete Connection', 'workflow-automate' ) . '</h2>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wfa-settings-form wfa-settings-danger-zone">';
-		echo '<input type="hidden" name="action" value="wfa_connection_action" />';
+		echo '<h2>' . esc_html__( 'Delete Connection', 'dragwyb-agentflow' ) . '</h2>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form dragwyb-af-settings-danger-zone">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="delete" />';
-		printf( '<input type="hidden" name="connection_id" value="%d" />', $connection->id() );
-		wp_nonce_field( 'wfa_connection_action_delete_' . $connection->id() );
-		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'workflow-automate' ) . '</p>';
-		submit_button( __( 'Delete Connection', 'workflow-automate' ), 'delete' );
+		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
+		wp_nonce_field( 'dragwyb_af_connection_action_delete_' . $connection->id() );
+		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'dragwyb-agentflow' ) . '</p>';
+		submit_button( __( 'Delete Connection', 'dragwyb-agentflow' ), 'delete' );
 		echo '</form>';
 	}
 
@@ -329,14 +331,14 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderFieldRow( string $field, string $label, bool $secret, string $current, bool $configured ): void {
 		$input_type = $secret ? 'password' : 'text';
-		$input_id = 'wfa-connection-field-' . $field;
+		$input_id   = 'dragwyb-af-connection-field-' . $field;
 
 		echo '<tr><th scope="row"><label for="' . esc_attr( $input_id ) . '">' . esc_html( $label ) . '</label></th><td>';
 
 		if ( $configured ) {
-			echo '<p class="description wfa-connection-current-value">' . sprintf(
+			echo '<p class="description dragwyb-af-connection-current-value">' . sprintf(
 				/* translators: %s: masked or otherwise safe-to-display current value. */
-				esc_html__( 'Currently set: %s', 'workflow-automate' ),
+				esc_html__( 'Currently set: %s', 'dragwyb-agentflow' ),
 				'<code>' . esc_html( $current ) . '</code>'
 			) . '</p>';
 		}
@@ -350,7 +352,7 @@ class ConnectionFormPage implements AdminPage {
 		);
 
 		if ( $configured ) {
-			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current value.', 'workflow-automate' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current value.', 'dragwyb-agentflow' ) . '</p>';
 		}
 
 		echo '</td></tr>';
@@ -366,14 +368,14 @@ class ConnectionFormPage implements AdminPage {
 		echo wp_kses(
 			sprintf(
 				/* translators: %s: URL to Google Cloud Console credentials page */
-				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'workflow-automate' ),
+				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'dragwyb-agentflow' ),
 				esc_url( GoogleOAuthService::GOOGLE_CREDENTIALS_URL )
 			),
 			array(
 				'a' => array(
-					'href' => true,
+					'href'   => true,
 					'target' => true,
-					'rel' => true,
+					'rel'    => true,
 				),
 			)
 		);
@@ -388,12 +390,12 @@ class ConnectionFormPage implements AdminPage {
 	private function renderOAuthCallbackRow(): void {
 		$callback = $this->google_oauth->callbackUrl();
 
-		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'dragwyb-agentflow' ) . '</th><td>';
 		printf(
 			'<input type="text" class="large-text code" readonly="readonly" value="%s" onclick="this.select();" />',
 			esc_attr( $callback )
 		);
-		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'dragwyb-agentflow' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -405,12 +407,12 @@ class ConnectionFormPage implements AdminPage {
 	private function renderOAuthStatusRow( Connection $connection ): void {
 		$connected = $this->google_oauth->isConnected( $connection );
 
-		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'dragwyb-agentflow' ) . '</th><td>';
 
 		if ( $connected ) {
-			echo '<p><span class="wfa-connection-status wfa-connection-status--verified">' . esc_html__( 'Connected', 'workflow-automate' ) . '</span></p>';
+			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-agentflow' ) . '</span></p>';
 		} else {
-			echo '<p><span class="wfa-connection-status wfa-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'workflow-automate' ) . '</span></p>';
+			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-agentflow' ) . '</span></p>';
 		}
 
 		echo '</td></tr>';
@@ -425,21 +427,21 @@ class ConnectionFormPage implements AdminPage {
 		$url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action' => 'wfa_google_oauth_authorize',
+					'action'        => 'dragwyb_af_google_oauth_authorize',
 					'connection_id' => $connection->id(),
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'wfa_google_oauth_authorize_' . $connection->id()
+			'dragwyb_af_google_oauth_authorize_' . $connection->id()
 		);
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'workflow-automate' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'dragwyb-agentflow' ) . '</th><td>';
 		printf(
 			'<a href="%1$s" class="button button-primary">%2$s</a>',
 			esc_url( $url ),
-			esc_html__( 'Connect with Google', 'workflow-automate' )
+			esc_html__( 'Connect with Google', 'dragwyb-agentflow' )
 		);
-		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'workflow-automate' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'dragwyb-agentflow' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -448,20 +450,20 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['wfa_notice'] ) ? sanitize_key( wp_unslash( $_GET['wfa_notice'] ) ) : '';
+		$key = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 
 		$notices = array(
-			'created_oauth' => array(
-				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'workflow-automate' ),
-				'type' => 'success',
+			'created_oauth'   => array(
+				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
 			'oauth_connected' => array(
-				'message' => __( 'Google account connected successfully.', 'workflow-automate' ),
-				'type' => 'success',
+				'message' => __( 'Google account connected successfully.', 'dragwyb-agentflow' ),
+				'type'    => 'success',
 			),
-			'error' => array(
-				'message' => __( 'That connection action could not be completed.', 'workflow-automate' ),
-				'type' => 'error',
+			'error'           => array(
+				'message' => __( 'That connection action could not be completed.', 'dragwyb-agentflow' ),
+				'type'    => 'error',
 			),
 		);
 
@@ -470,7 +472,7 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail.
-		$detail = isset( $_GET['wfa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['wfa_error'] ) ) : '';
+		$detail = isset( $_GET['dragwyb_af_error'] ) ? sanitize_text_field( wp_unslash( $_GET['dragwyb_af_error'] ) ) : '';
 
 		printf(
 			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',

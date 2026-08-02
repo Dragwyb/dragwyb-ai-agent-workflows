@@ -20,7 +20,7 @@ import {
  */
 function createPillElement(token, path, nodeLabels = {}) {
 	const span = document.createElement('span');
-	span.className = 'wfa-token-field__pill';
+	span.className = 'dragwyb-af-token-field__pill';
 	span.contentEditable = 'false';
 	span.dataset.token = token;
 	const label =
@@ -260,7 +260,7 @@ export default function TokenField({
 			? createPortal(
 					<div
 						ref={popoverRef}
-						className="wfa-token-field__popover"
+						className="dragwyb-af-token-field__popover"
 						style={{
 							position: 'fixed',
 							top: `${popoverPos.top}px`,
@@ -287,14 +287,14 @@ export default function TokenField({
 	return (
 		<div
 			ref={wrapperRef}
-			className={`wfa-token-field${pickerOpen ? ' wfa-token-field--picker-open' : ''}`}
+			className={`dragwyb-af-token-field${pickerOpen ? ' dragwyb-af-token-field--picker-open' : ''}`}
 		>
-			<div className="wfa-token-field__header">
-				<label className="wfa-token-field__label">
+			<div className="dragwyb-af-token-field__header">
+				<label className="dragwyb-af-token-field__label">
 					{label}
 					{required && (
 						<span
-							className="wfa-token-field__required"
+							className="dragwyb-af-token-field__required"
 							aria-hidden="true"
 						>
 							{' '}
@@ -305,17 +305,17 @@ export default function TokenField({
 				{hasVariables && (
 					<button
 						type="button"
-						className="wfa-token-field__insert"
+						className="dragwyb-af-token-field__insert"
 						onClick={openPicker}
 					>
-						{__('Insert variable', 'workflow-automate')}
+						{__('Insert variable', 'dragwyb-agentflow')}
 					</button>
 				)}
 			</div>
 
 			<div
 				ref={editorRef}
-				className="wfa-token-field__editor"
+				className="dragwyb-af-token-field__editor"
 				contentEditable
 				role="textbox"
 				aria-multiline="true"
@@ -328,10 +328,10 @@ export default function TokenField({
 			{popover}
 
 			{!hasVariables && (
-				<p className="wfa-token-field__hint">
+				<p className="dragwyb-af-token-field__hint">
 					{__(
 						'Add steps above this node, or use Test Flow → Listen to load trigger variables.',
-						'workflow-automate'
+						'dragwyb-agentflow'
 					)}
 				</p>
 			)}

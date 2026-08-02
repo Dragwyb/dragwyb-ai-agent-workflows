@@ -2,18 +2,18 @@
 /**
  * Connections admin list table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Domain\Connection;
-use WorkflowAutomate\Plugin\Service\ConnectionAuthTypes;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -47,30 +47,30 @@ class ConnectionsListTable extends WP_List_Table {
 		parent::__construct(
 			array(
 				'singular' => 'connection',
-				'plural' => 'connections',
-				'ajax' => false,
+				'plural'   => 'connections',
+				'ajax'     => false,
 			)
 		);
 
 		$this->connections = $connections;
-		$this->settings = $settings;
-		$this->rowForms = new RowActionForms();
+		$this->settings    = $settings;
+		$this->rowForms    = new RowActionForms();
 	}
 
 	public function get_columns() {
 		return array(
-			'cb' => '<input type="checkbox" />',
-			'label' => __( 'Label', 'workflow-automate' ),
-			'integration_slug' => __( 'Integration', 'workflow-automate' ),
-			'auth_type' => __( 'Authentication', 'workflow-automate' ),
-			'status' => __( 'Status', 'workflow-automate' ),
-			'created_at' => __( 'Created', 'workflow-automate' ),
+			'cb'               => '<input type="checkbox" />',
+			'label'            => __( 'Label', 'dragwyb-agentflow' ),
+			'integration_slug' => __( 'Integration', 'dragwyb-agentflow' ),
+			'auth_type'        => __( 'Authentication', 'dragwyb-agentflow' ),
+			'status'           => __( 'Status', 'dragwyb-agentflow' ),
+			'created_at'       => __( 'Created', 'dragwyb-agentflow' ),
 		);
 	}
 
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'workflow-automate' ),
+			'delete' => __( 'Delete', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -89,8 +89,8 @@ class ConnectionsListTable extends WP_List_Table {
 
 		$result = $this->connections->list(
 			array(
-				'page' => $paged,
-				'per_page' => self::PER_PAGE,
+				'page'             => $paged,
+				'per_page'         => self::PER_PAGE,
 				'integration_slug' => $this->currentIntegrationFilter(),
 			)
 		);
@@ -100,7 +100,7 @@ class ConnectionsListTable extends WP_List_Table {
 		$this->set_pagination_args(
 			array(
 				'total_items' => $result['total'],
-				'per_page' => self::PER_PAGE,
+				'per_page'    => self::PER_PAGE,
 			)
 		);
 	}
@@ -109,7 +109,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No connections yet.', 'workflow-automate' );
+		esc_html_e( 'No connections yet.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -127,7 +127,7 @@ class ConnectionsListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'workflow-automate' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-agentflow' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -137,11 +137,11 @@ class ConnectionsListTable extends WP_List_Table {
 	public function filterFields(): array {
 		return array(
 			array(
-				'name' => 'integration_slug',
-				'type' => 'search',
-				'label' => __( 'Filter by integration', 'workflow-automate' ),
-				'placeholder' => __( 'e.g. gemini, openai', 'workflow-automate' ),
-				'value' => $this->currentIntegrationFilter(),
+				'name'        => 'integration_slug',
+				'type'        => 'search',
+				'label'       => __( 'Filter by integration', 'dragwyb-agentflow' ),
+				'placeholder' => __( 'e.g. gemini, openai', 'dragwyb-agentflow' ),
+				'value'       => $this->currentIntegrationFilter(),
 			),
 		);
 	}
@@ -164,7 +164,7 @@ class ConnectionsListTable extends WP_List_Table {
 	private function editUrl( int $id ): string {
 		return add_query_arg(
 			array(
-				'page' => ConnectionFormPage::SLUG,
+				'page'       => ConnectionFormPage::SLUG,
 				'connection' => $id,
 			),
 			admin_url( 'admin.php' )
@@ -200,7 +200,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'wfa-connections-table' );
+		return array( 'widefat', 'fixed', 'striped', 'dragwyb-af-connections-table' );
 	}
 
 	/**
@@ -215,12 +215,12 @@ class ConnectionsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id = 'wfa-connection-delete-' . $id;
-		$nonce_field = wp_nonce_field( 'wfa_connection_action_delete_' . $id, '_wpnonce', true, false );
+		$form_id     = 'dragwyb-af-connection-delete-' . $id;
+		$nonce_field = wp_nonce_field( 'dragwyb_af_connection_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="wfa_connection_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="dragwyb-af-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="dragwyb_af_connection_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
 				. '<input type="hidden" name="connection_id" value="%3$d" />'
 				. '%4$s'
@@ -231,7 +231,7 @@ class ConnectionsListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'workflow-automate' ) );
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'dragwyb-agentflow' ) );
 	}
 
 	private function currentIntegrationFilter(): string {

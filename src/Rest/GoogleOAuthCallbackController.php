@@ -2,16 +2,16 @@
 /**
  * Google OAuth callback REST endpoint.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use WorkflowAutomate\Plugin\Admin\Pages\ConnectionFormPage;
-use WorkflowAutomate\Plugin\Service\ConnectionService;
-use WorkflowAutomate\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 use WP_REST_Request;
 
 // Prevent direct file access.
@@ -24,15 +24,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class GoogleOAuthCallbackController {
 
-	private const API_NAMESPACE = 'wfa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private ConnectionService $connections;
 
 	private GoogleOAuthService $google_oauth;
 
 	public function __construct( ConnectionService $connections, GoogleOAuthService $google_oauth ) {
-		$this->connections   = $connections;
-		$this->google_oauth  = $google_oauth;
+		$this->connections  = $connections;
+		$this->google_oauth = $google_oauth;
 	}
 
 	/**
@@ -43,23 +43,23 @@ class GoogleOAuthCallbackController {
 			self::API_NAMESPACE,
 			'/oauth/google/callback',
 			array(
-				'methods' => 'GET',
-				'callback' => array( $this, 'handleCallback' ),
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'handleCallback' ),
 				'permission_callback' => '__return_true',
-				'args' => array(
-					'code' => array(
-						'type' => 'string',
-						'required' => false,
+				'args'                => array(
+					'code'  => array(
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'state' => array(
-						'type' => 'string',
-						'required' => false,
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'error' => array(
-						'type' => 'string',
-						'required' => false,
+						'type'              => 'string',
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
@@ -81,7 +81,7 @@ class GoogleOAuthCallbackController {
 				'error',
 				sprintf(
 					/* translators: %s: Google OAuth error code */
-					__( 'Google authorization was denied or failed (%s).', 'workflow-automate' ),
+					__( 'Google authorization was denied or failed (%s).', 'dragwyb-agentflow' ),
 					$error
 				)
 			);
@@ -93,7 +93,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				0,
 				'error',
-				__( 'OAuth state expired or was invalid. Please try connecting again.', 'workflow-automate' )
+				__( 'OAuth state expired or was invalid. Please try connecting again.', 'dragwyb-agentflow' )
 			);
 		}
 
@@ -103,7 +103,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				0,
 				'error',
-				__( 'The connection for this authorization no longer exists.', 'workflow-automate' ),
+				__( 'The connection for this authorization no longer exists.', 'dragwyb-agentflow' ),
 				$state_payload
 			);
 		}
@@ -117,7 +117,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				$connection->id(),
 				'error',
-				isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to connect to Google.', 'workflow-automate' ),
+				isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to connect to Google.', 'dragwyb-agentflow' ),
 				$state_payload
 			);
 		}
@@ -138,21 +138,21 @@ class GoogleOAuthCallbackController {
 
 		if ( '' !== $return_url ) {
 			$args = array(
-				'wfa_notice' => $notice,
+				'dragwyb_af_notice' => $notice,
 			);
 
 			if ( $connection_id > 0 ) {
-				$args['wfa_connection'] = $connection_id;
+				$args['dragwyb_af_connection'] = $connection_id;
 			}
 
 			$node_id = isset( $state_payload['node_id'] ) ? (string) $state_payload['node_id'] : '';
 
 			if ( '' !== $node_id ) {
-				$args['wfa_node'] = $node_id;
+				$args['dragwyb_af_node'] = $node_id;
 			}
 
 			if ( '' !== $detail ) {
-				$args['wfa_error'] = $detail;
+				$args['dragwyb_af_error'] = $detail;
 			}
 
 			wp_safe_redirect( add_query_arg( $args, $return_url ) );
@@ -160,8 +160,8 @@ class GoogleOAuthCallbackController {
 		}
 
 		$args = array(
-			'page' => ConnectionFormPage::SLUG,
-			'wfa_notice' => $notice,
+			'page'       => ConnectionFormPage::SLUG,
+			'dragwyb_af_notice' => $notice,
 		);
 
 		if ( $connection_id > 0 ) {
@@ -169,7 +169,7 @@ class GoogleOAuthCallbackController {
 		}
 
 		if ( '' !== $detail ) {
-			$args['wfa_error'] = $detail;
+			$args['dragwyb_af_error'] = $detail;
 		}
 
 		wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php' ) ) );

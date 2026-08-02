@@ -2,15 +2,15 @@
 /**
  * Creates the webhooks table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use WorkflowAutomate\Plugin\Database\Migration;
-use WorkflowAutomate\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wfa_webhooks` holds one row per inbound webhook endpoint (roadmap item
+ * `dragwyb_af_webhooks` holds one row per inbound webhook endpoint (roadmap item
  * 13). `public_id` is the unguessable UUID segment of the public URL;
  * `signing_secret` stores an *encrypted* HMAC secret (or empty when
  * signature verification is off for that webhook) — architecture §2.3
  * originally typed this as VARCHAR(191), but field-level AES ciphertext
  * from `Core\Encryption` needs more room, so this migration uses TEXT
- * instead (same reasoning as `wfa_connections.credentials_json`). No
+ * instead (same reasoning as `dragwyb_af_connections.credentials_json`). No
  * SQL-level FOREIGN KEY for the same `dbDelta()` limitation noted on
  * every other table; application code nulls `workflow_id` when a
  * workflow is permanently deleted.
@@ -65,9 +65,9 @@ class CreateWebhooksTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'webhooks' );
+		$table = esc_sql( Table::name( 'webhooks' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is not user input; DROP TABLE cannot be parameterized; schema DDL is never a caching candidate.
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 	}
 }

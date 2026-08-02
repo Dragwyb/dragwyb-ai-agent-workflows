@@ -2,15 +2,15 @@
 /**
  * Catalog-defined WooCommerce hook trigger.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use WorkflowAutomate\Plugin\Domain\Contracts\TriggerInterface;
-use WorkflowAutomate\Plugin\Integration\WooCommerce\WooCommercePayloadBuilder;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Integration\WooCommerce\WooCommercePayloadBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -260,17 +260,17 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 					return;
 				}
 
-				$user = get_userdata( (int) $customer_id );
+				$user     = get_userdata( (int) $customer_id );
 				$userdata = array();
 
 				if ( is_object( $user ) ) {
 					$userdata = array(
-						'ID' => (int) $user->ID,
+						'ID'         => (int) $user->ID,
 						'user_email' => (string) $user->user_email,
 						'user_login' => (string) $user->user_login,
 						'first_name' => (string) $user->first_name,
-						'last_name' => (string) $user->last_name,
-						'role' => in_array( 'customer', (array) $user->roles, true ) ? 'customer' : '',
+						'last_name'  => (string) $user->last_name,
+						'role'       => in_array( 'customer', (array) $user->roles, true ) ? 'customer' : '',
 					);
 				}
 
@@ -411,10 +411,10 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 					return;
 				}
 
-				$payload = WooCommercePayloadBuilder::product( $event, $product_id, null );
+				$payload                = WooCommercePayloadBuilder::product( $event, $product_id, null );
 				$payload['status_kind'] = 'post';
-				$payload['old_status'] = (string) $old_status;
-				$payload['new_status'] = (string) $new_status;
+				$payload['old_status']  = (string) $old_status;
+				$payload['new_status']  = (string) $new_status;
 
 				$on_fire( $payload, $config );
 			},
@@ -476,12 +476,12 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 				return;
 			}
 
-			$payload = WooCommercePayloadBuilder::product( $event, $product_id, $product );
-			$payload['status_kind'] = 'stock';
+			$payload                     = WooCommercePayloadBuilder::product( $event, $product_id, $product );
+			$payload['status_kind']      = 'stock';
 			$payload['old_stock_status'] = $old_stock_status;
 			$payload['new_stock_status'] = $new_stock_status;
-			$payload['old_status'] = $old_stock_status;
-			$payload['new_status'] = $new_stock_status;
+			$payload['old_status']       = $old_stock_status;
+			$payload['new_status']       = $new_stock_status;
 
 			$on_fire( $payload, $config );
 		};
@@ -569,7 +569,10 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 				$variation_id = 0,
 				$variation = array(),
 				$cart_item_data = array()
-			) use ( $on_fire, $config ): void {
+			) use (
+				$on_fire,
+				$config
+			): void {
 				if ( ! self::isWooCommerceActive() ) {
 					return;
 				}
@@ -577,11 +580,11 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 				$on_fire(
 					WooCommercePayloadBuilder::cartItemAdded(
 						array(
-							'cart_item_key' => (string) $cart_item_key,
-							'product_id' => (int) $product_id,
-							'variation_id' => (int) $variation_id,
-							'quantity' => $quantity,
-							'variation' => is_array( $variation ) ? $variation : array(),
+							'cart_item_key'  => (string) $cart_item_key,
+							'product_id'     => (int) $product_id,
+							'variation_id'   => (int) $variation_id,
+							'quantity'       => $quantity,
+							'variation'      => is_array( $variation ) ? $variation : array(),
 							'cart_item_data' => is_array( $cart_item_data ) ? $cart_item_data : array(),
 						)
 					),
@@ -609,19 +612,19 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 
 				$context = array(
 					'cart_item_key' => (string) $cart_item_key,
-					'product_id' => 0,
-					'variation_id' => 0,
-					'quantity' => 0,
+					'product_id'    => 0,
+					'variation_id'  => 0,
+					'quantity'      => 0,
 				);
 
 				if ( is_object( $cart ) && method_exists( $cart, 'removed_cart_contents' ) ) {
 					$removed = $cart->removed_cart_contents;
 
 					if ( is_array( $removed ) && isset( $removed[ $cart_item_key ] ) && is_array( $removed[ $cart_item_key ] ) ) {
-						$item = $removed[ $cart_item_key ];
-						$context['product_id'] = isset( $item['product_id'] ) ? (int) $item['product_id'] : 0;
+						$item                    = $removed[ $cart_item_key ];
+						$context['product_id']   = isset( $item['product_id'] ) ? (int) $item['product_id'] : 0;
 						$context['variation_id'] = isset( $item['variation_id'] ) ? (int) $item['variation_id'] : 0;
-						$context['quantity'] = isset( $item['quantity'] ) ? $item['quantity'] : 0;
+						$context['quantity']     = isset( $item['quantity'] ) ? $item['quantity'] : 0;
 					}
 				}
 
@@ -671,7 +674,7 @@ class WooCommerceCatalogTrigger implements TriggerInterface {
 					return;
 				}
 
-				$payload = WooCommercePayloadBuilder::order( 'order_status_changed', (int) $order_id, $order );
+				$payload               = WooCommercePayloadBuilder::order( 'order_status_changed', (int) $order_id, $order );
 				$payload['old_status'] = (string) $old_status;
 				$payload['new_status'] = (string) $new_status;
 

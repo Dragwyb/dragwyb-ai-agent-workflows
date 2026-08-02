@@ -2,19 +2,19 @@
 /**
  * Runs admin list table.
  *
- * @package WorkflowAutomate\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace WorkflowAutomate\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use WorkflowAutomate\Plugin\Admin\Pages\RunDetailPage;
-use WorkflowAutomate\Plugin\Admin\Pages\RunsPage;
-use WorkflowAutomate\Plugin\Domain\WorkflowRun;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRepository;
-use WorkflowAutomate\Plugin\Persistence\WorkflowRunRepository;
-use WorkflowAutomate\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunDetailPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -75,15 +75,15 @@ class RunsListTable extends WP_List_Table {
 		parent::__construct(
 			array(
 				'singular' => 'run',
-				'plural' => 'runs',
-				'ajax' => false,
+				'plural'   => 'runs',
+				'ajax'     => false,
 			)
 		);
 
-		$this->runs = $runs;
+		$this->runs      = $runs;
 		$this->workflows = $workflows;
-		$this->settings = $settings;
-		$this->rowForms = new RowActionForms();
+		$this->settings  = $settings;
+		$this->rowForms  = new RowActionForms();
 	}
 
 	/**
@@ -91,13 +91,13 @@ class RunsListTable extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'cb' => '<input type="checkbox" />',
-			'id' => __( 'Run', 'workflow-automate' ),
-			'workflow' => __( 'Workflow', 'workflow-automate' ),
-			'status' => __( 'Status', 'workflow-automate' ),
-			'attempt' => __( 'Attempt', 'workflow-automate' ),
-			'started_at' => __( 'Started', 'workflow-automate' ),
-			'duration' => __( 'Duration', 'workflow-automate' ),
+			'cb'         => '<input type="checkbox" />',
+			'id'         => __( 'Run', 'dragwyb-agentflow' ),
+			'workflow'   => __( 'Workflow', 'dragwyb-agentflow' ),
+			'status'     => __( 'Status', 'dragwyb-agentflow' ),
+			'attempt'    => __( 'Attempt', 'dragwyb-agentflow' ),
+			'started_at' => __( 'Started', 'dragwyb-agentflow' ),
+			'duration'   => __( 'Duration', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -106,7 +106,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'workflow-automate' ),
+			'delete' => __( 'Delete', 'dragwyb-agentflow' ),
 		);
 	}
 
@@ -131,12 +131,12 @@ class RunsListTable extends WP_List_Table {
 		$this->_column_headers = array( $this->get_columns(), array(), array() );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only pagination parameter, not a state change.
-		$paged = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
+		$paged       = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
 		$workflow_id = $this->currentWorkflowFilter();
-		$view = $this->currentView();
+		$view        = $this->currentView();
 
 		$args = array(
-			'page' => $paged,
+			'page'     => $paged,
 			'per_page' => self::PER_PAGE,
 		);
 
@@ -150,14 +150,14 @@ class RunsListTable extends WP_List_Table {
 
 		$result = $this->runs->paginateAll( $args );
 
-		$this->items = $result['items'];
-		$this->workflowTitles = $this->resolveWorkflowTitles( $this->items );
+		$this->items                 = $result['items'];
+		$this->workflowTitles        = $this->resolveWorkflowTitles( $this->items );
 		$this->workflowFilterOptions = $this->loadWorkflowFilterOptions();
 
 		$this->set_pagination_args(
 			array(
 				'total_items' => $result['total'],
-				'per_page' => self::PER_PAGE,
+				'per_page'    => self::PER_PAGE,
 			)
 		);
 	}
@@ -166,7 +166,7 @@ class RunsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No runs match this filter.', 'workflow-automate' );
+		esc_html_e( 'No runs match this filter.', 'dragwyb-agentflow' );
 	}
 
 	/**
@@ -197,7 +197,7 @@ class RunsListTable extends WP_List_Table {
 	private function loadWorkflowFilterOptions(): array {
 		$result = $this->workflows->paginate(
 			array(
-				'page' => 1,
+				'page'     => 1,
 				'per_page' => 100,
 			)
 		);
@@ -218,7 +218,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	public function filterFields(): array {
 		$options = array(
-			'0' => __( 'All workflows', 'workflow-automate' ),
+			'0' => __( 'All workflows', 'dragwyb-agentflow' ),
 		);
 
 		foreach ( $this->workflowFilterOptions as $id => $title ) {
@@ -227,9 +227,9 @@ class RunsListTable extends WP_List_Table {
 
 		return array(
 			array(
-				'name' => 'workflow_id',
-				'label' => __( 'Filter by workflow', 'workflow-automate' ),
-				'value' => (string) $this->currentWorkflowFilter(),
+				'name'    => 'workflow_id',
+				'label'   => __( 'Filter by workflow', 'dragwyb-agentflow' ),
+				'value'   => (string) $this->currentWorkflowFilter(),
 				'options' => $options,
 			),
 		);
@@ -243,7 +243,7 @@ class RunsListTable extends WP_List_Table {
 	public function preservedFilters(): array {
 		return array(
 			'workflow_id' => $this->currentWorkflowFilter(),
-			'status' => 'all' === $this->currentView() ? '' : $this->currentView(),
+			'status'      => 'all' === $this->currentView() ? '' : $this->currentView(),
 		);
 	}
 
@@ -261,13 +261,13 @@ class RunsListTable extends WP_List_Table {
 	 */
 	protected function get_views() {
 		$current = $this->currentView();
-		$labels = array(
-			'all' => __( 'All', 'workflow-automate' ),
-			WorkflowRun::STATUS_QUEUED => __( 'Queued', 'workflow-automate' ),
-			WorkflowRun::STATUS_RUNNING => __( 'Running', 'workflow-automate' ),
-			WorkflowRun::STATUS_SUCCESS => __( 'Success', 'workflow-automate' ),
-			WorkflowRun::STATUS_FAILED => __( 'Failed', 'workflow-automate' ),
-			WorkflowRun::STATUS_PARTIAL => __( 'Partial', 'workflow-automate' ),
+		$labels  = array(
+			'all'                       => __( 'All', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_QUEUED  => __( 'Queued', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_RUNNING => __( 'Running', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_SUCCESS => __( 'Success', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_FAILED  => __( 'Failed', 'dragwyb-agentflow' ),
+			WorkflowRun::STATUS_PARTIAL => __( 'Partial', 'dragwyb-agentflow' ),
 		);
 
 		$views = array();
@@ -288,18 +288,18 @@ class RunsListTable extends WP_List_Table {
 		$view_url = $this->detailUrl( $item->id() );
 
 		$actions = array(
-			'view' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $view_url ), esc_html__( 'View', 'workflow-automate' ) ),
+			'view' => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $view_url ), esc_html__( 'View', 'dragwyb-agentflow' ) ),
 		);
 
 		if ( in_array( $item->status(), self::RERUNNABLE_STATUSES, true ) ) {
-			$actions['rerun'] = $this->actionForm( 'rerun', $item->id(), __( 'Re-run', 'workflow-automate' ) );
+			$actions['rerun'] = $this->actionForm( 'rerun', $item->id(), __( 'Re-run', 'dragwyb-agentflow' ) );
 		}
 
 		$actions['delete'] = $this->actionForm(
 			'delete',
 			$item->id(),
-			__( 'Delete', 'workflow-automate' ),
-			__( 'Delete this run permanently? This cannot be undone.', 'workflow-automate' )
+			__( 'Delete', 'dragwyb-agentflow' ),
+			__( 'Delete this run permanently? This cannot be undone.', 'dragwyb-agentflow' )
 		);
 
 		$label = sprintf(
@@ -331,7 +331,7 @@ class RunsListTable extends WP_List_Table {
 			case 'started_at':
 				return $item->startedAt()
 					? esc_html( RunTimestamp::format( $item->startedAt(), $this->settings->displayTimestampsInUtc() ) )
-					: esc_html__( 'Not started yet', 'workflow-automate' );
+					: esc_html__( 'Not started yet', 'dragwyb-agentflow' );
 
 			case 'duration':
 				return esc_html( RunDuration::forRun( $item ) );
@@ -348,7 +348,7 @@ class RunsListTable extends WP_List_Table {
 	 */
 	private function workflowCell( WorkflowRun $item ): string {
 		if ( ! isset( $this->workflowTitles[ $item->workflowId() ] ) ) {
-			return esc_html__( '(deleted workflow)', 'workflow-automate' );
+			return esc_html__( '(deleted workflow)', 'dragwyb-agentflow' );
 		}
 
 		return sprintf(
@@ -362,7 +362,7 @@ class RunsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'wfa-runs-table' );
+		return array( 'widefat', 'fixed', 'striped', 'dragwyb-af-runs-table' );
 	}
 
 	/**
@@ -373,7 +373,7 @@ class RunsListTable extends WP_List_Table {
 	private function detailUrl( int $run_id ): string {
 		return add_query_arg(
 			array(
-				'page' => RunDetailPage::SLUG,
+				'page'   => RunDetailPage::SLUG,
 				'run_id' => $run_id,
 			),
 			admin_url( 'admin.php' )
@@ -388,7 +388,7 @@ class RunsListTable extends WP_List_Table {
 	private function workflowFilterUrl( int $workflow_id ): string {
 		return add_query_arg(
 			array(
-				'page' => RunsPage::SLUG,
+				'page'        => RunsPage::SLUG,
 				'workflow_id' => $workflow_id,
 			),
 			admin_url( 'admin.php' )
@@ -404,12 +404,12 @@ class RunsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $run_id, string $label, ?string $confirm = null ): string {
-		$form_id = 'wfa-run-action-' . $op . '-' . $run_id;
-		$nonce_field = wp_nonce_field( 'wfa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$form_id     = 'dragwyb-af-run-action-' . $op . '-' . $run_id;
+		$nonce_field = wp_nonce_field( 'dragwyb_af_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="wfa-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="wfa_run_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="dragwyb-af-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="dragwyb_af_run_action" />'
 				. '<input type="hidden" name="op" value="%3$s" />'
 				. '<input type="hidden" name="run_id" value="%4$d" />'
 				. '%5$s'
@@ -421,7 +421,7 @@ class RunsListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, $label, 'wfa-row-action-button', $confirm );
+		return $this->rowForms->registerButton( $form_id, $form_markup, $label, 'dragwyb-af-row-action-button', $confirm );
 	}
 
 	/**
