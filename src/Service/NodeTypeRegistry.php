@@ -104,7 +104,7 @@ class NodeTypeRegistry {
 	private function warnOnDuplicate( string $slug, string $kind ): void {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- _doing_it_wrong is for developer notices only.
 		_doing_it_wrong(
-			self::class . '::register' . ucfirst( esc_html( $kind ) ),
+			self::class . '::register' . esc_html( ucfirst( $kind ) ),
 			sprintf(
 				/* translators: 1: node type kind (trigger/action), 2: slug. */
 				esc_html__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'workflow-automate' ),
