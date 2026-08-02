@@ -22,6 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WorkflowRunLogRepository {
 
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'aiawa_workflow_run_logs';
+
 	/**
 	 * Defensive upper bound on logs fetched for a single run. A legitimate
 	 * workflow is expected to stay well under this; it exists only to guard
@@ -77,6 +81,9 @@ class WorkflowRunLogRepository {
 			return null;
 		}
 
+		// A new row changes the collection findByRun() returns.
+		$this->cacheDelete( $this->runCacheKey( (int) $attributes['run_id'] ) );
+
 		return $this->find( (int) $wpdb->insert_id );
 	}
 
@@ -90,10 +97,23 @@ class WorkflowRunLogRepository {
 	public function find( int $id ): ?WorkflowRunLog {
 		global $wpdb;
 
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
-		return $row ? WorkflowRunLog::fromRow( $row ) : null;
+		$log = $row ? WorkflowRunLog::fromRow( $row ) : null;
+
+		if ( null !== $log ) {
+			$this->cacheSet( $cache_key, $log );
+		}
+
+		return $log;
 	}
 
 	/**
@@ -106,13 +126,24 @@ class WorkflowRunLogRepository {
 	public function findByRun( int $run_id ): array {
 		global $wpdb;
 
+		$cache_key = $this->runCacheKey( $run_id );
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		$rows  = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE run_id = %d ORDER BY id ASC LIMIT %d", $run_id, self::MAX_LOGS_PER_RUN )
 		);
 
-		return array_map( array( WorkflowRunLog::class, 'fromRow' ), $rows );
+		$logs = array_map( array( WorkflowRunLog::class, 'fromRow' ), $rows );
+
+		$this->cacheSet( $cache_key, $logs );
+
+		return $logs;
 	}
 
 	/**
@@ -120,6 +151,11 @@ class WorkflowRunLogRepository {
 	 * runs. Used by WorkflowService::delete() when hard-deleting a
 	 * workflow, since there is no SQL-level cascade (see
 	 * CreateWorkflowRunLogsTable migration).
+	 *
+	 * Only the per-run collection caches are invalidated here, not each
+	 * individual log's own id-based cache entry: those rows are gone
+	 * forever, so an orphaned id-keyed cache entry can never be read by
+	 * anything afterward.
 	 *
 	 * @param int[] $run_ids Run ids.
 	 *
@@ -141,6 +177,19 @@ class WorkflowRunLogRepository {
 			$wpdb->prepare( "DELETE FROM {$table} WHERE run_id IN ({$placeholders})", $run_ids )
 		);
 
+		foreach ( $run_ids as $run_id ) {
+			$this->cacheDelete( $this->runCacheKey( $run_id ) );
+		}
+
 		return false !== $deleted;
+	}
+
+	/**
+	 * @param int $run_id Run id.
+	 *
+	 * @return string
+	 */
+	private function runCacheKey( int $run_id ): string {
+		return 'run_' . $run_id;
 	}
 }

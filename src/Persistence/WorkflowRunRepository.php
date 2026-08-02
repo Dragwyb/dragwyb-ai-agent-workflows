@@ -22,6 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WorkflowRunRepository {
 
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'aiawa_workflow_runs';
+
 	private const MAX_PER_PAGE = 100;
 
 	private const DEFAULT_PER_PAGE = 20;
@@ -112,6 +116,11 @@ class WorkflowRunRepository {
 		$table = esc_sql($this->table());
 		$like  = '%' . $wpdb->esc_like( $payload_needle ) . '%';
 
+		// Intentionally not object-cached: this must always reflect the
+		// live queue state at the instant a new trigger fires, to decide
+		// whether to collapse it into an existing pending run. A cached
+		// answer could let duplicate runs through.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$found = $wpdb->get_var(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
@@ -164,6 +173,7 @@ class WorkflowRunRepository {
 		$claim_token  = wp_generate_uuid4();
 		$stale_before = gmdate( 'Y-m-d H:i:s', time() - ( $stale_after_minutes * MINUTE_IN_SECONDS ) );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- this is a write (atomic claim), not a cacheable read.
 		$wpdb->query(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
@@ -189,10 +199,21 @@ class WorkflowRunRepository {
 			return array();
 		}
 
+		// Not object-cached: $claim_token is freshly generated every call,
+		// so this SELECT would always be a guaranteed cache miss anyway.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC", $claim_token )
 		);
+
+		// This UPDATE bypassed update()/finish(), so any previously cached
+		// find( $id ) result for a now-claimed row (e.g. still showing
+		// status 'queued') must be evicted here explicitly, or a caller
+		// could read stale data for it until it's next written through.
+		foreach ( $rows as $row ) {
+			$this->cacheDelete( (string) $row->id );
+		}
 
 		return array_map( array( WorkflowRun::class, 'fromRow' ), $rows );
 	}
@@ -221,6 +242,8 @@ class WorkflowRunRepository {
 			array( '%s', '%s', '%s' ),
 			array( '%d' )
 		);
+
+		$this->cacheDelete( (string) $id );
 
 		return false !== $updated;
 	}
@@ -251,6 +274,8 @@ class WorkflowRunRepository {
 			return null;
 		}
 
+		$this->cacheDelete( (string) $id );
+
 		return $this->find( $id );
 	}
 
@@ -264,10 +289,23 @@ class WorkflowRunRepository {
 	public function find( int $id ): ?WorkflowRun {
 		global $wpdb;
 
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
-		return $row ? WorkflowRun::fromRow( $row ) : null;
+		$run = $row ? WorkflowRun::fromRow( $row ) : null;
+
+		if ( null !== $run ) {
+			$this->cacheSet( $cache_key, $run );
+		}
+
+		return $run;
 	}
 
 	/**
@@ -293,11 +331,15 @@ class WorkflowRunRepository {
 
 		$table = esc_sql($this->table());
 
+		// Intentionally not object-cached: see paginateAll()'s docblock —
+		// same reasoning applies to every filtered/paginated list query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d", $workflow_id )
 		);
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $workflow_id, $per_page, $offset )
@@ -323,6 +365,12 @@ class WorkflowRunRepository {
 	 *     @type int    $page        1-indexed page number. Default 1.
 	 *     @type int    $per_page    Rows per page, clamped to [1, 100]. Default 20.
 	 * }
+	 *
+	 * Intentionally not object-cached: the result depends on an open-ended
+	 * combination of filters, page, and per_page, so caching it would need
+	 * one cache key per combination, invalidated on nearly every write to
+	 * this table — high complexity for little real hit rate. Only find()
+	 * caches, since a single id has exactly one cache key.
 	 *
 	 * @return array{items: WorkflowRun[], total: int, page: int, per_page: int}
 	 */
@@ -354,12 +402,14 @@ class WorkflowRunRepository {
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = esc_sql($this->table());
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginateAll() docblock.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginateAll() docblock.
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
@@ -378,6 +428,10 @@ class WorkflowRunRepository {
 	 * into `aiawa_workflow_run_logs` (which is keyed by run id, not workflow
 	 * id) before removing the runs themselves.
 	 *
+	 * Not object-cached: this is a one-off cascade-preparation query (hard
+	 * delete of a workflow), not a repeated lookup, so there is nothing to
+	 * amortize.
+	 *
 	 * @param int $workflow_id Workflow id.
 	 *
 	 * @return int[]
@@ -389,7 +443,7 @@ class WorkflowRunRepository {
 
 		return array_map(
 			'intval',
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.NoCaching --- $table is escaped and %i placeholder is support wp 6.2+; not cached, see docblock
 			$wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE workflow_id = %d", $workflow_id ) )
 		);
 	}
@@ -403,6 +457,10 @@ class WorkflowRunRepository {
 	 * is BackgroundRunner::claimBatch()'s stale-claim recovery's problem
 	 * to solve, not retention's).
 	 *
+	 * Not object-cached: the result depends on the current wall-clock
+	 * cutoff, which is different (or at least newly relevant) on every
+	 * cron tick, so a cached answer would rarely if ever be reused.
+	 *
 	 * @param string $cutoff_gmt MySQL datetime (GMT). Runs finished strictly before this are eligible.
 	 *
 	 * @return int[]
@@ -414,6 +472,7 @@ class WorkflowRunRepository {
 
 		return array_map(
 			'intval',
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see docblock.
 			$wpdb->get_col(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 				$wpdb->prepare( "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d", $cutoff_gmt, self::MAX_PRUNE_BATCH )
@@ -446,6 +505,13 @@ class WorkflowRunRepository {
 			$wpdb->prepare( "DELETE FROM {$table} WHERE id IN ({$placeholders})", $ids )
 		);
 
+		// The ids are already known here at no extra cost, unlike
+		// deleteByWorkflow() below, so every affected cache entry is
+		// invalidated individually rather than left as an orphan.
+		foreach ( $ids as $id ) {
+			$this->cacheDelete( (string) $id );
+		}
+
 		return false === $deleted ? 0 : (int) $deleted;
 	}
 
@@ -454,6 +520,11 @@ class WorkflowRunRepository {
 	 * WorkflowService::delete() when hard-deleting a workflow. Callers must
 	 * remove dependent `aiawa_workflow_run_logs` rows first (see
 	 * idsForWorkflow()).
+	 *
+	 * Unlike deleteByIds(), the individual ids aren't known here without an
+	 * extra query; since the rows are gone forever after a hard delete,
+	 * any orphaned per-id cache entries are harmless and are not worth
+	 * that extra query on this rare path.
 	 *
 	 * @param int $workflow_id Workflow id.
 	 *

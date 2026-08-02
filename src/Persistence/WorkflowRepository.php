@@ -25,6 +25,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WorkflowRepository {
 
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'aiawa_workflows';
+
 	private const MAX_PER_PAGE = 100;
 
 	private const DEFAULT_PER_PAGE = 20;
@@ -127,6 +131,8 @@ class WorkflowRepository {
 			return null;
 		}
 
+		$this->invalidateCache( $id );
+
 		return $this->find( $id, true );
 	}
 
@@ -150,6 +156,8 @@ class WorkflowRepository {
 			array( '%s', '%s' ),
 			array( '%d' )
 		);
+
+		$this->invalidateCache( $id );
 
 		return false !== $updated;
 	}
@@ -175,6 +183,8 @@ class WorkflowRepository {
 			array( '%d' )
 		);
 
+		$this->invalidateCache( $id );
+
 		return false !== $updated;
 	}
 
@@ -191,6 +201,8 @@ class WorkflowRepository {
 
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
 
+		$this->invalidateCache( $id );
+
 		return false !== $deleted && $deleted > 0;
 	}
 
@@ -205,6 +217,13 @@ class WorkflowRepository {
 	public function find( int $id, bool $include_trashed = false ): ?Workflow {
 		global $wpdb;
 
+		$cache_key = $this->cacheKey( $id, $include_trashed );
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 
 		if ( $include_trashed ) {
@@ -215,7 +234,13 @@ class WorkflowRepository {
 			$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND deleted_at IS NULL", $id ) );
 		}
 
-		return $row ? Workflow::fromRow( $row ) : null;
+		$workflow = $row ? Workflow::fromRow( $row ) : null;
+
+		if ( null !== $workflow ) {
+			$this->cacheSet( $cache_key, $workflow );
+		}
+
+		return $workflow;
 	}
 
 	/**
@@ -242,19 +267,43 @@ class WorkflowRepository {
 			return array();
 		}
 
+		// This deliberately includes trashed workflows, i.e. the same data
+		// as find( $id, true ), so it shares cache entries with that
+		// variant's '_all' keys rather than maintaining a second cache.
+		$cache_keys_by_id = array();
+
+		foreach ( $ids as $id ) {
+			$cache_keys_by_id[ $id ] = $this->cacheKey( $id, true );
+		}
+
+		$cached      = $this->cacheGetMultiple( array_values( $cache_keys_by_id ) );
+		$map         = array();
+		$missing_ids = array();
+
+		foreach ( $cache_keys_by_id as $id => $cache_key ) {
+			if ( isset( $cached[ $cache_key ] ) && false !== $cached[ $cache_key ] ) {
+				$map[ $id ] = $cached[ $cache_key ];
+			} else {
+				$missing_ids[] = $id;
+			}
+		}
+
+		if ( array() === $missing_ids ) {
+			return $map;
+		}
+
 		$table        = esc_sql($this->table());
-		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+		$placeholders = implode( ', ', array_fill( 0, count( $missing_ids ), '%d' ) );
 
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE id IN ({$placeholders})", $ids )
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id IN ({$placeholders})", $missing_ids )
 		);
-
-		$map = array();
 
 		foreach ( $rows as $row ) {
 			$workflow               = Workflow::fromRow( $row );
 			$map[ $workflow->id() ] = $workflow;
+			$this->cacheSet( $cache_keys_by_id[ $workflow->id() ], $workflow );
 		}
 
 		return $map;
@@ -278,7 +327,35 @@ class WorkflowRepository {
 			$wpdb->prepare( "UPDATE {$table} SET run_count = run_count + 1, updated_at = %s WHERE id = %d", current_time( 'mysql', true ), $id )
 		);
 
+		$this->invalidateCache( $id );
+
 		return false !== $updated;
+	}
+
+	/**
+	 * Builds the cache key for a single workflow id, distinguishing the
+	 * "active only" and "include trashed" query variants of find() since
+	 * they can return different results for the same id.
+	 *
+	 * @param int  $id              Workflow id.
+	 * @param bool $include_trashed Whether the key is for the include-trashed variant.
+	 *
+	 * @return string
+	 */
+	private function cacheKey( int $id, bool $include_trashed ): string {
+		return $include_trashed ? $id . '_all' : (string) $id;
+	}
+
+	/**
+	 * Invalidates every cache entry for a workflow id (both find() variants).
+	 *
+	 * @param int $id Workflow id.
+	 *
+	 * @return void
+	 */
+	private function invalidateCache( int $id ): void {
+		$this->cacheDelete( $this->cacheKey( $id, false ) );
+		$this->cacheDelete( $this->cacheKey( $id, true ) );
 	}
 
 	/**
@@ -292,6 +369,12 @@ class WorkflowRepository {
 	 *     @type int  $page            1-indexed page number. Default 1.
 	 *     @type int  $per_page        Rows per page, clamped to [1, 100]. Default 20.
 	 * }
+	 *
+	 * Intentionally not object-cached: the result depends on an open-ended
+	 * combination of filters, page, and per_page, so caching it would need
+	 * one cache key per combination, invalidated on nearly every write to
+	 * this table — high complexity for little real hit rate. Only find()
+	 * and findByIds() cache, since a single id has exactly one cache key.
 	 *
 	 * @return array{items: Workflow[], total: int, page: int, per_page: int}
 	 */
@@ -330,6 +413,7 @@ class WorkflowRepository {
 		$table     = esc_sql($this->table());
 
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql is static text and placeholders
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- intentionally uncached: filter+page combinations would need one cache key per combination, invalidated on nearly every write, for little real hit rate. See paginate() docblock.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
@@ -337,6 +421,7 @@ class WorkflowRepository {
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
 		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where_sql is static text and placeholders
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- intentionally uncached, see paginate() docblock.
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )

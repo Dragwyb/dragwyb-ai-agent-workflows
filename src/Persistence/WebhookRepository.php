@@ -23,6 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WebhookRepository {
 
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'aiawa_webhooks';
+
 	private const MAX_PER_PAGE = 100;
 
 	private const DEFAULT_PER_PAGE = 20;
@@ -112,7 +116,17 @@ class WebhookRepository {
 			return null;
 		}
 
-		return $this->find( $id );
+		$this->cacheDelete( (string) $id );
+
+		$webhook = $this->find( $id );
+
+		if ( null !== $webhook ) {
+			// public_id is immutable, so this is always the same key the
+			// row was (or would be) cached under via findByPublicId().
+			$this->cacheDelete( $this->publicIdCacheKey( $webhook->publicId() ) );
+		}
+
+		return $webhook;
 	}
 
 	/**
@@ -125,7 +139,17 @@ class WebhookRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
+		// Looked up first (cache-aware, so usually free) purely to learn
+		// the public_id cache key that also needs invalidating.
+		$webhook = $this->find( $id );
+
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
+
+		$this->cacheDelete( (string) $id );
+
+		if ( null !== $webhook ) {
+			$this->cacheDelete( $this->publicIdCacheKey( $webhook->publicId() ) );
+		}
 
 		return false !== $deleted && $deleted > 0;
 	}
@@ -133,6 +157,13 @@ class WebhookRepository {
 	/**
 	 * Nulls `workflow_id` on every webhook that pointed at a permanently
 	 * deleted workflow (application-level ON DELETE SET NULL).
+	 *
+	 * Not cache-invalidated here: this bulk `UPDATE ... WHERE workflow_id`
+	 * doesn't cheaply tell us which individual ids/public_ids it touched,
+	 * and workflow hard-delete is a rare admin action, so any affected
+	 * webhook's cached `workflow_id` field briefly going stale is low
+	 * impact and self-heals the next time that specific webhook is
+	 * written through update()/delete().
 	 *
 	 * @param int $workflow_id Workflow id that was hard-deleted.
 	 *
@@ -160,11 +191,24 @@ class WebhookRepository {
 	public function find( int $id ): ?Webhook {
 		global $wpdb;
 
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 
-		return $row ? Webhook::fromRow( $row ) : null;
+		$webhook = $row ? Webhook::fromRow( $row ) : null;
+
+		if ( null !== $webhook ) {
+			$this->cacheSet( $cache_key, $webhook );
+		}
+
+		return $webhook;
 	}
 
 	/**
@@ -177,11 +221,33 @@ class WebhookRepository {
 	public function findByPublicId( string $public_id ): ?Webhook {
 		global $wpdb;
 
+		$cache_key = $this->publicIdCacheKey( $public_id );
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE public_id = %s", $public_id ) );
 
-		return $row ? Webhook::fromRow( $row ) : null;
+		$webhook = $row ? Webhook::fromRow( $row ) : null;
+
+		if ( null !== $webhook ) {
+			$this->cacheSet( $cache_key, $webhook );
+		}
+
+		return $webhook;
+	}
+
+	/**
+	 * @param string $public_id UUID segment of the public ingress URL.
+	 *
+	 * @return string
+	 */
+	private function publicIdCacheKey( string $public_id ): string {
+		return 'public_' . $public_id;
 	}
 
 	/**
@@ -191,6 +257,12 @@ class WebhookRepository {
 	 *     @type int $page     1-indexed page number. Default 1.
 	 *     @type int $per_page Rows per page, clamped to [1, 100]. Default 20.
 	 * }
+	 *
+	 * Intentionally not object-cached: the result depends on an open-ended
+	 * combination of filters, page, and per_page, so caching it would need
+	 * one cache key per combination, invalidated on nearly every write to
+	 * this table — high complexity for little real hit rate. Only find()
+	 * and findByPublicId() cache, since each has exactly one cache key.
 	 *
 	 * @return array{items: Webhook[], total: int, page: int, per_page: int}
 	 */
@@ -217,12 +289,14 @@ class WebhookRepository {
 		$where_sql = 'WHERE ' . implode( ' AND ', $where );
 		$table     = esc_sql($this->table());
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginate() docblock.
 		$total = (int) $wpdb->get_var(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching -- see paginate() docblock.
 		$rows        = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )

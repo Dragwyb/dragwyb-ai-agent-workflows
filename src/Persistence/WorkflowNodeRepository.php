@@ -22,6 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WorkflowNodeRepository {
 
+	use CachesRepositoryRows;
+
+	private const CACHE_GROUP = 'aiawa_workflow_nodes';
+
 	/**
 	 * Defensive upper bound on nodes fetched for a single workflow. A
 	 * legitimate workflow graph is expected to stay well under this; it
@@ -72,6 +76,9 @@ class WorkflowNodeRepository {
 			return null;
 		}
 
+		// A new row changes the collection findByWorkflow() returns.
+		$this->cacheDelete( $this->workflowCacheKey( (int) $attributes['workflow_id'] ) );
+
 		return $this->find( (int) $wpdb->insert_id );
 	}
 
@@ -117,7 +124,17 @@ class WorkflowNodeRepository {
 			return null;
 		}
 
-		return $this->find( $id );
+		$this->cacheDelete( (string) $id );
+
+		$node = $this->find( $id );
+
+		if ( null !== $node ) {
+			// The node's own fields changed, so any cached findByWorkflow()
+			// collection containing it is now stale too.
+			$this->cacheDelete( $this->workflowCacheKey( $node->workflowId() ) );
+		}
+
+		return $node;
 	}
 
 	/**
@@ -130,10 +147,23 @@ class WorkflowNodeRepository {
 	public function find( int $id ): ?WorkflowNode {
 		global $wpdb;
 
+		$cache_key = (string) $id;
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
-		return $row ? WorkflowNode::fromRow( $row ) : null;
+		$node = $row ? WorkflowNode::fromRow( $row ) : null;
+
+		if ( null !== $node ) {
+			$this->cacheSet( $cache_key, $node );
+		}
+
+		return $node;
 	}
 
 	/**
@@ -146,13 +176,24 @@ class WorkflowNodeRepository {
 	public function findByWorkflow( int $workflow_id ): array {
 		global $wpdb;
 
+		$cache_key = $this->workflowCacheKey( $workflow_id );
+		$cached    = $this->cacheGet( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		$table = esc_sql($this->table());
 		$rows  = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d", $workflow_id, self::MAX_NODES_PER_WORKFLOW )
 		);
 
-		return array_map( array( WorkflowNode::class, 'fromRow' ), $rows );
+		$nodes = array_map( array( WorkflowNode::class, 'fromRow' ), $rows );
+
+		$this->cacheSet( $cache_key, $nodes );
+
+		return $nodes;
 	}
 
 	/**
@@ -165,7 +206,17 @@ class WorkflowNodeRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
+		// Looked up first (cache-aware, so usually free) purely to learn
+		// which findByWorkflow() collection cache needs invalidating.
+		$node = $this->find( $id );
+
 		$deleted = $wpdb->delete( $this->table(), array( 'id' => $id ), array( '%d' ) );
+
+		$this->cacheDelete( (string) $id );
+
+		if ( null !== $node ) {
+			$this->cacheDelete( $this->workflowCacheKey( $node->workflowId() ) );
+		}
 
 		return false !== $deleted && $deleted > 0;
 	}
@@ -174,6 +225,12 @@ class WorkflowNodeRepository {
 	 * Permanently removes every node belonging to a workflow. Used by
 	 * WorkflowService::delete() when hard-deleting a workflow, since there
 	 * is no SQL-level cascade (see CreateWorkflowNodesTable migration).
+	 *
+	 * Only the collection cache is invalidated here, not each individual
+	 * node's own id-based cache entry: fetching every affected id first
+	 * just for cache hygiene isn't worth it on this rare hard-delete path,
+	 * since those rows are gone forever and nothing user-visible can read
+	 * them stale afterward.
 	 *
 	 * @param int $workflow_id Workflow id.
 	 *
@@ -184,6 +241,17 @@ class WorkflowNodeRepository {
 
 		$deleted = $wpdb->delete( $this->table(), array( 'workflow_id' => $workflow_id ), array( '%d' ) );
 
+		$this->cacheDelete( $this->workflowCacheKey( $workflow_id ) );
+
 		return false !== $deleted;
+	}
+
+	/**
+	 * @param int $workflow_id Workflow id.
+	 *
+	 * @return string
+	 */
+	private function workflowCacheKey( int $workflow_id ): string {
+		return 'workflow_' . $workflow_id;
 	}
 }
