@@ -85,12 +85,12 @@ class AddQueueColumnsToWorkflowRunsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflow_runs' );
+		$table = esc_sql( Table::name( 'workflow_runs' ) );
 
 		// Dropping a column that is the sole member of an index (claim_token)
 		// or part of a composite one (status_next_attempt) makes MySQL adjust
 		// or drop that index automatically; no separate DROP INDEX is needed.
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; column names are hardcoded, not user input.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input; column names are hardcoded, not user input.
 		$wpdb->query( "ALTER TABLE {$table} DROP COLUMN trigger_payload_json, DROP COLUMN attempts, DROP COLUMN next_attempt_at, DROP COLUMN claim_token" );
 	}
 }

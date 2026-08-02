@@ -65,9 +65,9 @@ class CreateConnectionsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'connections' );
+		$table = esc_sql( Table::name( 'connections' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 	}
 }

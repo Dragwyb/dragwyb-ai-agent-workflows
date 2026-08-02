@@ -31,7 +31,7 @@ class WebhookRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'webhooks' );
+		return esc_sql( Table::name( 'webhooks' ) );
 	}
 
 	/**
@@ -161,6 +161,7 @@ class WebhookRepository {
 		global $wpdb;
 
 		$table = $this->table();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) );
 
 		return $row ? Webhook::fromRow( $row ) : null;
@@ -177,6 +178,7 @@ class WebhookRepository {
 		global $wpdb;
 
 		$table = $this->table();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE public_id = %s", $public_id ) );
 
 		return $row ? Webhook::fromRow( $row ) : null;
@@ -216,11 +218,13 @@ class WebhookRepository {
 		$table     = $this->table();
 
 		$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
 		$rows        = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
 		);
 

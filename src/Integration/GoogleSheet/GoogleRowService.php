@@ -330,7 +330,7 @@ final class GoogleRowService {
 	 * @return array<int, string|null>
 	 */
 	private function fillMissingColumns( array $values, string $range ): array {
-		if ( str_contains( $range, '!' ) ) {
+		if ( function_exists( 'str_contains' ) && str_contains( $range, '!' ) ) {
 			$range = explode( '!', $range )[1];
 		}
 

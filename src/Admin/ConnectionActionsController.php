@@ -235,7 +235,7 @@ class ConnectionActionsController {
 	 * @return array<string,string>
 	 */
 	private function extractCredentialValues(): array {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in verifyBulkNonce(), WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- manual sanitization is performed below
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nonce already verified in verifyBulkNonce() & manual sanitization is performed below
 		$raw = isset( $_POST['credential'] ) && is_array( $_POST['credential'] ) ? wp_unslash( $_POST['credential'] ) : array();
 
 		$values = array();

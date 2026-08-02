@@ -75,9 +75,9 @@ class AddNodeSnapshotColumnsToWorkflowRunLogsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflow_run_logs' );
+		$table = esc_sql( Table::name( 'workflow_run_logs' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; column names are hardcoded, not user input.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input; column names are hardcoded, not user input.
 		$wpdb->query( "ALTER TABLE {$table} DROP COLUMN node_type, DROP COLUMN node_label" );
 	}
 }

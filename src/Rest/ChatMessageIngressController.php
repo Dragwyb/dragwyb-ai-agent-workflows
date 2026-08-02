@@ -251,6 +251,7 @@ class ChatMessageIngressController {
 		}
 
 		if ( 'immediate' === $response_mode ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- dynamic hookname is 'aiawa_chat_message_received'.
 			do_action( ChatMessageReceivedTrigger::HOOK, $payload );
 
 			return new WP_REST_Response(

@@ -99,7 +99,7 @@ class ConfigInterpolator {
 	private function looksLikeJsonTemplate( string $template ): bool {
 		$trimmed = ltrim( $template );
 
-		return str_starts_with( $trimmed, '{' ) || str_starts_with( $trimmed, '[' );
+		return function_exists( 'str_starts_with' ) && str_starts_with( $trimmed, '{' ) || function_exists( 'str_starts_with' ) && str_starts_with( $trimmed, '[' );
 	}
 
 	/**
@@ -172,7 +172,7 @@ class ConfigInterpolator {
 			} elseif ( is_scalar( $value ) ) {
 				$resolved = (string) $value;
 
-				if ( str_contains( $resolved, '<!-- wp:' ) ) {
+				if ( function_exists( 'str_contains' ) && str_contains( $resolved, '<!-- wp:' ) ) {
 					$resolved = TriggerPayloadNormalizer::plainTextFromPostContent( $resolved );
 				}
 
@@ -264,7 +264,7 @@ class ConfigInterpolator {
 			return $value;
 		}
 
-		if ( str_starts_with( $path, 'trigger.' ) ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $path, 'trigger.' ) ) {
 			return null;
 		}
 

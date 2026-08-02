@@ -125,7 +125,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 			return array();
 		}
 
-		if ( str_starts_with( $string, '[' ) ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $string, '[' ) ) {
 			$decoded = json_decode( $string, true );
 
 			if ( is_array( $decoded ) ) {

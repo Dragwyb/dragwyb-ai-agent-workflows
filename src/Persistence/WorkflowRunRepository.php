@@ -39,7 +39,7 @@ class WorkflowRunRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'workflow_runs' );
+		return esc_sql( Table::name( 'workflow_runs' ) );
 	}
 
 	/**
@@ -114,6 +114,7 @@ class WorkflowRunRepository {
 
 		$found = $wpdb->get_var(
 			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 				"SELECT id FROM {$table}
 					WHERE workflow_id = %d
 						AND status IN ( %s, %s )
@@ -165,6 +166,7 @@ class WorkflowRunRepository {
 
 		$wpdb->query(
 			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 				"UPDATE {$table}
 					SET status = %s, claim_token = %s, started_at = %s
 					WHERE
@@ -188,6 +190,7 @@ class WorkflowRunRepository {
 		}
 
 		$rows = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE claim_token = %s ORDER BY id ASC", $claim_token )
 		);
 
@@ -262,7 +265,7 @@ class WorkflowRunRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
 		return $row ? WorkflowRun::fromRow( $row ) : null;
 	}
@@ -291,10 +294,12 @@ class WorkflowRunRepository {
 		$table = $this->table();
 
 		$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE workflow_id = %d", $workflow_id )
 		);
 
 		$rows = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $workflow_id, $per_page, $offset )
 		);
 
@@ -350,11 +355,13 @@ class WorkflowRunRepository {
 		$table     = $this->table();
 
 		$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} {$where_sql}", $params )
 		);
 
 		$list_params = array_merge( $params, array( $per_page, $offset ) );
 		$rows        = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber --- $table is escaped and %i placeholder is support wp 6.2+ and $where_sql is escaped
 			$wpdb->prepare( "SELECT * FROM {$table} {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $list_params )
 		);
 
@@ -382,6 +389,7 @@ class WorkflowRunRepository {
 
 		return array_map(
 			'intval',
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE workflow_id = %d", $workflow_id ) )
 		);
 	}
@@ -407,6 +415,7 @@ class WorkflowRunRepository {
 		return array_map(
 			'intval',
 			$wpdb->get_col(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 				$wpdb->prepare( "SELECT id FROM {$table} WHERE finished_at IS NOT NULL AND finished_at < %s ORDER BY id ASC LIMIT %d", $cutoff_gmt, self::MAX_PRUNE_BATCH )
 			)
 		);
@@ -433,6 +442,7 @@ class WorkflowRunRepository {
 		$table        = $this->table();
 
 		$deleted = $wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare --- $table is escaped and %i placeholder is support wp 6.2+ and $placeholders is escaped
 			$wpdb->prepare( "DELETE FROM {$table} WHERE id IN ({$placeholders})", $ids )
 		);
 

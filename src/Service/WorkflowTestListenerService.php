@@ -190,7 +190,7 @@ class WorkflowTestListenerService {
 			return 'elementor-atomic' === $source;
 		}
 
-		if ( str_starts_with( $trigger_type, 'woocommerce_' ) && 'woocommerce' === $source ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $trigger_type, 'woocommerce_' ) && 'woocommerce' === $source ) {
 			return true;
 		}
 
@@ -202,7 +202,7 @@ class WorkflowTestListenerService {
 			return 'wpforms' === $source;
 		}
 
-		if ( str_starts_with( $trigger_type, 'wp_' ) && 'WordPress' === $source ) {
+		if ( function_exists( 'str_starts_with' ) && str_starts_with( $trigger_type, 'wp_' ) && 'WordPress' === $source ) {
 			return true;
 		}
 

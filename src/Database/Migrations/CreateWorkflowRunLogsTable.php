@@ -67,9 +67,9 @@ class CreateWorkflowRunLogsTable extends Migration {
 	public function down(): void {
 		global $wpdb;
 
-		$table = Table::name( 'workflow_run_logs' );
+		$table = esc_sql( Table::name( 'workflow_run_logs' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- table name is not user input; DROP TABLE cannot be parameterized.
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 	}
 }

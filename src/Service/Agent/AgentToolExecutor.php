@@ -140,8 +140,8 @@ class AgentToolExecutor {
 		if ( is_string( $value ) ) {
 			$trimmed = trim( $value );
 			// JSON array/object encoded as a string.
-			if ( ( str_starts_with( $trimmed, '[' ) && str_ends_with( $trimmed, ']' ) )
-				|| ( str_starts_with( $trimmed, '{' ) && str_ends_with( $trimmed, '}' ) ) ) {
+			if ( ( function_exists( 'str_starts_with' ) && function_exists( 'str_ends_with' ) && str_starts_with( $trimmed, '[' ) && str_ends_with( $trimmed, ']' ) )
+				|| ( function_exists( 'str_starts_with' ) && function_exists( 'str_ends_with' ) && str_starts_with( $trimmed, '{' ) && str_ends_with( $trimmed, '}' ) ) ) {
 				$decoded = json_decode( $trimmed, true );
 				if ( is_array( $decoded ) ) {
 					return $this->normalizeArgumentValue( $decoded );

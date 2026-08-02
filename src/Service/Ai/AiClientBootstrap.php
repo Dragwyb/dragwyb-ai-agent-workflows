@@ -155,7 +155,7 @@ class AiClientBootstrap {
 		}
 
 		// phpcs:ignore PluginCheck.WPCompatibility.FunctionAvailability -- only called after isAvailable() succeeds; polyfilled on older core via vendored SDK.
-		return wp_ai_client_prompt( $messages );
+		return function_exists( 'wp_ai_client_prompt' ) ? wp_ai_client_prompt( $messages ) : null;
 	}
 
 	/**

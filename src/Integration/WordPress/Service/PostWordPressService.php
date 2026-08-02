@@ -251,7 +251,7 @@ final class PostWordPressService {
 
 		$postType = WordPressActionHelper::str( $config, 'post_type', 'post' );
 		$rawType  = trim( (string) ( $config['post_type'] ?? '' ) );
-		if ( str_contains( $rawType, '{{' ) ) {
+		if ( function_exists( 'str_contains' ) && str_contains( $rawType, '{{' ) ) {
 			$postType = 'post';
 		}
 

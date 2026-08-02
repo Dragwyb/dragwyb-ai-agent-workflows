@@ -33,7 +33,7 @@ class WorkflowNodeRepository {
 	 * @return string
 	 */
 	private function table(): string {
-		return Table::name( 'workflow_nodes' );
+		return esc_sql( Table::name( 'workflow_nodes' ) );
 	}
 
 	/**
@@ -131,7 +131,7 @@ class WorkflowNodeRepository {
 		global $wpdb;
 
 		$table = $this->table();
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is not user input.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is not user input.
 
 		return $row ? WorkflowNode::fromRow( $row ) : null;
 	}
@@ -148,6 +148,7 @@ class WorkflowNodeRepository {
 
 		$table = $this->table();
 		$rows  = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter --- $table is escaped and %i placeholder is support wp 6.2+
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE workflow_id = %d ORDER BY id ASC LIMIT %d", $workflow_id, self::MAX_NODES_PER_WORKFLOW )
 		);
 
