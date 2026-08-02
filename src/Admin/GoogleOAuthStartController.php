@@ -2,19 +2,19 @@
 /**
  * Starts the Google OAuth authorization redirect from wp-admin.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use RuntimeException;
-use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Service\ConnectionAuthTypes;
-use AIAWA\Plugin\Service\ConnectionService;
-use AIAWA\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles `admin-post.php?action=aiawa_google_oauth_authorize`.
+ * Handles `admin-post.php?action=dragwyb_af_google_oauth_authorize`.
  */
 class GoogleOAuthStartController {
 
@@ -39,7 +39,7 @@ class GoogleOAuthStartController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_aiawa_google_oauth_authorize', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_google_oauth_authorize', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class GoogleOAuthStartController {
 			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-agentflow' ) );
 		}
 
-		check_admin_referer( 'aiawa_google_oauth_authorize_' . $connection_id );
+		check_admin_referer( 'dragwyb_af_google_oauth_authorize_' . $connection_id );
 
 		$connection = $this->connections->find( $connection_id );
 
@@ -88,8 +88,8 @@ class GoogleOAuthStartController {
 	private function redirectWithError( int $connection_id, string $message ): void {
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'aiawa_notice' => 'error',
-			'aiawa_error'  => $message,
+			'dragwyb_af_notice' => 'error',
+			'dragwyb_af_error'  => $message,
 		);
 
 		if ( $connection_id > 0 ) {

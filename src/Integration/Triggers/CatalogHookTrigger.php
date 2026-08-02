@@ -2,18 +2,18 @@
 /**
  * Catalog-defined WordPress hook trigger.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\Triggers;
+namespace DragwybAgentFlow\Plugin\Integration\Triggers;
 
-use AIAWA\Plugin\Domain\Contracts\TriggerGroupInterface;
-use AIAWA\Plugin\Domain\Contracts\TriggerInterface;
-use AIAWA\Plugin\Integration\WordPress\WordPressActionHelper;
-use AIAWA\Plugin\Service\TriggerPayloadNormalizer;
-use AIAWA\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybAgentFlow\Plugin\Service\TriggerPayloadNormalizer;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

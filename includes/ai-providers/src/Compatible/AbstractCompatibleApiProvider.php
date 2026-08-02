@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AIAWA\AiProviders\Compatible;
+namespace DragwybAgentFlow\AiProviders\Compatible;
 
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Common\Exception\RuntimeException;

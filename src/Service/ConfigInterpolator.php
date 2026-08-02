@@ -2,12 +2,12 @@
 /**
  * Replaces {{path.to.value}} tokens in action config strings.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

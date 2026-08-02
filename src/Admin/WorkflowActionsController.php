@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Workflow admin actions.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWA\Plugin\Admin\Pages\BuilderPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Service\WorkflowImportExport;
-use AIAWA\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Service\WorkflowImportExport;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=aiawa_workflow_action` POST submitted
+ * Receives the `admin-post.php?action=dragwyb_af_workflow_action` POST submitted
  * by WorkflowsListTable's row-action forms (trash/restore/delete).
  *
  * Deliberately its own class rather than logic inlined into `WorkflowsPage`
@@ -58,9 +58,9 @@ class WorkflowActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_aiawa_workflow_action', array( $this, 'handle' ) );
-		add_action( 'admin_post_aiawa_workflow_import', array( $this, 'handleImport' ) );
-		add_action( 'admin_post_aiawa_workflow_export', array( $this, 'handleExport' ) );
+		add_action( 'admin_post_dragwyb_af_workflow_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_workflow_import', array( $this, 'handleImport' ) );
+		add_action( 'admin_post_dragwyb_af_workflow_export', array( $this, 'handleExport' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleWorkflowsBulkFromList' ), 5 );
 	}
 
@@ -107,7 +107,7 @@ class WorkflowActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'aiawa_workflow_action_' . $op . '_' . $workflow_id );
+		check_admin_referer( 'dragwyb_af_workflow_action_' . $op . '_' . $workflow_id );
 
 		$success = $this->perform( $op, $workflow_id );
 
@@ -124,14 +124,14 @@ class WorkflowActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		check_admin_referer( 'aiawa_workflow_import' );
+		check_admin_referer( 'dragwyb_af_workflow_import' );
 
-		if ( empty( $_FILES['aiawa_workflow_json'] ) || ! is_array( $_FILES['aiawa_workflow_json'] ) ) {
+		if ( empty( $_FILES['dragwyb_af_workflow_json'] ) || ! is_array( $_FILES['dragwyb_af_workflow_json'] ) ) {
 			$this->redirect( 'import_error' );
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- manual sanitization is performed below
-		$file  = $_FILES['aiawa_workflow_json'];
+		$file  = $_FILES['dragwyb_af_workflow_json'];
 		$error = isset( $file['error'] ) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
 
 		if ( UPLOAD_ERR_OK !== $error ) {
@@ -173,7 +173,7 @@ class WorkflowActionsController {
 				array(
 					'page'       => BuilderPage::SLUG,
 					'workflow'   => $workflow->id(),
-					'aiawa_notice' => 'imported',
+					'dragwyb_af_notice' => 'imported',
 				),
 				admin_url( 'admin.php' )
 			)
@@ -198,7 +198,7 @@ class WorkflowActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'aiawa_workflow_export_' . $workflow_id );
+		check_admin_referer( 'dragwyb_af_workflow_export_' . $workflow_id );
 
 		$workflow = $this->workflows->find( $workflow_id );
 
@@ -231,7 +231,7 @@ class WorkflowActionsController {
 	 */
 	public function handleWorkflowsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['aiawa_workflow_bulk'] ) ) {
+		if ( empty( $_POST['dragwyb_af_workflow_bulk'] ) ) {
 			return;
 		}
 
@@ -239,7 +239,7 @@ class WorkflowActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'aiawa_workflow_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_workflow_bulk_action' ) ) {
 			$this->redirect( 'error', $this->bulkRedirectArgs() );
 		}
 
@@ -357,7 +357,7 @@ class WorkflowActionsController {
 				array_merge(
 					array(
 						'page'       => $this->redirectSlug,
-						'aiawa_notice' => $notice,
+						'dragwyb_af_notice' => $notice,
 					),
 					$extra
 				),

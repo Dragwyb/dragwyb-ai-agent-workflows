@@ -2,15 +2,15 @@
 /**
  * Adds background-queue columns to the workflow runs table.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use AIAWA\Plugin\Database\Migration;
-use AIAWA\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `aiawa_workflow_runs` (created in roadmap item 7) for background/
+ * Extends `dragwyb_af_workflow_runs` (created in roadmap item 7) for background/
  * queued execution (roadmap item 8), rather than editing
  * `CreateWorkflowRunsTable` in place — that migration already shipped and
  * may have run against a live site, so schema evolution happens through a

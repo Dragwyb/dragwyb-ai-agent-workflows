@@ -2,18 +2,18 @@
 /**
  * Resolves chat-trigger workflows and extracts chat replies from runs.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Domain\WorkflowRun;
-use AIAWA\Plugin\Domain\WorkflowRunLog;
-use AIAWA\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

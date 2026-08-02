@@ -24,8 +24,8 @@ export default function ToolNodeCard({
 	return (
 		<div
 			className={[
-				'aiawa-tool-node',
-				selected ? 'aiawa-tool-node--selected' : '',
+				'dragwyb-af-tool-node',
+				selected ? 'dragwyb-af-tool-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -35,9 +35,9 @@ export default function ToolNodeCard({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="aiawa-tool-node__input-dot" aria-hidden="true" />
+			<span className="dragwyb-af-tool-node__input-dot" aria-hidden="true" />
 			<span
-				className="aiawa-tool-node__icon"
+				className="dragwyb-af-tool-node__icon"
 				style={{
 					backgroundColor: meta.bg,
 					color: meta.accent,
@@ -46,9 +46,9 @@ export default function ToolNodeCard({
 			>
 				{meta.icon}
 			</span>
-			<span className="aiawa-tool-node__text">
-				<span className="aiawa-tool-node__label">{node.label}</span>
-				<span className="aiawa-tool-node__subtitle">
+			<span className="dragwyb-af-tool-node__text">
+				<span className="dragwyb-af-tool-node__label">{node.label}</span>
+				<span className="dragwyb-af-tool-node__subtitle">
 					{__('Tool', 'dragwyb-agentflow')}
 				</span>
 			</span>

@@ -2,21 +2,21 @@
 /**
  * Workflow execution service.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWA\Plugin\Domain\WorkflowNode;
-use AIAWA\Plugin\Domain\WorkflowRun;
-use AIAWA\Plugin\Domain\WorkflowRunLog;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
-use AIAWA\Plugin\Service\Agent\AgentGraphHelper;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentGraphHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -327,7 +327,7 @@ class WorkflowExecutionService {
 
 		/**
 		 * Fires immediately before a workflow run starts executing nodes.
-		 * The `aiawa_workflow_runs` row already exists with status `running`.
+		 * The `dragwyb_af_workflow_runs` row already exists with status `running`.
 		 * See docs/hooks-reference.md.
 		 *
 		 * @since 0.1.0
@@ -335,7 +335,7 @@ class WorkflowExecutionService {
 		 * @param int                   $workflow_id     The workflow about to run.
 		 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
 		 */
-		do_action( 'aiawa/workflow/before_run', $workflow_id, $trigger_payload );
+		do_action( 'dragwyb_af/workflow/before_run', $workflow_id, $trigger_payload );
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
 
@@ -523,7 +523,7 @@ class WorkflowExecutionService {
 			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'dragwyb-agentflow' ) );
 		}
 
-		do_action( 'aiawa/workflow/after_run', $finished, $trigger_payload );
+		do_action( 'dragwyb_af/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
 	}

@@ -2,15 +2,15 @@
 /**
  * Plugin deactivation handler.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
-use AIAWA\Plugin\Service\BackgroundRunner;
-use AIAWA\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

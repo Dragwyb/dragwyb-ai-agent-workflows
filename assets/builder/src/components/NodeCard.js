@@ -122,15 +122,15 @@ export default function NodeCard({
 		);
 	};
 
-	const classNames = ['aiawa-builder-node'];
+	const classNames = ['dragwyb-af-builder-node'];
 	if (selected) {
-		classNames.push('aiawa-builder-node--selected');
+		classNames.push('dragwyb-af-builder-node--selected');
 	}
 	if (hasUnknownType) {
-		classNames.push('aiawa-builder-node--unknown');
+		classNames.push('dragwyb-af-builder-node--unknown');
 	}
 	if (isLinkTarget) {
-		classNames.push('aiawa-builder-node--link-target');
+		classNames.push('dragwyb-af-builder-node--link-target');
 	}
 
 	const ariaLabel = [
@@ -161,12 +161,12 @@ export default function NodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="aiawa-builder-node__handle aiawa-builder-node__handle--top"
+				className="dragwyb-af-builder-node__handle dragwyb-af-builder-node__handle--top"
 				aria-hidden="true"
 			/>
-			<div className="aiawa-builder-node__body">
+			<div className="dragwyb-af-builder-node__body">
 				<span
-					className="aiawa-builder-node__icon"
+					className="dragwyb-af-builder-node__icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -175,23 +175,23 @@ export default function NodeCard({
 				>
 					{meta.icon}
 				</span>
-				<div className="aiawa-builder-node__text">
-					<span className="aiawa-builder-node__label" aria-hidden="true">
+				<div className="dragwyb-af-builder-node__text">
+					<span className="dragwyb-af-builder-node__label" aria-hidden="true">
 						{node.label}
 					</span>
-					<span className="aiawa-builder-node__subtitle" aria-hidden="true">
+					<span className="dragwyb-af-builder-node__subtitle" aria-hidden="true">
 						{meta.categoryLabel}
 					</span>
 				</div>
 			</div>
 			<span
-				className="aiawa-builder-node__handle aiawa-builder-node__handle--bottom"
+				className="dragwyb-af-builder-node__handle dragwyb-af-builder-node__handle--bottom"
 				aria-hidden="true"
 			/>
 			{canStartFlowConnection && onStartFlowConnectionDrag && (
 				<button
 					type="button"
-					className="aiawa-builder-node__output-port"
+					className="dragwyb-af-builder-node__output-port"
 					title={__(
 						'Drag to the next step to connect',
 						'dragwyb-agentflow'

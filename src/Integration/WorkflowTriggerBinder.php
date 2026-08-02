@@ -2,21 +2,21 @@
 /**
  * Binds active workflows' triggers to their real-world event sources.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration;
+namespace DragwybAgentFlow\Plugin\Integration;
 
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Integration\WordPress\WordPressActionHelper;
-use AIAWA\Plugin\Service\NodeTypeRegistry;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\TriggerReentrancyGuard;
-use AIAWA\Plugin\Service\WorkflowExecutionService;
-use AIAWA\Plugin\Service\WorkflowService;
-use AIAWA\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * not recommended otherwise.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
- * rather than the `aiawa_workflow_nodes` table: binding must happen as early
+ * rather than the `dragwyb_af_workflow_nodes` table: binding must happen as early
  * as possible in the request (see Core\Plugin::registerExecutionEngine()),
  * before WorkflowExecutionService ever gets a chance to lazily sync that
  * table, so `graph_json` — the builder's own always-current source of
@@ -176,7 +176,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Mid-write: any aiawa create/update/delete is still on the stack.
+					// Mid-write: any dragwyb_af create/update/delete is still on the stack.
 					if ( $this->trigger_guard->isWriting() ) {
 						return;
 					}
@@ -186,7 +186,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Entity was created by a previous aiawa action (translated post,
+					// Entity was created by a previous dragwyb_af action (translated post,
 					// auto-user, auto-comment, etc.) — do not start another loop.
 					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
 						return;

@@ -2,12 +2,12 @@
 /**
  * Formats GMT-stored timestamps for admin display.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Every timestamp this plugin stores (`aiawa_workflow_runs`, `aiawa_workflows`,
+ * Every timestamp this plugin stores (`dragwyb_af_workflow_runs`, `dragwyb_af_workflows`,
  * etc.) is GMT — see `current_time( 'mysql', true )` at each insert site.
  * Historically this class's callers always converted that to the site's
  * local timezone for display via `get_date_from_gmt()`; the "General" tab

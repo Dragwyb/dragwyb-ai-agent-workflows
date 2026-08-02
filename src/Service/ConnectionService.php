@@ -2,18 +2,18 @@
 /**
  * Connection application service.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWA\Plugin\Core\Encryption;
-use AIAWA\Plugin\Domain\Connection;
-use AIAWA\Plugin\Persistence\ConnectionRepository;
+use DragwybAgentFlow\Plugin\Core\Encryption;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

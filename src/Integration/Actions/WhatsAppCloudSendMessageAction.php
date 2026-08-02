@@ -2,16 +2,16 @@
 /**
  * WhatsApp Cloud API send text message action.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
-use AIAWA\Plugin\Domain\Contracts\ActionInterface;
-use AIAWA\Plugin\Service\ConnectionSecretResolver;
-use AIAWA\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\ConnectionSecretResolver;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

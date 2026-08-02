@@ -2,17 +2,17 @@
 /**
  * REST endpoints for builder test-flow listen / status.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Service\WorkflowService;
-use AIAWA\Plugin\Service\WorkflowNodeTestService;
-use AIAWA\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WorkflowTestController {
 
-	private const API_NAMESPACE = 'aiawa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private WorkflowService $workflows;
 
@@ -134,7 +134,7 @@ class WorkflowTestController {
 	public function permissions_check( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'aiawa_rest_forbidden',
+				'dragwyb_af_rest_forbidden',
 				__( 'Sorry, you are not allowed to test workflows.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -153,7 +153,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'aiawa_rest_not_found',
+				'dragwyb_af_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -174,7 +174,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'aiawa_rest_not_found',
+				'dragwyb_af_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -195,7 +195,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'aiawa_rest_not_found',
+				'dragwyb_af_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -214,7 +214,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'aiawa_rest_not_found',
+				'dragwyb_af_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -238,7 +238,7 @@ class WorkflowTestController {
 
 		if ( null === $workflow ) {
 			return new WP_Error(
-				'aiawa_rest_not_found',
+				'dragwyb_af_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -246,7 +246,7 @@ class WorkflowTestController {
 
 		if ( '' === $node_id ) {
 			return new WP_Error(
-				'aiawa_rest_invalid_param',
+				'dragwyb_af_rest_invalid_param',
 				__( 'A node id is required.', 'dragwyb-agentflow' ),
 				array( 'status' => 400 )
 			);

@@ -174,31 +174,31 @@ export default function TestDataTree({ title, data, embedded = false }) {
 		<div
 			className={
 				embedded
-					? 'aiawa-test-io__panel aiawa-test-io__panel--embedded'
-					: 'aiawa-test-io__panel'
+					? 'dragwyb-af-test-io__panel dragwyb-af-test-io__panel--embedded'
+					: 'dragwyb-af-test-io__panel'
 			}
 		>
 			{!embedded && title && (
-				<h4 className="aiawa-test-io__panel-title">{title}</h4>
+				<h4 className="dragwyb-af-test-io__panel-title">{title}</h4>
 			)}
 
 			{!hasData ? (
-				<p className="aiawa-test-io__empty">
+				<p className="dragwyb-af-test-io__empty">
 					{__('No data', 'dragwyb-agentflow')}
 				</p>
 			) : (
-				<div className="aiawa-test-io__tree-wrap">
-					<ul className="aiawa-test-io__tree">
-						<li className="aiawa-test-io__branch">
+				<div className="dragwyb-af-test-io__tree-wrap">
+					<ul className="dragwyb-af-test-io__tree">
+						<li className="dragwyb-af-test-io__branch">
 							<button
 								type="button"
-								className="aiawa-test-io__branch-btn"
+								className="dragwyb-af-test-io__branch-btn"
 								aria-expanded
 								disabled
 							>
-								<span className="aiawa-test-io__chevron">▾</span>
-								<span className="aiawa-test-io__branch-label">root</span>
-								<span className="aiawa-test-io__count">
+								<span className="dragwyb-af-test-io__chevron">▾</span>
+								<span className="dragwyb-af-test-io__branch-label">root</span>
+								<span className="dragwyb-af-test-io__count">
 									{sprintf(
 										/* translators: %d: number of fields */
 										__('%d items', 'dragwyb-agentflow'),
@@ -206,7 +206,7 @@ export default function TestDataTree({ title, data, embedded = false }) {
 									)}
 								</span>
 							</button>
-							<ul className="aiawa-test-io__tree aiawa-test-io__tree--nested">
+							<ul className="dragwyb-af-test-io__tree dragwyb-af-test-io__tree--nested">
 								{(tree.children || []).map((child) => (
 									<ReadOnlyBranch key={child.id} node={child} depth={0} />
 								))}
@@ -234,17 +234,17 @@ function ReadOnlyBranch({ node, depth }) {
 		const rawValue = node.value;
 
 		return (
-			<li className="aiawa-test-io__leaf">
+			<li className="dragwyb-af-test-io__leaf">
 				<div
-					className={`aiawa-test-io__field${isResponse ? ' aiawa-test-io__field--response' : ''}`}
+					className={`dragwyb-af-test-io__field${isResponse ? ' dragwyb-af-test-io__field--response' : ''}`}
 					style={{ paddingLeft: `${8 + depth * 14}px` }}
 				>
-					<span className="aiawa-test-io__key">{fieldKey}</span>
-					<span className="aiawa-test-io__colon">:</span>
+					<span className="dragwyb-af-test-io__key">{fieldKey}</span>
+					<span className="dragwyb-af-test-io__colon">:</span>
 					{isResponse && typeof rawValue === 'string' ? (
-						<pre className="aiawa-test-io__response">{rawValue}</pre>
+						<pre className="dragwyb-af-test-io__response">{rawValue}</pre>
 					) : (
-						<span className="aiawa-test-io__value">
+						<span className="dragwyb-af-test-io__value">
 							{formatScalarValue(rawValue)}
 						</span>
 					)}
@@ -260,17 +260,17 @@ function ReadOnlyBranch({ node, depth }) {
 	const childCount = children.length;
 
 	return (
-		<li className="aiawa-test-io__branch">
+		<li className="dragwyb-af-test-io__branch">
 			<button
 				type="button"
-				className="aiawa-test-io__branch-btn"
+				className="dragwyb-af-test-io__branch-btn"
 				style={{ paddingLeft: `${8 + depth * 14}px` }}
 				onClick={() => setOpen(!open)}
 				aria-expanded={open}
 			>
-				<span className="aiawa-test-io__chevron">{open ? '▾' : '▸'}</span>
-				<span className="aiawa-test-io__branch-label">{node.label}</span>
-				<span className="aiawa-test-io__count">
+				<span className="dragwyb-af-test-io__chevron">{open ? '▾' : '▸'}</span>
+				<span className="dragwyb-af-test-io__branch-label">{node.label}</span>
+				<span className="dragwyb-af-test-io__count">
 					{sprintf(
 						/* translators: %d: number of nested fields */
 						__('%d items', 'dragwyb-agentflow'),
@@ -279,7 +279,7 @@ function ReadOnlyBranch({ node, depth }) {
 				</span>
 			</button>
 			{open && (
-				<ul className="aiawa-test-io__tree aiawa-test-io__tree--nested">
+				<ul className="dragwyb-af-test-io__tree dragwyb-af-test-io__tree--nested">
 					{children.map((child) => (
 						<ReadOnlyBranch
 							key={child.id}

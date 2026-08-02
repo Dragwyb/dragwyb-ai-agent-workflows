@@ -2,7 +2,7 @@
 /**
  * WordPress version helpers and polyfills for declared minimum support.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 // Prevent direct file access.
@@ -10,28 +10,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'aiawa_wp_version' ) ) {
+if ( ! function_exists( 'dragwyb_af_wp_version' ) ) {
 	/**
 	 * Returns the running WordPress version without wp_get_wp_version().
 	 *
 	 * @return string
 	 */
-	function aiawa_wp_version(): string {
+	function dragwyb_af_wp_version(): string {
 		global $wp_version;
 
 		return isset( $wp_version ) ? (string) $wp_version : '0.0.0';
 	}
 }
 
-if ( ! function_exists( 'aiawa_has_core_ai_client' ) ) {
+if ( ! function_exists( 'dragwyb_af_has_core_ai_client' ) ) {
 	/**
 	 * Whether WordPress core ships the AI Client API.
 	 *
 	 * @return bool
 	 */
-	function aiawa_has_core_ai_client(): bool {
+	function dragwyb_af_has_core_ai_client(): bool {
 		return function_exists( 'wp_ai_client_prompt' )
-			|| version_compare( aiawa_wp_version(), '7.0-alpha', '>=' );
+			|| version_compare( dragwyb_af_wp_version(), '7.0-alpha', '>=' );
 	}
 }
 

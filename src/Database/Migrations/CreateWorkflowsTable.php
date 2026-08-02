@@ -2,15 +2,15 @@
 /**
  * Creates the workflows table.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use AIAWA\Plugin\Database\Migration;
-use AIAWA\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `aiawa_workflows` holds one row per workflow: its builder graph, status,
+ * `dragwyb_af_workflows` holds one row per workflow: its builder graph, status,
  * and lightweight run-count/soft-delete bookkeeping. See
  * docs/internal/architecture.md §2.3 for the full column rationale.
  */

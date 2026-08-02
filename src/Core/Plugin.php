@@ -2,70 +2,70 @@
 /**
  * Main plugin bootstrap class.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use AIAWA\Plugin\Admin\ConnectionActionsController;
-use AIAWA\Plugin\Admin\GoogleOAuthStartController;
-use AIAWA\Plugin\Admin\Menu;
-use AIAWA\Plugin\Admin\Pages\BuilderPage;
-use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWA\Plugin\Admin\Pages\ConnectionsPage;
-use AIAWA\Plugin\Admin\Pages\RunDetailPage;
-use AIAWA\Plugin\Admin\Pages\RunsPage;
-use AIAWA\Plugin\Admin\Pages\SettingsPage;
-use AIAWA\Plugin\Admin\Pages\WebhookFormPage;
-use AIAWA\Plugin\Admin\Pages\WebhooksPage;
-use AIAWA\Plugin\Admin\Pages\WorkflowsPage;
-use AIAWA\Plugin\Admin\RunActionsController;
-use AIAWA\Plugin\Admin\SettingsController;
-use AIAWA\Plugin\Admin\WebhookActionsController;
-use AIAWA\Plugin\Admin\WorkflowActionsController;
-use AIAWA\Plugin\Database\MigrationRunner;
-use AIAWA\Plugin\Database\SchemaMigrations;
-use AIAWA\Plugin\Integration\BuiltInNodeTypes;
-use AIAWA\Plugin\Integration\WorkflowTriggerBinder;
-use AIAWA\Plugin\Persistence\ConnectionRepository;
-use AIAWA\Plugin\Persistence\WebhookRepository;
-use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWA\Plugin\Persistence\WorkflowRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
-use AIAWA\Plugin\Rest\RestApi;
-use AIAWA\Plugin\Service\Agent\AgentAiClient;
-use AIAWA\Plugin\Service\Agent\AgentService;
-use AIAWA\Plugin\Service\Agent\AgentToolExecutor;
-use AIAWA\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
-use AIAWA\Plugin\Service\AiModelsService;
-use AIAWA\Plugin\Service\BackgroundRunner;
-use AIAWA\Plugin\Service\ChatMessageService;
-use AIAWA\Plugin\Service\ConnectionService;
-use AIAWA\Plugin\Service\ConnectionVerifier;
-use AIAWA\Plugin\Service\ElementorFormsService;
-use AIAWA\Plugin\Service\GoogleOAuthService;
-use AIAWA\Plugin\Service\NodeExecutionService;
-use AIAWA\Plugin\Service\NodeTypeRegistry;
-use AIAWA\Plugin\Service\RunRetentionService;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\TriggerReentrancyGuard;
-use AIAWA\Plugin\Service\WebhookService;
-use AIAWA\Plugin\Service\WorkflowExecutionService;
-use AIAWA\Plugin\Service\WorkflowService;
-use AIAWA\Plugin\Service\WorkflowNodeTestService;
-use AIAWA\Plugin\Service\WorkflowTestListenerService;
-use AIAWA\Plugin\Provider\PersistenceServiceProvider;
-use AIAWA\Plugin\Provider\AdminServiceProvider;
-use AIAWA\Plugin\Provider\RestServiceProvider;
-use AIAWA\Plugin\Provider\ExecutionServiceProvider;
+use DragwybAgentFlow\Plugin\Admin\ConnectionActionsController;
+use DragwybAgentFlow\Plugin\Admin\GoogleOAuthStartController;
+use DragwybAgentFlow\Plugin\Admin\Menu;
+use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionsPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunDetailPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\SettingsPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\WebhookFormPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\WebhooksPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\WorkflowsPage;
+use DragwybAgentFlow\Plugin\Admin\RunActionsController;
+use DragwybAgentFlow\Plugin\Admin\SettingsController;
+use DragwybAgentFlow\Plugin\Admin\WebhookActionsController;
+use DragwybAgentFlow\Plugin\Admin\WorkflowActionsController;
+use DragwybAgentFlow\Plugin\Database\MigrationRunner;
+use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
+use DragwybAgentFlow\Plugin\Integration\BuiltInNodeTypes;
+use DragwybAgentFlow\Plugin\Integration\WorkflowTriggerBinder;
+use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
+use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Rest\RestApi;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentToolExecutor;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybAgentFlow\Plugin\Service\AiModelsService;
+use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\ConnectionVerifier;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Provider\PersistenceServiceProvider;
+use DragwybAgentFlow\Plugin\Provider\AdminServiceProvider;
+use DragwybAgentFlow\Plugin\Provider\RestServiceProvider;
+use DragwybAgentFlow\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -200,7 +200,7 @@ class Plugin {
 		 *
 		 * @param Container $container The plugin's service container.
 		 */
-		do_action( 'aiawa/loaded', $this->container );
+		do_action( 'dragwyb_af/loaded', $this->container );
 	}
 
 	/**
@@ -234,11 +234,11 @@ class Plugin {
 	 * Registers the node type registry and, on `init`, fires the extension
 	 * point that populates it.
 	 *
-	 * The `aiawa/nodes/register` action is deliberately fired on `init` rather
+	 * The `dragwyb_af/nodes/register` action is deliberately fired on `init` rather
 	 * than directly from here (this method itself runs during our own
 	 * `plugins_loaded` callback): by `init`, every other plugin's
 	 * `plugins_loaded` callback has already run, so third-party code hooking
-	 * `aiawa/nodes/register` from inside its own `plugins_loaded` handler is
+	 * `dragwyb_af/nodes/register` from inside its own `plugins_loaded` handler is
 	 * guaranteed to have registered before this fires. Firing immediately
 	 * here would make that depend on plugin load order.
 	 *
@@ -259,7 +259,7 @@ class Plugin {
 			$this->container->get( AgentAiClient::class )
 		);
 
-		add_action( 'aiawa/nodes/register', array( $built_in_node_types, 'register' ) );
+		add_action( 'dragwyb_af/nodes/register', array( $built_in_node_types, 'register' ) );
 
 		add_action(
 			'init',
@@ -272,7 +272,7 @@ class Plugin {
 				 *
 				 * @param NodeTypeRegistry $registry The plugin's node type registry.
 				 */
-				do_action( 'aiawa/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
+				do_action( 'dragwyb_af/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
 		);
 	}

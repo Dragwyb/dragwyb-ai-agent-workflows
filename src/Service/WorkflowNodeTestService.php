@@ -2,17 +2,17 @@
 /**
  * Executes a single builder node for "Test node" previews.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Domain\WorkflowNode;
-use AIAWA\Plugin\Service\Agent\AgentGraphHelper;
-use AIAWA\Plugin\Service\ConfigInterpolator;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentGraphHelper;
+use DragwybAgentFlow\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

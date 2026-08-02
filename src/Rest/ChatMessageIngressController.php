@@ -2,18 +2,18 @@
 /**
  * Public chat-message ingress REST controller.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use AIAWA\Plugin\Service\ChatMessageService;
-use AIAWA\Plugin\Service\WorkflowExecutionService;
-use AIAWA\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ChatMessageIngressController {
 
-	private const API_NAMESPACE = 'aiawa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private const ROUTE = '/chat/(?P<endpoint_id>[0-9a-fA-F-]{36})';
 
@@ -109,7 +109,7 @@ class ChatMessageIngressController {
 			}
 
 			return new WP_Error(
-				'aiawa_chat_not_found',
+				'dragwyb_af_chat_not_found',
 				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -126,7 +126,7 @@ class ChatMessageIngressController {
 		}
 
 		return new WP_Error(
-			'aiawa_chat_forbidden',
+			'dragwyb_af_chat_forbidden',
 			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-agentflow' ),
 			array( 'status' => 401 )
 		);
@@ -149,7 +149,7 @@ class ChatMessageIngressController {
 
 		if ( null === $match ) {
 			return new WP_Error(
-				'aiawa_chat_not_found',
+				'dragwyb_af_chat_not_found',
 				__( 'No chat endpoint found for this ID.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -187,7 +187,7 @@ class ChatMessageIngressController {
 
 		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
 			return new WP_Error(
-				'aiawa_chat_rate_limit_exceeded',
+				'dragwyb_af_chat_rate_limit_exceeded',
 				__( 'Rate limit exceeded. Please try again in a minute.', 'dragwyb-agentflow' ),
 				array( 'status' => 429 )
 			);
@@ -197,7 +197,7 @@ class ChatMessageIngressController {
 
 		if ( null === $match ) {
 			return new WP_Error(
-				'aiawa_chat_not_found',
+				'dragwyb_af_chat_not_found',
 				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-agentflow' ),
 				array( 'status' => 404 )
 			);
@@ -228,7 +228,7 @@ class ChatMessageIngressController {
 
 		if ( '' === $payload['chatInput'] ) {
 			return new WP_Error(
-				'aiawa_chat_empty',
+				'dragwyb_af_chat_empty',
 				__( 'chatInput is required.', 'dragwyb-agentflow' ),
 				array( 'status' => 422 )
 			);
@@ -251,7 +251,7 @@ class ChatMessageIngressController {
 		}
 
 		if ( 'immediate' === $response_mode ) {
-			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- dynamic hookname is 'aiawa_chat_message_received'.
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- dynamic hookname is 'dragwyb_af_chat_message_received'.
 			do_action( ChatMessageReceivedTrigger::HOOK, $payload );
 
 			return new WP_REST_Response(
@@ -272,7 +272,7 @@ class ChatMessageIngressController {
 				error_log( 'WorkflowAutomate Chat Run Error: ' . $exception->getMessage() );
 			}
 			return new WP_Error(
-				'aiawa_chat_run_failed',
+				'dragwyb_af_chat_run_failed',
 				__( 'Chat execution failed.', 'dragwyb-agentflow' ),
 				array( 'status' => 500 )
 			);
@@ -299,7 +299,7 @@ class ChatMessageIngressController {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] )
 			? sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) )
 			: '127.0.0.1';
-		$transient_key = 'aiawa_chat_rl_' . md5( $ip . '|' . $endpoint_id );
+		$transient_key = 'dragwyb_af_chat_rl_' . md5( $ip . '|' . $endpoint_id );
 		$count         = (int) get_transient( $transient_key );
 
 		if ( $count >= 30 ) {

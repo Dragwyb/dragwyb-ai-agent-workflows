@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AIAWA\AiProviders\Compatible;
+namespace DragwybAgentFlow\AiProviders\Compatible;
 
 use WordPress\AiClient\Messages\Enums\ModalityEnum;
 use WordPress\AiClient\Providers\Http\DTO\Request;

@@ -439,7 +439,7 @@ export default function ConfigPanel({
 	if (!node) {
 		return (
 			<aside
-				className="aiawa-builder-config aiawa-builder-config--empty"
+				className="dragwyb-af-builder-config dragwyb-af-builder-config--empty"
 				aria-label={__('Node settings', 'dragwyb-agentflow')}
 			>
 				<p>
@@ -456,15 +456,15 @@ export default function ConfigPanel({
 		<aside
 			className={
 				node.type === 'ai_agent_action'
-					? 'aiawa-builder-config aiawa-builder-config--agent'
-					: 'aiawa-builder-config'
+					? 'dragwyb-af-builder-config dragwyb-af-builder-config--agent'
+					: 'dragwyb-af-builder-config'
 			}
 			aria-label={__('Node settings', 'dragwyb-agentflow')}
 		>
-			<div className="aiawa-builder-config__header">
+			<div className="dragwyb-af-builder-config__header">
 				<h2>{nodeType ? nodeType.label : node.type}</h2>
 				<Button
-					className="aiawa-builder-config__close"
+					className="dragwyb-af-builder-config__close"
 					icon="no-alt"
 					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
@@ -478,7 +478,7 @@ export default function ConfigPanel({
 			/>
 
 			{node.parent_agent_id && node.attachment_type === 'tool' && (
-				<p className="aiawa-builder-config__field-help">
+				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'This tool is attached to your AI Agent. Remove it from the agent or delete it here.',
 						'dragwyb-agentflow'
@@ -487,7 +487,7 @@ export default function ConfigPanel({
 			)}
 
 			{node.attachment_type === 'chat_model' && (
-				<p className="aiawa-builder-config__field-help">
+				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Chat model linked to your agent. Add an API key and pick a model below.',
 						'dragwyb-agentflow'
@@ -496,7 +496,7 @@ export default function ConfigPanel({
 			)}
 
 			{node.attachment_type === 'fallback_chat_model' && (
-				<p className="aiawa-builder-config__field-help">
+				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Fallback chat model used when the primary model fails.',
 						'dragwyb-agentflow'
@@ -506,7 +506,7 @@ export default function ConfigPanel({
 
 			{node.attachment_type === 'output_parser' && (
 				<>
-					<p className="aiawa-builder-config__field-help">
+					<p className="dragwyb-af-builder-config__field-help">
 						{__(
 							'JSON structure for the AI Agent reply. Connect a Model* on the canvas for Auto-Fix.',
 							'dragwyb-agentflow'
@@ -529,7 +529,7 @@ export default function ConfigPanel({
 			)}
 
 			{node.attachment_type === 'memory' && (
-				<p className="aiawa-builder-config__field-help">
+				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Simple memory keeps conversation context for this agent run.',
 						'dragwyb-agentflow'
@@ -538,7 +538,7 @@ export default function ConfigPanel({
 			)}
 
 			{node.type === 'condition_action' && (
-				<p className="aiawa-builder-config__field-help">
+				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Each condition has its own orange port on the right — drag each port to a different step (AI Agent, actions, etc.). Or pick targets under “Then run” for each condition below.',
 						'dragwyb-agentflow'
@@ -567,7 +567,7 @@ export default function ConfigPanel({
 
 			{node.category === 'trigger' &&
 				node.type === 'chat_message_received_trigger' && (
-					<p className="aiawa-builder-config__field-help">
+					<p className="dragwyb-af-builder-config__field-help">
 						{__(
 							'Click Chat in the header to open the chat panel and send messages (same idea as n8n). Save the workflow first if you just added this trigger.',
 							'dragwyb-agentflow'
@@ -584,7 +584,7 @@ export default function ConfigPanel({
 			)}
 
 			{!nodeType && (
-				<p className="aiawa-builder-config__warning">
+				<p className="dragwyb-af-builder-config__warning">
 					{__(
 						'This node\u2019s type is not currently registered (the plugin or code that provided it may be inactive). Its saved configuration is preserved but cannot be edited here.',
 						'dragwyb-agentflow'
@@ -617,7 +617,7 @@ export default function ConfigPanel({
 					.map((fieldName) => (
 					<div
 						key={`${node.id}-${fieldName}`}
-						className="aiawa-builder-config__field"
+						className="dragwyb-af-builder-config__field"
 					>
 						<ConfigField
 							fieldName={fieldName}
@@ -647,13 +647,13 @@ export default function ConfigPanel({
 				/>
 			)}
 
-			<div className="aiawa-builder-config__actions">
+			<div className="dragwyb-af-builder-config__actions">
 				<Button
 					variant="secondary"
 					onClick={handleTestNode}
 					isBusy={testing}
 					disabled={testing || !workflowId}
-					className="aiawa-builder-config__test"
+					className="dragwyb-af-builder-config__test"
 				>
 					{__('Test node', 'dragwyb-agentflow')}
 				</Button>
@@ -662,7 +662,7 @@ export default function ConfigPanel({
 					isDestructive
 					variant="secondary"
 					onClick={onDelete}
-					className="aiawa-builder-config__delete"
+					className="dragwyb-af-builder-config__delete"
 				>
 					{__('Delete node', 'dragwyb-agentflow')}
 				</Button>
@@ -737,7 +737,7 @@ function ConfigField({
 					onChange={onChange}
 				/>
 				{pageLinks.length > 0 && (
-					<div className="aiawa-builder-config__form-page-link">
+					<div className="dragwyb-af-builder-config__form-page-link">
 						{pageLinks.length === 1 ? (
 							<a
 								href={pageLinks[0].url}
@@ -754,10 +754,10 @@ function ConfigField({
 							</a>
 						) : (
 							<>
-								<span className="aiawa-builder-config__form-page-link-label">
+								<span className="dragwyb-af-builder-config__form-page-link-label">
 									{__('Form pages:', 'dragwyb-agentflow')}
 								</span>
-								<ul className="aiawa-builder-config__form-page-link-list">
+								<ul className="dragwyb-af-builder-config__form-page-link-list">
 									{pageLinks.map((page) => (
 										<li key={page.url}>
 											<a
@@ -788,7 +788,7 @@ function ConfigField({
 				? String(fieldSchema.default || '')
 				: String(resolved);
 		return (
-			<div className="aiawa-field aiawa-field--info">
+			<div className="dragwyb-af-field dragwyb-af-field--info">
 				<strong>{label}</strong>
 				<p style={{ marginTop: 4 }}>{text}</p>
 			</div>
@@ -1065,7 +1065,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 	const notifyModels = () => {
 		if (typeof window !== 'undefined') {
 			window.dispatchEvent(
-				new CustomEvent('aiawa-ai-credentials-changed', {
+				new CustomEvent('dragwyb-af-ai-credentials-changed', {
 					detail: { provider },
 				})
 			);
@@ -1130,8 +1130,8 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 
 	if (loading) {
 		return (
-			<div className="aiawa-field aiawa-field--ai-credentials">
-				<p className="aiawa-builder-config__field-help">
+			<div className="dragwyb-af-field dragwyb-af-field--ai-credentials">
+				<p className="dragwyb-af-builder-config__field-help">
 					{__('Checking API key…', 'dragwyb-agentflow')}
 				</p>
 			</div>
@@ -1140,22 +1140,22 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 
 	if (configured && !replacing) {
 		return (
-			<div className="aiawa-field aiawa-field--ai-credentials">
+			<div className="dragwyb-af-field dragwyb-af-field--ai-credentials">
 				<strong>{label}</strong>
-				<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
+				<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
 					{__('API key saved for this site.', 'dragwyb-agentflow')}
 				</p>
 				{notice ? (
-					<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
+					<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
 						{notice}
 					</p>
 				) : null}
 				{error ? (
-					<p className="aiawa-builder-config__field-error" role="alert">
+					<p className="dragwyb-af-builder-config__field-error" role="alert">
 						{error}
 					</p>
 				) : null}
-				<div className="aiawa-builder-config__connection-actions">
+				<div className="dragwyb-af-builder-config__connection-actions">
 					<Button
 						variant="secondary"
 						onClick={() => {
@@ -1183,7 +1183,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 	}
 
 	return (
-		<div className="aiawa-field aiawa-field--ai-credentials">
+		<div className="dragwyb-af-field dragwyb-af-field--ai-credentials">
 			<TextControl
 				label={label}
 				type="password"
@@ -1196,16 +1196,16 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 				)}
 			/>
 			{error ? (
-				<p className="aiawa-builder-config__field-error" role="alert">
+				<p className="dragwyb-af-builder-config__field-error" role="alert">
 					{error}
 				</p>
 			) : null}
 			{notice ? (
-				<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
+				<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
 					{notice}
 				</p>
 			) : null}
-			<div className="aiawa-builder-config__connection-actions">
+			<div className="dragwyb-af-builder-config__connection-actions">
 				<Button isPrimary onClick={handleSave} disabled={saving}>
 					{saving
 						? __('Saving…', 'dragwyb-agentflow')
@@ -1259,12 +1259,12 @@ function AiModelField({
 		};
 
 		window.addEventListener(
-			'aiawa-ai-credentials-changed',
+			'dragwyb-af-ai-credentials-changed',
 			onCredentialsChanged
 		);
 		return () => {
 			window.removeEventListener(
-				'aiawa-ai-credentials-changed',
+				'dragwyb-af-ai-credentials-changed',
 				onCredentialsChanged
 			);
 		};
@@ -1460,14 +1460,14 @@ function ConnectionField({
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
-		const notice = params.get('aiawa_notice') || '';
+		const notice = params.get('dragwyb_af_notice') || '';
 
 		if ('oauth_connected' === notice) {
 			setOauthNotice(
 				__('Google account connected successfully.', 'dragwyb-agentflow')
 			);
-		} else if ('error' === notice && params.get('aiawa_error')) {
-			setOauthNotice(String(params.get('aiawa_error')));
+		} else if ('error' === notice && params.get('dragwyb_af_error')) {
+			setOauthNotice(String(params.get('dragwyb_af_error')));
 		} else {
 			setOauthNotice('');
 		}
@@ -1639,15 +1639,15 @@ function ConnectionField({
 
 	const buildOAuthReturnUrl = () => {
 		const url = new URL(window.location.href);
-		url.searchParams.delete('aiawa_notice');
-		url.searchParams.delete('aiawa_error');
+		url.searchParams.delete('dragwyb_af_notice');
+		url.searchParams.delete('dragwyb_af_error');
 
 		if (selectedId > 0) {
-			url.searchParams.set('aiawa_connection', String(selectedId));
+			url.searchParams.set('dragwyb_af_connection', String(selectedId));
 		}
 
 		if (nodeId) {
-			url.searchParams.set('aiawa_node', nodeId);
+			url.searchParams.set('dragwyb_af_node', nodeId);
 		}
 
 		return url.toString();
@@ -1699,7 +1699,7 @@ function ConnectionField({
 	};
 
 	return (
-		<div className="aiawa-builder-config__connection">
+		<div className="dragwyb-af-builder-config__connection">
 			<SelectControl
 				label={label}
 				value={String(selectedId)}
@@ -1731,8 +1731,8 @@ function ConnectionField({
 				<p
 					className={
 						oauthNotice.includes('successfully')
-							? 'aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success'
-							: 'aiawa-builder-config__field-error'
+							? 'dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success'
+							: 'dragwyb-af-builder-config__field-error'
 					}
 					role="status"
 				>
@@ -1744,8 +1744,8 @@ function ConnectionField({
 				selectedConnection &&
 				isGoogleOAuth &&
 				!selectedConnection.oauth_connected && (
-					<div className="aiawa-builder-config__connection-form">
-						<p className="aiawa-builder-config__connection-form-help">
+					<div className="dragwyb-af-builder-config__connection-form">
+						<p className="dragwyb-af-builder-config__connection-form-help">
 							{__(
 								'Credentials saved. Connect your Google account to finish setup.',
 								'dragwyb-agentflow'
@@ -1767,7 +1767,7 @@ function ConnectionField({
 				selectedConnection &&
 				isGoogleOAuth &&
 				selectedConnection.oauth_connected && (
-					<p className="aiawa-builder-config__connection-notice aiawa-builder-config__connection-notice--success">
+					<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
 						{__('Google account connected.', 'dragwyb-agentflow')}
 					</p>
 				)}
@@ -1775,7 +1775,7 @@ function ConnectionField({
 			{!showAddForm && selectedId <= 0 && !isGoogleOAuth && (
 				<Button
 					variant="secondary"
-					className="aiawa-builder-config__add-connection"
+					className="dragwyb-af-builder-config__add-connection"
 					onClick={() => {
 						setSecret('');
 						setError('');
@@ -1790,7 +1790,7 @@ function ConnectionField({
 			{!showAddForm && selectedId <= 0 && isGoogleOAuth && (
 				<Button
 					variant="secondary"
-					className="aiawa-builder-config__add-connection"
+					className="dragwyb-af-builder-config__add-connection"
 					onClick={() => {
 						setClientId('');
 						setClientSecret('');
@@ -1805,7 +1805,7 @@ function ConnectionField({
 			{!showAddForm && selectedId > 0 && !isGoogleOAuth && (
 				<Button
 					variant="link"
-					className="aiawa-builder-config__add-connection"
+					className="dragwyb-af-builder-config__add-connection"
 					onClick={() => {
 						setSecret('');
 						setError('');
@@ -1820,7 +1820,7 @@ function ConnectionField({
 			{!showAddForm && selectedId > 0 && isGoogleOAuth && (
 				<Button
 					variant="link"
-					className="aiawa-builder-config__add-connection"
+					className="dragwyb-af-builder-config__add-connection"
 					onClick={() => {
 						onChange(0);
 						setClientId('');
@@ -1834,11 +1834,11 @@ function ConnectionField({
 			)}
 
 			{showAddForm && isGoogleOAuth && (
-				<div className="aiawa-builder-config__connection-form">
-					<p className="aiawa-builder-config__connection-form-title">
+				<div className="dragwyb-af-builder-config__connection-form">
+					<p className="dragwyb-af-builder-config__connection-form-title">
 						{__('Google OAuth connection', 'dragwyb-agentflow')}
 					</p>
-					<p className="aiawa-builder-config__connection-form-help">
+					<p className="dragwyb-af-builder-config__connection-form-help">
 						<a
 							href={bootstrap.googleCredentialsUrl}
 							target="_blank"
@@ -1888,11 +1888,11 @@ function ConnectionField({
 						onFocus={(event) => event.target.select()}
 					/>
 					{error && (
-						<p className="aiawa-builder-config__field-error" role="alert">
+						<p className="dragwyb-af-builder-config__field-error" role="alert">
 							{error}
 						</p>
 					)}
-					<div className="aiawa-builder-config__connection-form-actions">
+					<div className="dragwyb-af-builder-config__connection-form-actions">
 						<Button
 							variant="secondary"
 							onClick={handleSaveConnection}
@@ -1991,8 +1991,8 @@ function ConnectionField({
 			)}
 
 			{showAddForm && !isGoogleOAuth && (
-				<div className="aiawa-builder-config__connection-form">
-					<p className="aiawa-builder-config__connection-form-title">
+				<div className="dragwyb-af-builder-config__connection-form">
+					<p className="dragwyb-af-builder-config__connection-form-title">
 						{nodeTypeLabel
 							? sprintf(
 								/* translators: %s: integration label */
@@ -2041,11 +2041,11 @@ function ConnectionField({
 						)}
 					/>
 					{error && (
-						<p className="aiawa-builder-config__field-error" role="alert">
+						<p className="dragwyb-af-builder-config__field-error" role="alert">
 							{error}
 						</p>
 					)}
-					<div className="aiawa-builder-config__connection-form-actions">
+					<div className="dragwyb-af-builder-config__connection-form-actions">
 						<Button
 							isPrimary
 							onClick={handleSaveConnection}
@@ -2167,15 +2167,15 @@ function ConditionRoutesField({
 	};
 
 	return (
-		<div className="aiawa-builder-config__condition-routes">
-			<span className="aiawa-builder-config__key-value-label">{label}</span>
+		<div className="dragwyb-af-builder-config__condition-routes">
+			<span className="dragwyb-af-builder-config__key-value-label">{label}</span>
 			{help && (
-				<p className="aiawa-builder-config__field-help">{help}</p>
+				<p className="dragwyb-af-builder-config__field-help">{help}</p>
 			)}
 			{rows.map((row, index) => (
 				<div
 					key={row.id || `condition-${index}`}
-					className="aiawa-builder-config__condition-route"
+					className="dragwyb-af-builder-config__condition-route"
 				>
 					<TextControl
 						label={__('Label', 'dragwyb-agentflow')}
@@ -2280,16 +2280,16 @@ function KeyValueField({
 	};
 
 	return (
-		<div className="aiawa-builder-config__key-value">
-			<span className="aiawa-builder-config__key-value-label">{label}</span>
+		<div className="dragwyb-af-builder-config__key-value">
+			<span className="dragwyb-af-builder-config__key-value-label">{label}</span>
 			{help && (
-				<p className="aiawa-builder-config__field-help">{help}</p>
+				<p className="dragwyb-af-builder-config__field-help">{help}</p>
 			)}
 			{rows.map((row, index) => (
 				<div
 					// eslint-disable-next-line react/no-array-index-key
 					key={index}
-					className="aiawa-builder-config__key-value-row"
+					className="dragwyb-af-builder-config__key-value-row"
 				>
 					<TokenField
 						label={__('Name', 'dragwyb-agentflow')}
@@ -2312,7 +2312,7 @@ function KeyValueField({
 					<Button
 						isDestructive
 						variant="tertiary"
-						className="aiawa-builder-config__key-value-remove"
+						className="dragwyb-af-builder-config__key-value-remove"
 						onClick={() => removeRow(index)}
 					>
 						{__('Remove', 'dragwyb-agentflow')}
@@ -2321,7 +2321,7 @@ function KeyValueField({
 			))}
 			<Button
 				variant="secondary"
-				className="aiawa-builder-config__key-value-add"
+				className="dragwyb-af-builder-config__key-value-add"
 				onClick={addRow}
 			>
 				{addLabel || __('Add Field', 'dragwyb-agentflow')}
@@ -2365,7 +2365,7 @@ function JsonField({ label, value, onChange }) {
 	};
 
 	return (
-		<div className="aiawa-builder-config__json-field">
+		<div className="dragwyb-af-builder-config__json-field">
 			<TextareaControl
 				label={label}
 				value={text}
@@ -2373,7 +2373,7 @@ function JsonField({ label, value, onChange }) {
 				rows={4}
 			/>
 			{error && (
-				<p className="aiawa-builder-config__field-error">{error}</p>
+				<p className="dragwyb-af-builder-config__field-error">{error}</p>
 			)}
 		</div>
 	);

@@ -2,15 +2,15 @@
 /**
  * Workflow node repository.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use AIAWA\Plugin\Database\Table;
-use AIAWA\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `aiawa_workflow_nodes` access goes through this class.
+ * All `dragwyb_af_workflow_nodes` access goes through this class.
  */
 class WorkflowNodeRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'aiawa_workflow_nodes';
+	private const CACHE_GROUP = 'dragwyb_af_workflow_nodes';
 
 	/**
 	 * Defensive upper bound on nodes fetched for a single workflow. A

@@ -2,26 +2,26 @@
 /**
  * Run detail admin page.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use AIAWA\Plugin\Admin\AdminPage;
-use AIAWA\Plugin\Admin\RunDuration;
-use AIAWA\Plugin\Admin\RunStatusBadge;
-use AIAWA\Plugin\Admin\RunTimestamp;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Domain\WorkflowRun;
-use AIAWA\Plugin\Domain\WorkflowRunLog;
-use AIAWA\Plugin\Persistence\WorkflowRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Admin\RunDuration;
+use DragwybAgentFlow\Plugin\Admin\RunStatusBadge;
+use DragwybAgentFlow\Plugin\Admin\RunTimestamp;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
 
-// BuilderPage and RunsPage live in this same namespace (AIAWA\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
+// BuilderPage and RunsPage live in this same namespace (DragwybAgentFlow\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunDetailPage implements AdminPage {
 
-	public const SLUG = 'aiawa-run-detail';
+	public const SLUG = 'dragwyb-af-run-detail';
 
 	/**
 	 * Statuses that make sense to re-run — see RunsListTable's own
@@ -103,10 +103,10 @@ class RunDetailPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'aiawa-admin',
-			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			AIAWA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -122,7 +122,7 @@ class RunDetailPage implements AdminPage {
 		$run_id = isset( $_GET['run_id'] ) ? absint( wp_unslash( $_GET['run_id'] ) ) : 0;
 		$run    = $run_id > 0 ? $this->runs->find( $run_id ) : null;
 
-		echo '<div class="wrap aiawa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -191,7 +191,7 @@ class RunDetailPage implements AdminPage {
 	private function renderMeta( WorkflowRun $run ): void {
 		$workflow = $this->workflows->find( $run->workflowId(), true );
 
-		echo '<table class="widefat fixed striped aiawa-run-meta"><tbody>';
+		echo '<table class="widefat fixed striped dragwyb-af-run-meta"><tbody>';
 
 		$this->renderMetaRow(
 			__( 'Workflow', 'dragwyb-agentflow' ),
@@ -263,7 +263,7 @@ class RunDetailPage implements AdminPage {
 		}
 
 		printf(
-			'<details class="aiawa-run-details-block"><summary>%1$s</summary><pre>%2$s</pre></details>',
+			'<details class="dragwyb-af-run-details-block"><summary>%1$s</summary><pre>%2$s</pre></details>',
 			esc_html__( 'Trigger payload', 'dragwyb-agentflow' ),
 			esc_html( (string) wp_json_encode( $payload, JSON_PRETTY_PRINT ) )
 		);
@@ -285,7 +285,7 @@ class RunDetailPage implements AdminPage {
 			return;
 		}
 
-		echo '<table class="widefat fixed striped aiawa-run-logs"><thead><tr>';
+		echo '<table class="widefat fixed striped dragwyb-af-run-logs"><thead><tr>';
 		echo '<th>' . esc_html__( 'Node', 'dragwyb-agentflow' ) . '</th>';
 		echo '<th>' . esc_html__( 'Status', 'dragwyb-agentflow' ) . '</th>';
 		echo '<th>' . esc_html__( 'Duration', 'dragwyb-agentflow' ) . '</th>';
@@ -354,7 +354,7 @@ class RunDetailPage implements AdminPage {
 		$slug  = array_key_exists( $status, $labels ) ? $status : 'unknown';
 
 		return sprintf(
-			'<span class="aiawa-status-badge aiawa-status-badge--%1$s">%2$s</span>',
+			'<span class="dragwyb-af-status-badge dragwyb-af-status-badge--%1$s">%2$s</span>',
 			esc_attr( $slug ),
 			esc_html( $label )
 		);
@@ -376,7 +376,7 @@ class RunDetailPage implements AdminPage {
 			return;
 		}
 
-		echo '<details class="aiawa-run-details-block"><summary>' . esc_html__( 'View', 'dragwyb-agentflow' ) . '</summary>';
+		echo '<details class="dragwyb-af-run-details-block"><summary>' . esc_html__( 'View', 'dragwyb-agentflow' ) . '</summary>';
 
 		if ( null !== $log->input() ) {
 			echo '<p><strong>' . esc_html__( 'Input', 'dragwyb-agentflow' ) . '</strong></p>';
@@ -435,7 +435,7 @@ class RunDetailPage implements AdminPage {
 	 * @return string
 	 */
 	private function runActionForm( string $op, int $run_id, string $label, string $button_class, bool $confirm = false ): string {
-		$nonce_field  = wp_nonce_field( 'aiawa_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$nonce_field  = wp_nonce_field( 'dragwyb_af_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 		$confirm_attr = '';
 
 		if ( $confirm ) {
@@ -447,7 +447,7 @@ class RunDetailPage implements AdminPage {
 
 		return sprintf(
 			'<form method="post" action="%1$s" style="display:inline-block;margin-right:8px;">'
-				. '<input type="hidden" name="action" value="aiawa_run_action" />'
+				. '<input type="hidden" name="action" value="dragwyb_af_run_action" />'
 				. '<input type="hidden" name="op" value="%2$s" />'
 				. '<input type="hidden" name="run_id" value="%3$d" />'
 				. '%4$s'
@@ -465,7 +465,7 @@ class RunDetailPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?aiawa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -487,7 +487,7 @@ class RunDetailPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
+		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

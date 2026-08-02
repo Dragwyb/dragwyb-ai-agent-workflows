@@ -22,8 +22,8 @@ export default function MemorySubNode({
 	return (
 		<div
 			className={[
-				'aiawa-memory-node',
-				selected ? 'aiawa-memory-node--selected' : '',
+				'dragwyb-af-memory-node',
+				selected ? 'dragwyb-af-memory-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -33,11 +33,11 @@ export default function MemorySubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="aiawa-memory-node__input-dot" aria-hidden="true" />
-			<span className="aiawa-memory-node__icon" aria-hidden="true">
+			<span className="dragwyb-af-memory-node__input-dot" aria-hidden="true" />
+			<span className="dragwyb-af-memory-node__icon" aria-hidden="true">
 				🧠
 			</span>
-			<span className="aiawa-memory-node__label">
+			<span className="dragwyb-af-memory-node__label">
 				{node.label || __('Simple Memory', 'dragwyb-agentflow')}
 			</span>
 		</div>

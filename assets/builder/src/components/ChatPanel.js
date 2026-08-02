@@ -64,11 +64,11 @@ export default function ChatPanel({
 			  }));
 
 	return (
-		<aside className="aiawa-builder-chat" aria-label={__('Chat', 'dragwyb-agentflow')}>
-			<div className="aiawa-builder-chat__header">
+		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-agentflow')}>
+			<div className="dragwyb-af-builder-chat__header">
 				<div>
 					<strong>{title || __('Chat', 'dragwyb-agentflow')}</strong>
-					<p className="aiawa-builder-chat__subtitle">
+					<p className="dragwyb-af-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
 							'dragwyb-agentflow'
@@ -80,29 +80,29 @@ export default function ChatPanel({
 				</Button>
 			</div>
 
-			<div className="aiawa-builder-chat__messages" ref={listRef}>
+			<div className="dragwyb-af-builder-chat__messages" ref={listRef}>
 				{displayMessages.map((message) => (
 					<div
 						key={message.id}
-						className={`aiawa-builder-chat__bubble aiawa-builder-chat__bubble--${message.role}`}
+						className={`dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--${message.role}`}
 					>
 						{message.content}
 					</div>
 				))}
 				{sending && (
-					<div className="aiawa-builder-chat__bubble aiawa-builder-chat__bubble--assistant aiawa-builder-chat__bubble--pending">
+					<div className="dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--assistant dragwyb-af-builder-chat__bubble--pending">
 						{__('Thinking…', 'dragwyb-agentflow')}
 					</div>
 				)}
 			</div>
 
 			{error && (
-				<p className="aiawa-builder-chat__error" role="alert">
+				<p className="dragwyb-af-builder-chat__error" role="alert">
 					{error}
 				</p>
 			)}
 
-			<form className="aiawa-builder-chat__composer" onSubmit={handleSubmit}>
+			<form className="dragwyb-af-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
 					label={__('Message', 'dragwyb-agentflow')}
 					hideLabelFromVision

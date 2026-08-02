@@ -2,18 +2,18 @@
 /**
  * Optional co-plugin triggers — catalog + availability checks.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration;
+namespace DragwybAgentFlow\Plugin\Integration;
 
-use AIAWA\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
-use AIAWA\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
-use AIAWA\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use AIAWA\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use AIAWA\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

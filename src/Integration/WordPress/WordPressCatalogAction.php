@@ -2,16 +2,16 @@
 /**
  * Generic action node type driven by a `WordPressActionCatalog` entry.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
-use AIAWA\Plugin\Domain\Contracts\ActionGroupInterface;
-use AIAWA\Plugin\Domain\Contracts\ActionInterface;
-use AIAWA\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionGroupInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

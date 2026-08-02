@@ -2,16 +2,16 @@
 /**
  * Google OAuth 2.0 authorization and token lifecycle.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use RuntimeException;
-use AIAWA\Plugin\Domain\Connection;
-use AIAWA\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +56,7 @@ class GoogleOAuthService {
 	 * OAuth redirect URI registered in Google Cloud Console.
 	 */
 	public function callbackUrl(): string {
-		return rest_url( 'aiawa/v1/oauth/google/callback' );
+		return rest_url( 'dragwyb_af/v1/oauth/google/callback' );
 	}
 
 	/**
@@ -334,7 +334,7 @@ class GoogleOAuthService {
 	}
 
 	private function stateTransientKey( string $state ): string {
-		return 'aiawa_google_oauth_' . md5( $state );
+		return 'dragwyb_af_google_oauth_' . md5( $state );
 	}
 
 	private function sanitizeReturnUrl( string $return_url ): string {

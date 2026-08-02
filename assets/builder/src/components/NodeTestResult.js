@@ -29,7 +29,7 @@ export default function NodeTestResult({
 	if (error) {
 		return (
 			<div
-				className="aiawa-builder-config__test-result aiawa-builder-config__test-result--error"
+				className="dragwyb-af-builder-config__test-result dragwyb-af-builder-config__test-result--error"
 				role="alert"
 			>
 				<h3>{__('Response', 'dragwyb-agentflow')}</h3>
@@ -50,14 +50,14 @@ export default function NodeTestResult({
 	const showInput = activeTab === 'input';
 
 	return (
-		<div className="aiawa-builder-config__test-result">
-			<div className="aiawa-builder-config__test-result-header">
+		<div className="dragwyb-af-builder-config__test-result">
+			<div className="dragwyb-af-builder-config__test-result-header">
 				<h3>{__('Response', 'dragwyb-agentflow')}</h3>
 				<span
 					className={
 						success
-							? 'aiawa-builder-config__test-badge aiawa-builder-config__test-badge--success'
-							: 'aiawa-builder-config__test-badge aiawa-builder-config__test-badge--failed'
+							? 'dragwyb-af-builder-config__test-badge dragwyb-af-builder-config__test-badge--success'
+							: 'dragwyb-af-builder-config__test-badge dragwyb-af-builder-config__test-badge--failed'
 					}
 				>
 					{success
@@ -66,34 +66,34 @@ export default function NodeTestResult({
 				</span>
 			</div>
 
-			<div className="aiawa-test-io aiawa-test-io--tabs">
-				<div className="aiawa-test-io__tabs" role="tablist">
+			<div className="dragwyb-af-test-io dragwyb-af-test-io--tabs">
+				<div className="dragwyb-af-test-io__tabs" role="tablist">
 					<button
 						type="button"
-						id="aiawa-test-tab-input"
+						id="dragwyb-af-test-tab-input"
 						role="tab"
 						className={
 							showInput
-								? 'aiawa-test-io__tab aiawa-test-io__tab--active'
-								: 'aiawa-test-io__tab'
+								? 'dragwyb-af-test-io__tab dragwyb-af-test-io__tab--active'
+								: 'dragwyb-af-test-io__tab'
 						}
 						aria-selected={showInput}
-						aria-controls="aiawa-test-tabpanel"
+						aria-controls="dragwyb-af-test-tabpanel"
 						onClick={() => setActiveTab('input')}
 					>
 						{__('Input', 'dragwyb-agentflow')}
 					</button>
 					<button
 						type="button"
-						id="aiawa-test-tab-output"
+						id="dragwyb-af-test-tab-output"
 						role="tab"
 						className={
 							!showInput
-								? 'aiawa-test-io__tab aiawa-test-io__tab--active'
-								: 'aiawa-test-io__tab'
+								? 'dragwyb-af-test-io__tab dragwyb-af-test-io__tab--active'
+								: 'dragwyb-af-test-io__tab'
 						}
 						aria-selected={!showInput}
-						aria-controls="aiawa-test-tabpanel"
+						aria-controls="dragwyb-af-test-tabpanel"
 						onClick={() => setActiveTab('output')}
 					>
 						{__('Output', 'dragwyb-agentflow')}
@@ -101,11 +101,11 @@ export default function NodeTestResult({
 				</div>
 
 				<div
-					id="aiawa-test-tabpanel"
-					className="aiawa-test-io__body"
+					id="dragwyb-af-test-tabpanel"
+					className="dragwyb-af-test-io__body"
 					role="tabpanel"
 					aria-labelledby={
-						showInput ? 'aiawa-test-tab-input' : 'aiawa-test-tab-output'
+						showInput ? 'dragwyb-af-test-tab-input' : 'dragwyb-af-test-tab-output'
 					}
 				>
 					{showInput ? (

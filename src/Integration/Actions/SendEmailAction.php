@@ -2,15 +2,15 @@
 /**
  * Built-in "Send Email" action.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
 use WP_Error;
-use AIAWA\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

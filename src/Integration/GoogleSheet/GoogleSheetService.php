@@ -2,14 +2,14 @@
 /**
  * Worksheet/tab-level Google Sheets operations.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\GoogleSheet;
+namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet;
 
-use AIAWA\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

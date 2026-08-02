@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Connection admin actions.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWA\Plugin\Admin\Pages\ConnectionFormPage;
-use AIAWA\Plugin\Admin\Pages\ConnectionsPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Service\ConnectionAuthTypes;
-use AIAWA\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionsPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=aiawa_connection_action` POST
+ * Receives the `admin-post.php?action=dragwyb_af_connection_action` POST
  * submitted by ConnectionFormPage's create/edit forms and
  * ConnectionsListTable's/ConnectionFormPage's delete forms.
  *
@@ -55,7 +55,7 @@ class ConnectionActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_aiawa_connection_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_connection_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleConnectionsBulkFromList' ), 5 );
 	}
 
@@ -101,7 +101,7 @@ class ConnectionActionsController {
 		}
 
 		if ( 'create' === $op ) {
-			check_admin_referer( 'aiawa_connection_action_create' );
+			check_admin_referer( 'dragwyb_af_connection_action_create' );
 			$this->handleCreate();
 
 			return;
@@ -114,7 +114,7 @@ class ConnectionActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'aiawa_connection_action_' . $op . '_' . $id );
+		check_admin_referer( 'dragwyb_af_connection_action_' . $op . '_' . $id );
 
 		if ( 'update' === $op ) {
 			$this->handleUpdate( $id );
@@ -148,7 +148,7 @@ class ConnectionActionsController {
 					array(
 						'page'       => ConnectionFormPage::SLUG,
 						'connection' => $connection->id(),
-						'aiawa_notice' => 'created_oauth',
+						'dragwyb_af_notice' => 'created_oauth',
 					),
 					admin_url( 'admin.php' )
 				)
@@ -195,7 +195,7 @@ class ConnectionActionsController {
 	 */
 	public function handleConnectionsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['aiawa_connection_bulk'] ) ) {
+		if ( empty( $_POST['dragwyb_af_connection_bulk'] ) ) {
 			return;
 		}
 
@@ -203,7 +203,7 @@ class ConnectionActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'aiawa_connection_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_connection_bulk_action' ) ) {
 			$this->redirect( 'error' );
 		}
 
@@ -258,11 +258,11 @@ class ConnectionActionsController {
 	private function redirect( string $notice, string $detail = '' ): void {
 		$args = array(
 			'page'       => ConnectionsPage::SLUG,
-			'aiawa_notice' => $notice,
+			'dragwyb_af_notice' => $notice,
 		);
 
 		if ( '' !== $detail ) {
-			$args['aiawa_error'] = $detail;
+			$args['dragwyb_af_error'] = $detail;
 		}
 
 		wp_safe_redirect(

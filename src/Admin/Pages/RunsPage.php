@@ -2,22 +2,22 @@
 /**
  * Runs (execution history) admin page.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use AIAWA\Plugin\Admin\AdminPage;
-use AIAWA\Plugin\Admin\EmptyState;
-use AIAWA\Plugin\Admin\ListTableUi;
-use AIAWA\Plugin\Admin\RunActionsController;
-use AIAWA\Plugin\Admin\RunsListTable;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Persistence\WorkflowRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
-use AIAWA\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Admin\EmptyState;
+use DragwybAgentFlow\Plugin\Admin\ListTableUi;
+use DragwybAgentFlow\Plugin\Admin\RunActionsController;
+use DragwybAgentFlow\Plugin\Admin\RunsListTable;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunsPage implements AdminPage {
 
-	public const SLUG = 'aiawa-runs';
+	public const SLUG = 'dragwyb-af-runs';
 
 	private WorkflowRunRepository $runs;
 
@@ -92,10 +92,10 @@ class RunsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'aiawa-admin',
-			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			AIAWA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -110,7 +110,7 @@ class RunsPage implements AdminPage {
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap aiawa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -141,7 +141,7 @@ class RunsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'aiawa_run_bulk_action', 'aiawa_run_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_run_bulk_action', 'dragwyb_af_run_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -160,7 +160,7 @@ class RunsPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter form.
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
 
-		echo '<form method="get" class="aiawa-list-table-filters-form">';
+		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 
 		if ( '' !== $status ) {
@@ -195,7 +195,7 @@ class RunsPage implements AdminPage {
 		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-agentflow' );
 
 		printf(
-			'<p class="aiawa-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
+			'<p class="dragwyb-af-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
 				esc_html__( 'Showing runs for: %s', 'dragwyb-agentflow' ),
@@ -208,7 +208,7 @@ class RunsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?aiawa_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -242,7 +242,7 @@ class RunsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
+		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

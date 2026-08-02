@@ -2,15 +2,15 @@
 /**
  * Workflow repository.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use AIAWA\Plugin\Database\Table;
-use AIAWA\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `aiawa_workflows` access goes through this class. Every query is built
+ * All `dragwyb_af_workflows` access goes through this class. Every query is built
  * with `$wpdb->prepare()` or the `$wpdb` helper methods; the table name
  * itself is never user input, so its direct interpolation into SQL strings
  * is safe.
@@ -27,7 +27,7 @@ class WorkflowRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'aiawa_workflows';
+	private const CACHE_GROUP = 'dragwyb_af_workflows';
 
 	private const MAX_PER_PAGE = 100;
 

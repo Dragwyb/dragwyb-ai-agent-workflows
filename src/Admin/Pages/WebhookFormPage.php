@@ -2,20 +2,20 @@
 /**
  * Webhook create/edit admin page.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use AIAWA\Plugin\Admin\AdminPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Domain\Webhook;
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\WebhookService;
-use AIAWA\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Webhook;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WebhookFormPage implements AdminPage {
 
-	public const SLUG = 'aiawa-webhook-form';
+	public const SLUG = 'dragwyb-af-webhook-form';
 
 	private WebhookService $webhooks;
 
@@ -83,10 +83,10 @@ class WebhookFormPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'aiawa-admin',
-			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			AIAWA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -101,7 +101,7 @@ class WebhookFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which webhook to edit.
 		$webhook_id = isset( $_GET['webhook'] ) ? absint( wp_unslash( $_GET['webhook'] ) ) : 0;
 
-		echo '<div class="wrap aiawa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		$this->renderBackLink();
 
 		if ( $webhook_id > 0 ) {
@@ -141,10 +141,10 @@ class WebhookFormPage implements AdminPage {
 	private function renderCreateForm(): void {
 		$require_signing = $this->settings->requireWebhookSigning();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-webhook-form">';
-		echo '<input type="hidden" name="action" value="aiawa_webhook_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-webhook-form">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_webhook_action" />';
 		echo '<input type="hidden" name="op" value="create" />';
-		wp_nonce_field( 'aiawa_webhook_action_create' );
+		wp_nonce_field( 'dragwyb_af_webhook_action_create' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 		$this->renderWorkflowRow( 0 );
@@ -166,13 +166,13 @@ class WebhookFormPage implements AdminPage {
 		$secret_display  = $this->webhooks->displaySigningSecret( $webhook );
 		$webhook_id      = (int) $webhook->id();
 
-		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'dragwyb-agentflow' ) . ' <code class="aiawa-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
+		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'dragwyb-agentflow' ) . ' <code class="dragwyb-af-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-webhook-form">';
-		echo '<input type="hidden" name="action" value="aiawa_webhook_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-webhook-form">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_webhook_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
 		printf( '<input type="hidden" name="webhook_id" value="%s" />', esc_attr( $webhook_id ) );
-		wp_nonce_field( 'aiawa_webhook_action_update_' . $webhook_id );
+		wp_nonce_field( 'dragwyb_af_webhook_action_update_' . $webhook_id );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 		$this->renderWorkflowRow( (int) ( $webhook->workflowId() ?? 0 ) );
@@ -197,8 +197,8 @@ class WebhookFormPage implements AdminPage {
 			)
 		);
 
-		echo '<tr><th scope="row"><label for="aiawa-webhook-workflow">' . esc_html__( 'Workflow', 'dragwyb-agentflow' ) . '</label></th><td>';
-		echo '<select name="workflow_id" id="aiawa-webhook-workflow" required>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-workflow">' . esc_html__( 'Workflow', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<select name="workflow_id" id="dragwyb-af-webhook-workflow" required>';
 		echo '<option value="">' . esc_html__( 'Select a workflow…', 'dragwyb-agentflow' ) . '</option>';
 
 		foreach ( $workflows['items'] as $workflow ) {
@@ -226,23 +226,23 @@ class WebhookFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderSigningSecretRow( ?array $secret_display, bool $require_signing ): void {
-		echo '<tr><th scope="row"><label for="aiawa-webhook-signing-secret">' . esc_html__( 'Signing secret', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-signing-secret">' . esc_html__( 'Signing secret', 'dragwyb-agentflow' ) . '</label></th><td>';
 
 		if ( null !== $secret_display && $secret_display['configured'] ) {
 			printf(
-				'<p class="aiawa-webhook-current-value">%1$s <code>%2$s</code></p>',
+				'<p class="dragwyb-af-webhook-current-value">%1$s <code>%2$s</code></p>',
 				esc_html__( 'Currently set:', 'dragwyb-agentflow' ),
 				esc_html( $secret_display['display'] )
 			);
 		}
 
 		printf(
-			'<input type="text" class="regular-text" name="signing_secret" id="aiawa-webhook-signing-secret" value="" autocomplete="off" %1$s />',
+			'<input type="text" class="regular-text" name="signing_secret" id="dragwyb-af-webhook-signing-secret" value="" autocomplete="off" %1$s />',
 			( $require_signing && ( null === $secret_display || ! $secret_display['configured'] ) ) ? 'required' : ''
 		);
 
 		if ( null === $secret_display ) {
-			echo '<p class="description">' . esc_html__( 'Optional. When set, callers must send an X-aiawa-Signature header (sha256=… HMAC of the raw body). Leave blank for an unsigned webhook.', 'dragwyb-agentflow' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Optional. When set, callers must send an X-dragwyb-af-Signature header (sha256=… HMAC of the raw body). Leave blank for an unsigned webhook.', 'dragwyb-agentflow' ) . '</p>';
 		} else {
 			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current secret. Enter a new value to rotate it.', 'dragwyb-agentflow' ) . '</p>';
 
@@ -264,9 +264,9 @@ class WebhookFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderIpAllowListRow( array $ip_allow_list ): void {
-		echo '<tr><th scope="row"><label for="aiawa-webhook-ip-allow-list">' . esc_html__( 'IP allow-list', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-ip-allow-list">' . esc_html__( 'IP allow-list', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<textarea name="ip_allow_list" id="aiawa-webhook-ip-allow-list" class="large-text code" rows="4" cols="50">%s</textarea>',
+			'<textarea name="ip_allow_list" id="dragwyb-af-webhook-ip-allow-list" class="large-text code" rows="4" cols="50">%s</textarea>',
 			esc_textarea( implode( "\n", $ip_allow_list ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Optional. One IPv4/IPv6 address or IPv4 CIDR (e.g. 203.0.113.0/24) per line. Leave empty to accept requests from any IP.', 'dragwyb-agentflow' ) . '</p>';

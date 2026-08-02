@@ -2,38 +2,38 @@
 /**
  * Registers the plugin's own built-in node types.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration;
+namespace DragwybAgentFlow\Plugin\Integration;
 
-use AIAWA\Plugin\Integration\Actions\AiAgentAction;
-use AIAWA\Plugin\Integration\Actions\ClaudeMessagesAction;
-use AIAWA\Plugin\Integration\Actions\ConditionAction;
-use AIAWA\Plugin\Integration\Actions\GeminiGenerateContentAction;
-use AIAWA\Plugin\Integration\Actions\HttpRequestAction;
-use AIAWA\Plugin\Integration\Actions\DeepSeekChatAction;
-use AIAWA\Plugin\Integration\Actions\GroqChatAction;
-use AIAWA\Plugin\Integration\Actions\OpenAiChatAction;
-use AIAWA\Plugin\Integration\Actions\OpenRouterChatAction;
-use AIAWA\Plugin\Integration\Actions\RouterAction;
-use AIAWA\Plugin\Integration\Actions\SendEmailAction;
-use AIAWA\Plugin\Integration\Actions\SlackIncomingWebhookAction;
-use AIAWA\Plugin\Integration\Actions\StructuredOutputParserAction;
-use AIAWA\Plugin\Integration\Actions\TelegramSendMessageAction;
-use AIAWA\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
-use AIAWA\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
-use AIAWA\Plugin\Integration\Triggers\CatalogHookTrigger;
-use AIAWA\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use AIAWA\Plugin\Integration\WordPress\WordPressActionRegistrar;
-use AIAWA\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use AIAWA\Plugin\Service\Agent\AgentAiClient;
-use AIAWA\Plugin\Service\Agent\AgentService;
-use AIAWA\Plugin\Service\ConnectionService;
-use AIAWA\Plugin\Service\GoogleOAuthService;
-use AIAWA\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Integration\Actions\AiAgentAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\ClaudeMessagesAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\ConditionAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\GeminiGenerateContentAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\HttpRequestAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\DeepSeekChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\GroqChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\OpenAiChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\OpenRouterChatAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\RouterAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\SendEmailAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\SlackIncomingWebhookAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\StructuredOutputParserAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
+use DragwybAgentFlow\Plugin\Integration\Triggers\CatalogHookTrigger;
+use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionRegistrar;
+use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Listens on the public `aiawa/nodes/register` action to add this plugin's
+ * Listens on the public `dragwyb_af/nodes/register` action to add this plugin's
  * own built-in trigger/action node types.
  *
  * Optional co-plugin integrations are registered only when that plugin is

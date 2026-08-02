@@ -2,15 +2,15 @@
 /**
  * Workflow run log repository.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use AIAWA\Plugin\Database\Table;
-use AIAWA\Plugin\Domain\WorkflowRunLog;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRunLog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `aiawa_workflow_run_logs` access goes through this class.
+ * All `dragwyb_af_workflow_run_logs` access goes through this class.
  */
 class WorkflowRunLogRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'aiawa_workflow_run_logs';
+	private const CACHE_GROUP = 'dragwyb_af_workflow_run_logs';
 
 	/**
 	 * Defensive upper bound on logs fetched for a single run. A legitimate

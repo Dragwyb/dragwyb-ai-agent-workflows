@@ -2,15 +2,15 @@
 /**
  * Creates the workflow runs table.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use AIAWA\Plugin\Database\Migration;
-use AIAWA\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `aiawa_workflow_runs` holds one row per execution of a workflow. As with
- * `aiawa_workflow_nodes`, there is no SQL-level FOREIGN KEY to `aiawa_workflows`
+ * `dragwyb_af_workflow_runs` holds one row per execution of a workflow. As with
+ * `dragwyb_af_workflow_nodes`, there is no SQL-level FOREIGN KEY to `dragwyb_af_workflows`
  * because `dbDelta()` does not reliably manage foreign key constraints;
  * cascade-on-delete is instead enforced explicitly in the repository/service
  * layer. See docs/internal/architecture.md §2.3.

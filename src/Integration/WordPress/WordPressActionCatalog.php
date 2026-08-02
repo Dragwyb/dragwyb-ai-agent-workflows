@@ -2,17 +2,17 @@
 /**
  * Static catalog of every built-in WordPress workflow action.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
-use AIAWA\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
-use AIAWA\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
-use AIAWA\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
-use AIAWA\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

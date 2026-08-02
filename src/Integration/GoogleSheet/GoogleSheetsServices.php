@@ -2,17 +2,17 @@
 /**
  * Google Sheets service factory.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\GoogleSheet;
+namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet;
 
-use AIAWA\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
-use AIAWA\Plugin\Service\ConnectionSecretResolver;
-use AIAWA\Plugin\Service\ConnectionService;
-use AIAWA\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use DragwybAgentFlow\Plugin\Service\ConnectionSecretResolver;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

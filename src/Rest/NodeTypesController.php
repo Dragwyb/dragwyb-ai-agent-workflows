@@ -2,21 +2,21 @@
 /**
  * Node types REST controller.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Rest;
+namespace DragwybAgentFlow\Plugin\Rest;
 
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Domain\Contracts\ActionGroupInterface;
-use AIAWA\Plugin\Domain\Contracts\NodeTypeInterface;
-use AIAWA\Plugin\Domain\Contracts\TriggerGroupInterface;
-use AIAWA\Plugin\Integration\IntegrationTriggerCatalog;
-use AIAWA\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use AIAWA\Plugin\Service\ElementorFormsService;
-use AIAWA\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionGroupInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\NodeTypeInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybAgentFlow\Plugin\Integration\IntegrationTriggerCatalog;
+use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -30,13 +30,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Exposes the server-side `NodeTypeRegistry` (item 5) to the builder's node
  * palette. Read-only by design — node types are registered in PHP via the
- * `aiawa/nodes/register` action, never created/edited over HTTP — so this is
+ * `dragwyb_af/nodes/register` action, never created/edited over HTTP — so this is
  * a plain class rather than a `WP_REST_Controller` subclass: there is no
  * CRUD/schema-derivation machinery to inherit for a single GET route.
  */
 class NodeTypesController {
 
-	private const API_NAMESPACE = 'aiawa/v1';
+	private const API_NAMESPACE = 'dragwyb_af/v1';
 
 	private const ROUTE = '/node-types';
 
@@ -96,7 +96,7 @@ class NodeTypesController {
 	public function permissionsCheck( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'aiawa_rest_forbidden',
+				'dragwyb_af_rest_forbidden',
 				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-agentflow' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -161,7 +161,7 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'aiawa_trigger_sample_unavailable',
+					'dragwyb_af_trigger_sample_unavailable',
 					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-agentflow' ) ),
 					array( 'status' => 404 )
 				);
@@ -180,7 +180,7 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'aiawa_trigger_sample_unavailable',
+					'dragwyb_af_trigger_sample_unavailable',
 					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-agentflow' ) ),
 					array( 'status' => 404 )
 				);
@@ -195,7 +195,7 @@ class NodeTypesController {
 		}
 
 		return new WP_Error(
-			'aiawa_trigger_sample_unsupported',
+			'dragwyb_af_trigger_sample_unsupported',
 			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-agentflow' ),
 			array( 'status' => 400 )
 		);

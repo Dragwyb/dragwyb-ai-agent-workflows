@@ -2,18 +2,18 @@
 /**
  * Workflows admin list table.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use AIAWA\Plugin\Admin\Pages\BuilderPage;
-use AIAWA\Plugin\Admin\Pages\RunsPage;
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
+use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -295,12 +295,12 @@ class WorkflowsListTable extends WP_List_Table {
 		return wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'      => 'aiawa_workflow_export',
+					'action'      => 'dragwyb_af_workflow_export',
 					'workflow_id' => $id,
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'aiawa_workflow_export_' . $id
+			'dragwyb_af_workflow_export_' . $id
 		);
 	}
 
@@ -330,7 +330,7 @@ class WorkflowsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'aiawa-workflows-table' );
+		return array( 'widefat', 'fixed', 'striped', 'dragwyb-af-workflows-table' );
 	}
 
 	/**
@@ -343,12 +343,12 @@ class WorkflowsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $id, string $label ): string {
-		$form_id     = 'aiawa-workflow-action-' . $op . '-' . $id;
-		$nonce_field = wp_nonce_field( 'aiawa_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
+		$form_id     = 'dragwyb-af-workflow-action-' . $op . '-' . $id;
+		$nonce_field = wp_nonce_field( 'dragwyb_af_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="aiawa-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="aiawa_workflow_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="dragwyb-af-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="dragwyb_af_workflow_action" />'
 				. '<input type="hidden" name="op" value="%3$s" />'
 				. '<input type="hidden" name="workflow_id" value="%4$d" />'
 				. '%5$s'

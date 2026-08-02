@@ -2,15 +2,15 @@
 /**
  * Creates the workflow run logs table.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use AIAWA\Plugin\Database\Migration;
-use AIAWA\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `aiawa_workflow_run_logs` holds one row per node outcome within a workflow
+ * `dragwyb_af_workflow_run_logs` holds one row per node outcome within a workflow
  * run. `node_id` intentionally has no `NOT NULL` constraint: it references
- * `aiawa_workflow_nodes.id`, but a node can later be removed from the builder
+ * `dragwyb_af_workflow_nodes.id`, but a node can later be removed from the builder
  * graph (which deletes its row) while its historical run logs are kept, so
  * `node_id` on an old log entry may point to a node that no longer exists.
  * A future "Runs" UI (roadmap item 9) is expected to resolve `node_id`

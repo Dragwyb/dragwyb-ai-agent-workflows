@@ -2,17 +2,17 @@
 /**
  * Handles state-changing Settings admin actions.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use AIAWA\Plugin\Admin\Pages\SettingsPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Service\RunRetentionService;
-use AIAWA\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Admin\Pages\SettingsPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin_post.php?action=aiawa_settings_action` POST submitted
+ * Receives the `admin_post.php?action=dragwyb_af_settings_action` POST submitted
  * by each of SettingsPage's per-tab forms.
  *
  * One op per form, matching one SettingsService method each, rather than
@@ -49,7 +49,7 @@ class SettingsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_aiawa_settings_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragwyb_af_settings_action', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -69,7 +69,7 @@ class SettingsController {
 			$this->redirect( 'general', 'error' );
 		}
 
-		check_admin_referer( 'aiawa_settings_action_' . $op );
+		check_admin_referer( 'dragwyb_af_settings_action_' . $op );
 
 		switch ( $op ) {
 			case 'general':
@@ -160,7 +160,7 @@ class SettingsController {
 				array(
 					'page'       => SettingsPage::SLUG,
 					'tab'        => 'retention',
-					'aiawa_notice' => 'purged',
+					'dragwyb_af_notice' => 'purged',
 					'count'      => $count,
 				),
 				admin_url( 'admin.php' )
@@ -183,7 +183,7 @@ class SettingsController {
 				array(
 					'page'       => SettingsPage::SLUG,
 					'tab'        => $tab,
-					'aiawa_notice' => $notice,
+					'dragwyb_af_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)

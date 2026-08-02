@@ -2,15 +2,15 @@
 /**
  * Webhook repository.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use AIAWA\Plugin\Database\Table;
-use AIAWA\Plugin\Domain\Webhook;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\Webhook;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `aiawa_webhooks` access goes through this class. Never decrypts the
+ * All `dragwyb_af_webhooks` access goes through this class. Never decrypts the
  * signing secret — that stays the job of `Service\WebhookService`.
  */
 class WebhookRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'aiawa_webhooks';
+	private const CACHE_GROUP = 'dragwyb_af_webhooks';
 
 	private const MAX_PER_PAGE = 100;
 

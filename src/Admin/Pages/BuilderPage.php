@@ -2,16 +2,16 @@
 /**
  * Workflow builder admin page.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use AIAWA\Plugin\Admin\AdminPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class BuilderPage implements AdminPage {
 	 * needing an instantiated `BuilderPage` (see `WorkflowsPage::SLUG` for
 	 * the same pattern used in reverse, for this page's back-to-list link).
 	 */
-	public const SLUG = 'aiawa-builder';
+	public const SLUG = 'dragwyb-af-builder';
 
 	/**
 	 * {@inheritDoc}
@@ -79,7 +79,7 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function enqueueAssets(): void {
-		$asset_file = AIAWA_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
+		$asset_file = DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			// The React app hasn't been built (e.g. a git checkout without
@@ -93,21 +93,21 @@ class BuilderPage implements AdminPage {
 		$asset   = require $asset_file;
 		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
 		// Bust browser caches when the built bundle changes on disk.
-		$built_js = AIAWA_PLUGIN_DIR . 'assets/builder/build/index.js';
+		$built_js = DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/index.js';
 		if ( file_exists( $built_js ) ) {
 			$version = (string) filemtime( $built_js );
 		}
 
 		wp_enqueue_style(
-			'aiawa-builder-font',
+			'dragwyb-af-builder-font',
 			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
 			array(),
-			AIAWA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 
 		wp_enqueue_script(
-			'aiawa-builder',
-			AIAWA_PLUGIN_URL . 'assets/builder/build/index.js',
+			'dragwyb-af-builder',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
 			$version,
 			true
@@ -116,19 +116,19 @@ class BuilderPage implements AdminPage {
 		// wp-scripts' MiniCssExtractPlugin config names the extracted
 		// stylesheet "style-{entry}.css" (plus an auto-generated
 		// "-rtl.css" companion), not "{entry}.css".
-		if ( file_exists( AIAWA_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
+		if ( file_exists( DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
 			wp_enqueue_style(
-				'aiawa-builder',
-				AIAWA_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components', 'aiawa-builder-font' ),
+				'dragwyb-af-builder',
+				DRAGWYB_AF_PLUGIN_URL . 'assets/builder/build/style-index.css',
+				array( 'wp-components', 'dragwyb-af-builder-font' ),
 				$version
 			);
-			wp_style_add_data( 'aiawa-builder', 'rtl', 'replace' );
+			wp_style_add_data( 'dragwyb-af-builder', 'rtl', 'replace' );
 		}
 
 		wp_add_inline_script(
-			'aiawa-builder',
-			'var aiawaBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
+			'dragwyb-af-builder',
+			'var dragwybAFBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
 			'before'
 		);
 	}
@@ -145,9 +145,9 @@ class BuilderPage implements AdminPage {
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl'                => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
 			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
-			'aiCredentialsUrl'       => \AIAWA\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'aiCredentialsUrl'       => \DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
-			'googleOAuthCallbackUrl' => rest_url( 'aiawa/v1/oauth/google/callback' ),
+			'googleOAuthCallbackUrl' => rest_url( 'dragwyb_af/v1/oauth/google/callback' ),
 		);
 	}
 
@@ -172,9 +172,9 @@ class BuilderPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
 		}
 
-		echo '<div class="wrap aiawa-admin-page aiawa-builder-page">';
+		echo '<div class="wrap dragwyb-af-admin-page dragwyb-af-builder-page">';
 		$this->renderImportNotice();
-		echo '<div id="aiawa-builder-root"></div>';
+		echo '<div id="dragwyb-af-builder-root"></div>';
 		echo '</div>';
 	}
 
@@ -185,7 +185,7 @@ class BuilderPage implements AdminPage {
 	 */
 	private function renderImportNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
+		$key = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 
 		if ( 'imported' !== $key ) {
 			return;

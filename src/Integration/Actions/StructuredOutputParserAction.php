@@ -2,15 +2,15 @@
 /**
  * Structured Output Parser — n8n-style JSON schema for AI Agent replies.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\Actions;
 
-use AIAWA\Plugin\Domain\Contracts\ActionInterface;
-use AIAWA\Plugin\Service\Agent\AgentStructuredOutputParser;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentStructuredOutputParser;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

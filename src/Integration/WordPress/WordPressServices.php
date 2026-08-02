@@ -2,18 +2,18 @@
 /**
  * Implements every WordPress workflow action's business logic.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
-use AIAWA\Plugin\Integration\WordPress\Service\CommentWordPressService;
-use AIAWA\Plugin\Integration\WordPress\Service\PluginWordPressService;
-use AIAWA\Plugin\Integration\WordPress\Service\PostWordPressService;
-use AIAWA\Plugin\Integration\WordPress\Service\TaxonomyWordPressService;
-use AIAWA\Plugin\Integration\WordPress\Service\UserWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\CommentWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\PluginWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\PostWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\TaxonomyWordPressService;
+use DragwybAgentFlow\Plugin\Integration\WordPress\Service\UserWordPressService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

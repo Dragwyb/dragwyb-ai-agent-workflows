@@ -2,14 +2,14 @@
 /**
  * Row and column Google Sheets workflow actions.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\GoogleSheet\Actions;
+namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet\Actions;
 
-use AIAWA\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use DragwybAgentFlow\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

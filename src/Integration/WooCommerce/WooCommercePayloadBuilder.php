@@ -2,12 +2,12 @@
 /**
  * Structured WooCommerce trigger payloads for the builder variable picker.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\WooCommerce;
+namespace DragwybAgentFlow\Plugin\Integration\WooCommerce;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

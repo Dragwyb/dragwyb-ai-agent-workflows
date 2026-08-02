@@ -2,20 +2,20 @@
 /**
  * Registers persistence repositories against the container.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Provider;
+namespace DragwybAgentFlow\Plugin\Provider;
 
-use AIAWA\Plugin\Core\Container;
-use AIAWA\Plugin\Persistence\ConnectionRepository;
-use AIAWA\Plugin\Persistence\WebhookRepository;
-use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWA\Plugin\Persistence\WorkflowRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
+use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

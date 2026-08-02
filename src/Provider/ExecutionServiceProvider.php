@@ -2,34 +2,34 @@
 /**
  * Registers workflow execution services against the container.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Provider;
+namespace DragwybAgentFlow\Plugin\Provider;
 
-use AIAWA\Plugin\Core\Container;
-use AIAWA\Plugin\Service\NodeTypeRegistry;
-use AIAWA\Plugin\Persistence\WebhookRepository;
-use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWA\Plugin\Persistence\WorkflowRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
-use AIAWA\Plugin\Service\Agent\AgentAiClient;
-use AIAWA\Plugin\Service\Agent\AgentService;
-use AIAWA\Plugin\Service\Agent\AgentToolExecutor;
-use AIAWA\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use AIAWA\Plugin\Service\BackgroundRunner;
-use AIAWA\Plugin\Service\NodeExecutionService;
-use AIAWA\Plugin\Service\RunRetentionService;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\TriggerReentrancyGuard;
-use AIAWA\Plugin\Service\WebhookService;
-use AIAWA\Plugin\Service\WorkflowExecutionService;
-use AIAWA\Plugin\Service\WorkflowNodeTestService;
-use AIAWA\Plugin\Service\WorkflowService;
-use AIAWA\Plugin\Service\WorkflowTestListenerService;
+use DragwybAgentFlow\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentToolExecutor;
+use DragwybAgentFlow\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
+use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
+use DragwybAgentFlow\Plugin\Service\RunRetentionService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybAgentFlow\Plugin\Service\WebhookService;
+use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

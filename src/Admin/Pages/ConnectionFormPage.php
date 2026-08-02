@@ -2,19 +2,19 @@
 /**
  * Connection create/edit admin page.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin\Pages;
+namespace DragwybAgentFlow\Plugin\Admin\Pages;
 
-use AIAWA\Plugin\Admin\AdminPage;
-use AIAWA\Plugin\Core\Capabilities;
-use AIAWA\Plugin\Domain\Connection;
-use AIAWA\Plugin\Service\ConnectionAuthTypes;
-use AIAWA\Plugin\Service\ConnectionService;
-use AIAWA\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Admin\AdminPage;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ConnectionFormPage implements AdminPage {
 
-	public const SLUG = 'aiawa-connection-form';
+	public const SLUG = 'dragwyb-af-connection-form';
 
 	private ConnectionService $connections;
 
@@ -94,10 +94,10 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'aiawa-admin',
-			AIAWA_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragwyb-af-admin',
+			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			AIAWA_VERSION
+			DRAGWYB_AF_VERSION
 		);
 	}
 
@@ -112,7 +112,7 @@ class ConnectionFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which connection to load/create; the admin-post controller this feeds still re-checks capability and nonce on every write.
 		$id = isset( $_GET['connection'] ) ? absint( wp_unslash( $_GET['connection'] ) ) : 0;
 
-		echo '<div class="wrap aiawa-admin-page">';
+		echo '<div class="wrap dragwyb-af-admin-page">';
 		$this->renderNotice();
 
 		if ( $id > 0 ) {
@@ -177,22 +177,22 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderChooseTypeForm(): void {
-		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '" class="aiawa-settings-form">';
+		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '" class="dragwyb-af-settings-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( self::SLUG ) );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-integration">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</label></th><td>';
-		echo '<input type="text" id="aiawa-connection-integration" name="integration_slug" class="regular-text" required="required" />';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<input type="text" id="dragwyb-af-connection-integration" name="integration_slug" class="regular-text" required="required" />';
 		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'dragwyb-agentflow' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
-		echo '<input type="text" id="aiawa-connection-label" name="label" class="regular-text" required="required" />';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" required="required" />';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-agentflow' ) . '</label></th><td>';
-		echo '<select id="aiawa-connection-auth-type" name="auth_type">';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<select id="dragwyb-af-connection-auth-type" name="auth_type">';
 		foreach ( ConnectionAuthTypes::VALID as $auth_type ) {
 			printf(
 				'<option value="%1$s">%2$s</option>',
@@ -218,24 +218,24 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderCreateForm( string $auth_type, string $integration_slug, string $label ): void {
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form">';
-		echo '<input type="hidden" name="action" value="aiawa_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="create" />';
 		echo '<input type="hidden" name="auth_type" value="' . esc_attr( $auth_type ) . '" />';
-		wp_nonce_field( 'aiawa_connection_action_create' );
+		wp_nonce_field( 'dragwyb_af_connection_action_create' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-integration">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="aiawa-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragwyb-af-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
 			esc_attr( $integration_slug )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="aiawa-connection-label" name="label" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $label )
 		);
 		echo '</td></tr>';
@@ -265,11 +265,11 @@ class ConnectionFormPage implements AdminPage {
 	private function renderEditForm( Connection $connection ): void {
 		$connection_id = (int) $connection->id();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form">';
-		echo '<input type="hidden" name="action" value="aiawa_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
 		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
-		wp_nonce_field( 'aiawa_connection_action_update_' . $connection->id() );
+		wp_nonce_field( 'dragwyb_af_connection_action_update_' . $connection->id() );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -281,9 +281,9 @@ class ConnectionFormPage implements AdminPage {
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $connection->authType() ) ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="aiawa-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-agentflow' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="aiawa-connection-label" name="label" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $connection->label() )
 		);
 		echo '</td></tr>';
@@ -307,11 +307,11 @@ class ConnectionFormPage implements AdminPage {
 		echo '</form>';
 
 		echo '<h2>' . esc_html__( 'Delete Connection', 'dragwyb-agentflow' ) . '</h2>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="aiawa-settings-form aiawa-settings-danger-zone">';
-		echo '<input type="hidden" name="action" value="aiawa_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form dragwyb-af-settings-danger-zone">';
+		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="delete" />';
 		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
-		wp_nonce_field( 'aiawa_connection_action_delete_' . $connection->id() );
+		wp_nonce_field( 'dragwyb_af_connection_action_delete_' . $connection->id() );
 		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'dragwyb-agentflow' ) . '</p>';
 		submit_button( __( 'Delete Connection', 'dragwyb-agentflow' ), 'delete' );
 		echo '</form>';
@@ -331,12 +331,12 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderFieldRow( string $field, string $label, bool $secret, string $current, bool $configured ): void {
 		$input_type = $secret ? 'password' : 'text';
-		$input_id   = 'aiawa-connection-field-' . $field;
+		$input_id   = 'dragwyb-af-connection-field-' . $field;
 
 		echo '<tr><th scope="row"><label for="' . esc_attr( $input_id ) . '">' . esc_html( $label ) . '</label></th><td>';
 
 		if ( $configured ) {
-			echo '<p class="description aiawa-connection-current-value">' . sprintf(
+			echo '<p class="description dragwyb-af-connection-current-value">' . sprintf(
 				/* translators: %s: masked or otherwise safe-to-display current value. */
 				esc_html__( 'Currently set: %s', 'dragwyb-agentflow' ),
 				'<code>' . esc_html( $current ) . '</code>'
@@ -410,9 +410,9 @@ class ConnectionFormPage implements AdminPage {
 		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'dragwyb-agentflow' ) . '</th><td>';
 
 		if ( $connected ) {
-			echo '<p><span class="aiawa-connection-status aiawa-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-agentflow' ) . '</span></p>';
+			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-agentflow' ) . '</span></p>';
 		} else {
-			echo '<p><span class="aiawa-connection-status aiawa-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-agentflow' ) . '</span></p>';
+			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-agentflow' ) . '</span></p>';
 		}
 
 		echo '</td></tr>';
@@ -427,12 +427,12 @@ class ConnectionFormPage implements AdminPage {
 		$url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'        => 'aiawa_google_oauth_authorize',
+					'action'        => 'dragwyb_af_google_oauth_authorize',
 					'connection_id' => $connection->id(),
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'aiawa_google_oauth_authorize_' . $connection->id()
+			'dragwyb_af_google_oauth_authorize_' . $connection->id()
 		);
 
 		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'dragwyb-agentflow' ) . '</th><td>';
@@ -450,7 +450,7 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['aiawa_notice'] ) ? sanitize_key( wp_unslash( $_GET['aiawa_notice'] ) ) : '';
+		$key = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
 
 		$notices = array(
 			'created_oauth'   => array(
@@ -472,7 +472,7 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail.
-		$detail = isset( $_GET['aiawa_error'] ) ? sanitize_text_field( wp_unslash( $_GET['aiawa_error'] ) ) : '';
+		$detail = isset( $_GET['dragwyb_af_error'] ) ? sanitize_text_field( wp_unslash( $_GET['dragwyb_af_error'] ) ) : '';
 
 		printf(
 			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',

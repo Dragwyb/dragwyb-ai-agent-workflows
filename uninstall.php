@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is deleted via the WordPress admin.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 // If this file is called directly and not by WordPress, abort.
@@ -18,12 +18,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  */
 require_once __DIR__ . '/src/Core/WordPressCompat.php';
 
-$aiawa_has_core_ai_client = aiawa_has_core_ai_client();
+$dragwyb_af_has_core_ai_client = dragwyb_af_has_core_ai_client();
 
-if ( ! $aiawa_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( ! $dragwyb_af_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 } else {
 	require_once __DIR__ . '/src/autoload.php';
 }
 
-AIAWA\Plugin\Core\Uninstaller::uninstall();
+DragwybAgentFlow\Plugin\Core\Uninstaller::uninstall();

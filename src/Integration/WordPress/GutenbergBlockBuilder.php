@@ -2,12 +2,12 @@
 /**
  * Builds Gutenberg block markup from structured design sections.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\WordPress;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

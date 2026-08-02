@@ -2,16 +2,16 @@
 /**
  * Executes an AI Agent tool call against a workflow action node.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
-use AIAWA\Plugin\Domain\WorkflowNode;
-use AIAWA\Plugin\Service\ConfigInterpolator;
-use AIAWA\Plugin\Service\NodeExecutionService;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Service\ConfigInterpolator;
+use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

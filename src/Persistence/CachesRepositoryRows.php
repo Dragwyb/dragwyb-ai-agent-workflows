@@ -2,12 +2,12 @@
 /**
  * Shared object-cache helpers for repositories.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

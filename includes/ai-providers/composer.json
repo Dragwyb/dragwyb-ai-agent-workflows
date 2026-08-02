@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "AIAWA\\AiProviders\\": "src/"
+            "DragwybAgentFlow\\AiProviders\\": "src/"
         }
     },
     "config": {

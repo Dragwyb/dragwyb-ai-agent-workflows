@@ -2,21 +2,21 @@
 /**
  * Ordered list of all schema migrations.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database;
+namespace DragwybAgentFlow\Plugin\Database;
 
-use AIAWA\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
-use AIAWA\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
-use AIAWA\Plugin\Database\Migrations\CreateConnectionsTable;
-use AIAWA\Plugin\Database\Migrations\CreateWebhooksTable;
-use AIAWA\Plugin\Database\Migrations\CreateWorkflowNodesTable;
-use AIAWA\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
-use AIAWA\Plugin\Database\Migrations\CreateWorkflowRunsTable;
-use AIAWA\Plugin\Database\Migrations\CreateWorkflowsTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\CreateConnectionsTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\CreateWebhooksTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowNodesTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowRunsTable;
+use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowsTable;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

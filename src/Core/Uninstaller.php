@@ -2,14 +2,14 @@
 /**
  * Plugin uninstall handler.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Core;
+namespace DragwybAgentFlow\Plugin\Core;
 
-use AIAWA\Plugin\Database\SchemaMigrations;
+use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

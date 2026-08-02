@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Post and Post Type actions.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Integration\WordPress\Service;
+namespace DragwybAgentFlow\Plugin\Integration\WordPress\Service;
 
-use AIAWA\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

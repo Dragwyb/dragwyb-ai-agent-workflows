@@ -2,14 +2,14 @@
 /**
  * Live credential verification for stored connections.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use AIAWA\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Calls each integration's real API with the submitted credentials before a
  * connection is saved. AI providers use in-builder API keys (Connectors on WP 7+,
- * AI Client credentials option below WP 7) instead of aiawa Connections, so they
+ * AI Client credentials option below WP 7) instead of dragwyb_af Connections, so they
  * are not verified here.
  */
 class ConnectionVerifier {

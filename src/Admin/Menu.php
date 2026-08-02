@@ -2,14 +2,14 @@
 /**
  * Admin menu bootstrap.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Admin;
+namespace DragwybAgentFlow\Plugin\Admin;
 
-use AIAWA\Plugin\Core\Capabilities;
+use DragwybAgentFlow\Plugin\Core\Capabilities;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,7 +71,7 @@ class Menu {
 		$first = $this->pages[0];
 
 		// Top-level menu uses ACCESS (implied by any granular cap, and by
-		// manage_options) so a user granted only e.g. aiawa_manage_runs still
+		// manage_options) so a user granted only e.g. dragwyb_af_manage_runs still
 		// sees the plugin menu; individual submenu rows keep each page's
 		// own capability so unauthorized items stay hidden.
 		$hook = add_menu_page(

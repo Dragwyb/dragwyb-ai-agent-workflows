@@ -2,19 +2,19 @@
 /**
  * Registers REST endpoints & feature integrations against the container.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Provider;
+namespace DragwybAgentFlow\Plugin\Provider;
 
-use AIAWA\Plugin\Core\Container;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Service\AiModelsService;
-use AIAWA\Plugin\Service\ChatMessageService;
-use AIAWA\Plugin\Service\ElementorFormsService;
-use AIAWA\Plugin\Service\WorkflowService;
+use DragwybAgentFlow\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Service\AiModelsService;
+use DragwybAgentFlow\Plugin\Service\ChatMessageService;
+use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
+use DragwybAgentFlow\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

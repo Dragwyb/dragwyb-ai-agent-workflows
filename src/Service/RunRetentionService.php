@@ -2,15 +2,15 @@
 /**
  * Prunes old, finished workflow runs and their logs.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,7 +33,7 @@ class RunRetentionService {
 	/**
 	 * The WP-Cron hook this service's pruneAccordingToSettings() is bound to.
 	 */
-	public const CRON_HOOK = 'aiawa/cron/prune_runs';
+	public const CRON_HOOK = 'dragwyb_af/cron/prune_runs';
 
 	private WorkflowRunRepository $runs;
 

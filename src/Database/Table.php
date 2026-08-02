@@ -2,12 +2,12 @@
 /**
  * Table naming helper.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database;
+namespace DragwybAgentFlow\Plugin\Database;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Table {
 
-	public const PREFIX = 'aiawa_';
+	public const PREFIX = 'dragwyb_af_';
 
 	/**
 	 * Builds the fully-qualified, `$wpdb`-prefixed table name.

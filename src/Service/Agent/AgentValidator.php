@@ -2,14 +2,14 @@
 /**
  * Validates AI Agent configuration before execution.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
-use AIAWA\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

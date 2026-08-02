@@ -2,22 +2,22 @@
 /**
  * Workflow application service.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use AIAWA\Plugin\Domain\Workflow;
-use AIAWA\Plugin\Domain\WorkflowNode;
-use AIAWA\Plugin\Persistence\WebhookRepository;
-use AIAWA\Plugin\Persistence\WorkflowNodeRepository;
-use AIAWA\Plugin\Persistence\WorkflowRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunLogRepository;
-use AIAWA\Plugin\Persistence\WorkflowRunRepository;
+use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
+use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -273,13 +273,13 @@ class WorkflowService {
 	}
 
 	/**
-	 * Reconciles `aiawa_workflow_nodes` rows with a workflow's current
+	 * Reconciles `dragwyb_af_workflow_nodes` rows with a workflow's current
 	 * `graph_json` (the builder's source of truth for node identity and
 	 * configuration): existing nodes are updated, new ones inserted, and
 	 * ones no longer present in the graph are removed.
 	 *
 	 * The builder (roadmap item 6) only ever writes the whole graph as JSON
-	 * via update(); nothing keeps `aiawa_workflow_nodes` in sync with it as
+	 * via update(); nothing keeps `dragwyb_af_workflow_nodes` in sync with it as
 	 * that happens, since nothing read that table until the execution
 	 * engine needed real, stable node ids to log run outcomes against.
 	 * Rather than pay a sync cost on every autosave, this is called lazily,

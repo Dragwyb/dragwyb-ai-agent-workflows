@@ -2,19 +2,19 @@
 /**
  * Registers admin domain services against the container.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Provider;
+namespace DragwybAgentFlow\Plugin\Provider;
 
-use AIAWA\Plugin\Core\Container;
-use AIAWA\Plugin\Persistence\ConnectionRepository;
-use AIAWA\Plugin\Service\ConnectionService;
-use AIAWA\Plugin\Service\GoogleOAuthService;
-use AIAWA\Plugin\Service\SettingsService;
-use AIAWA\Plugin\Service\ConnectionVerifier;
+use DragwybAgentFlow\Plugin\Core\Container;
+use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
+use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybAgentFlow\Plugin\Service\ConnectionVerifier;
 
 
 // Prevent direct file access.

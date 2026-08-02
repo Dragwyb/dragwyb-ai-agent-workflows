@@ -40,10 +40,10 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 	return (
 		<nav
-			className="aiawa-builder-palette"
+			className="dragwyb-af-builder-palette"
 			aria-label={__('Node palette', 'dragwyb-agentflow')}
 		>
-			<div className="aiawa-builder-palette__search">
+			<div className="dragwyb-af-builder-palette__search">
 				<TextControl
 					label={__('Search nodes', 'dragwyb-agentflow')}
 					hideLabelFromVision
@@ -102,12 +102,12 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 	return (
-		<div className="aiawa-builder-palette__section">
-			<h2 className="aiawa-builder-palette__heading">{title}</h2>
+		<div className="dragwyb-af-builder-palette__section">
+			<h2 className="dragwyb-af-builder-palette__heading">{title}</h2>
 			{apps.length === 0 && (
-				<p className="aiawa-builder-palette__empty">{emptyMessage}</p>
+				<p className="dragwyb-af-builder-palette__empty">{emptyMessage}</p>
 			)}
-			<ul className="aiawa-builder-palette__list">
+			<ul className="dragwyb-af-builder-palette__list">
 				{apps.map((app) => {
 					const meta = getNodeMeta(app.id, kind === 'trigger' ? 'trigger' : 'action');
 					const isDisabled = app.available === false;
@@ -128,15 +128,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								type="button"
 								className={
 									isDisabled
-										? 'aiawa-builder-palette__item aiawa-builder-palette__item--disabled'
-										: 'aiawa-builder-palette__item'
+										? 'dragwyb-af-builder-palette__item dragwyb-af-builder-palette__item--disabled'
+										: 'dragwyb-af-builder-palette__item'
 								}
 								onClick={() => onOpenPicker(kind, app.id)}
 								aria-label={app.label}
 								title={isDisabled ? disabledMessage : app.label}
 							>
 								<span
-									className="aiawa-builder-palette__item-icon"
+									className="dragwyb-af-builder-palette__item-icon"
 									style={{
 										backgroundColor: meta.bg,
 										color: meta.accent,
@@ -145,15 +145,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								>
 									{meta.icon}
 								</span>
-								<span className="aiawa-builder-palette__item-content">
+								<span className="dragwyb-af-builder-palette__item-content">
 									<span
-										className="aiawa-builder-palette__item-label"
+										className="dragwyb-af-builder-palette__item-label"
 										aria-hidden="true"
 									>
 										{app.label}
 									</span>
 									{isDisabled && (
-										<span className="aiawa-builder-palette__item-hint">
+										<span className="dragwyb-af-builder-palette__item-hint">
 											{disabledMessage}
 										</span>
 									)}

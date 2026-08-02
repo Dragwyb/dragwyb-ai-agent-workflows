@@ -2,12 +2,12 @@
 /**
  * Branch-aware execution order for workflow graphs.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

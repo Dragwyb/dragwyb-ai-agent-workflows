@@ -2,12 +2,12 @@
 /**
  * Builds / validates structured JSON for AI Agent output parsers.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service\Agent;
+namespace DragwybAgentFlow\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

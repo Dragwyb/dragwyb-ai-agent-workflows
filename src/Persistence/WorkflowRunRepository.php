@@ -2,15 +2,15 @@
 /**
  * Workflow run repository.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use AIAWA\Plugin\Database\Table;
-use AIAWA\Plugin\Domain\WorkflowRun;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `aiawa_workflow_runs` access goes through this class.
+ * All `dragwyb_af_workflow_runs` access goes through this class.
  */
 class WorkflowRunRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'aiawa_workflow_runs';
+	private const CACHE_GROUP = 'dragwyb_af_workflow_runs';
 
 	private const MAX_PER_PAGE = 100;
 
@@ -428,7 +428,7 @@ class WorkflowRunRepository {
 
 	/**
 	 * Returns every run id belonging to a workflow, so callers can cascade
-	 * into `aiawa_workflow_run_logs` (which is keyed by run id, not workflow
+	 * into `dragwyb_af_workflow_run_logs` (which is keyed by run id, not workflow
 	 * id) before removing the runs themselves.
 	 *
 	 * Not object-cached: this is a one-off cascade-preparation query (hard
@@ -485,7 +485,7 @@ class WorkflowRunRepository {
 
 	/**
 	 * Permanently removes the given runs. Callers must remove dependent
-	 * `aiawa_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
+	 * `dragwyb_af_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
 	 * same cascade-ordering requirement as `deleteByWorkflow()`.
 	 *
 	 * @param int[] $ids Run ids.
@@ -522,7 +522,7 @@ class WorkflowRunRepository {
 	/**
 	 * Permanently removes every run belonging to a workflow. Used by
 	 * WorkflowService::delete() when hard-deleting a workflow. Callers must
-	 * remove dependent `aiawa_workflow_run_logs` rows first (see
+	 * remove dependent `dragwyb_af_workflow_run_logs` rows first (see
 	 * idsForWorkflow()).
 	 *
 	 * Unlike deleteByIds(), the individual ids aren't known here without an

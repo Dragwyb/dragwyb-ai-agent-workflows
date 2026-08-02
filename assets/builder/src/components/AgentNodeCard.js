@@ -41,11 +41,11 @@ export default function AgentNodeCard({
 	};
 
 	const classNames = [
-		'aiawa-builder-node',
-		'aiawa-builder-node--agent',
-		selected ? 'aiawa-builder-node--selected' : '',
-		hasUnknownType ? 'aiawa-builder-node--unknown' : '',
-		isLinkTarget ? 'aiawa-builder-node--link-target' : '',
+		'dragwyb-af-builder-node',
+		'dragwyb-af-builder-node--agent',
+		selected ? 'dragwyb-af-builder-node--selected' : '',
+		hasUnknownType ? 'dragwyb-af-builder-node--unknown' : '',
+		isLinkTarget ? 'dragwyb-af-builder-node--link-target' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -67,17 +67,17 @@ export default function AgentNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<div
-				className="aiawa-agent-node__main"
+				className="dragwyb-af-agent-node__main"
 				style={{ minHeight: `${AGENT_BODY_HEIGHT}px` }}
 			>
 				<span
-					className="aiawa-builder-node__handle aiawa-builder-node__handle--input"
+					className="dragwyb-af-builder-node__handle dragwyb-af-builder-node__handle--input"
 					aria-hidden="true"
 				/>
 
-				<div className="aiawa-builder-node__body">
+				<div className="dragwyb-af-builder-node__body">
 					<span
-						className="aiawa-builder-node__icon"
+						className="dragwyb-af-builder-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -86,9 +86,9 @@ export default function AgentNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="aiawa-builder-node__text">
-						<span className="aiawa-builder-node__label">{node.label}</span>
-						<span className="aiawa-builder-node__subtitle">
+					<div className="dragwyb-af-builder-node__text">
+						<span className="dragwyb-af-builder-node__label">{node.label}</span>
+						<span className="dragwyb-af-builder-node__subtitle">
 							{__('AI Agent', 'dragwyb-agentflow')}
 						</span>
 					</div>
@@ -97,7 +97,7 @@ export default function AgentNodeCard({
 				{canStartFlowConnection && onStartFlowConnectionDrag && (
 					<button
 						type="button"
-						className="aiawa-builder-node__output-port aiawa-builder-node__output-port--side"
+						className="dragwyb-af-builder-node__output-port dragwyb-af-builder-node__output-port--side"
 						title={__(
 							'Drag to the next step to connect',
 							'dragwyb-agentflow'
@@ -115,18 +115,18 @@ export default function AgentNodeCard({
 			</div>
 
 			<div
-				className="aiawa-agent-node__ports"
+				className="dragwyb-af-agent-node__ports"
 				style={{ minHeight: `${AGENT_PORTS_HEIGHT}px` }}
 			>
-				<div className="aiawa-agent-node__port">
-					<span className="aiawa-agent-node__port-label">
+				<div className="dragwyb-af-agent-node__port">
+					<span className="dragwyb-af-agent-node__port-label">
 						{__('Chat Model', 'dragwyb-agentflow')}
-						<span className="aiawa-agent-node__required">*</span>
+						<span className="dragwyb-af-agent-node__required">*</span>
 					</span>
 					{hasChatModel ? (
 						<button
 							type="button"
-							className="aiawa-agent-node__port-dot aiawa-agent-node__port-dot--ok aiawa-agent-node__port-dot--link"
+							className="dragwyb-af-agent-node__port-dot dragwyb-af-agent-node__port-dot--ok dragwyb-af-agent-node__port-dot--link"
 							title={__('Open chat model settings', 'dragwyb-agentflow')}
 							aria-label={__(
 								'Open chat model settings',
@@ -143,7 +143,7 @@ export default function AgentNodeCard({
 					) : (
 						<button
 							type="button"
-							className="aiawa-agent-node__add-port"
+							className="dragwyb-af-agent-node__add-port"
 							aria-label={__(
 								'Add chat model to agent',
 								'dragwyb-agentflow'
@@ -163,19 +163,19 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="aiawa-agent-node__port">
-					<span className="aiawa-agent-node__port-label">
+				<div className="dragwyb-af-agent-node__port">
+					<span className="dragwyb-af-agent-node__port-label">
 						{__('Memory', 'dragwyb-agentflow')}
 					</span>
 					{hasMemory ? (
 						<span
-							className="aiawa-agent-node__port-dot aiawa-agent-node__port-dot--ok"
+							className="dragwyb-af-agent-node__port-dot dragwyb-af-agent-node__port-dot--ok"
 							title={__('Memory connected', 'dragwyb-agentflow')}
 						/>
 					) : (
 						<button
 							type="button"
-							className="aiawa-agent-node__add-port aiawa-agent-node__add-port--muted"
+							className="dragwyb-af-agent-node__add-port dragwyb-af-agent-node__add-port--muted"
 							aria-label={__('Add memory to agent', 'dragwyb-agentflow')}
 							title={__('Add simple memory', 'dragwyb-agentflow')}
 							onPointerDown={stopPointer}
@@ -189,13 +189,13 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="aiawa-agent-node__port aiawa-agent-node__port--tool">
-					<span className="aiawa-agent-node__port-label">
+				<div className="dragwyb-af-agent-node__port dragwyb-af-agent-node__port--tool">
+					<span className="dragwyb-af-agent-node__port-label">
 						{__('Tool', 'dragwyb-agentflow')}
 					</span>
 					<button
 						type="button"
-						className="aiawa-agent-node__add-port"
+						className="dragwyb-af-agent-node__add-port"
 						aria-label={__('Add tool to agent', 'dragwyb-agentflow')}
 						title={__(
 							'Add an action as an agent tool',

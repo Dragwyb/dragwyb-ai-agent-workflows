@@ -3,10 +3,10 @@
  * Dependency-free PSR-4 autoloader fallback.
  *
  * Used only when no Composer-generated `vendor/autoload.php` is present.
- * Maps the `AIAWA\Plugin\` namespace prefix to this directory,
+ * Maps the `DragwybAgentFlow\Plugin\` namespace prefix to this directory,
  * following the standard PSR-4 file resolution algorithm.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 // Prevent direct file access.
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 spl_autoload_register(
 	function ( $class ) {
-		$prefix = 'AIAWA\\Plugin\\';
+		$prefix = 'DragwybAgentFlow\\Plugin\\';
 
 		if ( strncmp( $prefix, $class, strlen( $prefix ) ) !== 0 ) {
 			return;

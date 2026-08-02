@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AIAWA\AiProviders\Groq;
+namespace DragwybAgentFlow\AiProviders\Groq;
 
-use AIAWA\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use DragwybAgentFlow\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * Groq AI provider (OpenAI-compatible).

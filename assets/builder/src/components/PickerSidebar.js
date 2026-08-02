@@ -159,8 +159,8 @@ export default function PickerSidebar({
 					type="button"
 					className={
 						isDisabled
-							? 'aiawa-builder-picker__item aiawa-builder-picker__item--disabled'
-							: 'aiawa-builder-picker__item'
+							? 'dragwyb-af-builder-picker__item dragwyb-af-builder-picker__item--disabled'
+							: 'dragwyb-af-builder-picker__item'
 					}
 					onClick={() => handlePick(item)}
 					title={isDisabled ? disabledMessage : item.description}
@@ -168,7 +168,7 @@ export default function PickerSidebar({
 					aria-disabled={isDisabled}
 				>
 					<span
-						className="aiawa-builder-picker__item-icon"
+						className="dragwyb-af-builder-picker__item-icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -177,12 +177,12 @@ export default function PickerSidebar({
 					>
 						{meta.icon}
 					</span>
-					<span className="aiawa-builder-picker__item-content">
-						<span className="aiawa-builder-picker__item-label">
+					<span className="dragwyb-af-builder-picker__item-content">
+						<span className="dragwyb-af-builder-picker__item-label">
 							{getPickerItemLabel(item, itemAppId)}
 						</span>
 						{isDisabled && (
-							<span className="aiawa-builder-picker__item-hint">
+							<span className="dragwyb-af-builder-picker__item-hint">
 								{disabledMessage}
 							</span>
 						)}
@@ -194,22 +194,22 @@ export default function PickerSidebar({
 
 	return (
 		<aside
-			className="aiawa-builder-picker"
+			className="dragwyb-af-builder-picker"
 			aria-label={title}
 		>
-			<div className="aiawa-builder-picker__header">
+			<div className="dragwyb-af-builder-picker__header">
 				{showBack && (
 					<Button
 						variant="link"
-						className="aiawa-builder-picker__back"
+						className="dragwyb-af-builder-picker__back"
 						onClick={handleBack}
 					>
 						{__('← Back', 'dragwyb-agentflow')}
 					</Button>
 				)}
-				<h2 className="aiawa-builder-picker__title">{title}</h2>
+				<h2 className="dragwyb-af-builder-picker__title">{title}</h2>
 				<Button
-					className="aiawa-builder-picker__close"
+					className="dragwyb-af-builder-picker__close"
 					icon="no-alt"
 					label={__('Close', 'dragwyb-agentflow')}
 					onClick={onClose}
@@ -217,19 +217,19 @@ export default function PickerSidebar({
 			</div>
 
 			{replaceHint && (
-				<p className="aiawa-builder-picker__hint">{replaceHint}</p>
+				<p className="dragwyb-af-builder-picker__hint">{replaceHint}</p>
 			)}
 
 			{showGroups ? (
-				<ul className="aiawa-builder-picker__list">
+				<ul className="dragwyb-af-builder-picker__list">
 					{groups.map((group) => (
 						<li key={group.id}>
 							<button
 								type="button"
-								className="aiawa-builder-picker__item"
+								className="dragwyb-af-builder-picker__item"
 								onClick={() => setGroupId(group.id)}
 							>
-								<span className="aiawa-builder-picker__item-label">
+								<span className="dragwyb-af-builder-picker__item-label">
 									{group.label}
 								</span>
 							</button>
@@ -238,7 +238,7 @@ export default function PickerSidebar({
 				</ul>
 			) : kind === 'agent-tool' ? (
 				<>
-					<div className="aiawa-builder-picker__search">
+					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
 							label={__('Search tools', 'dragwyb-agentflow')}
 							hideLabelFromVision
@@ -248,7 +248,7 @@ export default function PickerSidebar({
 						/>
 					</div>
 					{toolSections.length === 0 ? (
-						<p className="aiawa-builder-picker__empty">
+						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No tools match your search.',
 								'dragwyb-agentflow'
@@ -258,12 +258,12 @@ export default function PickerSidebar({
 						toolSections.map((section) => (
 							<div
 								key={section.id}
-								className="aiawa-builder-picker__section"
+								className="dragwyb-af-builder-picker__section"
 							>
-								<h3 className="aiawa-builder-picker__section-heading">
+								<h3 className="dragwyb-af-builder-picker__section-heading">
 									{section.label}
 								</h3>
-								<ul className="aiawa-builder-picker__list">
+								<ul className="dragwyb-af-builder-picker__list">
 									{section.items.map((item) =>
 										renderItem(item, item.pickerAppId)
 									)}
@@ -274,7 +274,7 @@ export default function PickerSidebar({
 				</>
 			) : usesGroupedSections && groupedItems ? (
 				<>
-					<div className="aiawa-builder-picker__search">
+					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
 							label={__('Search actions', 'dragwyb-agentflow')}
 							hideLabelFromVision
@@ -284,7 +284,7 @@ export default function PickerSidebar({
 						/>
 					</div>
 					{groupedItems.length === 0 ? (
-						<p className="aiawa-builder-picker__empty">
+						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No actions match your search.',
 								'dragwyb-agentflow'
@@ -294,12 +294,12 @@ export default function PickerSidebar({
 						groupedItems.map((group) => (
 							<div
 								key={group.id}
-								className="aiawa-builder-picker__section"
+								className="dragwyb-af-builder-picker__section"
 							>
-								<h3 className="aiawa-builder-picker__section-heading">
+								<h3 className="dragwyb-af-builder-picker__section-heading">
 									{group.label}
 								</h3>
-								<ul className="aiawa-builder-picker__list">
+								<ul className="dragwyb-af-builder-picker__list">
 									{group.items.map((item) =>
 										renderItem(item, metaAppId)
 									)}
@@ -309,7 +309,7 @@ export default function PickerSidebar({
 					)}
 				</>
 			) : (
-				<ul className="aiawa-builder-picker__list">
+				<ul className="dragwyb-af-builder-picker__list">
 					{showCommunicationList &&
 						subApps.map((subApp) => (
 							<PickerSubApp
@@ -332,11 +332,11 @@ function PickerSubApp({ subApp, onOpen }) {
 		<li>
 			<button
 				type="button"
-				className="aiawa-builder-picker__item aiawa-builder-picker__item--subapp"
+				className="dragwyb-af-builder-picker__item dragwyb-af-builder-picker__item--subapp"
 				onClick={onOpen}
 			>
 				<span
-					className="aiawa-builder-picker__item-icon"
+					className="dragwyb-af-builder-picker__item-icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -345,12 +345,12 @@ function PickerSubApp({ subApp, onOpen }) {
 				>
 					{meta.icon}
 				</span>
-				<span className="aiawa-builder-picker__item-content">
-					<span className="aiawa-builder-picker__item-label">
+				<span className="dragwyb-af-builder-picker__item-content">
+					<span className="dragwyb-af-builder-picker__item-label">
 						{subApp.label}
 					</span>
 				</span>
-				<span className="aiawa-builder-picker__item-chevron" aria-hidden="true">
+				<span className="dragwyb-af-builder-picker__item-chevron" aria-hidden="true">
 					›
 				</span>
 			</button>

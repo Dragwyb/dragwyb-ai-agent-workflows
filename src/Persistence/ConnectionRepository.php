@@ -2,15 +2,15 @@
 /**
  * Connection repository.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Persistence;
+namespace DragwybAgentFlow\Plugin\Persistence;
 
-use AIAWA\Plugin\Database\Table;
-use AIAWA\Plugin\Domain\Connection;
+use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `aiawa_connections` access goes through this class. Every query is
+ * All `dragwyb_af_connections` access goes through this class. Every query is
  * built with `$wpdb->prepare()` or the `$wpdb` helper methods; the table
  * name itself is never user input, so its direct interpolation into SQL
  * strings is safe.
@@ -31,7 +31,7 @@ class ConnectionRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'aiawa_connections';
+	private const CACHE_GROUP = 'dragwyb_af_connections';
 
 	private const MAX_PER_PAGE = 100;
 

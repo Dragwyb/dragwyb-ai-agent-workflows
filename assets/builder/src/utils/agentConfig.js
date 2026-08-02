@@ -12,7 +12,7 @@ import {
 
 export const AI_AGENT_VERSION = '1.0';
 
-export const AGENT_TUTORIAL_DISMISS_KEY = 'aiawa_agent_tutorial_dismissed';
+export const AGENT_TUTORIAL_DISMISS_KEY = 'dragwyb_af_agent_tutorial_dismissed';
 
 export const PROMPT_SOURCE_DEFINE = 'define_below';
 

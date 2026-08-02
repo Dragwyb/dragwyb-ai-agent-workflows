@@ -2,15 +2,15 @@
 /**
  * Node type registry.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Service;
+namespace DragwybAgentFlow\Plugin\Service;
 
-use AIAWA\Plugin\Domain\Contracts\ActionInterface;
-use AIAWA\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Deliberately a plain PHP collection with no WordPress hook knowledge of
  * its own: something else (Plugin::registerNodeTypes()) is responsible for
- * firing the `aiawa/nodes/register` action that populates it, so this class
+ * firing the `dragwyb_af/nodes/register` action that populates it, so this class
  * stays trivially unit-testable.
  */
 class NodeTypeRegistry {
@@ -111,7 +111,7 @@ class NodeTypeRegistry {
 				esc_html( $kind ),
 				esc_html( $slug )
 			),
-			esc_html( AIAWA_VERSION )
+			esc_html( DRAGWYB_AF_VERSION )
 		);
 	}
 }

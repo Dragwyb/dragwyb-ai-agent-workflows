@@ -2,12 +2,12 @@
 /**
  * Optional trigger grouping for the builder palette.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Domain\Contracts;
+namespace DragwybAgentFlow\Plugin\Domain\Contracts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,15 +2,15 @@
 /**
  * Adds node-type/label snapshot columns to the workflow run logs table.
  *
- * @package AIAWA\Plugin
+ * @package DragwybAgentFlow\Plugin
  */
 
 declare(strict_types=1);
 
-namespace AIAWA\Plugin\Database\Migrations;
+namespace DragwybAgentFlow\Plugin\Database\Migrations;
 
-use AIAWA\Plugin\Database\Migration;
-use AIAWA\Plugin\Database\Table;
+use DragwybAgentFlow\Plugin\Database\Migration;
+use DragwybAgentFlow\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `aiawa_workflow_run_logs` (created in roadmap item 7) for the
+ * Extends `dragwyb_af_workflow_run_logs` (created in roadmap item 7) for the
  * history UI shipped in roadmap item 9, additively — same reasoning as
  * `AddQueueColumnsToWorkflowRunsTable` from item 8: the original migration
  * already shipped, so schema evolution happens through a new migration.
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * `WorkflowExecutionService::executeNodes()` and never updated afterwards
  * — the log row becomes fully self-contained for display purposes, the
  * same way `input_json` already snapshots the node's configuration at run
- * time rather than pointing back at `aiawa_workflow_nodes.config_json`.
+ * time rather than pointing back at `dragwyb_af_workflow_nodes.config_json`.
  */
 class AddNodeSnapshotColumnsToWorkflowRunLogsTable extends Migration {
 
