@@ -2,12 +2,12 @@
 /**
  * Plugin capability definitions and role wiring.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Core;
+namespace DragwybVisualAutomation\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Custom capabilities for Workflow Automate (roadmap item 14), layered
+ * Custom capabilities for Dragwyb Visual Automation (roadmap item 14), layered
  * over WordPress's `manage_options` so existing administrators keep full
  * access without any role-editor work, while site owners can grant
  * narrower access (workflows only, runs only, etc.) to non-admin roles.

@@ -2,14 +2,14 @@
 /**
  * Admin menu bootstrap.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
-use DragwybAgentFlow\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,7 +76,7 @@ class Menu {
 		// own capability so unauthorized items stay hidden.
 		$hook = add_menu_page(
 			$first->pageTitle(),
-			__( 'Workflow Automate', 'dragwyb-agentflow' ),
+			__( 'Dragwyb Visual Automation', 'dragwyb-visual-automation' ),
 			Capabilities::ACCESS,
 			$first->slug(),
 			array( $this, 'renderCurrentPage' ),
@@ -170,7 +170,7 @@ class Menu {
 			}
 		}
 
-		wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ), 403 );
+		wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ), 403 );
 	}
 
 	/**

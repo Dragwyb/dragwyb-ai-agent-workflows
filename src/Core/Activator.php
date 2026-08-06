@@ -2,17 +2,17 @@
 /**
  * Plugin activation handler.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Core;
+namespace DragwybVisualAutomation\Plugin\Core;
 
-use DragwybAgentFlow\Plugin\Database\MigrationRunner;
-use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
-use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
-use DragwybAgentFlow\Plugin\Service\RunRetentionService;
+use DragwybVisualAutomation\Plugin\Database\MigrationRunner;
+use DragwybVisualAutomation\Plugin\Database\SchemaMigrations;
+use DragwybVisualAutomation\Plugin\Service\BackgroundRunner;
+use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,7 +42,7 @@ class Activator {
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
-				esc_html__( 'Plugin activation error', 'dragwyb-agentflow' ),
+				esc_html__( 'Plugin activation error', 'dragwyb-visual-automation' ),
 				array( 'back_link' => true )
 			);
 		}

@@ -2,15 +2,15 @@
 /**
  * Node execution service.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
 use Throwable;
-use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -87,7 +87,7 @@ class NodeExecutionService {
 				'success' => false,
 				'error'   => sprintf(
 					/* translators: %s: node type slug. */
-					__( 'No action node type is registered for "%s". It may belong to a deactivated plugin.', 'dragwyb-agentflow' ),
+					__( 'No action node type is registered for "%s". It may belong to a deactivated plugin.', 'dragwyb-visual-automation' ),
 					$node->nodeType()
 				),
 			);
@@ -110,7 +110,7 @@ class NodeExecutionService {
 		if ( ! is_array( $result ) || ! array_key_exists( 'success', $result ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'The action returned an invalid result.', 'dragwyb-agentflow' ),
+				'error'   => __( 'The action returned an invalid result.', 'dragwyb-visual-automation' ),
 			);
 		}
 

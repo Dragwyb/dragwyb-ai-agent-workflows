@@ -2,14 +2,14 @@
 /**
  * Shared Google Sheet helper utilities.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet\Helpers;
+namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Helpers;
 
-use DragwybAgentFlow\Plugin\Integration\GoogleSheet\GoogleSheetsHttpClient;
+use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\GoogleSheetsHttpClient;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

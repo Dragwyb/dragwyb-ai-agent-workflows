@@ -2,22 +2,22 @@
 /**
  * Runs (execution history) admin page.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin\Pages;
+namespace DragwybVisualAutomation\Plugin\Admin\Pages;
 
-use DragwybAgentFlow\Plugin\Admin\AdminPage;
-use DragwybAgentFlow\Plugin\Admin\EmptyState;
-use DragwybAgentFlow\Plugin\Admin\ListTableUi;
-use DragwybAgentFlow\Plugin\Admin\RunActionsController;
-use DragwybAgentFlow\Plugin\Admin\RunsListTable;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
-use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybVisualAutomation\Plugin\Admin\AdminPage;
+use DragwybVisualAutomation\Plugin\Admin\EmptyState;
+use DragwybVisualAutomation\Plugin\Admin\ListTableUi;
+use DragwybVisualAutomation\Plugin\Admin\RunActionsController;
+use DragwybVisualAutomation\Plugin\Admin\RunsListTable;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -63,14 +63,14 @@ class RunsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Runs', 'dragwyb-agentflow' );
+		return __( 'Runs', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Runs', 'dragwyb-agentflow' );
+		return __( 'Runs', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class RunsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
 		}
 
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
@@ -123,13 +123,13 @@ class RunsPage implements AdminPage {
 
 		if ( ! $table->has_items() && ! $has_filters ) {
 			EmptyState::render(
-				__( 'No runs yet', 'dragwyb-agentflow' ),
-				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'dragwyb-agentflow' ),
+				__( 'No runs yet', 'dragwyb-visual-automation' ),
+				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'dragwyb-visual-automation' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-						'label'   => __( 'Go to Workflows', 'dragwyb-agentflow' ),
+						'label'   => __( 'Go to Workflows', 'dragwyb-visual-automation' ),
 						'primary' => true,
 					),
 				)
@@ -192,17 +192,17 @@ class RunsPage implements AdminPage {
 		}
 
 		$workflow = $this->workflows->find( $workflow_id, true );
-		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-agentflow' );
+		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-visual-automation' );
 
 		printf(
 			'<p class="dragwyb-af-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
-				esc_html__( 'Showing runs for: %s', 'dragwyb-agentflow' ),
+				esc_html__( 'Showing runs for: %s', 'dragwyb-visual-automation' ),
 				'<strong>' . esc_html( $name ) . '</strong>'
 			),
 			esc_url( remove_query_arg( 'workflow_id' ) ),
-			esc_html__( 'Clear filter', 'dragwyb-agentflow' )
+			esc_html__( 'Clear filter', 'dragwyb-visual-automation' )
 		);
 	}
 
@@ -215,23 +215,23 @@ class RunsPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'deleted'       => array(
-				'message' => __( 'Run deleted.', 'dragwyb-agentflow' ),
+				'message' => __( 'Run deleted.', 'dragwyb-visual-automation' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted'  => array(
-				'message' => __( 'Selected runs deleted.', 'dragwyb-agentflow' ),
+				'message' => __( 'Selected runs deleted.', 'dragwyb-visual-automation' ),
 				'type'    => 'success',
 			),
 			'delete_failed' => array(
-				'message' => __( 'That run could not be deleted.', 'dragwyb-agentflow' ),
+				'message' => __( 'That run could not be deleted.', 'dragwyb-visual-automation' ),
 				'type'    => 'error',
 			),
 			'action_failed' => array(
-				'message' => __( 'That run action could not be completed.', 'dragwyb-agentflow' ),
+				'message' => __( 'That run action could not be completed.', 'dragwyb-visual-automation' ),
 				'type'    => 'error',
 			),
 			'rerun_failed'  => array(
-				'message' => __( 'That run could not be re-run.', 'dragwyb-agentflow' ),
+				'message' => __( 'That run could not be re-run.', 'dragwyb-visual-automation' ),
 				'type'    => 'error',
 			),
 		);

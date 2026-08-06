@@ -2,16 +2,16 @@
 /**
  * AI Agent — reasoning node with attached chat model, memory, and tools.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
-use DragwybAgentFlow\Plugin\Service\ConfigInterpolator;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentService;
+use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,33 +33,33 @@ class AiAgentAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'AI Agent', 'dragwyb-agentflow' );
+		return __( 'AI Agent', 'dragwyb-visual-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Reasons over workflow data and calls attached tools (email, HTTP, etc.).', 'dragwyb-agentflow' );
+		return __( 'Reasons over workflow data and calls attached tools (email, HTTP, etc.).', 'dragwyb-visual-automation' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'prompt_source'         => array(
 				'type'    => 'select',
-				'label'   => __( 'Source for Prompt (User Message)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Source for Prompt (User Message)', 'dragwyb-visual-automation' ),
 				'default' => 'define_below',
 				'options' => array(
 					array(
 						'value' => 'connected_chat_trigger',
-						'label' => __( 'Connected Chat Trigger Node', 'dragwyb-agentflow' ),
+						'label' => __( 'Connected Chat Trigger Node', 'dragwyb-visual-automation' ),
 					),
 					array(
 						'value' => 'define_below',
-						'label' => __( 'Define below', 'dragwyb-agentflow' ),
+						'label' => __( 'Define below', 'dragwyb-visual-automation' ),
 					),
 				),
 			),
 			'provider'              => array(
 				'type'    => 'select',
-				'label'   => __( 'AI provider (fallback when no Chat Model is attached)', 'dragwyb-agentflow' ),
+				'label'   => __( 'AI provider (fallback when no Chat Model is attached)', 'dragwyb-visual-automation' ),
 				'default' => 'openai',
 				'options' => array(
 					array(
@@ -90,72 +90,72 @@ class AiAgentAction implements ActionInterface {
 			),
 			'api_credentials'       => array(
 				'type'           => 'ai_credentials',
-				'label'          => __( 'API key (fallback provider)', 'dragwyb-agentflow' ),
+				'label'          => __( 'API key (fallback provider)', 'dragwyb-visual-automation' ),
 				'provider_field' => 'provider',
 			),
 			'model'                 => array(
 				'type'           => 'dynamic_select',
-				'label'          => __( 'AI model (fallback)', 'dragwyb-agentflow' ),
+				'label'          => __( 'AI model (fallback)', 'dragwyb-visual-automation' ),
 				'default'        => 'gpt-4o-mini',
 				'options_source' => 'ai_models',
 				'provider_field' => 'provider',
 			),
 			'system_prompt'         => array(
 				'type'               => 'string',
-				'label'              => __( 'Instructions for the AI', 'dragwyb-agentflow' ),
+				'label'              => __( 'Instructions for the AI', 'dragwyb-visual-automation' ),
 				'supports_variables' => true,
-				'default'            => __( 'You are a workflow assistant. Use tools when needed to complete the task.', 'dragwyb-agentflow' ),
+				'default'            => __( 'You are a workflow assistant. Use tools when needed to complete the task.', 'dragwyb-visual-automation' ),
 			),
 			'prompt'                => array(
 				'type'               => 'string',
-				'label'              => __( 'Prompt (User Message)', 'dragwyb-agentflow' ),
+				'label'              => __( 'Prompt (User Message)', 'dragwyb-visual-automation' ),
 				'supports_variables' => true,
 				'required'           => true,
 			),
 			'require_output_format' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Require Specific Output Format', 'dragwyb-agentflow' ),
+				'label'   => __( 'Require Specific Output Format', 'dragwyb-visual-automation' ),
 				'default' => false,
 			),
 			'clean_output'          => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Clean output (strip markdown code fences)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Clean output (strip markdown code fences)', 'dragwyb-visual-automation' ),
 				'default' => true,
-				'help'    => __( 'When enabled, {{output}} is cleaned for HTTP Request and other nodes. Raw model text stays in {{response}}.', 'dragwyb-agentflow' ),
+				'help'    => __( 'When enabled, {{output}} is cleaned for HTTP Request and other nodes. Raw model text stays in {{response}}.', 'dragwyb-visual-automation' ),
 			),
 			'fallback_enabled'      => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Enable Fallback Model', 'dragwyb-agentflow' ),
+				'label'   => __( 'Enable Fallback Model', 'dragwyb-visual-automation' ),
 				'default' => false,
 			),
 			'max_iterations'        => array(
 				'type'    => 'integer',
-				'label'   => __( 'Max tool iterations', 'dragwyb-agentflow' ),
+				'label'   => __( 'Max tool iterations', 'dragwyb-visual-automation' ),
 				'default' => 5,
 			),
 			'output_format'         => array(
 				'type'    => 'select',
-				'label'   => __( 'Reply format', 'dragwyb-agentflow' ),
+				'label'   => __( 'Reply format', 'dragwyb-visual-automation' ),
 				'default' => 'text',
 				'options' => array(
 					array(
 						'value' => 'text',
-						'label' => __( 'Plain text', 'dragwyb-agentflow' ),
+						'label' => __( 'Plain text', 'dragwyb-visual-automation' ),
 					),
 					array(
 						'value' => 'json',
-						'label' => __( 'JSON', 'dragwyb-agentflow' ),
+						'label' => __( 'JSON', 'dragwyb-visual-automation' ),
 					),
 				),
 			),
 			'options'               => array(
 				'type'    => 'array',
-				'label'   => __( 'Options', 'dragwyb-agentflow' ),
+				'label'   => __( 'Options', 'dragwyb-visual-automation' ),
 				'default' => array(),
 			),
 			'settings'              => array(
 				'type'    => 'object',
-				'label'   => __( 'Settings', 'dragwyb-agentflow' ),
+				'label'   => __( 'Settings', 'dragwyb-visual-automation' ),
 				'default' => array(
 					'always_output_data'    => false,
 					'execute_once'          => false,
@@ -176,7 +176,7 @@ class AiAgentAction implements ActionInterface {
 		if ( '' === $agent_node_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'AI Agent could not resolve its node id.', 'dragwyb-agentflow' ),
+				'error'   => __( 'AI Agent could not resolve its node id.', 'dragwyb-visual-automation' ),
 			);
 		}
 

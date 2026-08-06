@@ -2,12 +2,12 @@
 /**
  * Shared list-table UI helpers.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -96,7 +96,7 @@ final class ListTableUi {
 			echo '</select>';
 		}
 
-		submit_button( __( 'Filter', 'dragwyb-agentflow' ), 'secondary', 'filter_action', false );
+		submit_button( __( 'Filter', 'dragwyb-visual-automation' ), 'secondary', 'filter_action', false );
 		echo '</div>';
 	}
 

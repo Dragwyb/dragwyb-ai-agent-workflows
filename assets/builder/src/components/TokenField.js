@@ -308,7 +308,7 @@ export default function TokenField({
 						className="dragwyb-af-token-field__insert"
 						onClick={openPicker}
 					>
-						{__('Insert variable', 'dragwyb-agentflow')}
+						{__('Insert variable', 'dragwyb-visual-automation')}
 					</button>
 				)}
 			</div>
@@ -331,7 +331,7 @@ export default function TokenField({
 				<p className="dragwyb-af-token-field__hint">
 					{__(
 						'Add steps above this node, or use Test Flow → Listen to load trigger variables.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 				</p>
 			)}

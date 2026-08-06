@@ -2,14 +2,14 @@
 /**
  * Spreadsheet-level Google Sheets operations.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet;
+namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet;
 
-use DragwybAgentFlow\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,7 +46,7 @@ final class GoogleSpreadsheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the spreadsheet payload.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Failed to encode the spreadsheet payload.', 'dragwyb-visual-automation' ),
 			);
 		}
 

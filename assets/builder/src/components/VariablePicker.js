@@ -87,11 +87,11 @@ export default function VariablePicker({
 		>
 			{!popover && (
 				<div className="dragwyb-af-variable-picker__header">
-					<h3>{__('Variables', 'dragwyb-agentflow')}</h3>
+					<h3>{__('Variables', 'dragwyb-visual-automation')}</h3>
 					{!embedded && (
 						<Button
 							icon="no-alt"
-							label={__('Close', 'dragwyb-agentflow')}
+							label={__('Close', 'dragwyb-visual-automation')}
 							onClick={onClose}
 						/>
 					)}
@@ -103,7 +103,7 @@ export default function VariablePicker({
 					<input
 						type="search"
 						className="dragwyb-af-variable-picker__search-input"
-						placeholder={__('Search variables…', 'dragwyb-agentflow')}
+						placeholder={__('Search variables…', 'dragwyb-visual-automation')}
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
 					/>
@@ -114,7 +114,7 @@ export default function VariablePicker({
 				<p className="dragwyb-af-variable-picker__empty">
 					{__(
 						'No variables yet. Listen for trigger data or add steps above this node.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 				</p>
 			) : (

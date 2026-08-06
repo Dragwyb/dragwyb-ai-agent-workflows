@@ -2,12 +2,12 @@
 /**
  * Normalizes raw WordPress hook arguments into JSON-friendly trigger payloads.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,21 +2,21 @@
 /**
  * Node types REST controller.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionGroupInterface;
-use DragwybAgentFlow\Plugin\Domain\Contracts\NodeTypeInterface;
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
-use DragwybAgentFlow\Plugin\Integration\IntegrationTriggerCatalog;
-use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
-use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionGroupInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\NodeTypeInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybVisualAutomation\Plugin\Integration\IntegrationTriggerCatalog;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybVisualAutomation\Plugin\Service\ElementorFormsService;
+use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -97,7 +97,7 @@ class NodeTypesController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_forbidden',
-				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-agentflow' ),
+				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-visual-automation' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -162,7 +162,7 @@ class NodeTypesController {
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
 					'dragwyb_af_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-agentflow' ) ),
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-visual-automation' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -181,7 +181,7 @@ class NodeTypesController {
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
 					'dragwyb_af_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-agentflow' ) ),
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-visual-automation' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -196,7 +196,7 @@ class NodeTypesController {
 
 		return new WP_Error(
 			'dragwyb_af_trigger_sample_unsupported',
-			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-agentflow' ),
+			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-visual-automation' ),
 			array( 'status' => 400 )
 		);
 	}

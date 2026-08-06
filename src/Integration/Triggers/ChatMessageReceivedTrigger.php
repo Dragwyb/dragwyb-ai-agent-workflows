@@ -2,15 +2,15 @@
 /**
  * Chat Message Received trigger (n8n-style Chat Trigger).
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Triggers;
+namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * so AI Agent "Connected Chat Trigger Node" prompt source works out of the box.
  *
  * Fired via {@see do_action( 'dragwyb_af_chat_message_received', $payload )} from
- * {@see \DragwybAgentFlow\Plugin\Rest\ChatMessageIngressController}.
+ * {@see \DragwybVisualAutomation\Plugin\Rest\ChatMessageIngressController}.
  */
 class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterface {
 
@@ -42,14 +42,14 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'When chat message received', 'dragwyb-agentflow' );
+		return __( 'When chat message received', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Runs the workflow when a chat message is submitted to this workflow\'s chat URL (same idea as n8n\'s Chat Trigger).', 'dragwyb-agentflow' );
+		return __( 'Runs the workflow when a chat message is submitted to this workflow\'s chat URL (same idea as n8n\'s Chat Trigger).', 'dragwyb-visual-automation' );
 	}
 
 	public function app(): string {
@@ -61,7 +61,7 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	}
 
 	public function groupLabel(): string {
-		return __( 'Chat', 'dragwyb-agentflow' );
+		return __( 'Chat', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -71,52 +71,52 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 		return array(
 			'endpoint_id'       => array(
 				'type'        => 'string',
-				'label'       => __( 'Chat endpoint ID', 'dragwyb-agentflow' ),
-				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'dragwyb-agentflow' ),
+				'label'       => __( 'Chat endpoint ID', 'dragwyb-visual-automation' ),
+				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'dragwyb-visual-automation' ),
 				'required'    => true,
 				'default'     => '',
 				'hidden'      => true,
 			),
 			'public'            => array(
 				'type'        => 'boolean',
-				'label'       => __( 'Make chat publicly available', 'dragwyb-agentflow' ),
-				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'dragwyb-agentflow' ),
+				'label'       => __( 'Make chat publicly available', 'dragwyb-visual-automation' ),
+				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'dragwyb-visual-automation' ),
 				'default'     => false,
 			),
 			'title'             => array(
 				'type'    => 'string',
-				'label'   => __( 'Title', 'dragwyb-agentflow' ),
-				'default' => __( 'Hi there! 👋', 'dragwyb-agentflow' ),
+				'label'   => __( 'Title', 'dragwyb-visual-automation' ),
+				'default' => __( 'Hi there! 👋', 'dragwyb-visual-automation' ),
 			),
 			'subtitle'          => array(
 				'type'    => 'string',
-				'label'   => __( 'Subtitle', 'dragwyb-agentflow' ),
-				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'dragwyb-agentflow' ),
+				'label'   => __( 'Subtitle', 'dragwyb-visual-automation' ),
+				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'dragwyb-visual-automation' ),
 			),
 			'input_placeholder' => array(
 				'type'    => 'string',
-				'label'   => __( 'Input placeholder', 'dragwyb-agentflow' ),
-				'default' => __( 'Type your question…', 'dragwyb-agentflow' ),
+				'label'   => __( 'Input placeholder', 'dragwyb-visual-automation' ),
+				'default' => __( 'Type your question…', 'dragwyb-visual-automation' ),
 			),
 			'initial_messages'  => array(
 				'type'        => 'string',
-				'label'       => __( 'Initial message(s)', 'dragwyb-agentflow' ),
-				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'dragwyb-agentflow' ),
+				'label'       => __( 'Initial message(s)', 'dragwyb-visual-automation' ),
+				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'dragwyb-visual-automation' ),
 				'multiline'   => true,
-				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'dragwyb-agentflow' ),
+				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'dragwyb-visual-automation' ),
 			),
 			'response_mode'     => array(
 				'type'    => 'select',
-				'label'   => __( 'Response mode', 'dragwyb-agentflow' ),
+				'label'   => __( 'Response mode', 'dragwyb-visual-automation' ),
 				'default' => 'lastNode',
 				'options' => array(
 					array(
 						'value' => 'lastNode',
-						'label' => __( 'When last node finishes', 'dragwyb-agentflow' ),
+						'label' => __( 'When last node finishes', 'dragwyb-visual-automation' ),
 					),
 					array(
 						'value' => 'immediate',
-						'label' => __( 'Acknowledge immediately (queue run)', 'dragwyb-agentflow' ),
+						'label' => __( 'Acknowledge immediately (queue run)', 'dragwyb-visual-automation' ),
 					),
 				),
 			),

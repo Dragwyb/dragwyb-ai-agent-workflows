@@ -2,15 +2,15 @@
 /**
  * Built-in "Send Email" action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
 use WP_Error;
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,14 +43,14 @@ class SendEmailAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Send Email', 'dragwyb-agentflow' );
+		return __( 'Send Email', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an email using the site\'s configured mail delivery method.', 'dragwyb-agentflow' );
+		return __( 'Sends an email using the site\'s configured mail delivery method.', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -60,22 +60,22 @@ class SendEmailAction implements ActionInterface {
 		return array(
 			'to'      => array(
 				'type'     => 'string',
-				'label'    => __( 'To (comma-separated for multiple recipients)', 'dragwyb-agentflow' ),
+				'label'    => __( 'To (comma-separated for multiple recipients)', 'dragwyb-visual-automation' ),
 				'required' => true,
 			),
 			'subject' => array(
 				'type'     => 'string',
-				'label'    => __( 'Subject', 'dragwyb-agentflow' ),
+				'label'    => __( 'Subject', 'dragwyb-visual-automation' ),
 				'required' => true,
 			),
 			'message' => array(
 				'type'     => 'string',
-				'label'    => __( 'Message', 'dragwyb-agentflow' ),
+				'label'    => __( 'Message', 'dragwyb-visual-automation' ),
 				'required' => true,
 			),
 			'headers' => array(
 				'type'    => 'object',
-				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Additional headers (e.g. From, Reply-To, Content-Type)', 'dragwyb-visual-automation' ),
 				'default' => array(),
 			),
 		);
@@ -90,7 +90,7 @@ class SendEmailAction implements ActionInterface {
 		if ( array() === $recipients ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No valid recipient address configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No valid recipient address configured.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -117,7 +117,7 @@ class SendEmailAction implements ActionInterface {
 				'success' => false,
 				'error'   => $captured_error instanceof WP_Error
 					? $captured_error->get_error_message()
-					: __( 'wp_mail() reported failure for an unknown reason.', 'dragwyb-agentflow' ),
+					: __( 'wp_mail() reported failure for an unknown reason.', 'dragwyb-visual-automation' ),
 			);
 		}
 

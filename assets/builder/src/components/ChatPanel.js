@@ -64,19 +64,19 @@ export default function ChatPanel({
 			  }));
 
 	return (
-		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-agentflow')}>
+		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-visual-automation')}>
 			<div className="dragwyb-af-builder-chat__header">
 				<div>
-					<strong>{title || __('Chat', 'dragwyb-agentflow')}</strong>
+					<strong>{title || __('Chat', 'dragwyb-visual-automation')}</strong>
 					<p className="dragwyb-af-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}
 					</p>
 				</div>
 				<Button isSmall isSecondary onClick={onClose}>
-					{__('Close', 'dragwyb-agentflow')}
+					{__('Close', 'dragwyb-visual-automation')}
 				</Button>
 			</div>
 
@@ -91,7 +91,7 @@ export default function ChatPanel({
 				))}
 				{sending && (
 					<div className="dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--assistant dragwyb-af-builder-chat__bubble--pending">
-						{__('Thinking…', 'dragwyb-agentflow')}
+						{__('Thinking…', 'dragwyb-visual-automation')}
 					</div>
 				)}
 			</div>
@@ -104,18 +104,18 @@ export default function ChatPanel({
 
 			<form className="dragwyb-af-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
-					label={__('Message', 'dragwyb-agentflow')}
+					label={__('Message', 'dragwyb-visual-automation')}
 					hideLabelFromVision
 					value={draft}
 					onChange={setDraft}
-					placeholder={__('Type a message…', 'dragwyb-agentflow')}
+					placeholder={__('Type a message…', 'dragwyb-visual-automation')}
 					rows={2}
 					disabled={sending}
 				/>
 				<Button isPrimary type="submit" disabled={sending || !draft.trim()}>
 					{sending
-						? __('Sending…', 'dragwyb-agentflow')
-						: __('Send', 'dragwyb-agentflow')}
+						? __('Sending…', 'dragwyb-visual-automation')
+						: __('Send', 'dragwyb-visual-automation')}
 				</Button>
 			</form>
 		</aside>

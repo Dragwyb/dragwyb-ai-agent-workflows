@@ -85,7 +85,7 @@ export default function useTestFlow(
 					setStatusMessage(
 						__(
 							'Sample captured. You can use existing data to test.',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)
 					);
 
@@ -99,7 +99,7 @@ export default function useTestFlow(
 				setStatusMessage(
 					error && error.message
 						? error.message
-						: __('Could not check listen status.', 'dragwyb-agentflow')
+						: __('Could not check listen status.', 'dragwyb-visual-automation')
 				);
 			}
 		}, POLL_MS);
@@ -118,7 +118,7 @@ export default function useTestFlow(
 			setStatusMessage(
 				__(
 					'Listen timed out. Fire your trigger and try again.',
-					'dragwyb-agentflow'
+					'dragwyb-visual-automation'
 				)
 			);
 		}, LISTEN_TIMEOUT_MS);
@@ -129,7 +129,7 @@ export default function useTestFlow(
 			listenStartedAtRef.current = startedAt || null;
 			setListening(true);
 			setStatusMessage(
-				__('Listening for the next trigger response…', 'dragwyb-agentflow')
+				__('Listening for the next trigger response…', 'dragwyb-visual-automation')
 			);
 			pollUntilCaptured();
 		},
@@ -170,13 +170,13 @@ export default function useTestFlow(
 			setStatusMessage(
 				__(
 					'Add a trigger block first, then listen again.',
-					'dragwyb-agentflow'
+					'dragwyb-visual-automation'
 				)
 			);
 			return;
 		}
 
-		setStatusMessage(__('Saving…', 'dragwyb-agentflow'));
+		setStatusMessage(__('Saving…', 'dragwyb-visual-automation'));
 
 		try {
 			await persistBeforeTest();
@@ -185,7 +185,7 @@ export default function useTestFlow(
 
 			if (!status.listening) {
 				throw new Error(
-					__('Server did not enter listen mode.', 'dragwyb-agentflow')
+					__('Server did not enter listen mode.', 'dragwyb-visual-automation')
 				);
 			}
 
@@ -196,7 +196,7 @@ export default function useTestFlow(
 			setStatusMessage(
 				error && error.message
 					? error.message
-					: __('Could not start listening.', 'dragwyb-agentflow')
+					: __('Could not start listening.', 'dragwyb-visual-automation')
 			);
 		}
 	}, [workflowId, persistBeforeTest, hasTrigger, beginListening]);
@@ -208,7 +208,7 @@ export default function useTestFlow(
 			return;
 		}
 
-		setStatusMessage(__('Running workflow with saved data…', 'dragwyb-agentflow'));
+		setStatusMessage(__('Running workflow with saved data…', 'dragwyb-visual-automation'));
 
 		try {
 			await persistBeforeTest();
@@ -223,7 +223,7 @@ export default function useTestFlow(
 				setStatusMessage(
 					__(
 						'No saved sample for this trigger. Use “Listen new response” first.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)
 				);
 				return;
@@ -233,19 +233,19 @@ export default function useTestFlow(
 				setStatusMessage(
 					__(
 						'No saved sample yet. Use “Listen new response” first.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)
 				);
 				return;
 			}
 
 			await runWorkflow(workflowId);
-			setStatusMessage(__('Test run completed.', 'dragwyb-agentflow'));
+			setStatusMessage(__('Test run completed.', 'dragwyb-visual-automation'));
 		} catch (error) {
 			setStatusMessage(
 				error && error.message
 					? error.message
-					: __('Test run failed.', 'dragwyb-agentflow')
+					: __('Test run failed.', 'dragwyb-visual-automation')
 			);
 		}
 	}, [workflowId, persistBeforeTest, getTriggerType]);

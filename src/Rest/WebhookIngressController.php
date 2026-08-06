@@ -2,14 +2,14 @@
 /**
  * Public inbound-webhook ingress REST controller.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
-use DragwybAgentFlow\Plugin\Service\WebhookService;
+use DragwybVisualAutomation\Plugin\Service\WebhookService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -86,7 +86,7 @@ class WebhookIngressController {
 		if ( ! $this->checkRateLimit( $public_id, $client_ip ) ) {
 			return new WP_Error(
 				'dragwyb_af_webhook_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again later.', 'dragwyb-agentflow' ),
+				__( 'Rate limit exceeded. Please try again later.', 'dragwyb-visual-automation' ),
 				array( 'status' => 429 )
 			);
 		}

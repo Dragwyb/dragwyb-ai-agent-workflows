@@ -2,12 +2,12 @@
 /**
  * Builds Gutenberg block markup from structured design sections.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -232,7 +232,7 @@ class GutenbergBlockBuilder {
 	private static function ctaSection( array $section ): string {
 		$heading     = (string) ( $section['heading'] ?? $section['title'] ?? '' );
 		$text        = (string) ( $section['text'] ?? '' );
-		$button_text = (string) ( $section['button_text'] ?? __( 'Learn more', 'dragwyb-agentflow' ) );
+		$button_text = (string) ( $section['button_text'] ?? __( 'Learn more', 'dragwyb-visual-automation' ) );
 		$button_url  = (string) ( $section['button_url'] ?? '#' );
 		$background  = self::sanitizeColor( (string) ( $section['background'] ?? '#f97316' ) );
 		$text_color  = self::sanitizeColor( (string) ( $section['text_color'] ?? '#ffffff' ) );

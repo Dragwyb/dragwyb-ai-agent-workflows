@@ -2,16 +2,16 @@
 /**
  * Built-in "HTTP Request" action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,14 +59,14 @@ class HttpRequestAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'HTTP Request', 'dragwyb-agentflow' );
+		return __( 'HTTP Request', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an outbound HTTP request to a URL you specify.', 'dragwyb-agentflow' );
+		return __( 'Sends an outbound HTTP request to a URL you specify.', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -76,7 +76,7 @@ class HttpRequestAction implements ActionInterface {
 		return array(
 			'method'            => array(
 				'type'    => 'select',
-				'label'   => __( 'Method', 'dragwyb-agentflow' ),
+				'label'   => __( 'Method', 'dragwyb-visual-automation' ),
 				'default' => self::DEFAULT_METHOD,
 				'options' => array(
 					array(
@@ -111,34 +111,34 @@ class HttpRequestAction implements ActionInterface {
 			),
 			'url'               => array(
 				'type'               => 'string',
-				'label'              => __( 'URL', 'dragwyb-agentflow' ),
+				'label'              => __( 'URL', 'dragwyb-visual-automation' ),
 				'required'           => true,
 				'supports_variables' => true,
 			),
 			'connection_id'     => array(
 				'type'    => 'connection',
-				'label'   => __( 'Authentication (optional)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Authentication (optional)', 'dragwyb-visual-automation' ),
 				'default' => 0,
 			),
 			'headers'           => array(
 				'type'    => 'object',
-				'label'   => __( 'Headers', 'dragwyb-agentflow' ),
+				'label'   => __( 'Headers', 'dragwyb-visual-automation' ),
 				'default' => array(),
 			),
 			'allow_unsafe_urls' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Allow local/unsafe URLs', 'dragwyb-agentflow' ),
+				'label'   => __( 'Allow local/unsafe URLs', 'dragwyb-visual-automation' ),
 				'default' => false,
-				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'dragwyb-agentflow' ),
+				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'dragwyb-visual-automation' ),
 			),
 			'send_body'         => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Send Body', 'dragwyb-agentflow' ),
+				'label'   => __( 'Send Body', 'dragwyb-visual-automation' ),
 				'default' => false,
 			),
 			'body_content_type' => array(
 				'type'      => 'select',
-				'label'     => __( 'Body Content Type', 'dragwyb-agentflow' ),
+				'label'     => __( 'Body Content Type', 'dragwyb-visual-automation' ),
 				'default'   => self::DEFAULT_BODY_CONTENT_TYPE,
 				'show_when' => array(
 					array(
@@ -149,21 +149,21 @@ class HttpRequestAction implements ActionInterface {
 				'options'   => array(
 					array(
 						'value' => 'json',
-						'label' => __( 'JSON', 'dragwyb-agentflow' ),
+						'label' => __( 'JSON', 'dragwyb-visual-automation' ),
 					),
 					array(
 						'value' => 'form_urlencoded',
-						'label' => __( 'Form URL Encoded', 'dragwyb-agentflow' ),
+						'label' => __( 'Form URL Encoded', 'dragwyb-visual-automation' ),
 					),
 					array(
 						'value' => 'raw',
-						'label' => __( 'Raw', 'dragwyb-agentflow' ),
+						'label' => __( 'Raw', 'dragwyb-visual-automation' ),
 					),
 				),
 			),
 			'body_specify'      => array(
 				'type'      => 'select',
-				'label'     => __( 'Specify Body', 'dragwyb-agentflow' ),
+				'label'     => __( 'Specify Body', 'dragwyb-visual-automation' ),
 				'default'   => 'json',
 				'show_when' => array(
 					array(
@@ -174,20 +174,20 @@ class HttpRequestAction implements ActionInterface {
 				'options'   => array(
 					array(
 						'value' => 'json',
-						'label' => __( 'Using JSON', 'dragwyb-agentflow' ),
+						'label' => __( 'Using JSON', 'dragwyb-visual-automation' ),
 					),
 					array(
 						'value' => 'fields',
-						'label' => __( 'Using Fields Below', 'dragwyb-agentflow' ),
+						'label' => __( 'Using Fields Below', 'dragwyb-visual-automation' ),
 					),
 				),
 			),
 			'body'              => array(
 				'type'               => 'string',
-				'label'              => __( 'Body', 'dragwyb-agentflow' ),
+				'label'              => __( 'Body', 'dragwyb-visual-automation' ),
 				'default'            => '',
 				'supports_variables' => true,
-				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'dragwyb-agentflow' ),
+				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'dragwyb-visual-automation' ),
 				'show_when'          => array(
 					array(
 						'field'  => 'send_body',
@@ -201,9 +201,9 @@ class HttpRequestAction implements ActionInterface {
 			),
 			'body_parameters'   => array(
 				'type'               => 'key_value',
-				'label'              => __( 'Body Parameters', 'dragwyb-agentflow' ),
+				'label'              => __( 'Body Parameters', 'dragwyb-visual-automation' ),
 				'default'            => array(),
-				'button_label'       => __( 'Add Body Field', 'dragwyb-agentflow' ),
+				'button_label'       => __( 'Add Body Field', 'dragwyb-visual-automation' ),
 				'supports_variables' => true,
 				'show_when'          => array(
 					array(
@@ -228,7 +228,7 @@ class HttpRequestAction implements ActionInterface {
 		if ( '' === $url ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No request URL configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No request URL configured.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -485,7 +485,7 @@ class HttpRequestAction implements ActionInterface {
 		$connection = $this->connections->find( $connection_id );
 
 		if ( null === $connection ) {
-			return __( 'The connection configured for this action no longer exists.', 'dragwyb-agentflow' );
+			return __( 'The connection configured for this action no longer exists.', 'dragwyb-visual-automation' );
 		}
 
 		$credentials = $this->connections->credentials( $connection );
@@ -496,7 +496,7 @@ class HttpRequestAction implements ActionInterface {
 				$password = $credentials['password'] ?? null;
 
 				if ( null === $username || null === $password ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-agentflow' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' );
 				}
 
 				$headers['Authorization'] = 'Basic ' . base64_encode( $username . ':' . $password );
@@ -507,7 +507,7 @@ class HttpRequestAction implements ActionInterface {
 				$token = $credentials['token'] ?? null;
 
 				if ( null === $token ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-agentflow' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' );
 				}
 
 				$headers['Authorization'] = 'Bearer ' . $token;
@@ -519,7 +519,7 @@ class HttpRequestAction implements ActionInterface {
 				$api_key = $credentials['api_key'] ?? null;
 
 				if ( null === $api_key ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-agentflow' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' );
 				}
 
 				$headers['Authorization'] = 'Bearer ' . $api_key;

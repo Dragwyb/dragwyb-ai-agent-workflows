@@ -2,15 +2,15 @@
 /**
  * Catalog-defined WooCommerce hook trigger.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Triggers;
+namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
-use DragwybAgentFlow\Plugin\Integration\WooCommerce\WooCommercePayloadBuilder;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Integration\WooCommerce\WooCommercePayloadBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

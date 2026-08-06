@@ -2,16 +2,16 @@
 /**
  * Workflow builder admin page.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin\Pages;
+namespace DragwybVisualAutomation\Plugin\Admin\Pages;
 
-use DragwybAgentFlow\Plugin\Admin\AdminPage;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Admin\AdminPage;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -51,14 +51,14 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Workflow Editor', 'dragwyb-agentflow' );
+		return __( 'Workflow Editor', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Workflow Editor', 'dragwyb-agentflow' );
+		return __( 'Workflow Editor', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -145,7 +145,7 @@ class BuilderPage implements AdminPage {
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl'                => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
 			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
-			'aiCredentialsUrl'       => \DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'aiCredentialsUrl'       => \DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
 			'googleOAuthCallbackUrl' => rest_url( 'dragwyb_af/v1/oauth/google/callback' ),
 		);
@@ -158,8 +158,8 @@ class BuilderPage implements AdminPage {
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
-				'Workflow Automate: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
-				'dragwyb-agentflow'
+				'Dragwyb Visual Automation: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
+				'dragwyb-visual-automation'
 			)
 		);
 	}
@@ -169,7 +169,7 @@ class BuilderPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
 		}
 
 		echo '<div class="wrap dragwyb-af-admin-page dragwyb-af-builder-page">';
@@ -193,7 +193,7 @@ class BuilderPage implements AdminPage {
 
 		printf(
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-			esc_html__( 'Workflow imported from JSON.', 'dragwyb-agentflow' )
+			esc_html__( 'Workflow imported from JSON.', 'dragwyb-visual-automation' )
 		);
 	}
 }

@@ -135,7 +135,7 @@ export default function AgentConfigPanel({
 					}
 					onClick={() => setActiveTab('parameters')}
 				>
-					{__('Parameters', 'dragwyb-agentflow')}
+					{__('Parameters', 'dragwyb-visual-automation')}
 				</button>
 				<button
 					type="button"
@@ -146,7 +146,7 @@ export default function AgentConfigPanel({
 					}
 					onClick={() => setActiveTab('settings')}
 				>
-					{__('Settings', 'dragwyb-agentflow')}
+					{__('Settings', 'dragwyb-visual-automation')}
 				</button>
 				<Button
 					variant="primary"
@@ -155,7 +155,7 @@ export default function AgentConfigPanel({
 					isBusy={testing}
 					disabled={testing || !canExecute}
 				>
-					{__('Execute step', 'dragwyb-agentflow')}
+					{__('Execute step', 'dragwyb-visual-automation')}
 				</Button>
 			</div>
 
@@ -169,21 +169,21 @@ export default function AgentConfigPanel({
 							<p className="dragwyb-af-agent-config__banner-text">
 								{__(
 									'Tip: Get a feel for agents with our quick',
-									'dragwyb-agentflow'
+									'dragwyb-visual-automation'
 								)}{' '}
 								<a
 									href={TUTORIAL_URL}
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{__('tutorial', 'dragwyb-agentflow')}
+									{__('tutorial', 'dragwyb-visual-automation')}
 								</a>
 								.
 							</p>
 							<button
 								type="button"
 								className="dragwyb-af-agent-config__banner-close"
-								aria-label={__('Dismiss tip', 'dragwyb-agentflow')}
+								aria-label={__('Dismiss tip', 'dragwyb-visual-automation')}
 								onClick={() => {
 									dismissAgentTutorial();
 									setBannerDismissed(true);
@@ -197,19 +197,19 @@ export default function AgentConfigPanel({
 					<SelectControl
 						label={__(
 							'Source for Prompt (User Message)',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}
 						value={config.prompt_source}
 						options={[
 							{
 								label: __(
 									'Connected Chat Trigger Node',
-									'dragwyb-agentflow'
+									'dragwyb-visual-automation'
 								),
 								value: PROMPT_SOURCE_CHAT_TRIGGER,
 							},
 							{
-								label: __('Define below', 'dragwyb-agentflow'),
+								label: __('Define below', 'dragwyb-visual-automation'),
 								value: PROMPT_SOURCE_DEFINE,
 							},
 						]}
@@ -220,14 +220,14 @@ export default function AgentConfigPanel({
 						<p className="dragwyb-af-agent-config__help">
 							{__(
 								'Looks for an input field called chatInput from a directly connected Chat Trigger node. The prompt textarea is hidden while this source is selected.',
-								'dragwyb-agentflow'
+								'dragwyb-visual-automation'
 							)}
 							{!hasChatTrigger && (
 								<span className="dragwyb-af-builder-config__field-error">
 									{' '}
 									{__(
 										'No trigger is connected to this agent yet.',
-										'dragwyb-agentflow'
+										'dragwyb-visual-automation'
 									)}
 								</span>
 							)}
@@ -237,7 +237,7 @@ export default function AgentConfigPanel({
 							<TokenField
 								label={__(
 									'Prompt (User Message)',
-									'dragwyb-agentflow'
+									'dragwyb-visual-automation'
 								)}
 								value={config.prompt}
 								variableSources={variableSources}
@@ -255,7 +255,7 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Require Specific Output Format',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}
 						checked={config.require_output_format}
 						onChange={(checked) =>
@@ -268,11 +268,11 @@ export default function AgentConfigPanel({
 							{attachments.outputParser
 								? __(
 										'Output Parser connected. Click it on the canvas to edit the JSON example or schema.',
-										'dragwyb-agentflow'
+										'dragwyb-visual-automation'
 								  )
 								: __(
 										'Connect an Output Parser node on the canvas to specify the output format you require.',
-										'dragwyb-agentflow'
+										'dragwyb-visual-automation'
 								  )}
 						</div>
 					)}
@@ -286,11 +286,11 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Clean output (strip markdown)',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}
 						help={__(
 							'Removes ``` code fences from {{output}} so HTTP Request gets plain text. Raw reply stays in {{response}}.',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}
 						checked={config.clean_output}
 						onChange={(checked) =>
@@ -299,7 +299,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Enable Fallback Model', 'dragwyb-agentflow')}
+						label={__('Enable Fallback Model', 'dragwyb-visual-automation')}
 						checked={config.fallback_enabled}
 						onChange={(checked) =>
 							onChangeConfig('fallback_enabled', checked)
@@ -310,7 +310,7 @@ export default function AgentConfigPanel({
 						<div className="dragwyb-af-agent-config__notice dragwyb-af-agent-config__notice--info">
 							{__(
 								'Connect an additional language model on the canvas to use it as a fallback if the main model fails.',
-								'dragwyb-agentflow'
+								'dragwyb-visual-automation'
 							)}
 						</div>
 					)}
@@ -323,12 +323,12 @@ export default function AgentConfigPanel({
 
 					<div className="dragwyb-af-agent-config__options">
 						<h3 className="dragwyb-af-agent-config__options-title">
-							{__('Options', 'dragwyb-agentflow')}
+							{__('Options', 'dragwyb-visual-automation')}
 						</h3>
 
 						{config.options.length === 0 ? (
 							<p className="dragwyb-af-agent-config__options-empty">
-								{__('No properties', 'dragwyb-agentflow')}
+								{__('No properties', 'dragwyb-visual-automation')}
 							</p>
 						) : (
 							config.options.map((optionId) => {
@@ -360,7 +360,7 @@ export default function AgentConfigPanel({
 												isDestructive
 												onClick={() => removeOption(optionId)}
 											>
-												{__('Remove', 'dragwyb-agentflow')}
+												{__('Remove', 'dragwyb-visual-automation')}
 											</Button>
 										</div>
 									);
@@ -390,7 +390,7 @@ export default function AgentConfigPanel({
 												isDestructive
 												onClick={() => removeOption(optionId)}
 											>
-												{__('Remove', 'dragwyb-agentflow')}
+												{__('Remove', 'dragwyb-visual-automation')}
 											</Button>
 										</div>
 									);
@@ -407,7 +407,7 @@ export default function AgentConfigPanel({
 								onClick={() => setOptionsMenuOpen((open) => !open)}
 								disabled={availableOptions.length === 0}
 							>
-								{__('Add Option', 'dragwyb-agentflow')}
+								{__('Add Option', 'dragwyb-visual-automation')}
 							</Button>
 							{optionsMenuOpen && availableOptions.length > 0 && (
 								<div className="dragwyb-af-agent-config__add-option-menu">
@@ -431,7 +431,7 @@ export default function AgentConfigPanel({
 			{activeTab === 'settings' && (
 				<div className="dragwyb-af-agent-config__panel">
 					<ToggleControl
-						label={__('Always Output Data', 'dragwyb-agentflow')}
+						label={__('Always Output Data', 'dragwyb-visual-automation')}
 						checked={config.settings.always_output_data}
 						onChange={(checked) =>
 							patchSettings({ always_output_data: checked })
@@ -439,7 +439,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Execute Once', 'dragwyb-agentflow')}
+						label={__('Execute Once', 'dragwyb-visual-automation')}
 						checked={config.settings.execute_once}
 						onChange={(checked) =>
 							patchSettings({ execute_once: checked })
@@ -447,7 +447,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<ToggleControl
-						label={__('Retry On Fail', 'dragwyb-agentflow')}
+						label={__('Retry On Fail', 'dragwyb-visual-automation')}
 						checked={config.settings.retry_on_fail}
 						onChange={(checked) =>
 							patchSettings({ retry_on_fail: checked })
@@ -457,7 +457,7 @@ export default function AgentConfigPanel({
 					{config.settings.retry_on_fail && (
 						<>
 							<TextControl
-								label={__('Max. Tries', 'dragwyb-agentflow')}
+								label={__('Max. Tries', 'dragwyb-visual-automation')}
 								type="number"
 								min={1}
 								max={10}
@@ -471,7 +471,7 @@ export default function AgentConfigPanel({
 							<TextControl
 								label={__(
 									'Wait Between Tries (ms)',
-									'dragwyb-agentflow'
+									'dragwyb-visual-automation'
 								)}
 								type="number"
 								min={0}
@@ -489,21 +489,21 @@ export default function AgentConfigPanel({
 					)}
 
 					<SelectControl
-						label={__('On Error', 'dragwyb-agentflow')}
+						label={__('On Error', 'dragwyb-visual-automation')}
 						value={config.settings.on_error}
 						options={[
 							{
-								label: __('Stop Workflow', 'dragwyb-agentflow'),
+								label: __('Stop Workflow', 'dragwyb-visual-automation'),
 								value: ON_ERROR_STOP,
 							},
 							{
-								label: __('Continue', 'dragwyb-agentflow'),
+								label: __('Continue', 'dragwyb-visual-automation'),
 								value: ON_ERROR_CONTINUE,
 							},
 							{
 								label: __(
 									'Continue using Error Output',
-									'dragwyb-agentflow'
+									'dragwyb-visual-automation'
 								),
 								value: ON_ERROR_ERROR_OUTPUT,
 							},
@@ -512,7 +512,7 @@ export default function AgentConfigPanel({
 					/>
 
 					<TextareaControl
-						label={__('Notes', 'dragwyb-agentflow')}
+						label={__('Notes', 'dragwyb-visual-automation')}
 						value={config.settings.notes}
 						onChange={(value) => patchSettings({ notes: value })}
 					/>
@@ -520,7 +520,7 @@ export default function AgentConfigPanel({
 					<ToggleControl
 						label={__(
 							'Display Note in Flow?',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}
 						checked={config.settings.display_note_in_flow}
 						onChange={(checked) =>
@@ -531,7 +531,7 @@ export default function AgentConfigPanel({
 					<p className="dragwyb-af-agent-config__version">
 						{__(
 							'AI Agent node version',
-							'dragwyb-agentflow'
+							'dragwyb-visual-automation'
 						)}{' '}
 						{AI_AGENT_VERSION}
 					</p>
@@ -569,7 +569,7 @@ function AgentConnectorRow({
 	const connectors = [
 		{
 			id: 'chat_model',
-			label: __('Chat Model', 'dragwyb-agentflow'),
+			label: __('Chat Model', 'dragwyb-visual-automation'),
 			required: true,
 			connected: attachments.chatModel,
 			onAdd: onAddChatModel,
@@ -577,13 +577,13 @@ function AgentConnectorRow({
 		},
 		{
 			id: 'memory',
-			label: __('Memory', 'dragwyb-agentflow'),
+			label: __('Memory', 'dragwyb-visual-automation'),
 			connected: attachments.memory,
 			onAdd: onAddMemory,
 		},
 		{
 			id: 'tool',
-			label: __('Tool', 'dragwyb-agentflow'),
+			label: __('Tool', 'dragwyb-visual-automation'),
 			connected: attachments.tools?.length > 0 ? attachments.tools[0] : null,
 			toolCount: attachments.tools?.length || 0,
 			onAdd: onAddTool,
@@ -593,7 +593,7 @@ function AgentConnectorRow({
 	if (fallbackEnabled) {
 		connectors.push({
 			id: 'fallback_chat_model',
-			label: __('Fallback Chat Model', 'dragwyb-agentflow'),
+			label: __('Fallback Chat Model', 'dragwyb-visual-automation'),
 			required: true,
 			connected: attachments.fallbackChatModel,
 			onAdd: onAddFallbackModel,
@@ -604,7 +604,7 @@ function AgentConnectorRow({
 	if (requireOutputFormat) {
 		connectors.splice(1, 0, {
 			id: 'output_parser',
-			label: __('Output Parser', 'dragwyb-agentflow'),
+			label: __('Output Parser', 'dragwyb-visual-automation'),
 			required: true,
 			connected: attachments.outputParser,
 			onAdd: onAddOutputParser,
@@ -653,7 +653,7 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 					type="button"
 					className="dragwyb-af-agent-config__connector-add"
 					onClick={onAdd}
-					aria-label={__('Add connection', 'dragwyb-agentflow')}
+					aria-label={__('Add connection', 'dragwyb-visual-automation')}
 				>
 					+
 				</button>

@@ -2,14 +2,14 @@
 /**
  * Elementor Pro form submission trigger.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Triggers;
+namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,14 +44,14 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Elementor Form Submitted', 'dragwyb-agentflow' );
+		return __( 'Elementor Form Submitted', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when an Elementor Pro form is submitted.', 'dragwyb-agentflow' );
+		return __( 'Starts the workflow when an Elementor Pro form is submitted.', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -61,12 +61,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'select',
-				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-visual-automation' ),
 				'default' => '',
 				'options' => array(
 					array(
 						'value' => '',
-						'label' => __( 'All forms', 'dragwyb-agentflow' ),
+						'label' => __( 'All forms', 'dragwyb-visual-automation' ),
 					),
 				),
 			),

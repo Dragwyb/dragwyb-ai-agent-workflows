@@ -2,12 +2,12 @@
 /**
  * Runtime environment requirement checks.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Core;
+namespace DragwybVisualAutomation\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,7 +43,7 @@ class Requirements {
 				'dragwyb_af_php_version',
 				sprintf(
 					/* translators: 1: required PHP version, 2: current PHP version. */
-					__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s.', 'dragwyb-agentflow' ),
+					__( 'Dragwyb Visual Automation requires PHP %1$s or higher. Your site is running PHP %2$s.', 'dragwyb-visual-automation' ),
 					DRAGWYB_AF_MIN_PHP_VERSION,
 					PHP_VERSION
 				)
@@ -55,7 +55,7 @@ class Requirements {
 				'dragwyb_af_wp_version',
 				sprintf(
 					/* translators: 1: required WordPress version, 2: current WordPress version. */
-					__( 'Workflow Automate requires WordPress %1$s or higher. Your site is running WordPress %2$s.', 'dragwyb-agentflow' ),
+					__( 'Dragwyb Visual Automation requires WordPress %1$s or higher. Your site is running WordPress %2$s.', 'dragwyb-visual-automation' ),
 					DRAGWYB_AF_MIN_WP_VERSION,
 					$wp_version
 				)
@@ -65,7 +65,7 @@ class Requirements {
 		if ( ! Encryption::isAvailable() ) {
 			$errors->add(
 				'dragwyb_af_openssl_missing',
-				__( 'Workflow Automate requires the PHP openssl extension (used to encrypt stored connection credentials) to be enabled.', 'dragwyb-agentflow' )
+				__( 'Dragwyb Visual Automation requires the PHP openssl extension (used to encrypt stored connection credentials) to be enabled.', 'dragwyb-visual-automation' )
 			);
 		}
 

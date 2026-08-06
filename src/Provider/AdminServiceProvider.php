@@ -2,19 +2,19 @@
 /**
  * Registers admin domain services against the container.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Provider;
+namespace DragwybVisualAutomation\Plugin\Provider;
 
-use DragwybAgentFlow\Plugin\Core\Container;
-use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
-use DragwybAgentFlow\Plugin\Service\SettingsService;
-use DragwybAgentFlow\Plugin\Service\ConnectionVerifier;
+use DragwybVisualAutomation\Plugin\Core\Container;
+use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Service\SettingsService;
+use DragwybVisualAutomation\Plugin\Service\ConnectionVerifier;
 
 
 // Prevent direct file access.

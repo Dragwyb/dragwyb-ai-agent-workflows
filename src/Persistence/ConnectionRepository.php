@@ -2,15 +2,15 @@
 /**
  * Connection repository.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Persistence;
+namespace DragwybVisualAutomation\Plugin\Persistence;
 
-use DragwybAgentFlow\Plugin\Database\Table;
-use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybVisualAutomation\Plugin\Database\Table;
+use DragwybVisualAutomation\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

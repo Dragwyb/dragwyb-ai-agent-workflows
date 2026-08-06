@@ -2,14 +2,14 @@
 /**
  * Lists Elementor Pro forms for builder config fields.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Integration\IntegrationTriggerCatalog;
+use DragwybVisualAutomation\Plugin\Integration\IntegrationTriggerCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ final class ElementorFormsService {
 		$options = array(
 			array(
 				'value' => '',
-				'label' => __( 'All forms', 'dragwyb-agentflow' ),
+				'label' => __( 'All forms', 'dragwyb-visual-automation' ),
 			),
 		);
 
@@ -50,7 +50,7 @@ final class ElementorFormsService {
 		$options = array(
 			array(
 				'value' => '',
-				'label' => __( 'All forms', 'dragwyb-agentflow' ),
+				'label' => __( 'All forms', 'dragwyb-visual-automation' ),
 			),
 		);
 
@@ -68,7 +68,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorAtomicFormsActive() ) {
 			return array(
 				'options' => array(),
-				'error'   => __( 'Elementor Pro atomic forms are not available.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Elementor Pro atomic forms are not available.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -78,7 +78,7 @@ final class ElementorFormsService {
 		);
 
 		if ( array() === $result['options'] ) {
-			$result['error'] = __( 'No Elementor atomic forms were found on this site.', 'dragwyb-agentflow' );
+			$result['error'] = __( 'No Elementor atomic forms were found on this site.', 'dragwyb-visual-automation' );
 		}
 
 		return $result;
@@ -91,7 +91,7 @@ final class ElementorFormsService {
 		if ( ! IntegrationTriggerCatalog::isElementorProActive() ) {
 			return array(
 				'options' => array(),
-				'error'   => __( 'Elementor Pro is not active.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Elementor Pro is not active.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -106,7 +106,7 @@ final class ElementorFormsService {
 		);
 
 		if ( array() === $result['options'] ) {
-			$result['error'] = __( 'No Elementor forms were found on this site.', 'dragwyb-agentflow' );
+			$result['error'] = __( 'No Elementor forms were found on this site.', 'dragwyb-visual-automation' );
 		}
 
 		return $result;
@@ -128,8 +128,8 @@ final class ElementorFormsService {
 			return array(
 				'success' => false,
 				'error'   => $atomic
-					? __( 'No Elementor atomic form was found for the variable picker.', 'dragwyb-agentflow' )
-					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'dragwyb-agentflow' ),
+					? __( 'No Elementor atomic form was found for the variable picker.', 'dragwyb-visual-automation' )
+					: __( 'No Elementor form was found for the variable picker. Select a form on the trigger, or create one in Elementor.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -287,7 +287,7 @@ final class ElementorFormsService {
 				$form_name = $resolve_form_name( $settings );
 
 				if ( '' === $form_name ) {
-					$form_name = __( 'Untitled Form', 'dragwyb-agentflow' );
+					$form_name = __( 'Untitled Form', 'dragwyb-visual-automation' );
 				}
 
 				$parsed = $atomic
@@ -542,14 +542,14 @@ final class ElementorFormsService {
 			if ( count( $page_titles ) > 1 ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: comma-separated page titles */
-					__( '%1$s (%2$s)', 'dragwyb-agentflow' ),
+					__( '%1$s (%2$s)', 'dragwyb-visual-automation' ),
 					$entry['form_name'],
 					implode( ', ', $page_titles )
 				);
 			} elseif ( 1 === count( $page_titles ) ) {
 				$label = sprintf(
 					/* translators: 1: form name, 2: page title */
-					__( '%1$s — %2$s', 'dragwyb-agentflow' ),
+					__( '%1$s — %2$s', 'dragwyb-visual-automation' ),
 					$entry['form_name'],
 					$page_titles[0]
 				);
@@ -823,7 +823,7 @@ final class ElementorFormsService {
 				$form_name = $resolve_form_name( $settings );
 
 				if ( '' === $form_name ) {
-					$form_name = __( 'Untitled Form', 'dragwyb-agentflow' );
+					$form_name = __( 'Untitled Form', 'dragwyb-visual-automation' );
 				}
 
 				if ( ! isset( $forms_by_id[ $form_id ] ) ) {

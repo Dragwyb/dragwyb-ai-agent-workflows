@@ -2,25 +2,25 @@
 /**
  * REST API bootstrap.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
-use DragwybAgentFlow\Plugin\Core\Container;
-use DragwybAgentFlow\Plugin\Service\AiModelsService;
-use DragwybAgentFlow\Plugin\Service\ChatMessageService;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
-use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
-use DragwybAgentFlow\Plugin\Service\WebhookService;
-use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
-use DragwybAgentFlow\Plugin\Service\WorkflowService;
-use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
-use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
+use DragwybVisualAutomation\Plugin\Core\Container;
+use DragwybVisualAutomation\Plugin\Service\AiModelsService;
+use DragwybVisualAutomation\Plugin\Service\ChatMessageService;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\ElementorFormsService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
+use DragwybVisualAutomation\Plugin\Service\WebhookService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowNodeTestService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -6,8 +6,8 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'DragwybAgentFlow\\AiProviders\\' => array($baseDir . '/src'),
     'WordPress\\OpenAiAiProvider\\' => array($vendorDir . '/wordpress/ai-provider-for-openai/src'),
     'WordPress\\GoogleAiProvider\\' => array($vendorDir . '/wordpress/ai-provider-for-google/src'),
     'WordPress\\AnthropicAiProvider\\' => array($vendorDir . '/wordpress/ai-provider-for-anthropic/src'),
+    'DragwybVisualAutomation\\AiProviders\\' => array($baseDir . '/src'),
 );

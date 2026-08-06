@@ -2,17 +2,17 @@
 /**
  * Handles state-changing Settings admin actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
-use DragwybAgentFlow\Plugin\Admin\Pages\SettingsPage;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Service\RunRetentionService;
-use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\SettingsPage;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
+use DragwybVisualAutomation\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,7 +59,7 @@ class SettingsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation.

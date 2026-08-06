@@ -25,7 +25,7 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 	return (
 		<div className="dragwyb-af-builder-config__captured">
 			<div className="dragwyb-af-builder-config__captured-header">
-				<h3>{__('Captured response', 'dragwyb-agentflow')}</h3>
+				<h3>{__('Captured response', 'dragwyb-visual-automation')}</h3>
 				{capturedAt && (
 					<span className="dragwyb-af-builder-config__captured-time">
 						{capturedAt}
@@ -44,7 +44,7 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 				<p className="dragwyb-af-builder-config__captured-empty">
 					{__(
 						'No captured data for this trigger yet. Use Test Flow → Listen new response, then fire the trigger.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 				</p>
 			)}

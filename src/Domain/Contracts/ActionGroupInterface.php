@@ -2,12 +2,12 @@
 /**
  * Optional action grouping for the builder palette.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Domain\Contracts;
+namespace DragwybVisualAutomation\Plugin\Domain\Contracts;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

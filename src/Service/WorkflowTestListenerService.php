@@ -2,14 +2,14 @@
 /**
  * Test-flow listener: capture trigger payloads while building a workflow.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Domain\Workflow;
+use DragwybVisualAutomation\Plugin\Domain\Workflow;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

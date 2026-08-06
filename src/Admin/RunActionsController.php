@@ -2,22 +2,22 @@
 /**
  * Handles state-changing Run admin actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Admin\Pages\RunDetailPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
-use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
-use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\RunDetailPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\RunsPage;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
+use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -99,7 +99,7 @@ class RunActionsController {
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_RUNS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_run_bulk_action' ) ) {
@@ -135,7 +135,7 @@ class RunActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_RUNS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation and per-id.

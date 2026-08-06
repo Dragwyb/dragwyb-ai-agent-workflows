@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Connection admin actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionsPage;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionsPage;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,7 +90,7 @@ class ConnectionActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation (and per-id for update/delete).
@@ -200,7 +200,7 @@ class ConnectionActionsController {
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_connection_bulk_action' ) ) {

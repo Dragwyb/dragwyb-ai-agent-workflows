@@ -2,18 +2,18 @@
 /**
  * Connection application service.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Core\Encryption;
-use DragwybAgentFlow\Plugin\Domain\Connection;
-use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
+use DragwybVisualAutomation\Plugin\Core\Encryption;
+use DragwybVisualAutomation\Plugin\Domain\Connection;
+use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -60,15 +60,15 @@ class ConnectionService {
 		$label            = trim( sanitize_text_field( $label ) );
 
 		if ( ! in_array( $auth_type, ConnectionAuthTypes::VALID, true ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Unrecognized authentication type.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'Unrecognized authentication type.', 'dragwyb-visual-automation' ) );
 		}
 
 		if ( '' === $integration_slug ) {
-			throw new InvalidArgumentException( esc_html__( 'An integration is required.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'An integration is required.', 'dragwyb-visual-automation' ) );
 		}
 
 		if ( '' === $label ) {
-			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'dragwyb-visual-automation' ) );
 		}
 
 		$encrypted = array();
@@ -79,7 +79,7 @@ class ConnectionService {
 			$required = ConnectionAuthTypes::isRequiredOnCreate( $auth_type, $field );
 
 			if ( $required && '' === $value ) {
-				throw new InvalidArgumentException( esc_html__( 'All fields are required to create a connection.', 'dragwyb-agentflow' ) );
+				throw new InvalidArgumentException( esc_html__( 'All fields are required to create a connection.', 'dragwyb-visual-automation' ) );
 			}
 
 			if ( '' === $value ) {
@@ -103,7 +103,7 @@ class ConnectionService {
 		);
 
 		if ( null === $connection ) {
-			throw new RuntimeException( esc_html__( 'Failed to create the connection.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'Failed to create the connection.', 'dragwyb-visual-automation' ) );
 		}
 
 		return $connection;
@@ -134,13 +134,13 @@ class ConnectionService {
 		$connection = $this->connections->find( $id );
 
 		if ( null === $connection ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified connection does not exist.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified connection does not exist.', 'dragwyb-visual-automation' ) );
 		}
 
 		$label = trim( sanitize_text_field( $label ) );
 
 		if ( '' === $label ) {
-			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'A connection label is required.', 'dragwyb-visual-automation' ) );
 		}
 
 		$encrypted = $connection->encryptedCredentials();
@@ -180,7 +180,7 @@ class ConnectionService {
 		);
 
 		if ( null === $updated ) {
-			throw new RuntimeException( esc_html__( 'Failed to update the connection.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'Failed to update the connection.', 'dragwyb-visual-automation' ) );
 		}
 
 		return $updated;
@@ -228,11 +228,11 @@ class ConnectionService {
 		$connection = $this->connections->find( $id );
 
 		if ( null === $connection ) {
-			throw new RuntimeException( esc_html__( 'The specified connection does not exist.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'The specified connection does not exist.', 'dragwyb-visual-automation' ) );
 		}
 
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
-			throw new RuntimeException( esc_html__( 'OAuth tokens can only be stored on OAuth connections.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'OAuth tokens can only be stored on OAuth connections.', 'dragwyb-visual-automation' ) );
 		}
 
 		$encrypted                  = $connection->encryptedCredentials();
@@ -256,7 +256,7 @@ class ConnectionService {
 		);
 
 		if ( null === $updated ) {
-			throw new RuntimeException( esc_html__( 'Failed to store OAuth tokens.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'Failed to store OAuth tokens.', 'dragwyb-visual-automation' ) );
 		}
 
 		return $updated;
@@ -305,7 +305,7 @@ class ConnectionService {
 				$plaintext = Encryption::decrypt( $ciphertext );
 
 				if ( null === $plaintext ) {
-					$display = __( '(unable to decrypt — please re-enter this value)', 'dragwyb-agentflow' );
+					$display = __( '(unable to decrypt — please re-enter this value)', 'dragwyb-visual-automation' );
 				} elseif ( ! empty( $meta['secret'] ) ) {
 					$display = self::mask( $plaintext );
 				} else {
@@ -373,7 +373,7 @@ class ConnectionService {
 		if ( empty( $result['success'] ) ) {
 			$message = isset( $result['error'] ) && '' !== $result['error']
 				? (string) $result['error']
-				: __( 'Credential verification failed. Check the API key or token and try again.', 'dragwyb-agentflow' );
+				: __( 'Credential verification failed. Check the API key or token and try again.', 'dragwyb-visual-automation' );
 
 			throw new InvalidArgumentException( esc_html( $message ) );
 		}

@@ -2,14 +2,14 @@
 /**
  * Elementor Pro atomic form submission trigger.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Triggers;
+namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,18 +17,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Starts a workflow when an Elementor Pro atomic form is submitted via the
- * `elementor_pro_atomic_forms_send_form` AJAX action.
+ * Starts a workflow when an Elementor Pro atomic form is submitted.
  *
- * Hooks at priority 1 so field data is captured before Elementor's own
- * handler runs at the default priority.
- *
- * Optional `form_id` config limits the trigger to one form widget; leave
- * empty to run for every atomic form on the site.
+ * Listens to Elementor Pro's existing AJAX action name (third-party hook),
+ * verifies Elementor's request nonce first, then builds a sanitized payload.
  */
 class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 
-	private const AJAX_ACTION = 'elementor_pro_atomic_forms_send_form';
+	/**
+	 * Elementor Pro's own AJAX action — we listen, we do not register this name.
+	 */
+	private const ELEMENTOR_AJAX_ACTION = 'elementor_pro_atomic_forms_send_form';
 
 	/**
 	 * {@inheritDoc}
@@ -41,14 +40,14 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Elementor Atomic Form Submitted', 'dragwyb-agentflow' );
+		return __( 'Elementor Atomic Form Submitted', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when an Elementor Pro atomic form is submitted.', 'dragwyb-agentflow' );
+		return __( 'Starts the workflow when an Elementor Pro atomic form is submitted.', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -58,12 +57,12 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'select',
-				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-visual-automation' ),
 				'default' => '',
 				'options' => array(
 					array(
 						'value' => '',
-						'label' => __( 'All forms', 'dragwyb-agentflow' ),
+						'label' => __( 'All forms', 'dragwyb-visual-automation' ),
 					),
 				),
 			),
@@ -81,6 +80,10 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 				return;
 			}
 
+			if ( ! self::verifyElementorRequest() ) {
+				return;
+			}
+
 			$payload = self::buildPayloadFromPost();
 
 			if ( null === $payload ) {
@@ -94,17 +97,50 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			$on_fire( $payload, $config );
 		};
 
-		add_action( 'wp_ajax_' . self::AJAX_ACTION, $handler, 1 );
-		add_action( 'wp_ajax_nopriv_' . self::AJAX_ACTION, $handler, 1 );
+		// Priority 20 runs after Elementor's own handler (default 10) has had a
+		// chance to validate the request. We still verify nonce ourselves.
+		add_action( 'wp_ajax_' . self::ELEMENTOR_AJAX_ACTION, $handler, 20 );
+		add_action( 'wp_ajax_nopriv_' . self::ELEMENTOR_AJAX_ACTION, $handler, 20 );
 	}
 
 	/**
 	 * @return bool
 	 */
 	private static function isAtomicFormSubmissionRequest(): bool {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only; Elementor validates the nonce later.
-		return wp_doing_ajax()
-			&& self::AJAX_ACTION === (string) self::getPostValue( 'action' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verifyElementorRequest().
+		$action = isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '';
+
+		return wp_doing_ajax() && self::ELEMENTOR_AJAX_ACTION === $action;
+	}
+
+	/**
+	 * Confirms Elementor's form nonce before workflow execution.
+	 *
+	 * @return bool
+	 */
+	private static function verifyElementorRequest(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifying here.
+		$nonce = isset( $_POST['_nonce'] )
+			? sanitize_text_field( wp_unslash( $_POST['_nonce'] ) )
+			: ( isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '' );
+
+		if ( '' === $nonce ) {
+			return false;
+		}
+
+		$actions = array(
+			'elementor_send_form',
+			'elementor-pro-frontend',
+			'elementor_pro_atomic_forms_send_form',
+		);
+
+		foreach ( $actions as $action ) {
+			if ( false !== wp_verify_nonce( $nonce, $action ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -113,23 +149,51 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 	 * @return mixed
 	 */
 	private static function getPostValue( string $key ) {
-		if ( class_exists( '\Elementor\Utils', false ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			return \Elementor\Utils::get_super_global_value( $_POST, $key );
+		// Always sanitize locally — do not trust third-party helpers alone.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified in verifyElementorRequest().
+		if ( ! isset( $_POST[ $key ] ) ) {
+			return null;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing, 
-		$value = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : null;
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below by type.
+		$raw = wp_unslash( $_POST[ $key ] );
 
-		if ( is_string( $value ) ) {
-			return sanitize_text_field( $value );
+		if ( is_string( $raw ) ) {
+			return sanitize_text_field( $raw );
 		}
 
-		if ( is_array( $value ) ) {
-			return array_map( 'sanitize_text_field', wp_unslash( $value ) );
+		if ( is_array( $raw ) ) {
+			return self::sanitizeArray( $raw );
 		}
 
-		return $value;
+		if ( is_numeric( $raw ) ) {
+			return $raw;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<mixed> $value Raw array.
+	 *
+	 * @return array<mixed>
+	 */
+	private static function sanitizeArray( array $value ): array {
+		$clean = array();
+
+		foreach ( $value as $k => $v ) {
+			$key = is_string( $k ) ? sanitize_text_field( $k ) : $k;
+
+			if ( is_array( $v ) ) {
+				$clean[ $key ] = self::sanitizeArray( $v );
+			} elseif ( is_string( $v ) ) {
+				$clean[ $key ] = sanitize_text_field( $v );
+			} elseif ( is_numeric( $v ) || is_bool( $v ) ) {
+				$clean[ $key ] = $v;
+			}
+		}
+
+		return $clean;
 	}
 
 	/**
@@ -154,14 +218,14 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 				continue;
 			}
 
-			$id = sanitize_text_field( $field['id'] ?? '' );
+			$id = sanitize_text_field( (string) ( $field['id'] ?? '' ) );
 
 			if ( '' === $id ) {
 				continue;
 			}
 
 			$value = $field['value'] ?? '';
-			$type  = sanitize_text_field( $field['type'] ?? 'text' );
+			$type  = sanitize_text_field( (string) ( $field['type'] ?? 'text' ) );
 
 			if ( is_array( $value ) ) {
 				$sanitized     = array_map( 'sanitize_text_field', $value );
@@ -172,7 +236,7 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 				$fields[ $id ] = sanitize_text_field( (string) $value );
 			}
 
-			$label = sanitize_text_field( $field['label'] ?? '' );
+			$label = sanitize_text_field( (string) ( $field['label'] ?? '' ) );
 
 			if ( '' !== $label ) {
 				$fields_by_label[ $label ] = $fields[ $id ];
@@ -193,11 +257,8 @@ class ElementorAtomicFormSubmittedTrigger implements TriggerInterface {
 			return null;
 		}
 
-		$referer_title = self::getPostValue( 'referer_title' ) ?? '';
-		$referer_title = is_string( $referer_title ) ? sanitize_text_field( wp_unslash( $referer_title ) ) : '';
-
-		$referrer = self::getPostValue( 'referrer' ) ?? '';
-		$referrer = is_string( $referrer ) ? esc_url_raw( wp_unslash( $referrer ) ) : '';
+		$referer_title = sanitize_text_field( (string) ( self::getPostValue( 'referer_title' ) ?? '' ) );
+		$referrer      = esc_url_raw( (string) ( self::getPostValue( 'referrer' ) ?? '' ) );
 
 		if ( '' === $form_name ) {
 			$form_name = $form_id;

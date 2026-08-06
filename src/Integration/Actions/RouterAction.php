@@ -2,15 +2,15 @@
 /**
  * Router tool — branch workflow based on a field value.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\ContextPathResolver;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\ContextPathResolver;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,29 +23,29 @@ class RouterAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'Router', 'dragwyb-agentflow' );
+		return __( 'Router', 'dragwyb-visual-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Routes to different steps based on a value.', 'dragwyb-agentflow' );
+		return __( 'Routes to different steps based on a value.', 'dragwyb-visual-automation' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'route_field'            => array(
 				'type'               => 'string',
-				'label'              => __( 'Value to check', 'dragwyb-agentflow' ),
+				'label'              => __( 'Value to check', 'dragwyb-visual-automation' ),
 				'supports_variables' => true,
 				'required'           => true,
 			),
 			'routes'                 => array(
 				'type'    => 'router_routes',
-				'label'   => __( 'Matching rules', 'dragwyb-agentflow' ),
+				'label'   => __( 'Matching rules', 'dragwyb-visual-automation' ),
 				'default' => array(),
 			),
 			'default_branch_node_id' => array(
 				'type'    => 'node_select',
-				'label'   => __( 'Otherwise, run this step', 'dragwyb-agentflow' ),
+				'label'   => __( 'Otherwise, run this step', 'dragwyb-visual-automation' ),
 				'default' => '',
 			),
 		);

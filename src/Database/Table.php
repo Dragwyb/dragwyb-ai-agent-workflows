@@ -2,12 +2,12 @@
 /**
  * Table naming helper.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Database;
+namespace DragwybVisualAutomation\Plugin\Database;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

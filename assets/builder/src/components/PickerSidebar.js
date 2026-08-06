@@ -91,28 +91,28 @@ export default function PickerSidebar({
 		kind === 'agent-fallback-chat-model' ||
 		kind === 'parser-chat-model'
 			? kind === 'agent-fallback-chat-model'
-				? __('Select fallback chat model', 'dragwyb-agentflow')
+				? __('Select fallback chat model', 'dragwyb-visual-automation')
 				: kind === 'parser-chat-model'
-					? __('Select Auto-Fix chat model', 'dragwyb-agentflow')
-					: __('Select chat model', 'dragwyb-agentflow')
+					? __('Select Auto-Fix chat model', 'dragwyb-visual-automation')
+					: __('Select chat model', 'dragwyb-visual-automation')
 			: kind === 'agent-tool'
-				? __('Add tool to agent', 'dragwyb-agentflow')
+				? __('Add tool to agent', 'dragwyb-visual-automation')
 				: kind === 'branch-action'
-					? __('Add step to branch', 'dragwyb-agentflow')
+					? __('Add step to branch', 'dragwyb-visual-automation')
 					: kind === 'edge-insert' || kind === 'edge-branch-insert'
-						? __('Add step between nodes', 'dragwyb-agentflow')
+						? __('Add step between nodes', 'dragwyb-visual-automation')
 						: showGroups
-						? __('Choose a group', 'dragwyb-agentflow')
+						? __('Choose a group', 'dragwyb-visual-automation')
 						: usesGroupedSections
 							? appLabel
-							: __('Choose a node', 'dragwyb-agentflow');
+							: __('Choose a node', 'dragwyb-visual-automation');
 	const replaceHint =
 		kind === 'trigger' && hasExistingTrigger && !showGroups
-			? __('Selecting a trigger replaces your current one.', 'dragwyb-agentflow')
+			? __('Selecting a trigger replaces your current one.', 'dragwyb-visual-automation')
 			: kind === 'agent-chat-model'
 				? __(
 					'Pick a provider — configure API key and model on the canvas node.',
-					'dragwyb-agentflow'
+					'dragwyb-visual-automation'
 				)
 				: '';
 	const showBack = (usesGroups && groupId) || subAppId;
@@ -147,9 +147,9 @@ export default function PickerSidebar({
 					/* translators: %s: plugin name, e.g. WooCommerce */
 					__(
 						'Activate %s to use this trigger.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					),
-					item.requires_plugin || __('this plugin', 'dragwyb-agentflow')
+					item.requires_plugin || __('this plugin', 'dragwyb-visual-automation')
 				)
 			: '';
 
@@ -204,14 +204,14 @@ export default function PickerSidebar({
 						className="dragwyb-af-builder-picker__back"
 						onClick={handleBack}
 					>
-						{__('← Back', 'dragwyb-agentflow')}
+						{__('← Back', 'dragwyb-visual-automation')}
 					</Button>
 				)}
 				<h2 className="dragwyb-af-builder-picker__title">{title}</h2>
 				<Button
 					className="dragwyb-af-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'dragwyb-agentflow')}
+					label={__('Close', 'dragwyb-visual-automation')}
 					onClick={onClose}
 				/>
 			</div>
@@ -240,9 +240,9 @@ export default function PickerSidebar({
 				<>
 					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
-							label={__('Search tools', 'dragwyb-agentflow')}
+							label={__('Search tools', 'dragwyb-visual-automation')}
 							hideLabelFromVision
-							placeholder={__('Search tools…', 'dragwyb-agentflow')}
+							placeholder={__('Search tools…', 'dragwyb-visual-automation')}
 							value={toolQuery}
 							onChange={setToolQuery}
 						/>
@@ -251,7 +251,7 @@ export default function PickerSidebar({
 						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No tools match your search.',
-								'dragwyb-agentflow'
+								'dragwyb-visual-automation'
 							)}
 						</p>
 					) : (
@@ -276,9 +276,9 @@ export default function PickerSidebar({
 				<>
 					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
-							label={__('Search actions', 'dragwyb-agentflow')}
+							label={__('Search actions', 'dragwyb-visual-automation')}
 							hideLabelFromVision
-							placeholder={__('Search actions…', 'dragwyb-agentflow')}
+							placeholder={__('Search actions…', 'dragwyb-visual-automation')}
 							value={groupedQuery}
 							onChange={setGroupedQuery}
 						/>
@@ -287,7 +287,7 @@ export default function PickerSidebar({
 						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No actions match your search.',
-								'dragwyb-agentflow'
+								'dragwyb-visual-automation'
 							)}
 						</p>
 					) : (

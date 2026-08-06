@@ -2,14 +2,14 @@
 /**
  * Renders a WorkflowRun status as a small colored badge.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
-use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,17 +54,17 @@ class RunStatusBadge {
 	private static function label( string $status ): string {
 		switch ( $status ) {
 			case WorkflowRun::STATUS_QUEUED:
-				return __( 'Queued', 'dragwyb-agentflow' );
+				return __( 'Queued', 'dragwyb-visual-automation' );
 			case WorkflowRun::STATUS_RUNNING:
-				return __( 'Running', 'dragwyb-agentflow' );
+				return __( 'Running', 'dragwyb-visual-automation' );
 			case WorkflowRun::STATUS_SUCCESS:
-				return __( 'Success', 'dragwyb-agentflow' );
+				return __( 'Success', 'dragwyb-visual-automation' );
 			case WorkflowRun::STATUS_FAILED:
-				return __( 'Failed', 'dragwyb-agentflow' );
+				return __( 'Failed', 'dragwyb-visual-automation' );
 			case WorkflowRun::STATUS_PARTIAL:
-				return __( 'Partial', 'dragwyb-agentflow' );
+				return __( 'Partial', 'dragwyb-visual-automation' );
 			default:
-				return __( 'Unknown', 'dragwyb-agentflow' );
+				return __( 'Unknown', 'dragwyb-visual-automation' );
 		}
 	}
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\AiProviders\Compatible;
+namespace DragwybVisualAutomation\AiProviders\Compatible;
 
 use WordPress\AiClient\Providers\DTO\ProviderMetadata;
 use WordPress\AiClient\Providers\Http\DTO\Request;

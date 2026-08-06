@@ -2,14 +2,14 @@
 /**
  * Slack Incoming Webhook action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,14 +42,14 @@ class SlackIncomingWebhookAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Slack (Incoming Webhook)', 'dragwyb-agentflow' );
+		return __( 'Slack (Incoming Webhook)', 'dragwyb-visual-automation' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Posts a message to Slack using an Incoming Webhook URL.', 'dragwyb-agentflow' );
+		return __( 'Posts a message to Slack using an Incoming Webhook URL.', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -59,12 +59,12 @@ class SlackIncomingWebhookAction implements ActionInterface {
 		return array(
 			'webhook_url' => array(
 				'type'     => 'string',
-				'label'    => __( 'Slack Incoming Webhook URL', 'dragwyb-agentflow' ),
+				'label'    => __( 'Slack Incoming Webhook URL', 'dragwyb-visual-automation' ),
 				'required' => true,
 			),
 			'message'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Message (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-agentflow' ),
+				'label'    => __( 'Message (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-visual-automation' ),
 				'required' => true,
 			),
 		);
@@ -81,7 +81,7 @@ class SlackIncomingWebhookAction implements ActionInterface {
 		if ( '' === $url ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No Slack webhook URL configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No Slack webhook URL configured.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -90,7 +90,7 @@ class SlackIncomingWebhookAction implements ActionInterface {
 		if ( 0 !== strpos( $url, 'https://hooks.slack.com/' ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Webhook URL must start with https://hooks.slack.com/.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Webhook URL must start with https://hooks.slack.com/.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -99,7 +99,7 @@ class SlackIncomingWebhookAction implements ActionInterface {
 		if ( '' === trim( $message ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No message configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No message configured.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -108,7 +108,7 @@ class SlackIncomingWebhookAction implements ActionInterface {
 		if ( ! is_string( $body ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the Slack payload.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Failed to encode the Slack payload.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -138,7 +138,7 @@ class SlackIncomingWebhookAction implements ActionInterface {
 				'success'     => false,
 				'error'       => sprintf(
 					/* translators: 1: HTTP status code, 2: response body snippet */
-					__( 'Slack returned HTTP %1$d: %2$s', 'dragwyb-agentflow' ),
+					__( 'Slack returned HTTP %1$d: %2$s', 'dragwyb-visual-automation' ),
 					$status_code,
 					self::truncate( $response_body, 200 )
 				),

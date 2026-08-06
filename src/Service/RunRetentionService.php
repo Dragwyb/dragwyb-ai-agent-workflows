@@ -2,15 +2,15 @@
 /**
  * Prunes old, finished workflow runs and their logs.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

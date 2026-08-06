@@ -2,18 +2,18 @@
 /**
  * Optional co-plugin triggers — catalog + availability checks.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration;
+namespace DragwybVisualAutomation\Plugin\Integration;
 
-use DragwybAgentFlow\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
-use DragwybAgentFlow\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
-use DragwybAgentFlow\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use DragwybAgentFlow\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use DragwybAgentFlow\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

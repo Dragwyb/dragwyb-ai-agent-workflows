@@ -2,12 +2,12 @@
 /**
  * Symmetric encryption helper for credential-at-rest storage.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Core;
+namespace DragwybVisualAutomation\Plugin\Core;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

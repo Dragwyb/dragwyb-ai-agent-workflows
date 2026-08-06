@@ -136,9 +136,9 @@ export default function NodeCard({
 	const ariaLabel = [
 		node.label || node.type,
 		node.category === 'trigger'
-			? __('Trigger', 'dragwyb-agentflow')
-			: __('Action', 'dragwyb-agentflow'),
-		selected ? __('selected', 'dragwyb-agentflow') : '',
+			? __('Trigger', 'dragwyb-visual-automation')
+			: __('Action', 'dragwyb-visual-automation'),
+		selected ? __('selected', 'dragwyb-visual-automation') : '',
 	]
 		.filter(Boolean)
 		.join(', ');
@@ -194,11 +194,11 @@ export default function NodeCard({
 					className="dragwyb-af-builder-node__output-port"
 					title={__(
 						'Drag to the next step to connect',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 					aria-label={__(
 						'Drag to the next step to connect',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 					onPointerDown={(event) => {
 						stopPointer(event);

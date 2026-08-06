@@ -400,7 +400,7 @@ export default function Canvas({
 			}
 			style={{ '--dragwyb-af-canvas-zoom': String(zoom) }}
 			role="region"
-			aria-label={__('Workflow canvas', 'dragwyb-agentflow')}
+			aria-label={__('Workflow canvas', 'dragwyb-visual-automation')}
 			onClick={onCanvasClick}
 		>
 			<div
@@ -697,11 +697,11 @@ export default function Canvas({
 				</div>
 			</div>
 		</div>
-			<div className="dragwyb-af-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'dragwyb-agentflow')}>
+			<div className="dragwyb-af-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'dragwyb-visual-automation')}>
 				<button
 					type="button"
 					className="dragwyb-af-builder-canvas__zoom-btn"
-					aria-label={__('Zoom out', 'dragwyb-agentflow')}
+					aria-label={__('Zoom out', 'dragwyb-visual-automation')}
 					disabled={zoom <= ZOOM_MIN}
 					onClick={(event) => {
 						event.stopPropagation();
@@ -716,7 +716,7 @@ export default function Canvas({
 				<button
 					type="button"
 					className="dragwyb-af-builder-canvas__zoom-btn"
-					aria-label={__('Zoom in', 'dragwyb-agentflow')}
+					aria-label={__('Zoom in', 'dragwyb-visual-automation')}
 					disabled={zoom >= ZOOM_MAX}
 					onClick={(event) => {
 						event.stopPropagation();
@@ -734,7 +734,7 @@ function EmptyCanvasGuide() {
 	return (
 		<div className="dragwyb-af-builder-canvas__guide" role="status">
 			<h2 className="dragwyb-af-builder-canvas__guide-title">
-				{__('Build your workflow', 'dragwyb-agentflow')}
+				{__('Build your workflow', 'dragwyb-visual-automation')}
 			</h2>
 
 			<ol className="dragwyb-af-builder-canvas__guide-steps">
@@ -742,7 +742,7 @@ function EmptyCanvasGuide() {
 					{__(
 						'Add a trigger, then add an AI Agent from the Agents section.',
 
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 				</li>
 
@@ -750,14 +750,14 @@ function EmptyCanvasGuide() {
 					{__(
 						'Click + under Chat Model to pick OpenAI, Gemini, or Claude.',
 
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 				</li>
 
 				<li>
 					{__(
 						'Add Condition from Tools, then use + on each branch to connect different flows.',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)}
 				</li>
 			</ol>

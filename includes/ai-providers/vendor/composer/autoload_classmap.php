@@ -7,6 +7,12 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'DragwybVisualAutomation\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => $baseDir . '/src/Compatible/AbstractCompatibleApiProvider.php',
+    'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => $baseDir . '/src/Compatible/CompatibleModelMetadataDirectory.php',
+    'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => $baseDir . '/src/Compatible/CompatibleTextGenerationModel.php',
+    'DragwybVisualAutomation\\AiProviders\\DeepSeek\\DeepSeekProvider' => $baseDir . '/src/DeepSeek/DeepSeekProvider.php',
+    'DragwybVisualAutomation\\AiProviders\\Groq\\GroqProvider' => $baseDir . '/src/Groq/GroqProvider.php',
+    'DragwybVisualAutomation\\AiProviders\\OpenRouter\\OpenRouterProvider' => $baseDir . '/src/OpenRouter/OpenRouterProvider.php',
     'WordPress\\AnthropicAiProvider\\Authentication\\AnthropicApiKeyRequestAuthentication' => $vendorDir . '/wordpress/ai-provider-for-anthropic/src/Authentication/AnthropicApiKeyRequestAuthentication.php',
     'WordPress\\AnthropicAiProvider\\Metadata\\AnthropicModelMetadataDirectory' => $vendorDir . '/wordpress/ai-provider-for-anthropic/src/Metadata/AnthropicModelMetadataDirectory.php',
     'WordPress\\AnthropicAiProvider\\Models\\AnthropicTextGenerationModel' => $vendorDir . '/wordpress/ai-provider-for-anthropic/src/Models/AnthropicTextGenerationModel.php',
@@ -22,10 +28,4 @@ return array(
     'WordPress\\OpenAiAiProvider\\Models\\OpenAiImageGenerationModel' => $vendorDir . '/wordpress/ai-provider-for-openai/src/Models/OpenAiImageGenerationModel.php',
     'WordPress\\OpenAiAiProvider\\Models\\OpenAiTextGenerationModel' => $vendorDir . '/wordpress/ai-provider-for-openai/src/Models/OpenAiTextGenerationModel.php',
     'WordPress\\OpenAiAiProvider\\Provider\\OpenAiProvider' => $vendorDir . '/wordpress/ai-provider-for-openai/src/Provider/OpenAiProvider.php',
-    'DragwybAgentFlow\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => $baseDir . '/src/Compatible/AbstractCompatibleApiProvider.php',
-    'DragwybAgentFlow\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => $baseDir . '/src/Compatible/CompatibleModelMetadataDirectory.php',
-    'DragwybAgentFlow\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => $baseDir . '/src/Compatible/CompatibleTextGenerationModel.php',
-    'DragwybAgentFlow\\AiProviders\\DeepSeek\\DeepSeekProvider' => $baseDir . '/src/DeepSeek/DeepSeekProvider.php',
-    'DragwybAgentFlow\\AiProviders\\Groq\\GroqProvider' => $baseDir . '/src/Groq/GroqProvider.php',
-    'DragwybAgentFlow\\AiProviders\\OpenRouter\\OpenRouterProvider' => $baseDir . '/src/OpenRouter/OpenRouterProvider.php',
 );

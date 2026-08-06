@@ -235,7 +235,7 @@ export default function App() {
 					workflow = await fetchWorkflow(bootstrap.workflowId);
 				} else {
 					workflow = await createWorkflow({
-						title: __('Untitled workflow', 'dragwyb-agentflow'),
+						title: __('Untitled workflow', 'dragwyb-visual-automation'),
 						graph: emptyGraph(),
 					});
 
@@ -335,7 +335,7 @@ export default function App() {
 							? error.message
 							: __(
 									'Failed to load the workflow.',
-									'dragwyb-agentflow'
+									'dragwyb-visual-automation'
 								)
 					);
 				}
@@ -428,7 +428,7 @@ export default function App() {
 
 		downloadWorkflowJson(
 			payload,
-			exportFilenameFromTitle(current.title || __('workflow', 'dragwyb-agentflow'))
+			exportFilenameFromTitle(current.title || __('workflow', 'dragwyb-visual-automation'))
 		);
 	}, [workflowStatus]);
 
@@ -448,7 +448,7 @@ export default function App() {
 				!window.confirm(
 					__(
 						'Importing will replace the current workflow on the canvas. Continue?',
-						'dragwyb-agentflow'
+						'dragwyb-visual-automation'
 					)
 				)
 			) {
@@ -486,7 +486,7 @@ export default function App() {
 						? error.message
 						: __(
 								'Failed to import the workflow JSON.',
-								'dragwyb-agentflow'
+								'dragwyb-visual-automation'
 							)
 				);
 			}
@@ -612,7 +612,7 @@ export default function App() {
 							reply ||
 							__(
 								'(Workflow finished with no chat reply. Check the AI Agent output.)',
-								'dragwyb-agentflow'
+								'dragwyb-visual-automation'
 							),
 					},
 				]);
@@ -623,7 +623,7 @@ export default function App() {
 			} catch (error) {
 				const message =
 					error?.message ||
-					__('Chat request failed.', 'dragwyb-agentflow');
+					__('Chat request failed.', 'dragwyb-visual-automation');
 				setChatError(message);
 			} finally {
 				setChatSending(false);
@@ -1383,7 +1383,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'agent_output_parser',
 			category: 'action',
-			label: __('Structured Output Parser', 'dragwyb-agentflow'),
+			label: __('Structured Output Parser', 'dragwyb-visual-automation'),
 			parent_agent_id: agentId,
 			attachment_type: 'output_parser',
 			x: position.x,
@@ -1437,7 +1437,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: nodeTypeDefinition.slug,
 			category: 'action',
-			label: `${nodeTypeDefinition.label} (${__('Fallback', 'dragwyb-agentflow')})`,
+			label: `${nodeTypeDefinition.label} (${__('Fallback', 'dragwyb-visual-automation')})`,
 			parent_agent_id: agentId,
 			attachment_type: 'fallback_chat_model',
 			x: position.x,
@@ -1502,7 +1502,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'simple_memory',
 			category: 'action',
-			label: __('Simple Memory', 'dragwyb-agentflow'),
+			label: __('Simple Memory', 'dragwyb-visual-automation'),
 			parent_agent_id: agentId,
 			attachment_type: 'memory',
 			x: position.x,
@@ -1846,7 +1846,7 @@ export default function App() {
 	if (loading) {
 		return (
 			<div className="dragwyb-af-builder-loading" role="status">
-				{__('Loading…', 'dragwyb-agentflow')}
+				{__('Loading…', 'dragwyb-visual-automation')}
 			</div>
 		);
 	}
@@ -1868,7 +1868,7 @@ export default function App() {
 	const knownTypeSlugs = allTypes.map((type) => type.slug);
 	const triggerNode = graph.nodes.find((item) => item.category === 'trigger');
 	const triggerLabel =
-		triggerNode?.label || __('Trigger', 'dragwyb-agentflow');
+		triggerNode?.label || __('Trigger', 'dragwyb-visual-automation');
 	const hasExistingTrigger = Boolean(triggerNode);
 	const hasChatTrigger =
 		triggerNode?.type === 'chat_message_received_trigger';
@@ -1951,7 +1951,7 @@ export default function App() {
 					sending={chatSending}
 					error={chatError}
 					onSend={handleSendChat}
-					title={triggerNode?.config?.title || __('Chat', 'dragwyb-agentflow')}
+					title={triggerNode?.config?.title || __('Chat', 'dragwyb-visual-automation')}
 					initialMessages={chatInitialMessages}
 				/>
 				</div>

@@ -2,12 +2,12 @@
 /**
  * OpenAI Chat Completions action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,11 +23,11 @@ class OpenAiChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'OpenAI Chat', 'dragwyb-agentflow' );
+		return __( 'OpenAI Chat', 'dragwyb-visual-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to OpenAI and returns the reply.', 'dragwyb-agentflow' );
+		return __( 'Sends a prompt to OpenAI and returns the reply.', 'dragwyb-visual-automation' );
 	}
 
 	protected function providerSlug(): string {

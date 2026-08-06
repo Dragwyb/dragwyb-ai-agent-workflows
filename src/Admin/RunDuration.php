@@ -2,14 +2,14 @@
 /**
  * Formats run/node execution durations for display.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
-use DragwybAgentFlow\Plugin\Domain\WorkflowRun;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,7 +39,7 @@ class RunDuration {
 	 */
 	public static function forRun( WorkflowRun $run ): string {
 		if ( null === $run->startedAt() || null === $run->finishedAt() ) {
-			return __( '—', 'dragwyb-agentflow' );
+			return __( '—', 'dragwyb-visual-automation' );
 		}
 
 		$seconds = max( 0, strtotime( $run->finishedAt() . ' UTC' ) - strtotime( $run->startedAt() . ' UTC' ) );
@@ -57,13 +57,13 @@ class RunDuration {
 	 */
 	public static function forNode( ?int $duration_ms ): string {
 		if ( null === $duration_ms ) {
-			return __( '—', 'dragwyb-agentflow' );
+			return __( '—', 'dragwyb-visual-automation' );
 		}
 
 		if ( $duration_ms < 1000 ) {
 			return sprintf(
 				/* translators: %d: duration in milliseconds. */
-				__( '%d ms', 'dragwyb-agentflow' ),
+				__( '%d ms', 'dragwyb-visual-automation' ),
 				$duration_ms
 			);
 		}
@@ -80,7 +80,7 @@ class RunDuration {
 		if ( $seconds < 60 ) {
 			return sprintf(
 				/* translators: %d: duration in seconds. */
-				_n( '%d second', '%d seconds', $seconds, 'dragwyb-agentflow' ),
+				_n( '%d second', '%d seconds', $seconds, 'dragwyb-visual-automation' ),
 				$seconds
 			);
 		}
@@ -90,7 +90,7 @@ class RunDuration {
 
 		return sprintf(
 			/* translators: 1: minutes, 2: seconds. */
-			__( '%1$dm %2$ds', 'dragwyb-agentflow' ),
+			__( '%1$dm %2$ds', 'dragwyb-visual-automation' ),
 			$minutes,
 			$remaining
 		);

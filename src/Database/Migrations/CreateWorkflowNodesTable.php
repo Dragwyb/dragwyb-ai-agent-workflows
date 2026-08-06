@@ -2,15 +2,15 @@
 /**
  * Creates the workflow nodes table.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Database\Migrations;
+namespace DragwybVisualAutomation\Plugin\Database\Migrations;
 
-use DragwybAgentFlow\Plugin\Database\Migration;
-use DragwybAgentFlow\Plugin\Database\Table;
+use DragwybVisualAutomation\Plugin\Database\Migration;
+use DragwybVisualAutomation\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

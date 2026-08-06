@@ -2,14 +2,14 @@
 /**
  * Live credential verification for stored connections.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybVisualAutomation\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -92,7 +92,7 @@ class ConnectionVerifier {
 
 			return array(
 				'success' => false,
-				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -229,7 +229,7 @@ class ConnectionVerifier {
 				? (string) $result['error']
 				: sprintf(
 					/* translators: %s: third-party service name */
-					__( 'Could not verify credentials with %s.', 'dragwyb-agentflow' ),
+					__( 'Could not verify credentials with %s.', 'dragwyb-visual-automation' ),
 					$service
 				),
 		);

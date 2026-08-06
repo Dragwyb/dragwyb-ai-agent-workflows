@@ -2,14 +2,14 @@
 /**
  * LLM client backed by WordPress AI Client (prompt + tools).
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service\Agent;
+namespace DragwybVisualAutomation\Plugin\Service\Agent;
 
-use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\Messages\DTO\Message;
 use WordPress\AiClient\Messages\DTO\MessagePart;
 use WordPress\AiClient\Messages\Enums\MessageRoleEnum;
@@ -49,7 +49,7 @@ class AgentAiClient {
 		if ( ! AiClientBootstrap::isAvailable() ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'WordPress AI Client is not available.', 'dragwyb-agentflow' ),
+				'error'   => __( 'WordPress AI Client is not available.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -68,7 +68,7 @@ class AgentAiClient {
 				'success' => false,
 				'error'   => sprintf(
 					/* translators: %s: provider name */
-					__( 'No API key configured for %s. Add an API key in this node.', 'dragwyb-agentflow' ),
+					__( 'No API key configured for %s. Add an API key in this node.', 'dragwyb-visual-automation' ),
 					$provider_id
 				),
 			);
@@ -84,7 +84,7 @@ class AgentAiClient {
 			if ( null === $builder ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The WordPress AI Client is not available on this site.', 'dragwyb-agentflow' ),
+					'error'   => __( 'The WordPress AI Client is not available on this site.', 'dragwyb-visual-automation' ),
 				);
 			}
 			$builder->using_provider( $provider_id );
@@ -110,7 +110,7 @@ class AgentAiClient {
 			if ( ! $result instanceof GenerativeAiResult ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The AI client returned an unexpected result.', 'dragwyb-agentflow' ),
+					'error'   => __( 'The AI client returned an unexpected result.', 'dragwyb-visual-automation' ),
 				);
 			}
 
@@ -151,7 +151,7 @@ class AgentAiClient {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => $result['error'] ?? __( 'AI request failed.', 'dragwyb-agentflow' ),
+				'error'   => $result['error'] ?? __( 'AI request failed.', 'dragwyb-visual-automation' ),
 			);
 		}
 

@@ -2,14 +2,14 @@
 /**
  * Registers all WordPress workflow actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,14 +2,14 @@
 /**
  * Google Sheets append row action (legacy slug).
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,11 +27,11 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Append Row', 'dragwyb-agentflow' );
+		return __( 'Google Sheets Append Row', 'dragwyb-visual-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Appends a row of values to a Google Sheet.', 'dragwyb-agentflow' );
+		return __( 'Appends a row of values to a Google Sheet.', 'dragwyb-visual-automation' );
 	}
 
 	public function configSchema(): array {
@@ -40,7 +40,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'range'          => array(
 				'type'    => 'string',
-				'label'   => __( 'Range / tab (e.g. Sheet1!A1)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Range / tab (e.g. Sheet1!A1)', 'dragwyb-visual-automation' ),
 				'default' => 'Sheet1!A1',
 			),
 			'values'         => $this->valuesField(),
@@ -67,7 +67,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-visual-automation' ),
 			);
 		}
 

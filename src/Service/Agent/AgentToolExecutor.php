@@ -2,16 +2,16 @@
 /**
  * Executes an AI Agent tool call against a workflow action node.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service\Agent;
+namespace DragwybVisualAutomation\Plugin\Service\Agent;
 
-use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
-use DragwybAgentFlow\Plugin\Service\ConfigInterpolator;
-use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
+use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
+use DragwybVisualAutomation\Plugin\Service\NodeExecutionService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -50,7 +50,7 @@ class AgentToolExecutor {
 			return array(
 				'error' => sprintf(
 					/* translators: %s: tool function name */
-					__( 'Unrecognized tool name "%s".', 'dragwyb-agentflow' ),
+					__( 'Unrecognized tool name "%s".', 'dragwyb-visual-automation' ),
 					$tool_name
 				),
 			);
@@ -75,7 +75,7 @@ class AgentToolExecutor {
 
 		if ( empty( $result['success'] ) ) {
 			return array(
-				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'The tool action failed.', 'dragwyb-agentflow' ),
+				'error' => isset( $result['error'] ) ? (string) $result['error'] : __( 'The tool action failed.', 'dragwyb-visual-automation' ),
 			);
 		}
 
@@ -90,14 +90,21 @@ class AgentToolExecutor {
 	 * @var array<string, true>
 	 */
 	private const RESTRICTED_KEYS = array(
-		'connection_id'     => true,
-		'allow_unsafe_urls' => true,
-		'user_role'         => true,
-		'password'          => true,
-		'role_capabilities' => true,
-		'role_name'         => true,
-		'headers'           => true,
-		'metadata'          => true,
+		'connection_id'       => true,
+		'allow_unsafe_urls'   => true,
+		'user_role'           => true,
+		'password'            => true,
+		'role_capabilities'   => true,
+		'role_name'           => true,
+		'role_display_name'   => true,
+		'headers'             => true,
+		'metadata'            => true,
+		'meta_key'            => true,
+		'meta_value'          => true,
+		'capabilities'        => true,
+		'auto_password'       => true,
+		'email_notification'  => true,
+		'reassign_user_id'    => true,
 	);
 
 	/**

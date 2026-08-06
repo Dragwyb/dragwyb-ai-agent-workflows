@@ -2,12 +2,12 @@
 /**
  * Transient-backed conversation memory for AI Agent nodes.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service\Agent;
+namespace DragwybVisualAutomation\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

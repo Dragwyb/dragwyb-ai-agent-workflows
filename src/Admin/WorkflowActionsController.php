@@ -2,20 +2,20 @@
 /**
  * Handles state-changing Workflow admin actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Domain\Workflow;
-use DragwybAgentFlow\Plugin\Service\WorkflowImportExport;
-use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\BuilderPage;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Domain\Workflow;
+use DragwybVisualAutomation\Plugin\Service\WorkflowImportExport;
+use DragwybVisualAutomation\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -95,7 +95,7 @@ class WorkflowActionsController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is verified explicitly below, per-operation and per-id.
@@ -121,7 +121,7 @@ class WorkflowActionsController {
 	 */
 	public function handleImport(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		check_admin_referer( 'dragwyb_af_workflow_import' );
@@ -188,7 +188,7 @@ class WorkflowActionsController {
 	 */
 	public function handleExport(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below.
@@ -236,7 +236,7 @@ class WorkflowActionsController {
 		}
 
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
 		}
 
 		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_workflow_bulk_action' ) ) {

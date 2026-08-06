@@ -2,18 +2,18 @@
 /**
  * Connections admin list table.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybAgentFlow\Plugin\Domain\Connection;
-use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\SettingsService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybVisualAutomation\Plugin\Domain\Connection;
+use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -60,17 +60,17 @@ class ConnectionsListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'               => '<input type="checkbox" />',
-			'label'            => __( 'Label', 'dragwyb-agentflow' ),
-			'integration_slug' => __( 'Integration', 'dragwyb-agentflow' ),
-			'auth_type'        => __( 'Authentication', 'dragwyb-agentflow' ),
-			'status'           => __( 'Status', 'dragwyb-agentflow' ),
-			'created_at'       => __( 'Created', 'dragwyb-agentflow' ),
+			'label'            => __( 'Label', 'dragwyb-visual-automation' ),
+			'integration_slug' => __( 'Integration', 'dragwyb-visual-automation' ),
+			'auth_type'        => __( 'Authentication', 'dragwyb-visual-automation' ),
+			'status'           => __( 'Status', 'dragwyb-visual-automation' ),
+			'created_at'       => __( 'Created', 'dragwyb-visual-automation' ),
 		);
 	}
 
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'dragwyb-agentflow' ),
+			'delete' => __( 'Delete', 'dragwyb-visual-automation' ),
 		);
 	}
 
@@ -109,7 +109,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No connections yet.', 'dragwyb-agentflow' );
+		esc_html_e( 'No connections yet.', 'dragwyb-visual-automation' );
 	}
 
 	/**
@@ -127,7 +127,7 @@ class ConnectionsListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-agentflow' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-visual-automation' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -139,8 +139,8 @@ class ConnectionsListTable extends WP_List_Table {
 			array(
 				'name'        => 'integration_slug',
 				'type'        => 'search',
-				'label'       => __( 'Filter by integration', 'dragwyb-agentflow' ),
-				'placeholder' => __( 'e.g. gemini, openai', 'dragwyb-agentflow' ),
+				'label'       => __( 'Filter by integration', 'dragwyb-visual-automation' ),
+				'placeholder' => __( 'e.g. gemini, openai', 'dragwyb-visual-automation' ),
 				'value'       => $this->currentIntegrationFilter(),
 			),
 		);
@@ -231,7 +231,7 @@ class ConnectionsListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'dragwyb-agentflow' ) );
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'dragwyb-visual-automation' ) );
 	}
 
 	private function currentIntegrationFilter(): string {

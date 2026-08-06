@@ -2,12 +2,12 @@
 /**
  * Anthropic Claude Messages API action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,11 +23,11 @@ class ClaudeMessagesAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'Anthropic Claude', 'dragwyb-agentflow' );
+		return __( 'Anthropic Claude', 'dragwyb-visual-automation' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to Anthropic Claude and returns the reply.', 'dragwyb-agentflow' );
+		return __( 'Sends a prompt to Anthropic Claude and returns the reply.', 'dragwyb-visual-automation' );
 	}
 
 	protected function providerSlug(): string {

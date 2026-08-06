@@ -2,18 +2,18 @@
 /**
  * Public chat-message ingress REST controller.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use DragwybAgentFlow\Plugin\Service\ChatMessageService;
-use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
-use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DragwybVisualAutomation\Plugin\Service\ChatMessageService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowTestListenerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -110,12 +110,13 @@ class ChatMessageIngressController {
 
 			return new WP_Error(
 				'dragwyb_af_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-agentflow' ),
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-visual-automation' ),
 				array( 'status' => 404 )
 			);
 		}
 
-		$is_public = ! isset( $match['config']['public'] ) || filter_var( $match['config']['public'], FILTER_VALIDATE_BOOLEAN );
+		// Default false: public chat must be opted in explicitly.
+		$is_public = isset( $match['config']['public'] ) && filter_var( $match['config']['public'], FILTER_VALIDATE_BOOLEAN );
 
 		if ( $is_public ) {
 			return true;
@@ -127,7 +128,7 @@ class ChatMessageIngressController {
 
 		return new WP_Error(
 			'dragwyb_af_chat_forbidden',
-			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-agentflow' ),
+			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-visual-automation' ),
 			array( 'status' => 401 )
 		);
 	}
@@ -150,7 +151,7 @@ class ChatMessageIngressController {
 		if ( null === $match ) {
 			return new WP_Error(
 				'dragwyb_af_chat_not_found',
-				__( 'No chat endpoint found for this ID.', 'dragwyb-agentflow' ),
+				__( 'No chat endpoint found for this ID.', 'dragwyb-visual-automation' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -188,7 +189,7 @@ class ChatMessageIngressController {
 		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
 			return new WP_Error(
 				'dragwyb_af_chat_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again in a minute.', 'dragwyb-agentflow' ),
+				__( 'Rate limit exceeded. Please try again in a minute.', 'dragwyb-visual-automation' ),
 				array( 'status' => 429 )
 			);
 		}
@@ -198,7 +199,7 @@ class ChatMessageIngressController {
 		if ( null === $match ) {
 			return new WP_Error(
 				'dragwyb_af_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-agentflow' ),
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-visual-automation' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -229,7 +230,7 @@ class ChatMessageIngressController {
 		if ( '' === $payload['chatInput'] ) {
 			return new WP_Error(
 				'dragwyb_af_chat_empty',
-				__( 'chatInput is required.', 'dragwyb-agentflow' ),
+				__( 'chatInput is required.', 'dragwyb-visual-automation' ),
 				array( 'status' => 422 )
 			);
 		}
@@ -245,7 +246,7 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'captured',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Payload captured for Test Flow.', 'dragwyb-agentflow' ),
+					'message'   => __( 'Payload captured for Test Flow.', 'dragwyb-visual-automation' ),
 				)
 			);
 		}
@@ -258,7 +259,7 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'accepted',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Message accepted. The workflow will run in the background.', 'dragwyb-agentflow' ),
+					'message'   => __( 'Message accepted. The workflow will run in the background.', 'dragwyb-visual-automation' ),
 				),
 				202
 			);
@@ -273,7 +274,7 @@ class ChatMessageIngressController {
 			}
 			return new WP_Error(
 				'dragwyb_af_chat_run_failed',
-				__( 'Chat execution failed.', 'dragwyb-agentflow' ),
+				__( 'Chat execution failed.', 'dragwyb-visual-automation' ),
 				array( 'status' => 500 )
 			);
 		}

@@ -2,15 +2,15 @@
 /**
  * Builds LLM tool schemas from attached workflow action nodes.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service\Agent;
+namespace DragwybVisualAutomation\Plugin\Service\Agent;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -256,19 +256,19 @@ class AgentToolSchemaBuilder {
 		$parts = array( $description );
 
 		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
-			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-agentflow' );
+			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-visual-automation' );
 		}
 
 		if ( 'post_type' === $field_key ) {
-			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-agentflow' );
+			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-visual-automation' );
 		}
 
 		if ( 'array' === $field_type ) {
-			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-agentflow' );
+			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-visual-automation' );
 		}
 
 		if ( 'key_value' === $field_type ) {
-			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-agentflow' );
+			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-visual-automation' );
 		}
 
 		if ( array_key_exists( $field_key, $config ) && ! $this->configValueIsEmpty( $config[ $field_key ] ) ) {
@@ -276,7 +276,7 @@ class AgentToolSchemaBuilder {
 			if ( is_scalar( $default ) ) {
 				$parts[] = sprintf(
 					/* translators: %s: current default value */
-					__( 'Current node default: %s. You may override this value.', 'dragwyb-agentflow' ),
+					__( 'Current node default: %s. You may override this value.', 'dragwyb-visual-automation' ),
 					(string) $default
 				);
 			}
