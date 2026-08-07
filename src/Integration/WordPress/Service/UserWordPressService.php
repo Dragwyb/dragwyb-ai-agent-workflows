@@ -78,19 +78,27 @@ final class UserWordPressService {
 		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
 		$password     = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
 
+		// Agent tools cannot pass passwords (excluded); generate when none is configured.
 		if ( '' === $password ) {
-			return WordPressActionHelper::fail( __( 'Password is required.', 'dragwyb-visual-automation' ) );
+			$password = wp_generate_password();
 		}
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
+		// Role is set on the tool node (not by the LLM). Fall back to subscriber.
 		if ( '' === $userRole ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-visual-automation' ) );
+			$userRole = 'subscriber';
 		}
 
-		$role_error = $this->validateAssignableRole( $userRole );
-		if ( null !== $role_error ) {
-			return WordPressActionHelper::fail( $role_error );
+		$resolved = $this->resolveAssignableRole( $userRole );
+		if ( null !== $resolved['error'] ) {
+			return WordPressActionHelper::fail( $resolved['error'] );
+		}
+		$userRole = $resolved['slug'];
+
+		$username = sanitize_user( $username, true );
+		if ( '' === $username ) {
+			return WordPressActionHelper::fail( __( 'Username is invalid after sanitization.', 'dragwyb-visual-automation' ) );
 		}
 
 		$userData = WordPressActionHelper::mapUserFields( $config );
@@ -160,11 +168,11 @@ final class UserWordPressService {
 				return WordPressActionHelper::fail( __( 'Changing user roles requires the promote_users capability.', 'dragwyb-visual-automation' ) );
 			}
 
-			$role_error = $this->validateAssignableRole( $userRole );
-			if ( null !== $role_error ) {
-				return WordPressActionHelper::fail( $role_error );
+			$resolved = $this->resolveAssignableRole( $userRole );
+			if ( null !== $resolved['error'] ) {
+				return WordPressActionHelper::fail( $resolved['error'] );
 			}
-			$userData['role'] = $userRole;
+			$userData['role'] = $resolved['slug'];
 		}
 
 		$password = WordPressActionHelper::str( $config, 'password' );
@@ -240,25 +248,97 @@ final class UserWordPressService {
 	}
 
 	/**
-	 * Only allow roles the current user can assign; never allow administrator
-	 * unless promote_users is held (still blocked for safety on public paths).
+	 * Resolves a role slug (accepts display names like "Customer") and checks it is assignable.
+	 *
+	 * @param string $role Role slug or display name.
+	 *
+	 * @return array{slug: string, error: string|null}
+	 */
+	private function resolveAssignableRole( string $role ): array {
+		$slug = $this->normalizeRoleSlug( $role );
+
+		if ( '' === $slug ) {
+			return array(
+				'slug'  => '',
+				'error' => __( 'User role is required.', 'dragwyb-visual-automation' ),
+			);
+		}
+
+		if ( 'administrator' === $slug ) {
+			return array(
+				'slug'  => $slug,
+				'error' => __( 'Assigning the administrator role via workflows is not allowed.', 'dragwyb-visual-automation' ),
+			);
+		}
+
+		// get_editable_roles() lives in wp-admin/includes/user.php (not loaded on front-end triggers).
+		WordPressActionHelper::ensureMediaIncludes();
+
+		$editable = function_exists( 'get_editable_roles' ) ? get_editable_roles() : array();
+		if ( ! is_array( $editable ) || array() === $editable ) {
+			$editable = wp_roles()->roles;
+		}
+
+		if ( isset( $editable[ $slug ] ) ) {
+			return array(
+				'slug'  => $slug,
+				'error' => null,
+			);
+		}
+
+		// Role exists on the site and actor can promote users (e.g. WooCommerce "customer").
+		if ( wp_roles()->is_role( $slug ) && current_user_can( 'promote_users' ) ) {
+			return array(
+				'slug'  => $slug,
+				'error' => null,
+			);
+		}
+
+		return array(
+			'slug'  => $slug,
+			'error' => sprintf(
+				/* translators: %s: role slug or label */
+				__( 'Invalid or unauthorized user role "%s". Use a role slug such as subscriber, customer, or editor.', 'dragwyb-visual-automation' ),
+				$role
+			),
+		);
+	}
+
+	/**
+	 * Maps "Customer" / "customer " → "customer".
+	 */
+	private function normalizeRoleSlug( string $role ): string {
+		$role = trim( $role );
+
+		if ( '' === $role ) {
+			return '';
+		}
+
+		$candidate = sanitize_key( $role );
+		$wp_roles  = wp_roles();
+
+		if ( $wp_roles->is_role( $candidate ) ) {
+			return $candidate;
+		}
+
+		foreach ( $wp_roles->role_names as $slug => $label ) {
+			if ( 0 === strcasecmp( (string) $slug, $role ) || 0 === strcasecmp( (string) $label, $role ) ) {
+				return sanitize_key( (string) $slug );
+			}
+		}
+
+		return $candidate;
+	}
+
+	/**
+	 * @deprecated Use resolveAssignableRole().
 	 *
 	 * @param string $role Role slug.
 	 *
 	 * @return string|null Error message or null when valid.
 	 */
 	private function validateAssignableRole( string $role ): ?string {
-		$editable = get_editable_roles();
-
-		if ( ! isset( $editable[ $role ] ) ) {
-			return __( 'Invalid or unauthorized user role.', 'dragwyb-visual-automation' );
-		}
-
-		if ( 'administrator' === $role ) {
-			return __( 'Assigning the administrator role via workflows is not allowed.', 'dragwyb-visual-automation' );
-		}
-
-		return null;
+		return $this->resolveAssignableRole( $role )['error'];
 	}
 
 	/**
@@ -623,11 +703,12 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-visual-automation' ) );
 		}
 
-		foreach ( $roles as $role ) {
-			$role_error = $this->validateAssignableRole( sanitize_key( (string) $role ) );
-			if ( null !== $role_error ) {
-				return WordPressActionHelper::fail( $role_error );
+		foreach ( $roles as $index => $role ) {
+			$resolved = $this->resolveAssignableRole( (string) $role );
+			if ( null !== $resolved['error'] ) {
+				return WordPressActionHelper::fail( $resolved['error'] );
 			}
+			$roles[ $index ] = $resolved['slug'];
 		}
 
 		if ( $update ) {

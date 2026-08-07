@@ -1,10 +1,10 @@
 === Dragwyb Visual Automation Builder ===
 Contributors: dragwyb
 Tags: automation, workflow, ai, webhooks, woocommerce
-Requires at least: 5.8
-Tested up to: 6.8
+Requires at least: 6.0
+Tested up to: 7.0.2
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.0.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,5 +88,7 @@ PHP 7.4+ and WordPress 5.8+.
 User create/update/delete actions only run when the current request has the matching WordPress capability (`create_users`, `edit_users`, or `delete_users`). Unauthenticated public triggers cannot create privileged users.
 
 == Changelog ==
+
+
 
 = 0.0.0 =

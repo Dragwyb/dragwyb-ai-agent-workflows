@@ -42,7 +42,7 @@ final class UserActionCatalog {
 				'email'              => $field( 'string', __( 'Email', 'dragwyb-visual-automation' ), array( 'required' => true ) ),
 				'username'           => $field( 'string', __( 'Username', 'dragwyb-visual-automation' ), array( 'required' => true ) ),
 				'password'           => $field( 'string', __( 'Password', 'dragwyb-visual-automation' ) ),
-				'auto_password'      => $field( 'boolean', __( 'Auto-generate password', 'dragwyb-visual-automation' ), array( 'default' => false ) ),
+				'auto_password'      => $field( 'boolean', __( 'Auto-generate password', 'dragwyb-visual-automation' ), array( 'default' => true ) ),
 				'nickname'           => $field( 'string', __( 'Nickname', 'dragwyb-visual-automation' ) ),
 				'display_name'       => $field( 'string', __( 'Display Name', 'dragwyb-visual-automation' ) ),
 				'first_name'         => $field( 'string', __( 'First Name', 'dragwyb-visual-automation' ) ),
@@ -53,8 +53,7 @@ final class UserActionCatalog {
 					'string',
 					__( 'User Role', 'dragwyb-visual-automation' ),
 					array(
-						'required' => true,
-						'default'  => 'subscriber',
+						'default' => 'subscriber',
 					)
 				),
 				'email_notification' => $field(

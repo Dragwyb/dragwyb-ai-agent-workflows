@@ -122,6 +122,18 @@ class AgentToolSchemaBuilder {
 			$description = $label . ' — ' . $description;
 		}
 
+		if ( 'wp_create_user_action' === $node_type ) {
+			$role = isset( $config['user_role'] ) ? trim( (string) $config['user_role'] ) : '';
+			if ( '' === $role ) {
+				$role = 'subscriber';
+			}
+			$description .= ' ' . sprintf(
+				/* translators: %s: WordPress role slug */
+				__( 'Pass email and username only. Role is fixed on this tool node (currently "%s"; use the role slug e.g. customer, not the label). Password is auto-generated. The model cannot change the role via tool arguments.', 'dragwyb-visual-automation' ),
+				$role
+			);
+		}
+
 		return array(
 			'type'     => 'function',
 			'function' => array(
@@ -370,6 +382,25 @@ class AgentToolSchemaBuilder {
 			}
 		}
 
-		return null;
+		// Models sometimes mangle the type prefix (e.g. wp_create_user_user_action__hash).
+		// Match uniquely on the stable 8-char hash suffix when present.
+		$parsed = self::parseToolName( $tool_name );
+		if ( null === $parsed ) {
+			return null;
+		}
+
+		$hash           = $parsed['id'];
+		$hash_matches   = array();
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) || empty( $graph_node['type'] ) ) {
+				continue;
+			}
+
+			if ( substr( md5( (string) $graph_node['id'] ), 0, 8 ) === $hash ) {
+				$hash_matches[] = $graph_node;
+			}
+		}
+
+		return 1 === count( $hash_matches ) ? $hash_matches[0] : null;
 	}
 }
