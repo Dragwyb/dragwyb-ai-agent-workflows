@@ -34,7 +34,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 	abstract public function description(): string;
 
 	/**
-	 * dragwyb_af provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * daiaw provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 */
 	abstract protected function providerSlug(): string;
 

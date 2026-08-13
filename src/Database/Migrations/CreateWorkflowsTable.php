@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `dragwyb_af_workflows` holds one row per workflow: its builder graph, status,
+ * `daiaw_workflows` holds one row per workflow: its builder graph, status,
  * and lightweight run-count/soft-delete bookkeeping. See
  * docs/internal/architecture.md §2.3 for the full column rationale.
  */

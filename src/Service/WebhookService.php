@@ -31,12 +31,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * established for connection credentials.
  *
  * Signature scheme (documented in `docs/integrations.md`): callers send
- * `X-dragwyb-af-Signature: sha256=<hex>` where `<hex>` is
+ * `X-daiaw-Signature: sha256=<hex>` where `<hex>` is
  * `hash_hmac( 'sha256', <raw request body>, <signing secret> )`.
  */
 class WebhookService {
 
-	public const SIGNATURE_HEADER = 'X-dragwyb-af-Signature';
+	public const SIGNATURE_HEADER = 'X-daiaw-Signature';
 
 	private WebhookRepository $webhooks;
 
@@ -212,7 +212,7 @@ class WebhookService {
 	 * @return string
 	 */
 	public function publicUrl( Webhook $webhook ): string {
-		return rest_url( 'dragwyb_af/v1/webhooks/' . $webhook->publicId() );
+		return rest_url( 'daiaw/v1/webhooks/' . $webhook->publicId() );
 	}
 
 	/**
@@ -254,7 +254,7 @@ class WebhookService {
 	 * @param string $public_id         UUID from the URL.
 	 * @param string $raw_body          Exact request body bytes (needed for HMAC).
 	 * @param string $client_ip         Caller IP (typically REMOTE_ADDR).
-	 * @param string $signature_header  Value of the X-dragwyb-af-Signature header, or ''.
+	 * @param string $signature_header  Value of the X-daiaw-Signature header, or ''.
 	 *
 	 * @return array{run_id: int, status: string, queued: bool}|WP_Error
 	 */
@@ -263,7 +263,7 @@ class WebhookService {
 
 		if ( null === $webhook ) {
 			return new WP_Error(
-				'dragwyb_af_webhook_not_found',
+				'daiaw_webhook_not_found',
 				__( 'Webhook not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -271,7 +271,7 @@ class WebhookService {
 
 		if ( ! $this->isIpAllowed( $client_ip, $webhook->ipAllowList() ) ) {
 			return new WP_Error(
-				'dragwyb_af_webhook_ip_denied',
+				'daiaw_webhook_ip_denied',
 				__( 'Request IP is not allowed for this webhook.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 403 )
 			);
@@ -282,7 +282,7 @@ class WebhookService {
 		if ( $requires_signature ) {
 			if ( ! $webhook->hasSigningSecret() ) {
 				return new WP_Error(
-					'dragwyb_af_webhook_signing_required',
+					'daiaw_webhook_signing_required',
 					__( 'This webhook has no signing secret configured, but site settings require one.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 403 )
 				);
@@ -292,7 +292,7 @@ class WebhookService {
 
 			if ( null === $secret || '' === $secret ) {
 				return new WP_Error(
-					'dragwyb_af_webhook_signing_unavailable',
+					'daiaw_webhook_signing_unavailable',
 					__( 'Unable to verify this webhook\'s signature.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 500 )
 				);
@@ -300,7 +300,7 @@ class WebhookService {
 
 			if ( ! $this->signatureIsValid( $raw_body, $secret, $signature_header ) ) {
 				return new WP_Error(
-					'dragwyb_af_webhook_invalid_signature',
+					'daiaw_webhook_invalid_signature',
 					__( 'Invalid webhook signature.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 401 )
 				);
@@ -311,7 +311,7 @@ class WebhookService {
 
 		if ( null === $workflow_id ) {
 			return new WP_Error(
-				'dragwyb_af_webhook_unlinked',
+				'daiaw_webhook_unlinked',
 				__( 'This webhook is not linked to a workflow.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 409 )
 			);
@@ -321,7 +321,7 @@ class WebhookService {
 
 		if ( null === $workflow || Workflow::STATUS_ACTIVE !== $workflow->status() ) {
 			return new WP_Error(
-				'dragwyb_af_webhook_workflow_inactive',
+				'daiaw_webhook_workflow_inactive',
 				__( 'The workflow linked to this webhook is not active.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 409 )
 			);
@@ -349,7 +349,7 @@ class WebhookService {
 			);
 		} catch ( InvalidArgumentException | RuntimeException $e ) {
 			return new WP_Error(
-				'dragwyb_af_webhook_run_failed',
+				'daiaw_webhook_run_failed',
 				__( 'The workflow could not be started.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 500 )
 			);

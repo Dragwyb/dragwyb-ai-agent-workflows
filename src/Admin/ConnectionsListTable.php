@@ -200,7 +200,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'dragwyb-af-connections-table' );
+		return array( 'widefat', 'fixed', 'striped', 'daiaw-connections-table' );
 	}
 
 	/**
@@ -215,12 +215,12 @@ class ConnectionsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id     = 'dragwyb-af-connection-delete-' . $id;
-		$nonce_field = wp_nonce_field( 'dragwyb_af_connection_action_delete_' . $id, '_wpnonce', true, false );
+		$form_id     = 'daiaw-connection-delete-' . $id;
+		$nonce_field = wp_nonce_field( 'daiaw_connection_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="dragwyb-af-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="dragwyb_af_connection_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="daiaw-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="daiaw_connection_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
 				. '<input type="hidden" name="connection_id" value="%3$d" />'
 				. '%4$s'

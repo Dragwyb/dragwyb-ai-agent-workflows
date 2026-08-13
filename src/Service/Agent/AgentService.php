@@ -559,7 +559,7 @@ class AgentService {
 		 * @param int                  $max    Requested iterations.
 		 * @param array<string, mixed> $config Agent node config.
 		 */
-		$max = (int) apply_filters( 'dragwyb_af_agent_max_iterations', $max, $config );
+		$max = (int) apply_filters( 'daiaw_agent_max_iterations', $max, $config );
 
 		if ( $max < 1 ) {
 			$max = self::DEFAULT_MAX_ITERATIONS;

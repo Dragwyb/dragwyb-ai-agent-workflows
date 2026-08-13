@@ -272,9 +272,9 @@ export default function App() {
 
 				const urlParams = new URLSearchParams(window.location.search);
 				const oauthConnectionId = Number(
-					urlParams.get('dragwyb_af_connection') || 0
+					urlParams.get('daiaw_connection') || 0
 				);
-				const oauthNodeId = urlParams.get('dragwyb_af_node') || '';
+				const oauthNodeId = urlParams.get('daiaw_node') || '';
 
 				if (oauthConnectionId > 0 && oauthNodeId) {
 					setGraph((previous) => ({
@@ -293,10 +293,10 @@ export default function App() {
 					}));
 					setSelectedNodeId(oauthNodeId);
 
-					urlParams.delete('dragwyb_af_connection');
-					urlParams.delete('dragwyb_af_node');
-					urlParams.delete('dragwyb_af_notice');
-					urlParams.delete('dragwyb_af_error');
+					urlParams.delete('daiaw_connection');
+					urlParams.delete('daiaw_node');
+					urlParams.delete('daiaw_notice');
+					urlParams.delete('daiaw_error');
 
 					const cleaned = `${window.location.pathname}?${urlParams.toString()}`;
 					window.history.replaceState(
@@ -1845,7 +1845,7 @@ export default function App() {
 
 	if (loading) {
 		return (
-			<div className="dragwyb-af-builder-loading" role="status">
+			<div className="daiaw-builder-loading" role="status">
 				{__('Loading…', 'dragwyb-ai-agent-workflows')}
 			</div>
 		);
@@ -1853,7 +1853,7 @@ export default function App() {
 
 	if (loadError) {
 		return (
-			<div className="dragwyb-af-builder-error" role="alert">
+			<div className="daiaw-builder-error" role="alert">
 				{loadError}
 			</div>
 		);
@@ -1880,7 +1880,7 @@ export default function App() {
 		.filter(Boolean);
 
 	return (
-		<div className={`dragwyb-af-builder${chatOpen ? ' dragwyb-af-builder--chat-open' : ''}`}>
+		<div className={`daiaw-builder${chatOpen ? ' daiaw-builder--chat-open' : ''}`}>
 			<Header
 				title={title}
 				onTitleChange={setTitle}
@@ -1898,13 +1898,13 @@ export default function App() {
 				chatOpen={chatOpen}
 				onToggleChat={handleToggleChat}
 			/>
-			<div className="dragwyb-af-builder__body">
+			<div className="daiaw-builder__body">
 				<Palette
 					triggers={nodeTypes.triggers}
 					actions={nodeTypes.actions}
 					onOpenPicker={handleOpenPicker}
 				/>
-				<div className="dragwyb-af-builder__canvas-wrap">
+				<div className="daiaw-builder__canvas-wrap">
 					<Canvas
 						nodes={graph.nodes}
 						connections={graph.connections}

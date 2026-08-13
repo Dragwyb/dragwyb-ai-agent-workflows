@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `dragwyb_af_workflow_run_logs` (created in roadmap item 7) for the
+ * Extends `daiaw_workflow_run_logs` (created in roadmap item 7) for the
  * history UI shipped in roadmap item 9, additively — same reasoning as
  * `AddQueueColumnsToWorkflowRunsTable` from item 8: the original migration
  * already shipped, so schema evolution happens through a new migration.
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * `WorkflowExecutionService::executeNodes()` and never updated afterwards
  * — the log row becomes fully self-contained for display purposes, the
  * same way `input_json` already snapshots the node's configuration at run
- * time rather than pointing back at `dragwyb_af_workflow_nodes.config_json`.
+ * time rather than pointing back at `daiaw_workflow_nodes.config_json`.
  */
 class AddNodeSnapshotColumnsToWorkflowRunLogsTable extends Migration {
 

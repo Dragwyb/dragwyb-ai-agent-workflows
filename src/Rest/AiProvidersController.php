@@ -30,7 +30,7 @@ class AiProvidersController extends WP_REST_Controller {
 	private AiModelsService $ai_models;
 
 	public function __construct( AiModelsService $ai_models ) {
-		$this->namespace = 'dragwyb_af/v1';
+		$this->namespace = 'daiaw/v1';
 		$this->rest_base = 'ai';
 		$this->ai_models = $ai_models;
 	}
@@ -135,7 +135,7 @@ class AiProvidersController extends WP_REST_Controller {
 		$key = '' !== $provider ? $provider : $node_type;
 		if ( '' === $key ) {
 			return new WP_Error(
-				'dragwyb_af_rest_invalid',
+				'daiaw_rest_invalid',
 				__( 'Provider is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);

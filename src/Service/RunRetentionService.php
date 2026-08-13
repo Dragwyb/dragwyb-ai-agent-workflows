@@ -33,7 +33,7 @@ class RunRetentionService {
 	/**
 	 * The WP-Cron hook this service's pruneAccordingToSettings() is bound to.
 	 */
-	public const CRON_HOOK = 'dragwyb_af/cron/prune_runs';
+	public const CRON_HOOK = 'daiaw/cron/prune_runs';
 
 	private WorkflowRunRepository $runs;
 

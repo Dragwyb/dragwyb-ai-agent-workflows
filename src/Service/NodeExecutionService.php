@@ -54,7 +54,7 @@ class NodeExecutionService {
 		 * @param WorkflowNode         $node    The node about to execute.
 		 * @param array<string, mixed> $context Runtime data available to this node.
 		 */
-		do_action( 'dragwyb_af/node/before_execute', $node, $context );
+		do_action( 'daiaw/node/before_execute', $node, $context );
 
 		$result = $this->executeAction( $node, $context );
 
@@ -68,7 +68,7 @@ class NodeExecutionService {
 		 * @param array                $result  Its outcome (see return value of execute()).
 		 * @param array<string, mixed> $context Runtime data that was available to this node.
 		 */
-		do_action( 'dragwyb_af/node/after_execute', $node, $result, $context );
+		do_action( 'daiaw/node/after_execute', $node, $result, $context );
 
 		return $result;
 	}

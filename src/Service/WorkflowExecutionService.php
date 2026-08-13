@@ -327,7 +327,7 @@ class WorkflowExecutionService {
 
 		/**
 		 * Fires immediately before a workflow run starts executing nodes.
-		 * The `dragwyb_af_workflow_runs` row already exists with status `running`.
+		 * The `daiaw_workflow_runs` row already exists with status `running`.
 		 * See docs/hooks-reference.md.
 		 *
 		 * @since 0.1.0
@@ -335,7 +335,7 @@ class WorkflowExecutionService {
 		 * @param int                   $workflow_id     The workflow about to run.
 		 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
 		 */
-		do_action( 'dragwyb_af/workflow/before_run', $workflow_id, $trigger_payload );
+		do_action( 'daiaw/workflow/before_run', $workflow_id, $trigger_payload );
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
 
@@ -523,7 +523,7 @@ class WorkflowExecutionService {
 			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		do_action( 'dragwyb_af/workflow/after_run', $finished, $trigger_payload );
+		do_action( 'daiaw/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
 	}

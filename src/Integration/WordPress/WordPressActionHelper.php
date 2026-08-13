@@ -25,7 +25,7 @@ final class WordPressActionHelper {
 	 * triggers do not re-fire on the automation's own output (e.g. a
 	 * translated post created by an agent).
 	 */
-	public const AUTOMATED_META_KEY = '_dragwyb_af_automated';
+	public const AUTOMATED_META_KEY = '_daiaw_automated';
 
 	/**
 	 * Builds a successful action result.
@@ -201,7 +201,7 @@ final class WordPressActionHelper {
 		 *
 		 * @param int $limit Requested limit.
 		 */
-		$limit = (int) apply_filters( 'dragwyb_af_wp_list_limit', $limit );
+		$limit = (int) apply_filters( 'daiaw_wp_list_limit', $limit );
 
 		if ( $limit < 1 ) {
 			$limit = self::DEFAULT_LIST_LIMIT;
@@ -719,7 +719,7 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * True when this post was just written by a dragwyb_af action (short grace window).
+	 * True when this post was just written by a daiaw action (short grace window).
 	 *
 	 * @param int $post_id Post id.
 	 *
@@ -737,14 +737,14 @@ final class WordPressActionHelper {
 		}
 
 		/**
-		 * Seconds after a dragwyb_af create/update during which save_post is ignored
+		 * Seconds after a daiaw create/update during which save_post is ignored
 		 * for that post (prevents immediate echo triggers). After this window,
 		 * human edits of the post may start workflows again.
 		 *
 		 * @param int $seconds Grace period in seconds.
 		 * @param int $post_id Post id.
 		 */
-		$grace = (int) apply_filters( 'dragwyb_af_automated_post_grace_seconds', 45, $post_id );
+		$grace = (int) apply_filters( 'daiaw_automated_post_grace_seconds', 45, $post_id );
 
 		if ( $grace < 1 ) {
 			$grace = 45;

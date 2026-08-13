@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=dragwyb_af_webhook_action` POST submitted
+ * Receives the `admin-post.php?action=daiaw_webhook_action` POST submitted
  * by WebhookFormPage's create/edit forms and WebhooksListTable's delete
  * forms. Same capability/nonce/allow-list shape as
  * ConnectionActionsController.
@@ -40,7 +40,7 @@ class WebhookActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_dragwyb_af_webhook_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_daiaw_webhook_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleWebhooksBulkFromList' ), 5 );
 	}
 
@@ -84,7 +84,7 @@ class WebhookActionsController {
 		}
 
 		if ( 'create' === $op ) {
-			check_admin_referer( 'dragwyb_af_webhook_action_create' );
+			check_admin_referer( 'daiaw_webhook_action_create' );
 			$this->handleCreate();
 
 			return;
@@ -97,7 +97,7 @@ class WebhookActionsController {
 			$this->redirect( 'error' );
 		}
 
-		check_admin_referer( 'dragwyb_af_webhook_action_' . $op . '_' . $id );
+		check_admin_referer( 'daiaw_webhook_action_' . $op . '_' . $id );
 
 		if ( 'update' === $op ) {
 			$this->handleUpdate( $id );
@@ -162,7 +162,7 @@ class WebhookActionsController {
 	 */
 	public function handleWebhooksBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['dragwyb_af_webhook_bulk'] ) ) {
+		if ( empty( $_POST['daiaw_webhook_bulk'] ) ) {
 			return;
 		}
 
@@ -170,7 +170,7 @@ class WebhookActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-ai-agent-workflows' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_webhook_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'daiaw_webhook_bulk_action' ) ) {
 			$this->redirect( 'error' );
 		}
 
@@ -215,7 +215,7 @@ class WebhookActionsController {
 			add_query_arg(
 				array(
 					'page'       => WebhooksPage::SLUG,
-					'dragwyb_af_notice' => $notice,
+					'daiaw_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)

@@ -64,11 +64,11 @@ export default function ChatPanel({
 			}));
 
 	return (
-		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-ai-agent-workflows')}>
-			<div className="dragwyb-af-builder-chat__header">
+		<aside className="daiaw-builder-chat" aria-label={__('Chat', 'dragwyb-ai-agent-workflows')}>
+			<div className="daiaw-builder-chat__header">
 				<div>
 					<strong>{title || __('Chat', 'dragwyb-ai-agent-workflows')}</strong>
-					<p className="dragwyb-af-builder-chat__subtitle">
+					<p className="daiaw-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
 							'dragwyb-ai-agent-workflows'
@@ -80,29 +80,29 @@ export default function ChatPanel({
 				</Button>
 			</div>
 
-			<div className="dragwyb-af-builder-chat__messages" ref={listRef}>
+			<div className="daiaw-builder-chat__messages" ref={listRef}>
 				{displayMessages.map((message) => (
 					<div
 						key={message.id}
-						className={`dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--${message.role}`}
+						className={`daiaw-builder-chat__bubble daiaw-builder-chat__bubble--${message.role}`}
 					>
 						{message.content}
 					</div>
 				))}
 				{sending && (
-					<div className="dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--assistant dragwyb-af-builder-chat__bubble--pending">
+					<div className="daiaw-builder-chat__bubble daiaw-builder-chat__bubble--assistant daiaw-builder-chat__bubble--pending">
 						{__('Thinking…', 'dragwyb-ai-agent-workflows')}
 					</div>
 				)}
 			</div>
 
 			{error && (
-				<p className="dragwyb-af-builder-chat__error" role="alert">
+				<p className="daiaw-builder-chat__error" role="alert">
 					{error}
 				</p>
 			)}
 
-			<form className="dragwyb-af-builder-chat__composer" onSubmit={handleSubmit}>
+			<form className="daiaw-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
 					label={__('Message', 'dragwyb-ai-agent-workflows')}
 					hideLabelFromVision

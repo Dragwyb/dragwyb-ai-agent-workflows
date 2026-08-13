@@ -127,10 +127,10 @@ export default function ConditionNodeCard({
 	};
 
 	const classNames = [
-		'dragwyb-af-builder-node',
-		'dragwyb-af-builder-node--condition',
-		selected ? 'dragwyb-af-builder-node--selected' : '',
-		hasUnknownType ? 'dragwyb-af-builder-node--unknown' : '',
+		'daiaw-builder-node',
+		'daiaw-builder-node--condition',
+		selected ? 'daiaw-builder-node--selected' : '',
+		hasUnknownType ? 'daiaw-builder-node--unknown' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -144,16 +144,16 @@ export default function ConditionNodeCard({
 			: '';
 
 		return (
-			<div className="dragwyb-af-condition-node__row-port">
+			<div className="daiaw-condition-node__row-port">
 				{targetId && (
-					<span className="dragwyb-af-condition-node__link-chip" title={targetLabel}>
+					<span className="daiaw-condition-node__link-chip" title={targetLabel}>
 						→ {targetLabel}
 					</span>
 				)}
 				{targetId && (
 					<Button
 						variant="link"
-						className="dragwyb-af-condition-node__row-btn dragwyb-af-condition-node__row-btn--danger"
+						className="daiaw-condition-node__row-btn daiaw-condition-node__row-btn--danger"
 						onPointerDown={stopPointer}
 						onClick={(event) => {
 							event.stopPropagation();
@@ -167,10 +167,10 @@ export default function ConditionNodeCard({
 					type="button"
 					className={
 						targetId
-							? 'dragwyb-af-condition-node__port-dot dragwyb-af-condition-node__port-dot--connected'
+							? 'daiaw-condition-node__port-dot daiaw-condition-node__port-dot--connected'
 							: isDragging
-								? 'dragwyb-af-condition-node__port-dot dragwyb-af-condition-node__port-dot--dragging'
-								: 'dragwyb-af-condition-node__port-dot'
+								? 'daiaw-condition-node__port-dot daiaw-condition-node__port-dot--dragging'
+								: 'daiaw-condition-node__port-dot'
 					}
 					data-branch-id={branchId}
 					title={__(
@@ -205,20 +205,20 @@ export default function ConditionNodeCard({
 		const branchLabel = row.label || __('Untitled Condition', 'dragwyb-ai-agent-workflows');
 
 		return (
-			<div key={branchId} className="dragwyb-af-condition-node__row">
-				<div className="dragwyb-af-condition-node__row-main">
-					<span className="dragwyb-af-condition-node__row-index">
+			<div key={branchId} className="daiaw-condition-node__row">
+				<div className="daiaw-condition-node__row-main">
+					<span className="daiaw-condition-node__row-index">
 						{index + 1}
 					</span>
-					<span className="dragwyb-af-condition-node__row-label">
+					<span className="daiaw-condition-node__row-label">
 						{branchLabel}
 					</span>
 				</div>
 				{row && (
-					<div className="dragwyb-af-condition-node__row-tools">
+					<div className="daiaw-condition-node__row-tools">
 						<Button
 							variant="link"
-							className="dragwyb-af-condition-node__row-btn"
+							className="daiaw-condition-node__row-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -229,7 +229,7 @@ export default function ConditionNodeCard({
 						</Button>
 						<Button
 							variant="link"
-							className="dragwyb-af-condition-node__row-btn dragwyb-af-condition-node__row-btn--danger"
+							className="daiaw-condition-node__row-btn daiaw-condition-node__row-btn--danger"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -266,14 +266,14 @@ export default function ConditionNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="dragwyb-af-condition-node__input-dot"
+				className="daiaw-condition-node__input-dot"
 				aria-hidden="true"
 			/>
 
-			<div className="dragwyb-af-condition-node__card">
-				<div className="dragwyb-af-condition-node__header">
+			<div className="daiaw-condition-node__card">
+				<div className="daiaw-condition-node__header">
 					<span
-						className="dragwyb-af-condition-node__icon"
+						className="daiaw-condition-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -282,11 +282,11 @@ export default function ConditionNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="dragwyb-af-condition-node__header-text">
-						<span className="dragwyb-af-condition-node__title">
+					<div className="daiaw-condition-node__header-text">
+						<span className="daiaw-condition-node__title">
 							{__('Condition', 'dragwyb-ai-agent-workflows')}
 						</span>
-						<span className="dragwyb-af-condition-node__subtitle">
+						<span className="daiaw-condition-node__subtitle">
 							{__(
 								'Each orange port connects to a different step — drag one port per branch',
 								'dragwyb-ai-agent-workflows'
@@ -295,19 +295,19 @@ export default function ConditionNodeCard({
 					</div>
 				</div>
 
-				<div className="dragwyb-af-condition-node__body">
+				<div className="daiaw-condition-node__body">
 					{displayRows.map((row, index) => (
 						<div key={row?.id || `row-${index}`}>
 							{renderBranchRow(row, index)}
 							{index < displayRows.length - 1 && (
-								<div className="dragwyb-af-condition-node__add-between">
+								<div className="daiaw-condition-node__add-between">
 									<span
-										className="dragwyb-af-condition-node__add-line"
+										className="daiaw-condition-node__add-line"
 										aria-hidden="true"
 									/>
 									<button
 										type="button"
-										className="dragwyb-af-condition-node__add-btn"
+										className="daiaw-condition-node__add-btn"
 										onPointerDown={stopPointer}
 										onClick={(event) => {
 											event.stopPropagation();
@@ -322,7 +322,7 @@ export default function ConditionNodeCard({
 										+
 									</button>
 									<span
-										className="dragwyb-af-condition-node__add-line"
+										className="daiaw-condition-node__add-line"
 										aria-hidden="true"
 									/>
 								</div>
@@ -330,14 +330,14 @@ export default function ConditionNodeCard({
 						</div>
 					))}
 
-					<div className="dragwyb-af-condition-node__add-between">
+					<div className="daiaw-condition-node__add-between">
 						<span
-							className="dragwyb-af-condition-node__add-line"
+							className="daiaw-condition-node__add-line"
 							aria-hidden="true"
 						/>
 						<button
 							type="button"
-							className="dragwyb-af-condition-node__add-btn"
+							className="daiaw-condition-node__add-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -349,15 +349,15 @@ export default function ConditionNodeCard({
 							+
 						</button>
 						<span
-							className="dragwyb-af-condition-node__add-line"
+							className="daiaw-condition-node__add-line"
 							aria-hidden="true"
 						/>
 					</div>
 
-					<div className="dragwyb-af-condition-node__row dragwyb-af-condition-node__row--default">
-						<div className="dragwyb-af-condition-node__row-main">
-							<span className="dragwyb-af-condition-node__row-index">∅</span>
-							<span className="dragwyb-af-condition-node__row-label">
+					<div className="daiaw-condition-node__row daiaw-condition-node__row--default">
+						<div className="daiaw-condition-node__row-main">
+							<span className="daiaw-condition-node__row-index">∅</span>
+							<span className="daiaw-condition-node__row-label">
 								{__('No Condition Matched', 'dragwyb-ai-agent-workflows')}
 							</span>
 						</div>

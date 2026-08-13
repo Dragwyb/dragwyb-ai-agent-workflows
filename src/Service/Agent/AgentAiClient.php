@@ -31,7 +31,7 @@ class AgentAiClient {
 	/**
 	 * Run a chat completion (optionally with tools) via the WP AI Client.
 	 *
-	 * @param string            $provider      dragwyb_af provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * @param string            $provider      daiaw provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 * @param string            $model         Model id.
 	 * @param array<int, mixed> $messages      OpenAI-style messages.
 	 * @param array<int, mixed> $tools         OpenAI-style tool schemas.
@@ -126,7 +126,7 @@ class AgentAiClient {
 	/**
 	 * Simple text completion helper for chat actions.
 	 *
-	 * @param string $provider      dragwyb_af provider slug.
+	 * @param string $provider      daiaw provider slug.
 	 * @param string $model         Model id.
 	 * @param string $prompt        User prompt.
 	 * @param string $system_prompt Optional system prompt.

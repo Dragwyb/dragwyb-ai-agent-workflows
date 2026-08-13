@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class GoogleOAuthCallbackController {
 
-	private const API_NAMESPACE = 'dragwyb_af/v1';
+	private const API_NAMESPACE = 'daiaw/v1';
 
 	private ConnectionService $connections;
 
@@ -138,21 +138,21 @@ class GoogleOAuthCallbackController {
 
 		if ( '' !== $return_url ) {
 			$args = array(
-				'dragwyb_af_notice' => $notice,
+				'daiaw_notice' => $notice,
 			);
 
 			if ( $connection_id > 0 ) {
-				$args['dragwyb_af_connection'] = $connection_id;
+				$args['daiaw_connection'] = $connection_id;
 			}
 
 			$node_id = isset( $state_payload['node_id'] ) ? (string) $state_payload['node_id'] : '';
 
 			if ( '' !== $node_id ) {
-				$args['dragwyb_af_node'] = $node_id;
+				$args['daiaw_node'] = $node_id;
 			}
 
 			if ( '' !== $detail ) {
-				$args['dragwyb_af_error'] = $detail;
+				$args['daiaw_error'] = $detail;
 			}
 
 			wp_safe_redirect( add_query_arg( $args, $return_url ) );
@@ -161,7 +161,7 @@ class GoogleOAuthCallbackController {
 
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'dragwyb_af_notice' => $notice,
+			'daiaw_notice' => $notice,
 		);
 
 		if ( $connection_id > 0 ) {
@@ -169,7 +169,7 @@ class GoogleOAuthCallbackController {
 		}
 
 		if ( '' !== $detail ) {
-			$args['dragwyb_af_error'] = $detail;
+			$args['daiaw_error'] = $detail;
 		}
 
 		wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php' ) ) );

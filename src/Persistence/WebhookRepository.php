@@ -18,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `dragwyb_af_webhooks` access goes through this class. Never decrypts the
+ * All `daiaw_webhooks` access goes through this class. Never decrypts the
  * signing secret — that stays the job of `Service\WebhookService`.
  */
 class WebhookRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'dragwyb_af_webhooks';
+	private const CACHE_GROUP = 'daiaw_webhooks';
 
 	private const MAX_PER_PAGE = 100;
 

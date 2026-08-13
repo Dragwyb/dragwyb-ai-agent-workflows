@@ -23,18 +23,18 @@ export default function FlowEdgeControls({
 
 	return (
 		<div
-			className="dragwyb-af-builder-canvas__edge-interactions"
+			className="daiaw-builder-canvas__edge-interactions"
 			aria-hidden={edges.length === 0}
 		>
 			<svg
-				className="dragwyb-af-builder-canvas__edge-hits"
+				className="daiaw-builder-canvas__edge-hits"
 				aria-hidden="true"
 				focusable="false"
 			>
 				{edges.map((edge) => (
 					<path
 						key={`hit-${edge.id}`}
-						className="dragwyb-af-builder-canvas__edge-hit"
+						className="daiaw-builder-canvas__edge-hit"
 						d={edge.path}
 						fill="none"
 						onClick={(event) => {
@@ -58,7 +58,7 @@ export default function FlowEdgeControls({
 				return (
 					<div
 						key={`toolbar-${edge.id}`}
-						className="dragwyb-af-builder-edge-toolbar"
+						className="daiaw-builder-edge-toolbar"
 						style={{
 							left: `${midpoint.x}px`,
 							top: `${midpoint.y}px`,
@@ -67,7 +67,7 @@ export default function FlowEdgeControls({
 					>
 						<button
 							type="button"
-							className="dragwyb-af-builder-edge-toolbar__btn dragwyb-af-builder-edge-toolbar__btn--add"
+							className="daiaw-builder-edge-toolbar__btn daiaw-builder-edge-toolbar__btn--add"
 							title={__(
 								'Add a step between these nodes',
 								'dragwyb-ai-agent-workflows'
@@ -82,7 +82,7 @@ export default function FlowEdgeControls({
 						</button>
 						<button
 							type="button"
-							className="dragwyb-af-builder-edge-toolbar__btn dragwyb-af-builder-edge-toolbar__btn--delete"
+							className="daiaw-builder-edge-toolbar__btn daiaw-builder-edge-toolbar__btn--delete"
 							title={__(
 								'Delete this connection',
 								'dragwyb-ai-agent-workflows'

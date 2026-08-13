@@ -39,7 +39,7 @@ class WorkflowsPage implements AdminPage {
 	 * instantiated `WorkflowsPage` (see `BuilderPage::SLUG` for the same
 	 * pattern used in reverse, for the "Add New"/"Edit" links below).
 	 */
-	public const SLUG = 'dragwyb-af-dashboard';
+	public const SLUG = 'daiaw-dashboard';
 
 	private WorkflowService $workflows;
 
@@ -93,23 +93,23 @@ class WorkflowsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'dragwyb-af-admin',
-			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'daiaw-admin',
+			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DRAGWYB_AF_VERSION
+			DAIAW_VERSION
 		);
 
 		wp_register_script(
-			'dragwyb-af-workflow-import',
+			'daiaw-workflow-import',
 			false,
 			array(),
-			DRAGWYB_AF_VERSION,
+			DAIAW_VERSION,
 			true
 		);
-		wp_enqueue_script( 'dragwyb-af-workflow-import' );
+		wp_enqueue_script( 'daiaw-workflow-import' );
 		wp_add_inline_script(
-			'dragwyb-af-workflow-import',
-			'(function(){var f=document.querySelector(".dragwyb-af-workflow-import-form");if(!f)return;var i=f.querySelector(".dragwyb-af-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();'
+			'daiaw-workflow-import',
+			'(function(){var f=document.querySelector(".daiaw-workflow-import-form");if(!f)return;var i=f.querySelector(".daiaw-workflow-import-form__input");if(!i)return;i.addEventListener("change",function(){if(i.files&&i.files.length){f.submit();}});})();'
 		);
 	}
 
@@ -124,7 +124,7 @@ class WorkflowsPage implements AdminPage {
 		$table = new WorkflowsListTable( $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap dragwyb-af-admin-page">';
+		echo '<div class="wrap daiaw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
@@ -161,7 +161,7 @@ class WorkflowsPage implements AdminPage {
 
 			// Keep the status views (especially Trash) reachable when the
 			// "all" list is empty but trashed workflows still exist.
-			echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
+			echo '<form method="get" class="daiaw-list-table-filters-form">';
 			printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 			$table->views();
 			echo '</form>';
@@ -170,7 +170,7 @@ class WorkflowsPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
+		echo '<form method="get" class="daiaw-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view selector.
 		$view = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
@@ -182,7 +182,7 @@ class WorkflowsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_workflow_bulk_action', 'dragwyb_af_workflow_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'daiaw_workflow_bulk_action', 'daiaw_workflow_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -212,7 +212,7 @@ class WorkflowsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?dragwyb_af_notice=` query arg. Kept as literal `__()` calls (rather than a
+	 * `?daiaw_notice=` query arg. Kept as literal `__()` calls (rather than a
 	 * class constant) so i18n string-extraction tooling can find them.
 	 *
 	 * @return array<string, array{message: string, type: string}>
@@ -260,27 +260,27 @@ class WorkflowsPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderImportButton(): void {
-		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-workflow-import-form page-title-action">';
-		echo '<input type="hidden" name="action" value="dragwyb_af_workflow_import" />';
-		wp_nonce_field( 'dragwyb_af_workflow_import' );
-		echo '<label class="dragwyb-af-workflow-import-form__label">';
+		echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-workflow-import-form page-title-action">';
+		echo '<input type="hidden" name="action" value="daiaw_workflow_import" />';
+		wp_nonce_field( 'daiaw_workflow_import' );
+		echo '<label class="daiaw-workflow-import-form__label">';
 		echo '<span class="screen-reader-text">' . esc_html__( 'Import workflow JSON', 'dragwyb-ai-agent-workflows' ) . '</span>';
 		echo '<span aria-hidden="true">' . esc_html__( 'Import', 'dragwyb-ai-agent-workflows' ) . '</span>';
-		echo '<input type="file" name="dragwyb_af_workflow_json" accept="application/json,.json" class="dragwyb-af-workflow-import-form__input" required />';
+		echo '<input type="file" name="daiaw_workflow_json" accept="application/json,.json" class="daiaw-workflow-import-form__input" required />';
 		echo '</label>';
-		echo '<button type="submit" class="dragwyb-af-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'dragwyb-ai-agent-workflows' ) . '</button>';
+		echo '<button type="submit" class="daiaw-workflow-import-form__submit screen-reader-text">' . esc_html__( 'Upload', 'dragwyb-ai-agent-workflows' ) . '</button>';
 		echo '</form>';
 	}
 
 	/**
-	 * Prints an admin notice for the read-only `?dragwyb_af_notice=` query arg, if
+	 * Prints an admin notice for the read-only `?daiaw_notice=` query arg, if
 	 * it matches one of the allow-listed keys from self::notices().
 	 *
 	 * @return void
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
+		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

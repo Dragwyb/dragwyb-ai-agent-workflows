@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * not recommended otherwise.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
- * rather than the `dragwyb_af_workflow_nodes` table: binding must happen as early
+ * rather than the `daiaw_workflow_nodes` table: binding must happen as early
  * as possible in the request (see Core\Plugin::registerExecutionEngine()),
  * before WorkflowExecutionService ever gets a chance to lazily sync that
  * table, so `graph_json` — the builder's own always-current source of
@@ -176,7 +176,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Mid-write: any dragwyb_af create/update/delete is still on the stack.
+					// Mid-write: any daiaw create/update/delete is still on the stack.
 					if ( $this->trigger_guard->isWriting() ) {
 						return;
 					}
@@ -186,7 +186,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Entity was created by a previous dragwyb_af action (translated post,
+					// Entity was created by a previous daiaw action (translated post,
 					// auto-user, auto-comment, etc.) — do not start another loop.
 					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
 						return;

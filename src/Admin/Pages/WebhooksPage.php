@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WebhooksPage implements AdminPage {
 
-	public const SLUG = 'dragwyb-af-webhooks';
+	public const SLUG = 'daiaw-webhooks';
 
 	private WebhookService $webhooks;
 
@@ -88,10 +88,10 @@ class WebhooksPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'dragwyb-af-admin',
-			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'daiaw-admin',
+			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DRAGWYB_AF_VERSION
+			DAIAW_VERSION
 		);
 	}
 
@@ -106,7 +106,7 @@ class WebhooksPage implements AdminPage {
 		$table = new WebhooksListTable( $this->webhooks, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap dragwyb-af-admin-page">';
+		echo '<div class="wrap daiaw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
@@ -141,12 +141,12 @@ class WebhooksPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
+		echo '<form method="get" class="daiaw-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
 
-		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_webhook_bulk_action', 'dragwyb_af_webhook_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'daiaw_webhook_bulk_action', 'daiaw_webhook_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -189,7 +189,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
+		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

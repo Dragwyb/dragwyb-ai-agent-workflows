@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Deliberately a plain PHP collection with no WordPress hook knowledge of
  * its own: something else (Plugin::registerNodeTypes()) is responsible for
- * firing the `dragwyb_af/nodes/register` action that populates it, so this class
+ * firing the `daiaw/nodes/register` action that populates it, so this class
  * stays trivially unit-testable.
  */
 class NodeTypeRegistry {
@@ -111,7 +111,7 @@ class NodeTypeRegistry {
 				esc_html( $kind ),
 				esc_html( $slug )
 			),
-			esc_html( DRAGWYB_AF_VERSION )
+			esc_html( DAIAW_VERSION )
 		);
 	}
 }

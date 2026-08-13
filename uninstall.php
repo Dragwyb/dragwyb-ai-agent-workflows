@@ -18,9 +18,9 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  */
 require_once __DIR__ . '/src/Core/WordPressCompat.php';
 
-$dragwyb_af_has_core_ai_client = dragwyb_af_has_core_ai_client();
+$daiaw_has_core_ai_client = daiaw_has_core_ai_client();
 
-if ( ! $dragwyb_af_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( ! $daiaw_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 } else {
 	require_once __DIR__ . '/src/autoload.php';

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Every timestamp this plugin stores (`dragwyb_af_workflow_runs`, `dragwyb_af_workflows`,
+ * Every timestamp this plugin stores (`daiaw_workflow_runs`, `daiaw_workflows`,
  * etc.) is GMT — see `current_time( 'mysql', true )` at each insert site.
  * Historically this class's callers always converted that to the site's
  * local timezone for display via `get_date_from_gmt()`; the "General" tab

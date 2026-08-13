@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin_post.php?action=dragwyb_af_settings_action` POST submitted
+ * Receives the `admin_post.php?action=daiaw_settings_action` POST submitted
  * by each of SettingsPage's per-tab forms.
  *
  * One op per form, matching one SettingsService method each, rather than
@@ -49,7 +49,7 @@ class SettingsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_dragwyb_af_settings_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_daiaw_settings_action', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -69,7 +69,7 @@ class SettingsController {
 			$this->redirect( 'general', 'error' );
 		}
 
-		check_admin_referer( 'dragwyb_af_settings_action_' . $op );
+		check_admin_referer( 'daiaw_settings_action_' . $op );
 
 		switch ( $op ) {
 			case 'general':
@@ -160,7 +160,7 @@ class SettingsController {
 				array(
 					'page'       => SettingsPage::SLUG,
 					'tab'        => 'retention',
-					'dragwyb_af_notice' => 'purged',
+					'daiaw_notice' => 'purged',
 					'count'      => $count,
 				),
 				admin_url( 'admin.php' )
@@ -183,7 +183,7 @@ class SettingsController {
 				array(
 					'page'       => SettingsPage::SLUG,
 					'tab'        => $tab,
-					'dragwyb_af_notice' => $notice,
+					'daiaw_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)

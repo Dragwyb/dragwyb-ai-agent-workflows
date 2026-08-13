@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Options {
 
-	public const PREFIX = 'dragwyb_af_option_';
+	public const PREFIX = 'daiaw_option_';
 
 	/**
 	 * Retrieves a plugin option.

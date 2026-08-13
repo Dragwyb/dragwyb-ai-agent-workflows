@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * on demand and reports back what happened.
  *
  * Public extension point: third-party code implements this interface and
- * registers an instance via the `dragwyb_af/nodes/register` action (see
+ * registers an instance via the `daiaw/nodes/register` action (see
  * `docs/hooks-reference.md`).
  */
 interface ActionInterface extends NodeTypeInterface {

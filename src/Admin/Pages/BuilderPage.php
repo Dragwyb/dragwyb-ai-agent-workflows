@@ -38,7 +38,7 @@ class BuilderPage implements AdminPage {
 	 * needing an instantiated `BuilderPage` (see `WorkflowsPage::SLUG` for
 	 * the same pattern used in reverse, for this page's back-to-list link).
 	 */
-	public const SLUG = 'dragwyb-af-builder';
+	public const SLUG = 'daiaw-builder';
 
 	/**
 	 * {@inheritDoc}
@@ -79,7 +79,7 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function enqueueAssets(): void {
-		$asset_file = DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
+		$asset_file = DAIAW_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			// The React app hasn't been built (e.g. a git checkout without
@@ -93,21 +93,21 @@ class BuilderPage implements AdminPage {
 		$asset   = require $asset_file;
 		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
 		// Bust browser caches when the built bundle changes on disk.
-		$built_js = DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/index.js';
+		$built_js = DAIAW_PLUGIN_DIR . 'assets/builder/build/index.js';
 		if ( file_exists( $built_js ) ) {
 			$version = (string) filemtime( $built_js );
 		}
 
 		wp_enqueue_style(
-			'dragwyb-af-builder-font',
+			'daiaw-builder-font',
 			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
 			array(),
-			DRAGWYB_AF_VERSION
+			DAIAW_VERSION
 		);
 
 		wp_enqueue_script(
-			'dragwyb-af-builder',
-			DRAGWYB_AF_PLUGIN_URL . 'assets/builder/build/index.js',
+			'daiaw-builder',
+			DAIAW_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
 			$version,
 			true
@@ -116,18 +116,18 @@ class BuilderPage implements AdminPage {
 		// wp-scripts' MiniCssExtractPlugin config names the extracted
 		// stylesheet "style-{entry}.css" (plus an auto-generated
 		// "-rtl.css" companion), not "{entry}.css".
-		if ( file_exists( DRAGWYB_AF_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
+		if ( file_exists( DAIAW_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
 			wp_enqueue_style(
-				'dragwyb-af-builder',
-				DRAGWYB_AF_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components', 'dragwyb-af-builder-font' ),
+				'daiaw-builder',
+				DAIAW_PLUGIN_URL . 'assets/builder/build/style-index.css',
+				array( 'wp-components', 'daiaw-builder-font' ),
 				$version
 			);
-			wp_style_add_data( 'dragwyb-af-builder', 'rtl', 'replace' );
+			wp_style_add_data( 'daiaw-builder', 'rtl', 'replace' );
 		}
 
 		wp_add_inline_script(
-			'dragwyb-af-builder',
+			'daiaw-builder',
 			'var dragwybAFBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
 			'before'
 		);
@@ -147,7 +147,7 @@ class BuilderPage implements AdminPage {
 			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
 			'aiCredentialsUrl'       => \DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
-			'googleOAuthCallbackUrl' => rest_url( 'dragwyb_af/v1/oauth/google/callback' ),
+			'googleOAuthCallbackUrl' => rest_url( 'daiaw/v1/oauth/google/callback' ),
 		);
 	}
 
@@ -172,9 +172,9 @@ class BuilderPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		echo '<div class="wrap dragwyb-af-admin-page dragwyb-af-builder-page">';
+		echo '<div class="wrap daiaw-admin-page daiaw-builder-page">';
 		$this->renderImportNotice();
-		echo '<div id="dragwyb-af-builder-root"></div>';
+		echo '<div id="daiaw-builder-root"></div>';
 		echo '</div>';
 	}
 
@@ -185,7 +185,7 @@ class BuilderPage implements AdminPage {
 	 */
 	private function renderImportNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
+		$key = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
 
 		if ( 'imported' !== $key ) {
 			return;

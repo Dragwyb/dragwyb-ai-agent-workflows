@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Listens on the public `dragwyb_af/nodes/register` action to add this plugin's
+ * Listens on the public `daiaw/nodes/register` action to add this plugin's
  * own built-in trigger/action node types.
  *
  * Optional co-plugin integrations are registered only when that plugin is

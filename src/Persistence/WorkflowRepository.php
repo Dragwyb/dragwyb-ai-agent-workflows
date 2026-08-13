@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `dragwyb_af_workflows` access goes through this class. Every query is built
+ * All `daiaw_workflows` access goes through this class. Every query is built
  * with `$wpdb->prepare()` or the `$wpdb` helper methods; the table name
  * itself is never user input, so its direct interpolation into SQL strings
  * is safe.
@@ -27,7 +27,7 @@ class WorkflowRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'dragwyb_af_workflows';
+	private const CACHE_GROUP = 'daiaw_workflows';
 
 	private const MAX_PER_PAGE = 100;
 

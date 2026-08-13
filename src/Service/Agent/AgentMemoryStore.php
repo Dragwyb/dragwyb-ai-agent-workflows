@@ -46,7 +46,7 @@ class AgentMemoryStore {
 
 		$key_suffix = '' !== $session_key ? $session_key . '_' : '';
 
-		$this->storage_key = 'dragwyb_af_agent_mem_' . md5( $agent_id . '_' . $memory_id . '_' . $key_suffix );
+		$this->storage_key = 'daiaw_agent_mem_' . md5( $agent_id . '_' . $memory_id . '_' . $key_suffix );
 	}
 
 	/**

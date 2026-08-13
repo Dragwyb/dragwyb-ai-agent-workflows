@@ -36,7 +36,7 @@ final class RowActionForms {
 	 *
 	 * @return string Submit button markup for use inside the table.
 	 */
-	public function registerButton( string $form_id, string $markup, string $label, string $class = 'dragwyb-af-row-action-button', ?string $confirm = null ): string {
+	public function registerButton( string $form_id, string $markup, string $label, string $class = 'daiaw-row-action-button', ?string $confirm = null ): string {
 		$this->forms[ $form_id ] = $markup;
 
 		$confirm_attr = null !== $confirm
@@ -63,7 +63,7 @@ final class RowActionForms {
 			return;
 		}
 
-		echo '<div class="dragwyb-af-detached-row-action-forms" hidden aria-hidden="true">';
+		echo '<div class="daiaw-detached-row-action-forms" hidden aria-hidden="true">';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each stored form was built with escaping at registration time.
 		echo implode( '', $this->forms );
 		echo '</div>';

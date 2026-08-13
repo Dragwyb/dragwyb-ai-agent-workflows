@@ -30,13 +30,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Exposes the server-side `NodeTypeRegistry` (item 5) to the builder's node
  * palette. Read-only by design — node types are registered in PHP via the
- * `dragwyb_af/nodes/register` action, never created/edited over HTTP — so this is
+ * `daiaw/nodes/register` action, never created/edited over HTTP — so this is
  * a plain class rather than a `WP_REST_Controller` subclass: there is no
  * CRUD/schema-derivation machinery to inherit for a single GET route.
  */
 class NodeTypesController {
 
-	private const API_NAMESPACE = 'dragwyb_af/v1';
+	private const API_NAMESPACE = 'daiaw/v1';
 
 	private const ROUTE = '/node-types';
 
@@ -96,7 +96,7 @@ class NodeTypesController {
 	public function permissionsCheck( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'dragwyb_af_rest_forbidden',
+				'daiaw_rest_forbidden',
 				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -161,7 +161,7 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'dragwyb_af_trigger_sample_unavailable',
+					'daiaw_trigger_sample_unavailable',
 					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-ai-agent-workflows' ) ),
 					array( 'status' => 404 )
 				);
@@ -180,7 +180,7 @@ class NodeTypesController {
 
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
-					'dragwyb_af_trigger_sample_unavailable',
+					'daiaw_trigger_sample_unavailable',
 					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-ai-agent-workflows' ) ),
 					array( 'status' => 404 )
 				);
@@ -195,7 +195,7 @@ class NodeTypesController {
 		}
 
 		return new WP_Error(
-			'dragwyb_af_trigger_sample_unsupported',
+			'daiaw_trigger_sample_unsupported',
 			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-ai-agent-workflows' ),
 			array( 'status' => 400 )
 		);

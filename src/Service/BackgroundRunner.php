@@ -29,14 +29,14 @@ class BackgroundRunner {
 	/**
 	 * The WP-Cron hook this worker's processBatch() is bound to.
 	 */
-	public const CRON_HOOK = 'dragwyb_af/cron/process_queue';
+	public const CRON_HOOK = 'daiaw/cron/process_queue';
 
 	/**
 	 * The custom cron_schedules key registered for that hook. WordPress
 	 * ships nothing finer-grained than hourly, so a custom schedule is
 	 * required for timely queue draining — see registerCronSchedule().
 	 */
-	public const CRON_SCHEDULE = 'dragwyb_af_every_minute';
+	public const CRON_SCHEDULE = 'daiaw_every_minute';
 
 	/**
 	 * Maximum runs claimed per cron tick. Kept modest because a single

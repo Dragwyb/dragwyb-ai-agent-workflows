@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunsPage implements AdminPage {
 
-	public const SLUG = 'dragwyb-af-runs';
+	public const SLUG = 'daiaw-runs';
 
 	private WorkflowRunRepository $runs;
 
@@ -92,10 +92,10 @@ class RunsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'dragwyb-af-admin',
-			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'daiaw-admin',
+			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DRAGWYB_AF_VERSION
+			DAIAW_VERSION
 		);
 	}
 
@@ -110,7 +110,7 @@ class RunsPage implements AdminPage {
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap dragwyb-af-admin-page">';
+		echo '<div class="wrap daiaw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -141,7 +141,7 @@ class RunsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'dragwyb_af_run_bulk_action', 'dragwyb_af_run_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'daiaw_run_bulk_action', 'daiaw_run_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -160,7 +160,7 @@ class RunsPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter form.
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
 
-		echo '<form method="get" class="dragwyb-af-list-table-filters-form">';
+		echo '<form method="get" class="daiaw-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 
 		if ( '' !== $status ) {
@@ -195,7 +195,7 @@ class RunsPage implements AdminPage {
 		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-ai-agent-workflows' );
 
 		printf(
-			'<p class="dragwyb-af-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
+			'<p class="daiaw-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
 				esc_html__( 'Showing runs for: %s', 'dragwyb-ai-agent-workflows' ),
@@ -208,7 +208,7 @@ class RunsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?daiaw_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -242,7 +242,7 @@ class RunsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
+		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

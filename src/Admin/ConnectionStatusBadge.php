@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Shared between ConnectionsListTable and a future connection detail view.
- * Reuses the same `.dragwyb-af-status-badge` CSS classes RunStatusBadge already
+ * Reuses the same `.daiaw-status-badge` CSS classes RunStatusBadge already
  * introduced (roadmap item 9) rather than a second color palette.
  */
 class ConnectionStatusBadge {
@@ -32,7 +32,7 @@ class ConnectionStatusBadge {
 	 */
 	public static function render( int $status ): string {
 		return sprintf(
-			'<span class="dragwyb-af-status-badge dragwyb-af-status-badge--%1$s">%2$s</span>',
+			'<span class="daiaw-status-badge daiaw-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);

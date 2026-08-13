@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `dragwyb_af_connections` holds one row per stored third-party credential
+ * `daiaw_connections` holds one row per stored third-party credential
  * (roadmap item 11). `credentials_json` is a JSON object of
  * `{field: ciphertext}` pairs — each *value* individually encrypted (see
  * `Core\Encryption`) before the object is ever serialized, not the whole

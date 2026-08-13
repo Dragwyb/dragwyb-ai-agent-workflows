@@ -31,7 +31,7 @@ class RunStatusBadge {
 	 */
 	public static function render( string $status ): string {
 		return sprintf(
-			'<span class="dragwyb-af-status-badge dragwyb-af-status-badge--%1$s">%2$s</span>',
+			'<span class="daiaw-status-badge daiaw-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);

@@ -124,14 +124,14 @@ export default function AgentConfigPanel({
 	const canExecute = validationErrors.length === 0;
 
 	return (
-		<div className="dragwyb-af-agent-config">
-			<div className="dragwyb-af-agent-config__tabs">
+		<div className="daiaw-agent-config">
+			<div className="daiaw-agent-config__tabs">
 				<button
 					type="button"
 					className={
 						activeTab === 'parameters'
-							? 'dragwyb-af-agent-config__tab dragwyb-af-agent-config__tab--active'
-							: 'dragwyb-af-agent-config__tab'
+							? 'daiaw-agent-config__tab daiaw-agent-config__tab--active'
+							: 'daiaw-agent-config__tab'
 					}
 					onClick={() => setActiveTab('parameters')}
 				>
@@ -141,8 +141,8 @@ export default function AgentConfigPanel({
 					type="button"
 					className={
 						activeTab === 'settings'
-							? 'dragwyb-af-agent-config__tab dragwyb-af-agent-config__tab--active'
-							: 'dragwyb-af-agent-config__tab'
+							? 'daiaw-agent-config__tab daiaw-agent-config__tab--active'
+							: 'daiaw-agent-config__tab'
 					}
 					onClick={() => setActiveTab('settings')}
 				>
@@ -150,7 +150,7 @@ export default function AgentConfigPanel({
 				</button>
 				<Button
 					variant="primary"
-					className="dragwyb-af-agent-config__execute"
+					className="daiaw-agent-config__execute"
 					onClick={onExecuteStep}
 					isBusy={testing}
 					disabled={testing || !canExecute}
@@ -160,13 +160,13 @@ export default function AgentConfigPanel({
 			</div>
 
 			{activeTab === 'parameters' && (
-				<div className="dragwyb-af-agent-config__panel">
+				<div className="daiaw-agent-config__panel">
 					{!bannerDismissed && (
-						<div className="dragwyb-af-agent-config__banner" role="note">
-							<span className="dragwyb-af-agent-config__banner-icon" aria-hidden="true">
+						<div className="daiaw-agent-config__banner" role="note">
+							<span className="daiaw-agent-config__banner-icon" aria-hidden="true">
 								i
 							</span>
-							<p className="dragwyb-af-agent-config__banner-text">
+							<p className="daiaw-agent-config__banner-text">
 								{__(
 									'Tip: Get a feel for agents with our quick',
 									'dragwyb-ai-agent-workflows'
@@ -182,7 +182,7 @@ export default function AgentConfigPanel({
 							</p>
 							<button
 								type="button"
-								className="dragwyb-af-agent-config__banner-close"
+								className="daiaw-agent-config__banner-close"
 								aria-label={__('Dismiss tip', 'dragwyb-ai-agent-workflows')}
 								onClick={() => {
 									dismissAgentTutorial();
@@ -217,13 +217,13 @@ export default function AgentConfigPanel({
 					/>
 
 					{config.prompt_source === PROMPT_SOURCE_CHAT_TRIGGER ? (
-						<p className="dragwyb-af-agent-config__help">
+						<p className="daiaw-agent-config__help">
 							{__(
 								'Looks for an input field called chatInput from a directly connected Chat Trigger node. The prompt textarea is hidden while this source is selected.',
 								'dragwyb-ai-agent-workflows'
 							)}
 							{!hasChatTrigger && (
-								<span className="dragwyb-af-builder-config__field-error">
+								<span className="daiaw-builder-config__field-error">
 									{' '}
 									{__(
 										'No trigger is connected to this agent yet.',
@@ -233,7 +233,7 @@ export default function AgentConfigPanel({
 							)}
 						</p>
 					) : (
-						<div className="dragwyb-af-builder-config__field">
+						<div className="daiaw-builder-config__field">
 							<TokenField
 								label={__(
 									'Prompt (User Message)',
@@ -245,7 +245,7 @@ export default function AgentConfigPanel({
 								onChange={(value) => onChangeConfig('prompt', value)}
 							/>
 							{validationByField.prompt && (
-								<p className="dragwyb-af-builder-config__field-error">
+								<p className="daiaw-builder-config__field-error">
 									{validationByField.prompt}
 								</p>
 							)}
@@ -264,7 +264,7 @@ export default function AgentConfigPanel({
 					/>
 
 					{config.require_output_format && (
-						<div className="dragwyb-af-agent-config__notice dragwyb-af-agent-config__notice--warning">
+						<div className="daiaw-agent-config__notice daiaw-agent-config__notice--warning">
 							{attachments.outputParser
 								? __(
 									'Output Parser connected. Click it on the canvas to edit the JSON example or schema.',
@@ -278,7 +278,7 @@ export default function AgentConfigPanel({
 					)}
 
 					{validationByField.output_parser && (
-						<p className="dragwyb-af-builder-config__field-error">
+						<p className="daiaw-builder-config__field-error">
 							{validationByField.output_parser}
 						</p>
 					)}
@@ -307,7 +307,7 @@ export default function AgentConfigPanel({
 					/>
 
 					{config.fallback_enabled && (
-						<div className="dragwyb-af-agent-config__notice dragwyb-af-agent-config__notice--info">
+						<div className="daiaw-agent-config__notice daiaw-agent-config__notice--info">
 							{__(
 								'Connect an additional language model on the canvas to use it as a fallback if the main model fails.',
 								'dragwyb-ai-agent-workflows'
@@ -316,18 +316,18 @@ export default function AgentConfigPanel({
 					)}
 
 					{validationByField.fallback_chat_model && (
-						<p className="dragwyb-af-builder-config__field-error">
+						<p className="daiaw-builder-config__field-error">
 							{validationByField.fallback_chat_model}
 						</p>
 					)}
 
-					<div className="dragwyb-af-agent-config__options">
-						<h3 className="dragwyb-af-agent-config__options-title">
+					<div className="daiaw-agent-config__options">
+						<h3 className="daiaw-agent-config__options-title">
 							{__('Options', 'dragwyb-ai-agent-workflows')}
 						</h3>
 
 						{config.options.length === 0 ? (
-							<p className="dragwyb-af-agent-config__options-empty">
+							<p className="daiaw-agent-config__options-empty">
 								{__('No properties', 'dragwyb-ai-agent-workflows')}
 							</p>
 						) : (
@@ -344,7 +344,7 @@ export default function AgentConfigPanel({
 									return (
 										<div
 											key={optionId}
-											className="dragwyb-af-agent-config__option-row"
+											className="daiaw-agent-config__option-row"
 										>
 											<TokenField
 												label={optionMeta.label}
@@ -370,7 +370,7 @@ export default function AgentConfigPanel({
 									return (
 										<div
 											key={optionId}
-											className="dragwyb-af-agent-config__option-row"
+											className="daiaw-agent-config__option-row"
 										>
 											<TextControl
 												label={optionMeta.label}
@@ -400,22 +400,22 @@ export default function AgentConfigPanel({
 							})
 						)}
 
-						<div className="dragwyb-af-agent-config__add-option-wrap">
+						<div className="daiaw-agent-config__add-option-wrap">
 							<Button
 								variant="secondary"
-								className="dragwyb-af-agent-config__add-option"
+								className="daiaw-agent-config__add-option"
 								onClick={() => setOptionsMenuOpen((open) => !open)}
 								disabled={availableOptions.length === 0}
 							>
 								{__('Add Option', 'dragwyb-ai-agent-workflows')}
 							</Button>
 							{optionsMenuOpen && availableOptions.length > 0 && (
-								<div className="dragwyb-af-agent-config__add-option-menu">
+								<div className="daiaw-agent-config__add-option-menu">
 									{availableOptions.map((option) => (
 										<button
 											key={option.id}
 											type="button"
-											className="dragwyb-af-agent-config__add-option-item"
+											className="daiaw-agent-config__add-option-item"
 											onClick={() => addOption(option.id)}
 										>
 											{option.label}
@@ -429,7 +429,7 @@ export default function AgentConfigPanel({
 			)}
 
 			{activeTab === 'settings' && (
-				<div className="dragwyb-af-agent-config__panel">
+				<div className="daiaw-agent-config__panel">
 					<ToggleControl
 						label={__('Always Output Data', 'dragwyb-ai-agent-workflows')}
 						checked={config.settings.always_output_data}
@@ -528,7 +528,7 @@ export default function AgentConfigPanel({
 						}
 					/>
 
-					<p className="dragwyb-af-agent-config__version">
+					<p className="daiaw-agent-config__version">
 						{__(
 							'AI Agent node version',
 							'dragwyb-ai-agent-workflows'
@@ -613,7 +613,7 @@ function AgentConnectorRow({
 	}
 
 	return (
-		<div className="dragwyb-af-agent-config__connectors">
+		<div className="daiaw-agent-config__connectors">
 			{connectors.map((connector) => (
 				<AgentConnectorSlot
 					key={connector.id}
@@ -629,21 +629,21 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 	const { connected, label, required, onAdd, error, toolCount } = connector;
 
 	return (
-		<div className="dragwyb-af-agent-config__connector">
-			<span className="dragwyb-af-agent-config__connector-label">
+		<div className="daiaw-agent-config__connector">
+			<span className="daiaw-agent-config__connector-label">
 				{label}
 				{required ? (
-					<span className="dragwyb-af-agent-config__connector-required">*</span>
+					<span className="daiaw-agent-config__connector-required">*</span>
 				) : null}
 			</span>
 			{connected ? (
 				<button
 					type="button"
-					className="dragwyb-af-agent-config__connector-chip"
+					className="daiaw-agent-config__connector-chip"
 					onClick={() => onSelectNode(connected.id)}
 				>
 					<ConnectorIcon node={connected} />
-					<span className="dragwyb-af-agent-config__connector-chip-label">
+					<span className="daiaw-agent-config__connector-chip-label">
 						{connected.label || connected.type}
 						{toolCount > 1 ? ` (+${toolCount - 1})` : ''}
 					</span>
@@ -651,7 +651,7 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 			) : (
 				<button
 					type="button"
-					className="dragwyb-af-agent-config__connector-add"
+					className="daiaw-agent-config__connector-add"
 					onClick={onAdd}
 					aria-label={__('Add connection', 'dragwyb-ai-agent-workflows')}
 				>
@@ -659,7 +659,7 @@ function AgentConnectorSlot({ connector, onSelectNode }) {
 				</button>
 			)}
 			{error ? (
-				<span className="dragwyb-af-agent-config__connector-error">{error}</span>
+				<span className="daiaw-agent-config__connector-error">{error}</span>
 			) : null}
 		</div>
 	);
@@ -672,7 +672,7 @@ function ConnectorIcon({ node }) {
 
 		return (
 			<span
-				className="dragwyb-af-agent-config__connector-icon"
+				className="daiaw-agent-config__connector-icon"
 				style={{ backgroundColor: meta.bg, color: meta.accent }}
 			>
 				{meta.icon}
@@ -682,7 +682,7 @@ function ConnectorIcon({ node }) {
 
 	if (node.attachment_type === 'memory') {
 		return (
-			<span className="dragwyb-af-agent-config__connector-icon dragwyb-af-agent-config__connector-icon--muted">
+			<span className="daiaw-agent-config__connector-icon daiaw-agent-config__connector-icon--muted">
 				M
 			</span>
 		);
@@ -690,14 +690,14 @@ function ConnectorIcon({ node }) {
 
 	if (node.attachment_type === 'output_parser') {
 		return (
-			<span className="dragwyb-af-agent-config__connector-icon dragwyb-af-agent-config__connector-icon--parser">
+			<span className="daiaw-agent-config__connector-icon daiaw-agent-config__connector-icon--parser">
 				{'{ }'}
 			</span>
 		);
 	}
 
 	return (
-		<span className="dragwyb-af-agent-config__connector-icon dragwyb-af-agent-config__connector-icon--tool">
+		<span className="daiaw-agent-config__connector-icon daiaw-agent-config__connector-icon--tool">
 			T
 		</span>
 	);

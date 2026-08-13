@@ -40,10 +40,10 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 	return (
 		<nav
-			className="dragwyb-af-builder-palette"
+			className="daiaw-builder-palette"
 			aria-label={__('Node palette', 'dragwyb-ai-agent-workflows')}
 		>
-			<div className="dragwyb-af-builder-palette__search">
+			<div className="daiaw-builder-palette__search">
 				<TextControl
 					label={__('Search nodes', 'dragwyb-ai-agent-workflows')}
 					hideLabelFromVision
@@ -102,12 +102,12 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 
 function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 	return (
-		<div className="dragwyb-af-builder-palette__section">
-			<h2 className="dragwyb-af-builder-palette__heading">{title}</h2>
+		<div className="daiaw-builder-palette__section">
+			<h2 className="daiaw-builder-palette__heading">{title}</h2>
 			{apps.length === 0 && (
-				<p className="dragwyb-af-builder-palette__empty">{emptyMessage}</p>
+				<p className="daiaw-builder-palette__empty">{emptyMessage}</p>
 			)}
-			<ul className="dragwyb-af-builder-palette__list">
+			<ul className="daiaw-builder-palette__list">
 				{apps.map((app) => {
 					const meta = getNodeMeta(app.id, kind === 'trigger' ? 'trigger' : 'action');
 					const isDisabled = app.available === false;
@@ -128,15 +128,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								type="button"
 								className={
 									isDisabled
-										? 'dragwyb-af-builder-palette__item dragwyb-af-builder-palette__item--disabled'
-										: 'dragwyb-af-builder-palette__item'
+										? 'daiaw-builder-palette__item daiaw-builder-palette__item--disabled'
+										: 'daiaw-builder-palette__item'
 								}
 								onClick={() => onOpenPicker(kind, app.id)}
 								aria-label={app.label}
 								title={isDisabled ? disabledMessage : app.label}
 							>
 								<span
-									className="dragwyb-af-builder-palette__item-icon"
+									className="daiaw-builder-palette__item-icon"
 									style={{
 										backgroundColor: meta.bg,
 										color: meta.accent,
@@ -145,15 +145,15 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 								>
 									{meta.icon}
 								</span>
-								<span className="dragwyb-af-builder-palette__item-content">
+								<span className="daiaw-builder-palette__item-content">
 									<span
-										className="dragwyb-af-builder-palette__item-label"
+										className="daiaw-builder-palette__item-label"
 										aria-hidden="true"
 									>
 										{app.label}
 									</span>
 									{isDisabled && (
-										<span className="dragwyb-af-builder-palette__item-hint">
+										<span className="daiaw-builder-palette__item-hint">
 											{disabledMessage}
 										</span>
 									)}

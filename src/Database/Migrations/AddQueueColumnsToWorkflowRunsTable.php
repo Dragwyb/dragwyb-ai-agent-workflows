@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `dragwyb_af_workflow_runs` (created in roadmap item 7) for background/
+ * Extends `daiaw_workflow_runs` (created in roadmap item 7) for background/
  * queued execution (roadmap item 8), rather than editing
  * `CreateWorkflowRunsTable` in place — that migration already shipped and
  * may have run against a live site, so schema evolution happens through a

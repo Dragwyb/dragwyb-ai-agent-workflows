@@ -28,7 +28,7 @@ class RunDuration {
 	 * timestamps (both stored in GMT — see WorkflowRun — so a plain
 	 * strtotime() diff is safe without any timezone conversion).
 	 *
-	 * Precision is whole seconds only: `dragwyb_af_workflow_runs` timestamps come
+	 * Precision is whole seconds only: `daiaw_workflow_runs` timestamps come
 	 * from current_time( 'mysql', true ), which has no sub-second
 	 * resolution. Good enough for a history list; not a substitute for the
 	 * per-node millisecond timings already shown in the run detail view.

@@ -56,7 +56,7 @@ class GoogleOAuthService {
 	 * OAuth redirect URI registered in Google Cloud Console.
 	 */
 	public function callbackUrl(): string {
-		return rest_url( 'dragwyb_af/v1/oauth/google/callback' );
+		return rest_url( 'daiaw/v1/oauth/google/callback' );
 	}
 
 	/**
@@ -334,7 +334,7 @@ class GoogleOAuthService {
 	}
 
 	private function stateTransientKey( string $state ): string {
-		return 'dragwyb_af_google_oauth_' . md5( $state );
+		return 'daiaw_google_oauth_' . md5( $state );
 	}
 
 	private function sanitizeReturnUrl( string $return_url ): string {

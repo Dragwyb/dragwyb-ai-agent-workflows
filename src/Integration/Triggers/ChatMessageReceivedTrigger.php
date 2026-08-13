@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ingress URL. Payload mirrors n8n's Chat Trigger (`chatInput`, `sessionId`)
  * so AI Agent "Connected Chat Trigger Node" prompt source works out of the box.
  *
- * Fired via {@see do_action( 'dragwyb_af_chat_message_received', $payload )} from
+ * Fired via {@see do_action( 'daiaw_chat_message_received', $payload )} from
  * {@see \DragwybVisualAutomation\Plugin\Rest\ChatMessageIngressController}.
  */
 class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterface {
 
-	public const HOOK = 'dragwyb_af_chat_message_received';
+	public const HOOK = 'daiaw_chat_message_received';
 
 	public const SLUG = 'chat_message_received_trigger';
 

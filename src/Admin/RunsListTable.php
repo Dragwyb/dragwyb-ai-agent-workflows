@@ -362,7 +362,7 @@ class RunsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'dragwyb-af-runs-table' );
+		return array( 'widefat', 'fixed', 'striped', 'daiaw-runs-table' );
 	}
 
 	/**
@@ -404,12 +404,12 @@ class RunsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $run_id, string $label, ?string $confirm = null ): string {
-		$form_id     = 'dragwyb-af-run-action-' . $op . '-' . $run_id;
-		$nonce_field = wp_nonce_field( 'dragwyb_af_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$form_id     = 'daiaw-run-action-' . $op . '-' . $run_id;
+		$nonce_field = wp_nonce_field( 'daiaw_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="dragwyb-af-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="dragwyb_af_run_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="daiaw-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="daiaw_run_action" />'
 				. '<input type="hidden" name="op" value="%3$s" />'
 				. '<input type="hidden" name="run_id" value="%4$d" />'
 				. '%5$s'
@@ -421,7 +421,7 @@ class RunsListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, $label, 'dragwyb-af-row-action-button', $confirm );
+		return $this->rowForms->registerButton( $form_id, $form_markup, $label, 'daiaw-row-action-button', $confirm );
 	}
 
 	/**

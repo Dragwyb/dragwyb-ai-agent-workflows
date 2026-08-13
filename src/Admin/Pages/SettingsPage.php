@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class SettingsPage implements AdminPage {
 
-	public const SLUG = 'dragwyb-af-settings';
+	public const SLUG = 'daiaw-settings';
 
 	private const TABS = array( 'general', 'retention', 'advanced' );
 
@@ -94,10 +94,10 @@ class SettingsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'dragwyb-af-admin',
-			DRAGWYB_AF_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'daiaw-admin',
+			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DRAGWYB_AF_VERSION
+			DAIAW_VERSION
 		);
 	}
 
@@ -111,7 +111,7 @@ class SettingsPage implements AdminPage {
 
 		$tab = $this->currentTab();
 
-		echo '<div class="wrap dragwyb-af-admin-page">';
+		echo '<div class="wrap daiaw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -182,10 +182,10 @@ class SettingsPage implements AdminPage {
 		$on_failure  = $this->settings->onNodeFailure();
 		$display_utc = $this->settings->displayTimestampsInUtc();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
-		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form">';
+		echo '<input type="hidden" name="action" value="daiaw_settings_action" />';
 		echo '<input type="hidden" name="op" value="general" />';
-		wp_nonce_field( 'dragwyb_af_settings_action_general' );
+		wp_nonce_field( 'daiaw_settings_action_general' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -224,15 +224,15 @@ class SettingsPage implements AdminPage {
 	private function renderRetentionTab(): void {
 		$days = $this->settings->retentionDays();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
-		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form">';
+		echo '<input type="hidden" name="action" value="daiaw_settings_action" />';
 		echo '<input type="hidden" name="op" value="retention" />';
-		wp_nonce_field( 'dragwyb_af_settings_action_retention' );
+		wp_nonce_field( 'daiaw_settings_action_retention' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
-		echo '<tr><th scope="row"><label for="dragwyb-af-retention-days">' . esc_html__( 'Keep finished run history for', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="daiaw-retention-days">' . esc_html__( 'Keep finished run history for', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
-			'<input type="number" id="dragwyb-af-retention-days" name="retention_days" min="%1$d" max="%2$d" value="%3$d" class="small-text" /> %4$s',
+			'<input type="number" id="daiaw-retention-days" name="retention_days" min="%1$d" max="%2$d" value="%3$d" class="small-text" /> %4$s',
 			(int) SettingsService::MIN_RETENTION_DAYS,
 			(int) SettingsService::MAX_RETENTION_DAYS,
 			(int) $days,
@@ -255,9 +255,9 @@ class SettingsPage implements AdminPage {
 		}
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
+		echo '<input type="hidden" name="action" value="daiaw_settings_action" />';
 		echo '<input type="hidden" name="op" value="purge_now" />';
-		wp_nonce_field( 'dragwyb_af_settings_action_purge_now' );
+		wp_nonce_field( 'daiaw_settings_action_purge_now' );
 		submit_button( __( 'Purge Now', 'dragwyb-ai-agent-workflows' ), 'secondary' );
 		echo '</form>';
 	}
@@ -270,10 +270,10 @@ class SettingsPage implements AdminPage {
 		$require_webhook_signing = $this->settings->requireWebhookSigning();
 		$remove_data             = $this->settings->removeDataOnUninstall();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form">';
-		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form">';
+		echo '<input type="hidden" name="action" value="daiaw_settings_action" />';
 		echo '<input type="hidden" name="op" value="advanced" />';
-		wp_nonce_field( 'dragwyb_af_settings_action_advanced' );
+		wp_nonce_field( 'daiaw_settings_action_advanced' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -307,10 +307,10 @@ class SettingsPage implements AdminPage {
 
 		echo '<hr />';
 		echo '<h2>' . esc_html__( 'Uninstall', 'dragwyb-ai-agent-workflows' ) . '</h2>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form dragwyb-af-settings-danger-zone">';
-		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form daiaw-settings-danger-zone">';
+		echo '<input type="hidden" name="action" value="daiaw_settings_action" />';
 		echo '<input type="hidden" name="op" value="uninstall" />';
-		wp_nonce_field( 'dragwyb_af_settings_action_uninstall' );
+		wp_nonce_field( 'daiaw_settings_action_uninstall' );
 
 		echo '<p><strong>' . esc_html__( 'This plugin keeps all of its data when deleted, by default.', 'dragwyb-ai-agent-workflows' ) . '</strong></p>';
 		echo '<input type="hidden" name="remove_data_on_uninstall" value="0" />';
@@ -326,7 +326,7 @@ class SettingsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?dragwyb_af_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?daiaw_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -354,7 +354,7 @@ class SettingsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['dragwyb_af_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragwyb_af_notice'] ) ) : '';
+		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

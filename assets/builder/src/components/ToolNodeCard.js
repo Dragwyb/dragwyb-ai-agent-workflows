@@ -24,8 +24,8 @@ export default function ToolNodeCard({
 	return (
 		<div
 			className={[
-				'dragwyb-af-tool-node',
-				selected ? 'dragwyb-af-tool-node--selected' : '',
+				'daiaw-tool-node',
+				selected ? 'daiaw-tool-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -35,9 +35,9 @@ export default function ToolNodeCard({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="dragwyb-af-tool-node__input-dot" aria-hidden="true" />
+			<span className="daiaw-tool-node__input-dot" aria-hidden="true" />
 			<span
-				className="dragwyb-af-tool-node__icon"
+				className="daiaw-tool-node__icon"
 				style={{
 					backgroundColor: meta.bg,
 					color: meta.accent,
@@ -46,9 +46,9 @@ export default function ToolNodeCard({
 			>
 				{meta.icon}
 			</span>
-			<span className="dragwyb-af-tool-node__text">
-				<span className="dragwyb-af-tool-node__label">{node.label}</span>
-				<span className="dragwyb-af-tool-node__subtitle">
+			<span className="daiaw-tool-node__text">
+				<span className="daiaw-tool-node__label">{node.label}</span>
+				<span className="daiaw-tool-node__subtitle">
 					{__('Tool', 'dragwyb-ai-agent-workflows')}
 				</span>
 			</span>

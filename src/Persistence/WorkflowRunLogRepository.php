@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `dragwyb_af_workflow_run_logs` access goes through this class.
+ * All `daiaw_workflow_run_logs` access goes through this class.
  */
 class WorkflowRunLogRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'dragwyb_af_workflow_run_logs';
+	private const CACHE_GROUP = 'daiaw_workflow_run_logs';
 
 	/**
 	 * Defensive upper bound on logs fetched for a single run. A legitimate

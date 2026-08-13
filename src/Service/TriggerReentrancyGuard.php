@@ -135,7 +135,7 @@ class TriggerReentrancyGuard {
 	}
 
 	/**
-	 * True while any dragwyb_af WordPress action is writing (create/update/delete).
+	 * True while any daiaw WordPress action is writing (create/update/delete).
 	 *
 	 * @return bool
 	 */
@@ -165,7 +165,7 @@ class TriggerReentrancyGuard {
 			return false;
 		}
 
-		$transient_key = 'dragwyb_af_trig_' . md5( $memory_key );
+		$transient_key = 'daiaw_trig_' . md5( $memory_key );
 
 		if ( false !== get_transient( $transient_key ) ) {
 			$this->claimed_triggers[ $memory_key ] = true;

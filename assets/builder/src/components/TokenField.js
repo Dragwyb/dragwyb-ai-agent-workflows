@@ -20,7 +20,7 @@ import {
  */
 function createPillElement(token, path, nodeLabels = {}) {
 	const span = document.createElement('span');
-	span.className = 'dragwyb-af-token-field__pill';
+	span.className = 'daiaw-token-field__pill';
 	span.contentEditable = 'false';
 	span.dataset.token = token;
 	const label =
@@ -260,7 +260,7 @@ export default function TokenField({
 			? createPortal(
 				<div
 					ref={popoverRef}
-					className="dragwyb-af-token-field__popover"
+					className="daiaw-token-field__popover"
 					style={{
 						position: 'fixed',
 						top: `${popoverPos.top}px`,
@@ -287,14 +287,14 @@ export default function TokenField({
 	return (
 		<div
 			ref={wrapperRef}
-			className={`dragwyb-af-token-field${pickerOpen ? ' dragwyb-af-token-field--picker-open' : ''}`}
+			className={`daiaw-token-field${pickerOpen ? ' daiaw-token-field--picker-open' : ''}`}
 		>
-			<div className="dragwyb-af-token-field__header">
-				<label className="dragwyb-af-token-field__label">
+			<div className="daiaw-token-field__header">
+				<label className="daiaw-token-field__label">
 					{label}
 					{required && (
 						<span
-							className="dragwyb-af-token-field__required"
+							className="daiaw-token-field__required"
 							aria-hidden="true"
 						>
 							{' '}
@@ -305,7 +305,7 @@ export default function TokenField({
 				{hasVariables && (
 					<button
 						type="button"
-						className="dragwyb-af-token-field__insert"
+						className="daiaw-token-field__insert"
 						onClick={openPicker}
 					>
 						{__('Insert variable', 'dragwyb-ai-agent-workflows')}
@@ -315,7 +315,7 @@ export default function TokenField({
 
 			<div
 				ref={editorRef}
-				className="dragwyb-af-token-field__editor"
+				className="daiaw-token-field__editor"
 				contentEditable
 				role="textbox"
 				aria-multiline="true"
@@ -328,7 +328,7 @@ export default function TokenField({
 			{popover}
 
 			{!hasVariables && (
-				<p className="dragwyb-af-token-field__hint">
+				<p className="daiaw-token-field__hint">
 					{__(
 						'Add steps above this node, or use Test Flow → Listen to load trigger variables.',
 						'dragwyb-ai-agent-workflows'

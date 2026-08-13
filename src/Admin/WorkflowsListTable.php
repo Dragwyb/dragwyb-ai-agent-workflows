@@ -295,12 +295,12 @@ class WorkflowsListTable extends WP_List_Table {
 		return wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'      => 'dragwyb_af_workflow_export',
+					'action'      => 'daiaw_workflow_export',
 					'workflow_id' => $id,
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'dragwyb_af_workflow_export_' . $id
+			'daiaw_workflow_export_' . $id
 		);
 	}
 
@@ -330,7 +330,7 @@ class WorkflowsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'dragwyb-af-workflows-table' );
+		return array( 'widefat', 'fixed', 'striped', 'daiaw-workflows-table' );
 	}
 
 	/**
@@ -343,12 +343,12 @@ class WorkflowsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $id, string $label ): string {
-		$form_id     = 'dragwyb-af-workflow-action-' . $op . '-' . $id;
-		$nonce_field = wp_nonce_field( 'dragwyb_af_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
+		$form_id     = 'daiaw-workflow-action-' . $op . '-' . $id;
+		$nonce_field = wp_nonce_field( 'daiaw_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="dragwyb-af-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="dragwyb_af_workflow_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="daiaw-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="daiaw_workflow_action" />'
 				. '<input type="hidden" name="op" value="%3$s" />'
 				. '<input type="hidden" name="workflow_id" value="%4$d" />'
 				. '%5$s'

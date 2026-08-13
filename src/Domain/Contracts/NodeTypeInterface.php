@@ -26,7 +26,7 @@ interface NodeTypeInterface {
 
 	/**
 	 * A stable, unique identifier for this node type (e.g. `wp_hook_trigger`).
-	 * Stored in `dragwyb_af_workflow_nodes.node_type`; must never change once
+	 * Stored in `daiaw_workflow_nodes.node_type`; must never change once
 	 * workflows may reference it.
 	 *
 	 * @return string

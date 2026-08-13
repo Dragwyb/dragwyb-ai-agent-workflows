@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Table {
 
-	public const PREFIX = 'dragwyb_af_';
+	public const PREFIX = 'daiaw_';
 
 	/**
 	 * Builds the fully-qualified, `$wpdb`-prefixed table name.

@@ -200,7 +200,7 @@ class Plugin {
 		 *
 		 * @param Container $container The plugin's service container.
 		 */
-		do_action( 'dragwyb_af/loaded', $this->container );
+		do_action( 'daiaw/loaded', $this->container );
 	}
 
 	/**
@@ -234,11 +234,11 @@ class Plugin {
 	 * Registers the node type registry and, on `init`, fires the extension
 	 * point that populates it.
 	 *
-	 * The `dragwyb_af/nodes/register` action is deliberately fired on `init` rather
+	 * The `daiaw/nodes/register` action is deliberately fired on `init` rather
 	 * than directly from here (this method itself runs during our own
 	 * `plugins_loaded` callback): by `init`, every other plugin's
 	 * `plugins_loaded` callback has already run, so third-party code hooking
-	 * `dragwyb_af/nodes/register` from inside its own `plugins_loaded` handler is
+	 * `daiaw/nodes/register` from inside its own `plugins_loaded` handler is
 	 * guaranteed to have registered before this fires. Firing immediately
 	 * here would make that depend on plugin load order.
 	 *
@@ -259,7 +259,7 @@ class Plugin {
 			$this->container->get( AgentAiClient::class )
 		);
 
-		add_action( 'dragwyb_af/nodes/register', array( $built_in_node_types, 'register' ) );
+		add_action( 'daiaw/nodes/register', array( $built_in_node_types, 'register' ) );
 
 		add_action(
 			'init',
@@ -272,7 +272,7 @@ class Plugin {
 				 *
 				 * @param NodeTypeRegistry $registry The plugin's node type registry.
 				 */
-				do_action( 'dragwyb_af/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
+				do_action( 'daiaw/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
 		);
 	}

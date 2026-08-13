@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WorkflowTestController {
 
-	private const API_NAMESPACE = 'dragwyb_af/v1';
+	private const API_NAMESPACE = 'daiaw/v1';
 
 	private WorkflowService $workflows;
 
@@ -134,7 +134,7 @@ class WorkflowTestController {
 	public function permissions_check( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'dragwyb_af_rest_forbidden',
+				'daiaw_rest_forbidden',
 				__( 'Sorry, you are not allowed to test workflows.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -153,7 +153,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'dragwyb_af_rest_not_found',
+				'daiaw_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -174,7 +174,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'dragwyb_af_rest_not_found',
+				'daiaw_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -195,7 +195,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'dragwyb_af_rest_not_found',
+				'daiaw_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -214,7 +214,7 @@ class WorkflowTestController {
 
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
-				'dragwyb_af_rest_not_found',
+				'daiaw_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -238,7 +238,7 @@ class WorkflowTestController {
 
 		if ( null === $workflow ) {
 			return new WP_Error(
-				'dragwyb_af_rest_not_found',
+				'daiaw_rest_not_found',
 				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -246,7 +246,7 @@ class WorkflowTestController {
 
 		if ( '' === $node_id ) {
 			return new WP_Error(
-				'dragwyb_af_rest_invalid_param',
+				'daiaw_rest_invalid_param',
 				__( 'A node id is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);

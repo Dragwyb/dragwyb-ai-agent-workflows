@@ -29,8 +29,8 @@ export default function ChatModelSubNode({
 	return (
 		<div
 			className={[
-				'dragwyb-af-chat-model-node',
-				selected ? 'dragwyb-af-chat-model-node--selected' : '',
+				'daiaw-chat-model-node',
+				selected ? 'daiaw-chat-model-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -41,18 +41,18 @@ export default function ChatModelSubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="dragwyb-af-chat-model-node__port" aria-hidden="true" />
+			<span className="daiaw-chat-model-node__port" aria-hidden="true" />
 			<span
-				className="dragwyb-af-chat-model-node__ring"
+				className="daiaw-chat-model-node__ring"
 				style={{ backgroundColor: meta.bg, color: meta.accent }}
 				aria-hidden="true"
 			>
-				<span className="dragwyb-af-chat-model-node__icon">{meta.icon}</span>
+				<span className="daiaw-chat-model-node__icon">{meta.icon}</span>
 			</span>
-			<span className="dragwyb-af-chat-model-node__label">
+			<span className="daiaw-chat-model-node__label">
 				{node.label || __('Chat Model', 'dragwyb-ai-agent-workflows')}
 			</span>
-			<span className="dragwyb-af-chat-model-node__subtitle">
+			<span className="daiaw-chat-model-node__subtitle">
 				{__('Chat Model', 'dragwyb-ai-agent-workflows')}
 			</span>
 		</div>

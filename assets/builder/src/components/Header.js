@@ -68,11 +68,11 @@ export default function Header({
 	}, [testFlow]);
 
 	return (
-		<header className="dragwyb-af-builder-header">
-			<div className="dragwyb-af-builder-header__left">
+		<header className="daiaw-builder-header">
+			<div className="daiaw-builder-header__left">
 				{listUrl && (
 					<a
-						className="dragwyb-af-builder-header__back"
+						className="daiaw-builder-header__back"
 						href={listUrl}
 						aria-label={__(
 							'Back to workflows list',
@@ -84,30 +84,30 @@ export default function Header({
 				)}
 				<input
 					type="text"
-					className="dragwyb-af-builder-header__title"
+					className="daiaw-builder-header__title"
 					value={title}
 					placeholder={__('Untitled workflow', 'dragwyb-ai-agent-workflows')}
 					aria-label={__('Workflow title', 'dragwyb-ai-agent-workflows')}
 					onChange={(event) => onTitleChange(event.target.value)}
 				/>
 				<span
-					className={`dragwyb-af-builder-header__workflow-status dragwyb-af-builder-header__workflow-status--${isActive ? 'active' : workflowStatus === 2 ? 'paused' : 'draft'
+					className={`daiaw-builder-header__workflow-status daiaw-builder-header__workflow-status--${isActive ? 'active' : workflowStatus === 2 ? 'paused' : 'draft'
 						}`}
 				>
 					{statusLabel}
 				</span>
 			</div>
-			<div className="dragwyb-af-builder-header__right">
+			<div className="daiaw-builder-header__right">
 				{testFlow?.statusMessage && (
 					<span
-						className="dragwyb-af-builder-header__test-status"
+						className="daiaw-builder-header__test-status"
 						role="status"
 					>
 						{testFlow.statusMessage}
 					</span>
 				)}
 				<span
-					className={`dragwyb-af-builder-header__status dragwyb-af-builder-header__status--${status}`}
+					className={`daiaw-builder-header__status daiaw-builder-header__status--${status}`}
 					role="status"
 				>
 					{SAVE_STATUS_LABELS[status] || ''}
@@ -118,7 +118,7 @@ export default function Header({
 							ref={importInputRef}
 							type="file"
 							accept="application/json,.json"
-							className="dragwyb-af-builder-header__import-input"
+							className="daiaw-builder-header__import-input"
 							aria-hidden="true"
 							tabIndex={-1}
 							onChange={(event) => {
@@ -156,7 +156,7 @@ export default function Header({
 				)}
 				{testFlow && (
 					<div
-						className="dragwyb-af-builder-header__test-wrap"
+						className="daiaw-builder-header__test-wrap"
 						ref={testWrapRef}
 					>
 						<Button
@@ -170,10 +170,10 @@ export default function Header({
 								: __('Test Flow', 'dragwyb-ai-agent-workflows')}
 						</Button>
 						{testFlow.menuOpen && (
-							<div className="dragwyb-af-builder-header__test-menu">
+							<div className="daiaw-builder-header__test-menu">
 								<button
 									type="button"
-									className="dragwyb-af-builder-header__test-menu-item"
+									className="daiaw-builder-header__test-menu-item"
 									onClick={testFlow.listenNew}
 								>
 									{__(
@@ -183,7 +183,7 @@ export default function Header({
 								</button>
 								<button
 									type="button"
-									className="dragwyb-af-builder-header__test-menu-item"
+									className="daiaw-builder-header__test-menu-item"
 									onClick={testFlow.useExisting}
 								>
 									{__(

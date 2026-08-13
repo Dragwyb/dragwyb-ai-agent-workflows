@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `dragwyb_af_workflow_runs` access goes through this class.
+ * All `daiaw_workflow_runs` access goes through this class.
  */
 class WorkflowRunRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'dragwyb_af_workflow_runs';
+	private const CACHE_GROUP = 'daiaw_workflow_runs';
 
 	private const MAX_PER_PAGE = 100;
 
@@ -428,7 +428,7 @@ class WorkflowRunRepository {
 
 	/**
 	 * Returns every run id belonging to a workflow, so callers can cascade
-	 * into `dragwyb_af_workflow_run_logs` (which is keyed by run id, not workflow
+	 * into `daiaw_workflow_run_logs` (which is keyed by run id, not workflow
 	 * id) before removing the runs themselves.
 	 *
 	 * Not object-cached: this is a one-off cascade-preparation query (hard
@@ -485,7 +485,7 @@ class WorkflowRunRepository {
 
 	/**
 	 * Permanently removes the given runs. Callers must remove dependent
-	 * `dragwyb_af_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
+	 * `daiaw_workflow_run_logs` rows first (see `WorkflowRunLogRepository::deleteByRunIds()`),
 	 * same cascade-ordering requirement as `deleteByWorkflow()`.
 	 *
 	 * @param int[] $ids Run ids.
@@ -522,7 +522,7 @@ class WorkflowRunRepository {
 	/**
 	 * Permanently removes every run belonging to a workflow. Used by
 	 * WorkflowService::delete() when hard-deleting a workflow. Callers must
-	 * remove dependent `dragwyb_af_workflow_run_logs` rows first (see
+	 * remove dependent `daiaw_workflow_run_logs` rows first (see
 	 * idsForWorkflow()).
 	 *
 	 * Unlike deleteByIds(), the individual ids aren't known here without an

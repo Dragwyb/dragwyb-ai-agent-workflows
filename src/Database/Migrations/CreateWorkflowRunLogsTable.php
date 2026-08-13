@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `dragwyb_af_workflow_run_logs` holds one row per node outcome within a workflow
+ * `daiaw_workflow_run_logs` holds one row per node outcome within a workflow
  * run. `node_id` intentionally has no `NOT NULL` constraint: it references
- * `dragwyb_af_workflow_nodes.id`, but a node can later be removed from the builder
+ * `daiaw_workflow_nodes.id`, but a node can later be removed from the builder
  * graph (which deletes its row) while its historical run logs are kept, so
  * `node_id` on an old log entry may point to a node that no longer exists.
  * A future "Runs" UI (roadmap item 9) is expected to resolve `node_id`

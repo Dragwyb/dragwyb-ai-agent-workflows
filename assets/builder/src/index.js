@@ -3,7 +3,7 @@ import { createRoot, render } from '@wordpress/element';
 import App from './App';
 import './style.css';
 
-const mountPoint = document.getElementById('dragwyb-af-builder-root');
+const mountPoint = document.getElementById('daiaw-builder-root');
 
 if (mountPoint) {
 	// createRoot is only available in the @wordpress/element versions that

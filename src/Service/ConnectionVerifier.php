@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Calls each integration's real API with the submitted credentials before a
  * connection is saved. AI providers use in-builder API keys (Connectors on WP 7+,
- * AI Client credentials option below WP 7) instead of dragwyb_af Connections, so they
+ * AI Client credentials option below WP 7) instead of daiaw Connections, so they
  * are not verified here.
  */
 class ConnectionVerifier {

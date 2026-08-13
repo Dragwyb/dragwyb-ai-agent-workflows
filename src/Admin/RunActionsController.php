@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=dragwyb_af_run_action` POST submitted by
+ * Receives the `admin-post.php?action=daiaw_run_action` POST submitted by
  * RunsListTable's and RunDetailPage's row/page action forms.
  *
  * Same reasoning as WorkflowActionsController for being its own class: the
@@ -56,7 +56,7 @@ class RunActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_dragwyb_af_run_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_daiaw_run_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleRunsBulkFromList' ), 5 );
 	}
 
@@ -94,7 +94,7 @@ class RunActionsController {
 	 */
 	public function handleRunsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['dragwyb_af_run_bulk'] ) ) {
+		if ( empty( $_POST['daiaw_run_bulk'] ) ) {
 			return;
 		}
 
@@ -102,7 +102,7 @@ class RunActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-ai-agent-workflows' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'dragwyb_af_run_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'daiaw_run_bulk_action' ) ) {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
@@ -147,7 +147,7 @@ class RunActionsController {
 			$this->redirectToList( 'action_failed' );
 		}
 
-		check_admin_referer( 'dragwyb_af_run_action_' . $op . '_' . $run_id );
+		check_admin_referer( 'daiaw_run_action_' . $op . '_' . $run_id );
 
 		switch ( $op ) {
 			case 'rerun':
@@ -218,7 +218,7 @@ class RunActionsController {
 				array(
 					'page'       => RunDetailPage::SLUG,
 					'run_id'     => $run_id,
-					'dragwyb_af_notice' => $notice,
+					'daiaw_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)
@@ -264,7 +264,7 @@ class RunActionsController {
 				array_merge(
 					array(
 						'page'       => RunsPage::SLUG,
-						'dragwyb_af_notice' => $notice,
+						'daiaw_notice' => $notice,
 					),
 					$extra
 				),

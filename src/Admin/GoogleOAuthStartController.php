@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles `admin-post.php?action=dragwyb_af_google_oauth_authorize`.
+ * Handles `admin-post.php?action=daiaw_google_oauth_authorize`.
  */
 class GoogleOAuthStartController {
 
@@ -39,7 +39,7 @@ class GoogleOAuthStartController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_dragwyb_af_google_oauth_authorize', array( $this, 'handle' ) );
+		add_action( 'admin_post_daiaw_google_oauth_authorize', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class GoogleOAuthStartController {
 			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		check_admin_referer( 'dragwyb_af_google_oauth_authorize_' . $connection_id );
+		check_admin_referer( 'daiaw_google_oauth_authorize_' . $connection_id );
 
 		$connection = $this->connections->find( $connection_id );
 
@@ -88,8 +88,8 @@ class GoogleOAuthStartController {
 	private function redirectWithError( int $connection_id, string $message ): void {
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'dragwyb_af_notice' => 'error',
-			'dragwyb_af_error'  => $message,
+			'daiaw_notice' => 'error',
+			'daiaw_error'  => $message,
 		);
 
 		if ( $connection_id > 0 ) {

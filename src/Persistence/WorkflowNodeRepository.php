@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `dragwyb_af_workflow_nodes` access goes through this class.
+ * All `daiaw_workflow_nodes` access goes through this class.
  */
 class WorkflowNodeRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'dragwyb_af_workflow_nodes';
+	private const CACHE_GROUP = 'daiaw_workflow_nodes';
 
 	/**
 	 * Defensive upper bound on nodes fetched for a single workflow. A

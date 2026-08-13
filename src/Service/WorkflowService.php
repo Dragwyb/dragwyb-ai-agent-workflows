@@ -273,13 +273,13 @@ class WorkflowService {
 	}
 
 	/**
-	 * Reconciles `dragwyb_af_workflow_nodes` rows with a workflow's current
+	 * Reconciles `daiaw_workflow_nodes` rows with a workflow's current
 	 * `graph_json` (the builder's source of truth for node identity and
 	 * configuration): existing nodes are updated, new ones inserted, and
 	 * ones no longer present in the graph are removed.
 	 *
 	 * The builder (roadmap item 6) only ever writes the whole graph as JSON
-	 * via update(); nothing keeps `dragwyb_af_workflow_nodes` in sync with it as
+	 * via update(); nothing keeps `daiaw_workflow_nodes` in sync with it as
 	 * that happens, since nothing read that table until the execution
 	 * engine needed real, stable node ids to log run outcomes against.
 	 * Rather than pay a sync cost on every autosave, this is called lazily,

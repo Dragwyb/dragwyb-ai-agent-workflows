@@ -38,7 +38,7 @@ class Activator {
 		$requirements = Requirements::check();
 
 		if ( is_wp_error( $requirements ) ) {
-			deactivate_plugins( DRAGWYB_AF_PLUGIN_BASENAME );
+			deactivate_plugins( DAIAW_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
@@ -55,7 +55,7 @@ class Activator {
 			Options::add( 'installed_at', time(), true );
 		}
 
-		Options::update( 'db_version', DRAGWYB_AF_VERSION );
+		Options::update( 'db_version', DAIAW_VERSION );
 
 		self::scheduleBackgroundQueue();
 		self::scheduleRetentionPruning();

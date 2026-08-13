@@ -18,11 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Defines the credential-field shape for each supported `auth_type`.
  *
  * This is a small, fixed lookup table rather than a `NodeTypeRegistry`-style
- * hook-based registry (compare `dragwyb_af/nodes/register`). Nothing yet consumes
+ * hook-based registry (compare `daiaw/nodes/register`). Nothing yet consumes
  * an auth type beyond what's built in here — no real third-party
  * integration exists until roadmap item 12 — so an extension point would
  * be speculative surface with nothing to exercise it, the same reasoning
- * that already deferred `dragwyb_af/integrations/register` (see
+ * that already deferred `daiaw/integrations/register` (see
  * `docs/internal/architecture.md` §2.6). OAuth2 is deliberately not one of
  * the built-in types yet either: it needs a redirect/callback flow and
  * token refresh handling that this item's scope (storage + encryption)

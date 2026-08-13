@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `dragwyb_af_workflow_nodes` holds one row per node in a workflow's graph. There
- * is no SQL-level FOREIGN KEY to `dragwyb_af_workflows` because `dbDelta()` does
+ * `daiaw_workflow_nodes` holds one row per node in a workflow's graph. There
+ * is no SQL-level FOREIGN KEY to `daiaw_workflows` because `dbDelta()` does
  * not reliably manage foreign key constraints; cascade-on-delete is instead
  * enforced explicitly in the repository/service layer. See
  * docs/internal/architecture.md §2.3.
