@@ -30,7 +30,7 @@ Use the visual builder to connect triggers (forms, WooCommerce events, inbound w
 ### Getting started
 
 1. Activate the plugin.
-2. Open **Automation → Workflows** and create a workflow.
+2. Open **Agent Workflows → Workflows** and create a workflow.
 3. Add a trigger, then add one or more actions on the canvas.
 4. Configure credentials under **Automation → Connections** when an action needs them.
 5. Save the workflow and set it to Active.
