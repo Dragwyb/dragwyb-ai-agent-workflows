@@ -158,7 +158,7 @@ class BuilderPage implements AdminPage {
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
-				'Dragwyb Visual Automation: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
+				'Dragwyb AI Agent Workflows: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
 				'dragwyb-visual-automation'
 			)
 		);

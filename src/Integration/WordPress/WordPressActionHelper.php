@@ -506,7 +506,7 @@ final class WordPressActionHelper {
 			'comment_type'         => 'comment',
 			'comment_parent'       => isset( $config['parent_id'] ) ? (int) $config['parent_id'] : 0,
 			'comment_author_IP'    => '',
-			'comment_agent'        => 'Dragwyb Visual Automation',
+			'comment_agent'        => 'Dragwyb AI Agent Workflows',
 			'comment_date'         => gmdate( 'Y-m-d H:i:s' ),
 			'comment_approved'     => 1,
 		);
@@ -698,7 +698,7 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * Marks a post as created/updated by Dragwyb Visual Automation.
+	 * Marks a post as created/updated by Dragwyb AI Agent Workflows.
 	 *
 	 * Stores a unix timestamp so triggers only suppress the brief follow-up
 	 * saves right after our write — not forever. Permanent suppression blocked

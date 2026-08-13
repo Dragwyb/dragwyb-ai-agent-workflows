@@ -115,7 +115,7 @@ class TriggerReentrancyGuard {
 	}
 
 	/**
-	 * Marks that a Dragwyb Visual Automation action is mutating WordPress state.
+	 * Marks that a Dragwyb AI Agent Workflows action is mutating WordPress state.
 	 *
 	 * @return void
 	 */

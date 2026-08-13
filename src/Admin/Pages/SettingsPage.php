@@ -65,7 +65,7 @@ class SettingsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Dragwyb Visual Automation Settings', 'dragwyb-visual-automation' );
+		return __( 'Dragwyb AI Agent Workflows Settings', 'dragwyb-visual-automation' );
 	}
 
 	/**

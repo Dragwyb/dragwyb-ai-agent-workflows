@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Dragwyb Visual Automation Builder
+ * Plugin Name:       Dragwyb AI Agent Workflows
  * Plugin URI:        https://dragwyb.com
  * Description:       Build and run visual multi-step automation workflows, webhooks, and AI agent actions in WordPress.
  * Version:           0.1.0
@@ -55,7 +55,7 @@ function dragwyb_af_php_version_notice() {
 		esc_html(
 			sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version. */
-				__( 'Dragwyb Visual Automation requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-visual-automation' ),
+				__( 'Dragwyb AI Agent Workflows requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-visual-automation' ),
 				DRAGWYB_AF_MIN_PHP_VERSION,
 				PHP_VERSION
 			)

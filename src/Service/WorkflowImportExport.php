@@ -125,7 +125,7 @@ class WorkflowImportExport {
 	public static function parseImportPayload( array $payload ): array {
 		if ( self::looksLikeN8n( $payload ) ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'This file looks like an n8n workflow. Import a Dragwyb Visual Automation JSON export instead.', 'dragwyb-visual-automation' )
+				esc_html__( 'This file looks like an n8n workflow. Import a Dragwyb AI Agent Workflows JSON export instead.', 'dragwyb-visual-automation' )
 			);
 		}
 
@@ -204,7 +204,7 @@ class WorkflowImportExport {
 		// n8n-style connection maps are objects keyed by node name — reject those.
 		if ( ! self::isList( $connections ) && array() !== $connections ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'Unsupported connections format. Expected a Dragwyb Visual Automation connections array.', 'dragwyb-visual-automation' )
+				esc_html__( 'Unsupported connections format. Expected a Dragwyb AI Agent Workflows connections array.', 'dragwyb-visual-automation' )
 			);
 		}
 

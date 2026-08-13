@@ -1,10 +1,10 @@
-=== Dragwyb Visual Automation Builder ===
+=== Dragwyb AI Agent Workflows ===
 Contributors: dragwyb
 Tags: automation, workflow, ai, webhooks, woocommerce
-Requires at least: 6.0
+Requires at least: 5.8
 Tested up to: 7.0.2
 Requires PHP: 7.4
-Stable tag: 0.0.0
+Stable tag: 0.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Build visual automation workflows in WordPress with webhooks, form triggers, Woo
 
 == Description ==
 
-Dragwyb Visual Automation Builder lets you design and run multi-step automations from your WordPress admin.
+Dragwyb AI Agent Workflows lets you design and run multi-step automations from your WordPress admin.
 
 Use the visual builder to connect triggers (forms, WooCommerce events, inbound webhooks, chat messages) to actions (email, HTTP requests, Google Sheets, messaging services, and AI agents). Workflows can be activated, tested, and reviewed with run history from the admin screens.
 
@@ -70,7 +70,7 @@ The HTTP Request action sends the method, headers, and body you configure to a U
 == Installation ==
 
 1. Upload the plugin folder to `/wp-content/plugins/dragwyb-visual-automation`, or install the ZIP from Plugins → Add New.
-2. Activate **Dragwyb Visual Automation Builder**.
+2. Activate **Dragwyb AI Agent Workflows**.
 3. Open **Automation → Workflows** to create your first workflow.
 
 == Frequently Asked Questions ==
@@ -89,6 +89,10 @@ User create/update/delete actions only run when the current request has the matc
 
 == Changelog ==
 
-
+= 0.1.0=
+* Update plugin name, plugin slug & prefix.
+* Added default password required for create user and add currnet user can promoter user capability check.
+* Use wp_iniline_script
 
 = 0.0.0 =
+* Initial Release

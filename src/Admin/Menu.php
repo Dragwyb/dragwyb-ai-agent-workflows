@@ -76,7 +76,7 @@ class Menu {
 		// own capability so unauthorized items stay hidden.
 		$hook = add_menu_page(
 			$first->pageTitle(),
-			__( 'Dragwyb Visual Automation', 'dragwyb-visual-automation' ),
+			__( 'Dragwyb AI Agent Workflows', 'dragwyb-visual-automation' ),
 			Capabilities::ACCESS,
 			$first->slug(),
 			array( $this, 'renderCurrentPage' ),

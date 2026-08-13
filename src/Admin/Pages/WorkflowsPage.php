@@ -244,7 +244,7 @@ class WorkflowsPage implements AdminPage {
 				'type'    => 'success',
 			),
 			'import_error' => array(
-				'message' => __( 'Could not import that JSON file. Use a Dragwyb Visual Automation export (not an n8n file).', 'dragwyb-visual-automation' ),
+				'message' => __( 'Could not import that JSON file. Use a Dragwyb AI Agent Workflows export (not an n8n file).', 'dragwyb-visual-automation' ),
 				'type'    => 'error',
 			),
 			'error'        => array(
