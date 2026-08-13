@@ -32,7 +32,7 @@ export default function NodeTestResult({
 				className="dragwyb-af-builder-config__test-result dragwyb-af-builder-config__test-result--error"
 				role="alert"
 			>
-				<h3>{__('Response', 'dragwyb-visual-automation')}</h3>
+				<h3>{__('Response', 'dragwyb-ai-agent-workflows')}</h3>
 				<p>{error}</p>
 			</div>
 		);
@@ -52,7 +52,7 @@ export default function NodeTestResult({
 	return (
 		<div className="dragwyb-af-builder-config__test-result">
 			<div className="dragwyb-af-builder-config__test-result-header">
-				<h3>{__('Response', 'dragwyb-visual-automation')}</h3>
+				<h3>{__('Response', 'dragwyb-ai-agent-workflows')}</h3>
 				<span
 					className={
 						success
@@ -61,8 +61,8 @@ export default function NodeTestResult({
 					}
 				>
 					{success
-						? __('Success', 'dragwyb-visual-automation')
-						: __('Failed', 'dragwyb-visual-automation')}
+						? __('Success', 'dragwyb-ai-agent-workflows')
+						: __('Failed', 'dragwyb-ai-agent-workflows')}
 				</span>
 			</div>
 
@@ -81,7 +81,7 @@ export default function NodeTestResult({
 						aria-controls="dragwyb-af-test-tabpanel"
 						onClick={() => setActiveTab('input')}
 					>
-						{__('Input', 'dragwyb-visual-automation')}
+						{__('Input', 'dragwyb-ai-agent-workflows')}
 					</button>
 					<button
 						type="button"
@@ -96,7 +96,7 @@ export default function NodeTestResult({
 						aria-controls="dragwyb-af-test-tabpanel"
 						onClick={() => setActiveTab('output')}
 					>
-						{__('Output', 'dragwyb-visual-automation')}
+						{__('Output', 'dragwyb-ai-agent-workflows')}
 					</button>
 				</div>
 

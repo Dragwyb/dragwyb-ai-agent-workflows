@@ -23,11 +23,11 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Create Sheet', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Create Sheet', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Adds a new worksheet tab to a spreadsheet.', 'dragwyb-visual-automation' );
+		return __( 'Adds a new worksheet tab to a spreadsheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -36,7 +36,7 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'sheet_title'    => array(
 				'type'     => 'string',
-				'label'    => __( 'New sheet tab name', 'dragwyb-visual-automation' ),
+				'label'    => __( 'New sheet tab name', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -62,7 +62,7 @@ final class GoogleSheetsCreateSheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $sheet_title ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Sheet tab name is required.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Sheet tab name is required.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -77,11 +77,11 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Find Sheet', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Find Sheet', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Finds worksheet tabs in a spreadsheet by title.', 'dragwyb-visual-automation' );
+		return __( 'Finds worksheet tabs in a spreadsheet by title.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -90,12 +90,12 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'title'          => array(
 				'type'     => 'string',
-				'label'    => __( 'Sheet title to find', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Sheet title to find', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 			'exact_match'    => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Exact match', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Exact match', 'dragwyb-ai-agent-workflows' ),
 				'default' => false,
 			),
 		);
@@ -121,7 +121,7 @@ final class GoogleSheetsFindSheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $title ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Sheet title is required.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Sheet title is required.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -142,11 +142,11 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Copy Sheet', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Copy Sheet', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Copies a worksheet tab to another spreadsheet.', 'dragwyb-visual-automation' );
+		return __( 'Copies a worksheet tab to another spreadsheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -156,7 +156,7 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 			'sheet_title'                => $this->sheetTitleField(),
 			'destination_spreadsheet_id' => array(
 				'type'     => 'string',
-				'label'    => __( 'Destination spreadsheet ID', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Destination spreadsheet ID', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -182,7 +182,7 @@ final class GoogleSheetsCopySheetAction extends AbstractGoogleSheetsAction {
 		if ( '' === $destination ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Destination spreadsheet ID is required.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Destination spreadsheet ID is required.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -203,11 +203,11 @@ final class GoogleSheetsDeleteSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Delete Sheet', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Delete Sheet', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Deletes a worksheet tab from a spreadsheet.', 'dragwyb-visual-automation' );
+		return __( 'Deletes a worksheet tab from a spreadsheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -246,11 +246,11 @@ final class GoogleSheetsClearSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Clear Sheet', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Clear Sheet', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Clears all cell values from a worksheet.', 'dragwyb-visual-automation' );
+		return __( 'Clears all cell values from a worksheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -260,7 +260,7 @@ final class GoogleSheetsClearSheetAction extends AbstractGoogleSheetsAction {
 			'sheet_title'          => $this->sheetTitleField(),
 			'is_first_row_headers' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Keep first row as headers', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Keep first row as headers', 'dragwyb-ai-agent-workflows' ),
 				'default' => false,
 			),
 		);
@@ -298,11 +298,11 @@ final class GoogleSheetsExportSheetAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Export Sheet', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Export Sheet', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Builds an export URL for a worksheet (CSV, PDF, or XLSX).', 'dragwyb-visual-automation' );
+		return __( 'Builds an export URL for a worksheet (CSV, PDF, or XLSX).', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -312,7 +312,7 @@ final class GoogleSheetsExportSheetAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'format'         => array(
 				'type'    => 'string',
-				'label'   => __( 'Export format (csv, pdf, xlsx)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Export format (csv, pdf, xlsx)', 'dragwyb-ai-agent-workflows' ),
 				'default' => 'csv',
 			),
 		);

@@ -83,7 +83,7 @@ class BackgroundRunner {
 	public static function registerCronSchedule( array $schedules ): array {
 		$schedules[ self::CRON_SCHEDULE ] = array(
 			'interval' => MINUTE_IN_SECONDS,
-			'display'  => __( 'Every minute (Dragwyb AI Agent Workflows queue)', 'dragwyb-visual-automation' ),
+			'display'  => __( 'Every minute (Dragwyb AI Agent Workflows queue)', 'dragwyb-ai-agent-workflows' ),
 		);
 
 		return $schedules;

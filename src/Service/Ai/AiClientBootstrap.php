@@ -313,7 +313,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'dragwyb-visual-automation' ),
+				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -324,7 +324,7 @@ class AiClientBootstrap {
 		if ( '' === $api_key ) {
 			return new WP_Error(
 				'dragwyb_af_ai_missing_key',
-				__( 'No API key configured for this provider. Add an API key in this node.', 'dragwyb-visual-automation' ),
+				__( 'No API key configured for this provider. Add an API key in this node.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -337,7 +337,7 @@ class AiClientBootstrap {
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'dragwyb_af_ai_auth_failed',
-				__( 'Could not attach API credentials for this provider.', 'dragwyb-visual-automation' ),
+				__( 'Could not attach API credentials for this provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -360,7 +360,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'dragwyb-visual-automation' ),
+				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -371,7 +371,7 @@ class AiClientBootstrap {
 		if ( '' === $provider_id ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unknown_provider',
-				__( 'Unknown AI provider.', 'dragwyb-visual-automation' ),
+				__( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -379,7 +379,7 @@ class AiClientBootstrap {
 		if ( '' === $api_key ) {
 			return new WP_Error(
 				'dragwyb_af_ai_empty_key',
-				__( 'API key is required.', 'dragwyb-visual-automation' ),
+				__( 'API key is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -391,7 +391,7 @@ class AiClientBootstrap {
 				'dragwyb_af_ai_provider_unregistered',
 				sprintf(
 					/* translators: %s: provider id */
-					__( 'AI provider "%s" is not registered.', 'dragwyb-visual-automation' ),
+					__( 'AI provider "%s" is not registered.', 'dragwyb-ai-agent-workflows' ),
 					$provider_id
 				),
 				array( 'status' => 400 )
@@ -411,7 +411,7 @@ class AiClientBootstrap {
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'dragwyb_af_ai_key_invalid',
-				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-visual-automation' ),
+				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -456,7 +456,7 @@ class AiClientBootstrap {
 			if ( is_wp_error( $response ) ) {
 				return new WP_Error(
 					'dragwyb_af_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-visual-automation' ),
+					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -465,7 +465,7 @@ class AiClientBootstrap {
 			if ( 200 !== $code ) {
 				return new WP_Error(
 					'dragwyb_af_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-visual-automation' ),
+					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -484,14 +484,14 @@ class AiClientBootstrap {
 			if ( ! $registry->isProviderConfigured( $provider_id ) ) {
 				return new WP_Error(
 					'dragwyb_af_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-visual-automation' ),
+					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'dragwyb_af_ai_key_invalid',
-				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-visual-automation' ),
+				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -517,7 +517,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'dragwyb-visual-automation' ),
+				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -526,7 +526,7 @@ class AiClientBootstrap {
 		if ( '' === $provider_id ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unknown_provider',
-				__( 'Unknown AI provider.', 'dragwyb-visual-automation' ),
+				__( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}

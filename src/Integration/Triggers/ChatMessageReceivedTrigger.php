@@ -42,14 +42,14 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'When chat message received', 'dragwyb-visual-automation' );
+		return __( 'When chat message received', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Runs the workflow when a chat message is submitted to this workflow\'s chat URL (same idea as n8n\'s Chat Trigger).', 'dragwyb-visual-automation' );
+		return __( 'Runs the workflow when a chat message is submitted to this workflow\'s chat URL (same idea as n8n\'s Chat Trigger).', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function app(): string {
@@ -61,7 +61,7 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 	}
 
 	public function groupLabel(): string {
-		return __( 'Chat', 'dragwyb-visual-automation' );
+		return __( 'Chat', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -71,52 +71,52 @@ class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterf
 		return array(
 			'endpoint_id'       => array(
 				'type'        => 'string',
-				'label'       => __( 'Chat endpoint ID', 'dragwyb-visual-automation' ),
-				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'dragwyb-visual-automation' ),
+				'label'       => __( 'Chat endpoint ID', 'dragwyb-ai-agent-workflows' ),
+				'description' => __( 'Unguessable ID used in the public chat URL. Generated automatically when you add this trigger.', 'dragwyb-ai-agent-workflows' ),
 				'required'    => true,
 				'default'     => '',
 				'hidden'      => true,
 			),
 			'public'            => array(
 				'type'        => 'boolean',
-				'label'       => __( 'Make chat publicly available', 'dragwyb-visual-automation' ),
-				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'dragwyb-visual-automation' ),
+				'label'       => __( 'Make chat publicly available', 'dragwyb-ai-agent-workflows' ),
+				'description' => __( 'When off, only logged-in users with workflow access can post messages. When on, anyone with the URL can post (like n8n public chat).', 'dragwyb-ai-agent-workflows' ),
 				'default'     => false,
 			),
 			'title'             => array(
 				'type'    => 'string',
-				'label'   => __( 'Title', 'dragwyb-visual-automation' ),
-				'default' => __( 'Hi there! 👋', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Title', 'dragwyb-ai-agent-workflows' ),
+				'default' => __( 'Hi there! 👋', 'dragwyb-ai-agent-workflows' ),
 			),
 			'subtitle'          => array(
 				'type'    => 'string',
-				'label'   => __( 'Subtitle', 'dragwyb-visual-automation' ),
-				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Subtitle', 'dragwyb-ai-agent-workflows' ),
+				'default' => __( 'Start a chat. We\'re here to help you 24/7.', 'dragwyb-ai-agent-workflows' ),
 			),
 			'input_placeholder' => array(
 				'type'    => 'string',
-				'label'   => __( 'Input placeholder', 'dragwyb-visual-automation' ),
-				'default' => __( 'Type your question…', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Input placeholder', 'dragwyb-ai-agent-workflows' ),
+				'default' => __( 'Type your question…', 'dragwyb-ai-agent-workflows' ),
 			),
 			'initial_messages'  => array(
 				'type'        => 'string',
-				'label'       => __( 'Initial message(s)', 'dragwyb-visual-automation' ),
-				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'dragwyb-visual-automation' ),
+				'label'       => __( 'Initial message(s)', 'dragwyb-ai-agent-workflows' ),
+				'description' => __( 'Default welcome messages shown at the start of the chat, one per line.', 'dragwyb-ai-agent-workflows' ),
 				'multiline'   => true,
-				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'dragwyb-visual-automation' ),
+				'default'     => __( "Hi there! 👋\nHow can I assist you today?", 'dragwyb-ai-agent-workflows' ),
 			),
 			'response_mode'     => array(
 				'type'    => 'select',
-				'label'   => __( 'Response mode', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Response mode', 'dragwyb-ai-agent-workflows' ),
 				'default' => 'lastNode',
 				'options' => array(
 					array(
 						'value' => 'lastNode',
-						'label' => __( 'When last node finishes', 'dragwyb-visual-automation' ),
+						'label' => __( 'When last node finishes', 'dragwyb-ai-agent-workflows' ),
 					),
 					array(
 						'value' => 'immediate',
-						'label' => __( 'Acknowledge immediately (queue run)', 'dragwyb-visual-automation' ),
+						'label' => __( 'Acknowledge immediately (queue run)', 'dragwyb-ai-agent-workflows' ),
 					),
 				),
 			),

@@ -65,14 +65,14 @@ class SettingsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Dragwyb AI Agent Workflows Settings', 'dragwyb-visual-automation' );
+		return __( 'Dragwyb AI Agent Workflows Settings', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Settings', 'dragwyb-visual-automation' );
+		return __( 'Settings', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -106,7 +106,7 @@ class SettingsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$tab = $this->currentTab();
@@ -152,9 +152,9 @@ class SettingsPage implements AdminPage {
 	 */
 	private function renderTabs( string $current ): void {
 		$labels = array(
-			'general'   => __( 'General', 'dragwyb-visual-automation' ),
-			'retention' => __( 'Logging & Retention', 'dragwyb-visual-automation' ),
-			'advanced'  => __( 'Advanced', 'dragwyb-visual-automation' ),
+			'general'   => __( 'General', 'dragwyb-ai-agent-workflows' ),
+			'retention' => __( 'Logging & Retention', 'dragwyb-ai-agent-workflows' ),
+			'advanced'  => __( 'Advanced', 'dragwyb-ai-agent-workflows' ),
 		);
 
 		echo '<h2 class="nav-tab-wrapper">';
@@ -189,32 +189,32 @@ class SettingsPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'When a node fails', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'When a node fails', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		printf(
 			'<label><input type="radio" name="on_node_failure" value="%1$s" %2$s /> %3$s</label><br />',
 			esc_attr( SettingsService::ON_FAILURE_STOP ),
 			checked( SettingsService::ON_FAILURE_STOP, $on_failure, false ),
-			esc_html__( 'Stop the run at the first failing node (recommended)', 'dragwyb-visual-automation' )
+			esc_html__( 'Stop the run at the first failing node (recommended)', 'dragwyb-ai-agent-workflows' )
 		);
 		printf(
 			'<label><input type="radio" name="on_node_failure" value="%1$s" %2$s /> %3$s</label>',
 			esc_attr( SettingsService::ON_FAILURE_CONTINUE ),
 			checked( SettingsService::ON_FAILURE_CONTINUE, $on_failure, false ),
-			esc_html__( 'Continue running the remaining nodes', 'dragwyb-visual-automation' )
+			esc_html__( 'Continue running the remaining nodes', 'dragwyb-ai-agent-workflows' )
 		);
-		echo '<p class="description">' . esc_html__( 'Applies to every workflow; there is currently no per-workflow override.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Applies to every workflow; there is currently no per-workflow override.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Timestamps', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Timestamps', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		printf(
 			'<label><input type="checkbox" name="display_timestamps_in_utc" value="1" %1$s /> %2$s</label>',
 			checked( true, $display_utc, false ),
-			esc_html__( 'Display run and workflow timestamps in UTC instead of this site\'s local timezone', 'dragwyb-visual-automation' )
+			esc_html__( 'Display run and workflow timestamps in UTC instead of this site\'s local timezone', 'dragwyb-ai-agent-workflows' )
 		);
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
-		submit_button( __( 'Save General Settings', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Save General Settings', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 	}
 
@@ -230,26 +230,26 @@ class SettingsPage implements AdminPage {
 		wp_nonce_field( 'dragwyb_af_settings_action_retention' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
-		echo '<tr><th scope="row"><label for="dragwyb-af-retention-days">' . esc_html__( 'Keep finished run history for', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-retention-days">' . esc_html__( 'Keep finished run history for', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
 			'<input type="number" id="dragwyb-af-retention-days" name="retention_days" min="%1$d" max="%2$d" value="%3$d" class="small-text" /> %4$s',
 			(int) SettingsService::MIN_RETENTION_DAYS,
 			(int) SettingsService::MAX_RETENTION_DAYS,
 			(int) $days,
-			esc_html__( 'days', 'dragwyb-visual-automation' )
+			esc_html__( 'days', 'dragwyb-ai-agent-workflows' )
 		);
-		echo '<p class="description">' . esc_html__( 'A daily background job automatically removes finished runs (and their logs) older than this. Set to 0 to keep history forever.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'A daily background job automatically removes finished runs (and their logs) older than this. Set to 0 to keep history forever.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 		echo '</tbody></table>';
-		submit_button( __( 'Save Retention Settings', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Save Retention Settings', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 
 		echo '<hr />';
-		echo '<h2>' . esc_html__( 'Purge now', 'dragwyb-visual-automation' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Immediately deletes finished runs older than the retention period above, instead of waiting for the next daily cleanup.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Purge now', 'dragwyb-ai-agent-workflows' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Immediately deletes finished runs older than the retention period above, instead of waiting for the next daily cleanup.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 
 		if ( $days <= 0 ) {
-			echo '<p><em>' . esc_html__( 'Retention is set to "keep forever", so there is nothing to purge.', 'dragwyb-visual-automation' ) . '</em></p>';
+			echo '<p><em>' . esc_html__( 'Retention is set to "keep forever", so there is nothing to purge.', 'dragwyb-ai-agent-workflows' ) . '</em></p>';
 
 			return;
 		}
@@ -258,7 +258,7 @@ class SettingsPage implements AdminPage {
 		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
 		echo '<input type="hidden" name="op" value="purge_now" />';
 		wp_nonce_field( 'dragwyb_af_settings_action_purge_now' );
-		submit_button( __( 'Purge Now', 'dragwyb-visual-automation' ), 'secondary' );
+		submit_button( __( 'Purge Now', 'dragwyb-ai-agent-workflows' ), 'secondary' );
 		echo '</form>';
 	}
 
@@ -277,7 +277,7 @@ class SettingsPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Background execution', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Background execution', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		// Hidden fallback ensures the field is always present in $_POST
 		// even when the checkbox is unchecked, so SettingsController can
 		// tell "left checked" apart from "explicitly unchecked" instead of
@@ -286,41 +286,41 @@ class SettingsPage implements AdminPage {
 		printf(
 			'<label><input type="checkbox" name="background_execution_enabled" value="1" %1$s /> %2$s</label>',
 			checked( true, $background_enabled, false ),
-			esc_html__( 'Run live-triggered workflows in the background via WP-Cron', 'dragwyb-visual-automation' )
+			esc_html__( 'Run live-triggered workflows in the background via WP-Cron', 'dragwyb-ai-agent-workflows' )
 		);
-		echo '<p class="description">' . esc_html__( 'Recommended. Disabling this runs triggered workflows immediately, on the same request that fired them — only useful on hosts where WP-Cron is unreliable or disabled.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Recommended. Disabling this runs triggered workflows immediately, on the same request that fired them — only useful on hosts where WP-Cron is unreliable or disabled.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Webhook signing', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Webhook signing', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		echo '<input type="hidden" name="require_webhook_signing" value="0" />';
 		printf(
 			'<label><input type="checkbox" name="require_webhook_signing" value="1" %1$s /> %2$s</label>',
 			checked( true, $require_webhook_signing, false ),
-			esc_html__( 'Require a signing secret on every inbound webhook', 'dragwyb-visual-automation' )
+			esc_html__( 'Require a signing secret on every inbound webhook', 'dragwyb-ai-agent-workflows' )
 		);
-		echo '<p class="description">' . esc_html__( 'When enabled, webhooks without a signing secret cannot be created or called. Individual webhooks can still require signing when this is off.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'When enabled, webhooks without a signing secret cannot be created or called. Individual webhooks can still require signing when this is off.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
-		submit_button( __( 'Save Advanced Settings', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Save Advanced Settings', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 
 		echo '<hr />';
-		echo '<h2>' . esc_html__( 'Uninstall', 'dragwyb-visual-automation' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Uninstall', 'dragwyb-ai-agent-workflows' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form dragwyb-af-settings-danger-zone">';
 		echo '<input type="hidden" name="action" value="dragwyb_af_settings_action" />';
 		echo '<input type="hidden" name="op" value="uninstall" />';
 		wp_nonce_field( 'dragwyb_af_settings_action_uninstall' );
 
-		echo '<p><strong>' . esc_html__( 'This plugin keeps all of its data when deleted, by default.', 'dragwyb-visual-automation' ) . '</strong></p>';
+		echo '<p><strong>' . esc_html__( 'This plugin keeps all of its data when deleted, by default.', 'dragwyb-ai-agent-workflows' ) . '</strong></p>';
 		echo '<input type="hidden" name="remove_data_on_uninstall" value="0" />';
 		printf(
 			'<label><input type="checkbox" name="remove_data_on_uninstall" value="1" %1$s /> %2$s</label>',
 			checked( true, $remove_data, false ),
-			esc_html__( 'Permanently delete all workflows, runs, logs, and settings when this plugin is deleted', 'dragwyb-visual-automation' )
+			esc_html__( 'Permanently delete all workflows, runs, logs, and settings when this plugin is deleted', 'dragwyb-ai-agent-workflows' )
 		);
-		echo '<p class="description">' . esc_html__( 'This only takes effect when the plugin is deleted from the Plugins screen, not on deactivation.', 'dragwyb-visual-automation' ) . '</p>';
-		submit_button( __( 'Save Uninstall Setting', 'dragwyb-visual-automation' ), 'delete' );
+		echo '<p class="description">' . esc_html__( 'This only takes effect when the plugin is deleted from the Plugins screen, not on deactivation.', 'dragwyb-ai-agent-workflows' ) . '</p>';
+		submit_button( __( 'Save Uninstall Setting', 'dragwyb-ai-agent-workflows' ), 'delete' );
 		echo '</form>';
 	}
 
@@ -333,17 +333,17 @@ class SettingsPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'saved'  => array(
-				'message' => __( 'Settings saved.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Settings saved.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			// The generic message here is only a fallback; renderNotice()
 			// always replaces it with a count-specific one via _n().
 			'purged' => array(
-				'message' => __( 'Old runs purged.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Old runs purged.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'error'  => array(
-				'message' => __( 'Your settings could not be saved.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Your settings could not be saved.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 		);
@@ -368,7 +368,7 @@ class SettingsPage implements AdminPage {
 			$count   = isset( $_GET['count'] ) ? absint( wp_unslash( $_GET['count'] ) ) : 0;
 			$message = sprintf(
 				/* translators: %d: number of runs deleted. */
-				_n( 'Purged %d old run.', 'Purged %d old runs.', $count, 'dragwyb-visual-automation' ),
+				_n( 'Purged %d old run.', 'Purged %d old runs.', $count, 'dragwyb-ai-agent-workflows' ),
 				$count
 			);
 		}

@@ -59,14 +59,14 @@ class HttpRequestAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'HTTP Request', 'dragwyb-visual-automation' );
+		return __( 'HTTP Request', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends an outbound HTTP request to a URL you specify.', 'dragwyb-visual-automation' );
+		return __( 'Sends an outbound HTTP request to a URL you specify.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -76,7 +76,7 @@ class HttpRequestAction implements ActionInterface {
 		return array(
 			'method'            => array(
 				'type'    => 'select',
-				'label'   => __( 'Method', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Method', 'dragwyb-ai-agent-workflows' ),
 				'default' => self::DEFAULT_METHOD,
 				'options' => array(
 					array(
@@ -111,34 +111,34 @@ class HttpRequestAction implements ActionInterface {
 			),
 			'url'               => array(
 				'type'               => 'string',
-				'label'              => __( 'URL', 'dragwyb-visual-automation' ),
+				'label'              => __( 'URL', 'dragwyb-ai-agent-workflows' ),
 				'required'           => true,
 				'supports_variables' => true,
 			),
 			'connection_id'     => array(
 				'type'    => 'connection',
-				'label'   => __( 'Authentication (optional)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Authentication (optional)', 'dragwyb-ai-agent-workflows' ),
 				'default' => 0,
 			),
 			'headers'           => array(
 				'type'    => 'object',
-				'label'   => __( 'Headers', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Headers', 'dragwyb-ai-agent-workflows' ),
 				'default' => array(),
 			),
 			'allow_unsafe_urls' => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Allow local/unsafe URLs', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Allow local/unsafe URLs', 'dragwyb-ai-agent-workflows' ),
 				'default' => false,
-				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'dragwyb-visual-automation' ),
+				'help'    => __( 'Enable to reach localhost or private/internal addresses (e.g. a local dev server). Leave off in production — this bypasses protection against requests to internal network hosts.', 'dragwyb-ai-agent-workflows' ),
 			),
 			'send_body'         => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Send Body', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Send Body', 'dragwyb-ai-agent-workflows' ),
 				'default' => false,
 			),
 			'body_content_type' => array(
 				'type'      => 'select',
-				'label'     => __( 'Body Content Type', 'dragwyb-visual-automation' ),
+				'label'     => __( 'Body Content Type', 'dragwyb-ai-agent-workflows' ),
 				'default'   => self::DEFAULT_BODY_CONTENT_TYPE,
 				'show_when' => array(
 					array(
@@ -149,21 +149,21 @@ class HttpRequestAction implements ActionInterface {
 				'options'   => array(
 					array(
 						'value' => 'json',
-						'label' => __( 'JSON', 'dragwyb-visual-automation' ),
+						'label' => __( 'JSON', 'dragwyb-ai-agent-workflows' ),
 					),
 					array(
 						'value' => 'form_urlencoded',
-						'label' => __( 'Form URL Encoded', 'dragwyb-visual-automation' ),
+						'label' => __( 'Form URL Encoded', 'dragwyb-ai-agent-workflows' ),
 					),
 					array(
 						'value' => 'raw',
-						'label' => __( 'Raw', 'dragwyb-visual-automation' ),
+						'label' => __( 'Raw', 'dragwyb-ai-agent-workflows' ),
 					),
 				),
 			),
 			'body_specify'      => array(
 				'type'      => 'select',
-				'label'     => __( 'Specify Body', 'dragwyb-visual-automation' ),
+				'label'     => __( 'Specify Body', 'dragwyb-ai-agent-workflows' ),
 				'default'   => 'json',
 				'show_when' => array(
 					array(
@@ -174,20 +174,20 @@ class HttpRequestAction implements ActionInterface {
 				'options'   => array(
 					array(
 						'value' => 'json',
-						'label' => __( 'Using JSON', 'dragwyb-visual-automation' ),
+						'label' => __( 'Using JSON', 'dragwyb-ai-agent-workflows' ),
 					),
 					array(
 						'value' => 'fields',
-						'label' => __( 'Using Fields Below', 'dragwyb-visual-automation' ),
+						'label' => __( 'Using Fields Below', 'dragwyb-ai-agent-workflows' ),
 					),
 				),
 			),
 			'body'              => array(
 				'type'               => 'string',
-				'label'              => __( 'Body', 'dragwyb-visual-automation' ),
+				'label'              => __( 'Body', 'dragwyb-ai-agent-workflows' ),
 				'default'            => '',
 				'supports_variables' => true,
-				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'dragwyb-visual-automation' ),
+				'help'               => __( 'For JSON, enter an object such as {"name":"Ravi"}. Supports {{tokens}} from earlier steps.', 'dragwyb-ai-agent-workflows' ),
 				'show_when'          => array(
 					array(
 						'field'  => 'send_body',
@@ -201,9 +201,9 @@ class HttpRequestAction implements ActionInterface {
 			),
 			'body_parameters'   => array(
 				'type'               => 'key_value',
-				'label'              => __( 'Body Parameters', 'dragwyb-visual-automation' ),
+				'label'              => __( 'Body Parameters', 'dragwyb-ai-agent-workflows' ),
 				'default'            => array(),
-				'button_label'       => __( 'Add Body Field', 'dragwyb-visual-automation' ),
+				'button_label'       => __( 'Add Body Field', 'dragwyb-ai-agent-workflows' ),
 				'supports_variables' => true,
 				'show_when'          => array(
 					array(
@@ -228,7 +228,7 @@ class HttpRequestAction implements ActionInterface {
 		if ( '' === $url ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No request URL configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No request URL configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -485,7 +485,7 @@ class HttpRequestAction implements ActionInterface {
 		$connection = $this->connections->find( $connection_id );
 
 		if ( null === $connection ) {
-			return __( 'The connection configured for this action no longer exists.', 'dragwyb-visual-automation' );
+			return __( 'The connection configured for this action no longer exists.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		$credentials = $this->connections->credentials( $connection );
@@ -496,7 +496,7 @@ class HttpRequestAction implements ActionInterface {
 				$password = $credentials['password'] ?? null;
 
 				if ( null === $username || null === $password ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-ai-agent-workflows' );
 				}
 
 				$headers['Authorization'] = 'Basic ' . base64_encode( $username . ':' . $password );
@@ -507,7 +507,7 @@ class HttpRequestAction implements ActionInterface {
 				$token = $credentials['token'] ?? null;
 
 				if ( null === $token ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-ai-agent-workflows' );
 				}
 
 				$headers['Authorization'] = 'Bearer ' . $token;
@@ -519,7 +519,7 @@ class HttpRequestAction implements ActionInterface {
 				$api_key = $credentials['api_key'] ?? null;
 
 				if ( null === $api_key ) {
-					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' );
+					return __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-ai-agent-workflows' );
 				}
 
 				$headers['Authorization'] = 'Bearer ' . $api_key;

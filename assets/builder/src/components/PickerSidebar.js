@@ -43,8 +43,8 @@ export default function PickerSidebar({
 	const [groupedQuery, setGroupedQuery] = useState('');
 	const pickerKind =
 		kind === 'branch-action' ||
-		kind === 'edge-insert' ||
-		kind === 'edge-branch-insert'
+			kind === 'edge-insert' ||
+			kind === 'edge-branch-insert'
 			? 'action'
 			: kind;
 	const usesGroups = appUsesGroups(pickerKind, appId);
@@ -88,31 +88,31 @@ export default function PickerSidebar({
 	const metaAppId = subAppId || appId;
 	const title =
 		kind === 'agent-chat-model' ||
-		kind === 'agent-fallback-chat-model' ||
-		kind === 'parser-chat-model'
+			kind === 'agent-fallback-chat-model' ||
+			kind === 'parser-chat-model'
 			? kind === 'agent-fallback-chat-model'
-				? __('Select fallback chat model', 'dragwyb-visual-automation')
+				? __('Select fallback chat model', 'dragwyb-ai-agent-workflows')
 				: kind === 'parser-chat-model'
-					? __('Select Auto-Fix chat model', 'dragwyb-visual-automation')
-					: __('Select chat model', 'dragwyb-visual-automation')
+					? __('Select Auto-Fix chat model', 'dragwyb-ai-agent-workflows')
+					: __('Select chat model', 'dragwyb-ai-agent-workflows')
 			: kind === 'agent-tool'
-				? __('Add tool to agent', 'dragwyb-visual-automation')
+				? __('Add tool to agent', 'dragwyb-ai-agent-workflows')
 				: kind === 'branch-action'
-					? __('Add step to branch', 'dragwyb-visual-automation')
+					? __('Add step to branch', 'dragwyb-ai-agent-workflows')
 					: kind === 'edge-insert' || kind === 'edge-branch-insert'
-						? __('Add step between nodes', 'dragwyb-visual-automation')
+						? __('Add step between nodes', 'dragwyb-ai-agent-workflows')
 						: showGroups
-						? __('Choose a group', 'dragwyb-visual-automation')
-						: usesGroupedSections
-							? appLabel
-							: __('Choose a node', 'dragwyb-visual-automation');
+							? __('Choose a group', 'dragwyb-ai-agent-workflows')
+							: usesGroupedSections
+								? appLabel
+								: __('Choose a node', 'dragwyb-ai-agent-workflows');
 	const replaceHint =
 		kind === 'trigger' && hasExistingTrigger && !showGroups
-			? __('Selecting a trigger replaces your current one.', 'dragwyb-visual-automation')
+			? __('Selecting a trigger replaces your current one.', 'dragwyb-ai-agent-workflows')
 			: kind === 'agent-chat-model'
 				? __(
 					'Pick a provider — configure API key and model on the canvas node.',
-					'dragwyb-visual-automation'
+					'dragwyb-ai-agent-workflows'
 				)
 				: '';
 	const showBack = (usesGroups && groupId) || subAppId;
@@ -144,13 +144,13 @@ export default function PickerSidebar({
 		const isDisabled = item.available === false;
 		const disabledMessage = isDisabled
 			? sprintf(
-					/* translators: %s: plugin name, e.g. WooCommerce */
-					__(
-						'Activate %s to use this trigger.',
-						'dragwyb-visual-automation'
-					),
-					item.requires_plugin || __('this plugin', 'dragwyb-visual-automation')
-				)
+				/* translators: %s: plugin name, e.g. WooCommerce */
+				__(
+					'Activate %s to use this trigger.',
+					'dragwyb-ai-agent-workflows'
+				),
+				item.requires_plugin || __('this plugin', 'dragwyb-ai-agent-workflows')
+			)
 			: '';
 
 		return (
@@ -204,14 +204,14 @@ export default function PickerSidebar({
 						className="dragwyb-af-builder-picker__back"
 						onClick={handleBack}
 					>
-						{__('← Back', 'dragwyb-visual-automation')}
+						{__('← Back', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				)}
 				<h2 className="dragwyb-af-builder-picker__title">{title}</h2>
 				<Button
 					className="dragwyb-af-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'dragwyb-visual-automation')}
+					label={__('Close', 'dragwyb-ai-agent-workflows')}
 					onClick={onClose}
 				/>
 			</div>
@@ -240,9 +240,9 @@ export default function PickerSidebar({
 				<>
 					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
-							label={__('Search tools', 'dragwyb-visual-automation')}
+							label={__('Search tools', 'dragwyb-ai-agent-workflows')}
 							hideLabelFromVision
-							placeholder={__('Search tools…', 'dragwyb-visual-automation')}
+							placeholder={__('Search tools…', 'dragwyb-ai-agent-workflows')}
 							value={toolQuery}
 							onChange={setToolQuery}
 						/>
@@ -251,7 +251,7 @@ export default function PickerSidebar({
 						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No tools match your search.',
-								'dragwyb-visual-automation'
+								'dragwyb-ai-agent-workflows'
 							)}
 						</p>
 					) : (
@@ -276,9 +276,9 @@ export default function PickerSidebar({
 				<>
 					<div className="dragwyb-af-builder-picker__search">
 						<TextControl
-							label={__('Search actions', 'dragwyb-visual-automation')}
+							label={__('Search actions', 'dragwyb-ai-agent-workflows')}
 							hideLabelFromVision
-							placeholder={__('Search actions…', 'dragwyb-visual-automation')}
+							placeholder={__('Search actions…', 'dragwyb-ai-agent-workflows')}
 							value={groupedQuery}
 							onChange={setGroupedQuery}
 						/>
@@ -287,7 +287,7 @@ export default function PickerSidebar({
 						<p className="dragwyb-af-builder-picker__empty">
 							{__(
 								'No actions match your search.',
-								'dragwyb-visual-automation'
+								'dragwyb-ai-agent-workflows'
 							)}
 						</p>
 					) : (

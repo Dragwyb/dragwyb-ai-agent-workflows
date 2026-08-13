@@ -57,7 +57,7 @@ class AgentService {
 		if ( array() === $graph_nodes ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Workflow graph is not available for the AI Agent.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Workflow graph is not available for the AI Agent.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -82,7 +82,7 @@ class AgentService {
 		$wait_ms      = max( 0, (int) $settings['wait_between_tries_ms'] );
 		$last_result  = array(
 			'success' => false,
-			'error'   => __( 'AI Agent request failed.', 'dragwyb-visual-automation' ),
+			'error'   => __( 'AI Agent request failed.', 'dragwyb-ai-agent-workflows' ),
 		);
 
 		for ( $attempt = 1; $attempt <= $max_attempts; ++$attempt ) {
@@ -117,7 +117,7 @@ class AgentService {
 		if ( ! AiClientBootstrap::isProviderConfigured( $chat['provider'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -294,11 +294,11 @@ class AgentService {
 				if ( is_array( $parsed ) ) {
 					$loop['parsed'] = $parsed;
 				} elseif ( ! empty( $attachments['tools'] ) || ! empty( $loop['tool_calls'] ) ) {
-					$loop['json_parse_warning'] = __( 'Reply was plain text, not JSON (expected when the agent uses tools).', 'dragwyb-visual-automation' );
+					$loop['json_parse_warning'] = __( 'Reply was plain text, not JSON (expected when the agent uses tools).', 'dragwyb-ai-agent-workflows' );
 				} else {
 					return array(
 						'success'  => false,
-						'error'    => __( 'The agent did not return valid JSON.', 'dragwyb-visual-automation' ),
+						'error'    => __( 'The agent did not return valid JSON.', 'dragwyb-ai-agent-workflows' ),
 						'response' => $response,
 					);
 				}
@@ -389,7 +389,7 @@ class AgentService {
 			if ( '' === $prompt ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'No prompt configured for the AI Agent.', 'dragwyb-visual-automation' ),
+					'error'   => __( 'No prompt configured for the AI Agent.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -404,7 +404,7 @@ class AgentService {
 		if ( '' === $prompt ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No chatInput value found from a connected Chat Trigger node.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No chatInput value found from a connected Chat Trigger node.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -492,7 +492,7 @@ class AgentService {
 				'response' => '',
 				'output'   => '',
 				'json'     => array( 'output' => '' ),
-				'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'dragwyb-visual-automation' ) ),
+				'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'dragwyb-ai-agent-workflows' ) ),
 			);
 
 			if ( 'continue_error_output' === $settings['on_error'] ) {
@@ -732,7 +732,7 @@ class AgentService {
 			if ( empty( $completion['success'] ) ) {
 				return array(
 					'success' => false,
-					'error'   => $completion['error'] ?? __( 'AI Agent request failed.', 'dragwyb-visual-automation' ),
+					'error'   => $completion['error'] ?? __( 'AI Agent request failed.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -741,7 +741,7 @@ class AgentService {
 			if ( ! is_array( $message ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The AI model returned an invalid message.', 'dragwyb-visual-automation' ),
+					'error'   => __( 'The AI model returned an invalid message.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -778,7 +778,7 @@ class AgentService {
 
 		return array(
 			'success'    => false,
-			'error'      => __( 'Max iterations reached.', 'dragwyb-visual-automation' ),
+			'error'      => __( 'Max iterations reached.', 'dragwyb-ai-agent-workflows' ),
 			'iterations' => $iteration,
 			'tool_calls' => $this->formatToolCalls( $all_tool_calls ),
 		);
@@ -808,13 +808,13 @@ class AgentService {
 		if ( isset( $seen_calls[ $signature ] ) && is_array( $seen_calls[ $signature ] ) ) {
 			$tool_result = $seen_calls[ $signature ];
 			if ( ! isset( $tool_result['note'] ) ) {
-				$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'dragwyb-visual-automation' );
+				$tool_result['note'] = __( 'Repeated identical tool call — returning cached result. Do not call the same tool with the same arguments again; continue with a different step or give the final answer.', 'dragwyb-ai-agent-workflows' );
 			}
 		} elseif ( $created_post_id > 0 && $this->isCreatePostToolName( $function_name ) ) {
 			$tool_result              = array(
 				'error'   => sprintf(
 					/* translators: %d: existing post id */
-					__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'dragwyb-visual-automation' ),
+					__( 'A post/page was already created in this run (ID %d). Do not create another. Use Update Post with that post_id for any changes, then give the final answer.', 'dragwyb-ai-agent-workflows' ),
 					$created_post_id
 				),
 				'post_id' => $created_post_id,
@@ -973,13 +973,13 @@ class AgentService {
 		}
 
 		if ( ! empty( $attachments['tools'] ) ) {
-			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'dragwyb-visual-automation' );
-			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'dragwyb-visual-automation' );
-			$parts[] = __( 'Tool usage rules: Read tool results before claiming success. Prefer IDs returned by previous tools. For list tools, use limit/search filters—do not dump entire databases. Omit optional URL fields (images, media) unless you have a real direct URL. If a tool returns a warning, the main action still succeeded—do not create another post/page to “fix” it; report once and finish. Create Post at most once per task; for fixes use Update Post with the returned post_id. Never repeat the same tool call; use the prior result and continue.', 'dragwyb-visual-automation' );
+			$parts[] = __( 'You have tools available. Use them to complete the task. Workflow trigger data is included in the user message when present—use it to fill tool parameters.', 'dragwyb-ai-agent-workflows' );
+			$parts[] = __( 'When calling tools, pass the final text with real values from the trigger data (customer name, order ID, amounts, etc.). Do not use {{placeholder}} or template syntax in tool arguments—write the complete message as plain text.', 'dragwyb-ai-agent-workflows' );
+			$parts[] = __( 'Tool usage rules: Read tool results before claiming success. Prefer IDs returned by previous tools. For list tools, use limit/search filters—do not dump entire databases. Omit optional URL fields (images, media) unless you have a real direct URL. If a tool returns a warning, the main action still succeeded—do not create another post/page to “fix” it; report once and finish. Create Post at most once per task; for fixes use Update Post with the returned post_id. Never repeat the same tool call; use the prior result and continue.', 'dragwyb-ai-agent-workflows' );
 
 			if ( $this->attachmentsIncludePostTools( $attachments['tools'] ) ) {
-				$parts[] = __( 'WordPress page/post design rules: When the user asks for a page, set post_type to "page". For designed/modern/colorful layouts, pass design_sections as a JSON array of sections (types: hero, heading, paragraph, columns, cta, buttons, spacer, separator, group) with colors—do not rely on a single plain paragraph. You may instead put full Gutenberg block markup (<!-- wp:... -->) in content. Omit featured_image unless you have a real direct image URL (not example.com or generic search URLs). Never claim the page was designed unless design_sections or Gutenberg block markup was used.', 'dragwyb-visual-automation' );
-				$parts[] = __( 'Post type from trigger: If the workflow trigger includes post_type (e.g. page), pass that same post_type to Create/Update Post unless the user explicitly requests a different type. Do not default everything to "post" when the trigger saved a page.', 'dragwyb-visual-automation' );
+				$parts[] = __( 'WordPress page/post design rules: When the user asks for a page, set post_type to "page". For designed/modern/colorful layouts, pass design_sections as a JSON array of sections (types: hero, heading, paragraph, columns, cta, buttons, spacer, separator, group) with colors—do not rely on a single plain paragraph. You may instead put full Gutenberg block markup (<!-- wp:... -->) in content. Omit featured_image unless you have a real direct image URL (not example.com or generic search URLs). Never claim the page was designed unless design_sections or Gutenberg block markup was used.', 'dragwyb-ai-agent-workflows' );
+				$parts[] = __( 'Post type from trigger: If the workflow trigger includes post_type (e.g. page), pass that same post_type to Create/Update Post unless the user explicitly requests a different type. Do not default everything to "post" when the trigger saved a page.', 'dragwyb-ai-agent-workflows' );
 			}
 		}
 
@@ -990,14 +990,14 @@ class AgentService {
 
 			if ( isset( $parser_resolved['success'] ) && false === $parser_resolved['success'] ) {
 				// Invalid schema is reported at parse time; still prefer JSON-only guidance.
-				$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'dragwyb-visual-automation' );
+				$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'dragwyb-ai-agent-workflows' );
 			} elseif ( ! empty( $parser_resolved['instructions'] ) ) {
 				$parts[] = (string) $parser_resolved['instructions'];
 			}
 		} elseif ( isset( $config['output_format'] ) && 'json' === $config['output_format'] && empty( $attachments['tools'] ) ) {
-			$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'dragwyb-visual-automation' );
+			$parts[] = __( 'Respond with valid JSON only. Do not include markdown fences or text outside the JSON object.', 'dragwyb-ai-agent-workflows' );
 		} elseif ( empty( $attachments['tools'] ) ) {
-			$parts[] = __( 'Reply with the final answer as plain text only — a single short string. Never return Python, JavaScript, curl, HTTP examples, markdown code fences, or wrappers. If the user asks for a joke, return only the joke words.', 'dragwyb-visual-automation' );
+			$parts[] = __( 'Reply with the final answer as plain text only — a single short string. Never return Python, JavaScript, curl, HTTP examples, markdown code fences, or wrappers. If the user asks for a joke, return only the joke words.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		return implode( "\n\n", $parts );
@@ -1083,7 +1083,7 @@ class AgentService {
 				'success'  => false,
 				'error'    => sprintf(
 					/* translators: %s: validation error */
-					__( 'Structured output validation failed: %s', 'dragwyb-visual-automation' ),
+					__( 'Structured output validation failed: %s', 'dragwyb-ai-agent-workflows' ),
 					(string) ( $parsed['error'] ?? '' )
 				),
 				'response' => $response,
@@ -1113,7 +1113,7 @@ class AgentService {
 		if ( empty( $completion['success'] ) ) {
 			return array(
 				'success'  => false,
-				'error'    => $completion['error'] ?? __( 'Structured output auto-fix request failed.', 'dragwyb-visual-automation' ),
+				'error'    => $completion['error'] ?? __( 'Structured output auto-fix request failed.', 'dragwyb-ai-agent-workflows' ),
 				'response' => $response,
 			);
 		}
@@ -1127,7 +1127,7 @@ class AgentService {
 				'success'  => false,
 				'error'    => sprintf(
 					/* translators: %s: validation error */
-					__( 'Structured output still invalid after auto-fix: %s', 'dragwyb-visual-automation' ),
+					__( 'Structured output still invalid after auto-fix: %s', 'dragwyb-ai-agent-workflows' ),
 					(string) ( $fixed_parsed['error'] ?? '' )
 				),
 				'response' => $fixed_reply,
@@ -1166,7 +1166,7 @@ class AgentService {
 		}
 
 		return $message . "\n\n---\n"
-			. __( 'Workflow trigger data:', 'dragwyb-visual-automation' )
+			. __( 'Workflow trigger data:', 'dragwyb-ai-agent-workflows' )
 			. "\n```json\n"
 			. $trigger_json
 			. "\n```";

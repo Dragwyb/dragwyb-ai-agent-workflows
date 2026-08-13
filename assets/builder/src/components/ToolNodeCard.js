@@ -49,7 +49,7 @@ export default function ToolNodeCard({
 			<span className="dragwyb-af-tool-node__text">
 				<span className="dragwyb-af-tool-node__label">{node.label}</span>
 				<span className="dragwyb-af-tool-node__subtitle">
-					{__('Tool', 'dragwyb-visual-automation')}
+					{__('Tool', 'dragwyb-ai-agent-workflows')}
 				</span>
 			</span>
 		</div>

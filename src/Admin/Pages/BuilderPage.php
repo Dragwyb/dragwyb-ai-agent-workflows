@@ -51,14 +51,14 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Workflow Editor', 'dragwyb-visual-automation' );
+		return __( 'Workflow Editor', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Workflow Editor', 'dragwyb-visual-automation' );
+		return __( 'Workflow Editor', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -159,7 +159,7 @@ class BuilderPage implements AdminPage {
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
 				'Dragwyb AI Agent Workflows: the builder app has not been built yet. Run "npm install && npm run build" in the plugin directory.',
-				'dragwyb-visual-automation'
+				'dragwyb-ai-agent-workflows'
 			)
 		);
 	}
@@ -169,7 +169,7 @@ class BuilderPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		echo '<div class="wrap dragwyb-af-admin-page dragwyb-af-builder-page">';
@@ -193,7 +193,7 @@ class BuilderPage implements AdminPage {
 
 		printf(
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-			esc_html__( 'Workflow imported from JSON.', 'dragwyb-visual-automation' )
+			esc_html__( 'Workflow imported from JSON.', 'dragwyb-ai-agent-workflows' )
 		);
 	}
 }

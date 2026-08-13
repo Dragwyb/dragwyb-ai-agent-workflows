@@ -39,7 +39,7 @@ class RunDuration {
 	 */
 	public static function forRun( WorkflowRun $run ): string {
 		if ( null === $run->startedAt() || null === $run->finishedAt() ) {
-			return __( '—', 'dragwyb-visual-automation' );
+			return __( '—', 'dragwyb-ai-agent-workflows' );
 		}
 
 		$seconds = max( 0, strtotime( $run->finishedAt() . ' UTC' ) - strtotime( $run->startedAt() . ' UTC' ) );
@@ -57,13 +57,13 @@ class RunDuration {
 	 */
 	public static function forNode( ?int $duration_ms ): string {
 		if ( null === $duration_ms ) {
-			return __( '—', 'dragwyb-visual-automation' );
+			return __( '—', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( $duration_ms < 1000 ) {
 			return sprintf(
 				/* translators: %d: duration in milliseconds. */
-				__( '%d ms', 'dragwyb-visual-automation' ),
+				__( '%d ms', 'dragwyb-ai-agent-workflows' ),
 				$duration_ms
 			);
 		}
@@ -80,7 +80,7 @@ class RunDuration {
 		if ( $seconds < 60 ) {
 			return sprintf(
 				/* translators: %d: duration in seconds. */
-				_n( '%d second', '%d seconds', $seconds, 'dragwyb-visual-automation' ),
+				_n( '%d second', '%d seconds', $seconds, 'dragwyb-ai-agent-workflows' ),
 				$seconds
 			);
 		}
@@ -90,7 +90,7 @@ class RunDuration {
 
 		return sprintf(
 			/* translators: 1: minutes, 2: seconds. */
-			__( '%1$dm %2$ds', 'dragwyb-visual-automation' ),
+			__( '%1$dm %2$ds', 'dragwyb-ai-agent-workflows' ),
 			$minutes,
 			$remaining
 		);

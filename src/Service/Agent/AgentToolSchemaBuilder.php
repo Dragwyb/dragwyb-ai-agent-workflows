@@ -129,7 +129,7 @@ class AgentToolSchemaBuilder {
 			}
 			$description .= ' ' . sprintf(
 				/* translators: %s: WordPress role slug */
-				__( 'Pass email and username only. Role is fixed on this tool node (currently "%s"; use the role slug e.g. customer, not the label). Password is auto-generated. The model cannot change the role via tool arguments.', 'dragwyb-visual-automation' ),
+				__( 'Pass email and username only. Role is fixed on this tool node (currently "%s"; use the role slug e.g. customer, not the label). Password is auto-generated. The model cannot change the role via tool arguments.', 'dragwyb-ai-agent-workflows' ),
 				$role
 			);
 		}
@@ -268,19 +268,19 @@ class AgentToolSchemaBuilder {
 		$parts = array( $description );
 
 		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
-			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-visual-automation' );
+			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( 'post_type' === $field_key ) {
-			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-visual-automation' );
+			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( 'array' === $field_type ) {
-			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-visual-automation' );
+			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( 'key_value' === $field_type ) {
-			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-visual-automation' );
+			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( array_key_exists( $field_key, $config ) && ! $this->configValueIsEmpty( $config[ $field_key ] ) ) {
@@ -288,7 +288,7 @@ class AgentToolSchemaBuilder {
 			if ( is_scalar( $default ) ) {
 				$parts[] = sprintf(
 					/* translators: %s: current default value */
-					__( 'Current node default: %s. You may override this value.', 'dragwyb-visual-automation' ),
+					__( 'Current node default: %s. You may override this value.', 'dragwyb-ai-agent-workflows' ),
 					(string) $default
 				);
 			}

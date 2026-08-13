@@ -20,11 +20,11 @@ class GroqChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'Groq Chat', 'dragwyb-visual-automation' );
+		return __( 'Groq Chat', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to Groq and returns the reply.', 'dragwyb-visual-automation' );
+		return __( 'Sends a prompt to Groq and returns the reply.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	protected function providerSlug(): string {

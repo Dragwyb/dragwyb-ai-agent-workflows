@@ -86,7 +86,7 @@ class WebhookIngressController {
 		if ( ! $this->checkRateLimit( $public_id, $client_ip ) ) {
 			return new WP_Error(
 				'dragwyb_af_webhook_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again later.', 'dragwyb-visual-automation' ),
+				__( 'Rate limit exceeded. Please try again later.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 429 )
 			);
 		}

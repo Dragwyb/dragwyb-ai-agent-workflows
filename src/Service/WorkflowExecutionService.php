@@ -136,7 +136,7 @@ class WorkflowExecutionService {
 	 */
 	public function run( int $workflow_id, array $trigger_payload = array() ): WorkflowRun {
 		if ( null === $this->workflows->find( $workflow_id ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-visual-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$run = $this->runs->insert(
@@ -148,7 +148,7 @@ class WorkflowExecutionService {
 		);
 
 		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'dragwyb-visual-automation' ) );
+			throw new RuntimeException( esc_html__( 'Failed to start the workflow run.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $this->executeNodes( $run );
@@ -174,11 +174,11 @@ class WorkflowExecutionService {
 		$original = $this->runs->find( $run_id );
 
 		if ( null === $original ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified run does not exist.', 'dragwyb-visual-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified run does not exist.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( null === $this->workflows->find( $original->workflowId() ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The workflow this run belongs to no longer exists.', 'dragwyb-visual-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The workflow this run belongs to no longer exists.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$run = $this->runs->insert(
@@ -191,7 +191,7 @@ class WorkflowExecutionService {
 		);
 
 		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to start the re-run.', 'dragwyb-visual-automation' ) );
+			throw new RuntimeException( esc_html__( 'Failed to start the re-run.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $this->executeNodes( $run );
@@ -213,7 +213,7 @@ class WorkflowExecutionService {
 	 */
 	public function queue( int $workflow_id, array $trigger_payload = array() ): WorkflowRun {
 		if ( null === $this->workflows->find( $workflow_id ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-visual-automation' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$run = $this->runs->insert(
@@ -225,7 +225,7 @@ class WorkflowExecutionService {
 		);
 
 		if ( null === $run ) {
-			throw new RuntimeException( esc_html__( 'Failed to queue the workflow run.', 'dragwyb-visual-automation' ) );
+			throw new RuntimeException( esc_html__( 'Failed to queue the workflow run.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $run;
@@ -277,7 +277,7 @@ class WorkflowExecutionService {
 					'run_id'  => $run->id(),
 					'node_id' => null,
 					'status'  => WorkflowRunLog::STATUS_ERROR,
-					'message' => __( 'The workflow was deleted or trashed before this queued run could execute.', 'dragwyb-visual-automation' ),
+					'message' => __( 'The workflow was deleted or trashed before this queued run could execute.', 'dragwyb-ai-agent-workflows' ),
 				)
 			);
 
@@ -505,7 +505,7 @@ class WorkflowExecutionService {
 				'status'      => $success ? WorkflowRunLog::STATUS_SUCCESS : WorkflowRunLog::STATUS_ERROR,
 				'input'       => $node->config(),
 				'output'      => $result,
-				'message'     => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'dragwyb-visual-automation' ) ),
+				'message'     => $success ? null : ( $result['error'] ?? __( 'The node failed without providing a specific error message.', 'dragwyb-ai-agent-workflows' ) ),
 				'duration_ms' => $duration_ms,
 			)
 		);
@@ -520,7 +520,7 @@ class WorkflowExecutionService {
 		$this->workflows->incrementRunCount( $workflow_id );
 
 		if ( null === $finished ) {
-			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'dragwyb-visual-automation' ) );
+			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		do_action( 'dragwyb_af/workflow/after_run', $finished, $trigger_payload );
@@ -667,7 +667,7 @@ class WorkflowExecutionService {
 		$output = array(
 			'success'  => true,
 			'response' => '',
-			'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'dragwyb-visual-automation' ) ),
+			'error'    => (string) ( $result['error'] ?? __( 'AI Agent request failed.', 'dragwyb-ai-agent-workflows' ) ),
 		);
 
 		if ( 'continue_error_output' === $on_error ) {

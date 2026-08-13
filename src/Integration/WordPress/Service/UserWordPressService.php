@@ -56,7 +56,7 @@ final class UserWordPressService {
 	public function createUser( array $config ): array {
 		if ( ! current_user_can( 'create_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Creating users requires the create_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Creating users requires the create_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -64,15 +64,15 @@ final class UserWordPressService {
 		$username = WordPressActionHelper::str( $config, 'username' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'Email is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Email is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $username ) {
-			return WordPressActionHelper::fail( __( 'Username is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Username is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( get_user_by( 'email', $email ) ) {
-			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
@@ -98,7 +98,7 @@ final class UserWordPressService {
 
 		$username = sanitize_user( $username, true );
 		if ( '' === $username ) {
-			return WordPressActionHelper::fail( __( 'Username is invalid after sanitization.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Username is invalid after sanitization.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$userData = WordPressActionHelper::mapUserFields( $config );
@@ -145,17 +145,17 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! current_user_can( 'edit_user', $userId ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Updating users requires the edit_user capability for the target user. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Updating users requires the edit_user capability for the target user. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$userData       = WordPressActionHelper::mapUserFields( $config );
@@ -165,7 +165,7 @@ final class UserWordPressService {
 
 		if ( '' !== $userRole ) {
 			if ( ! current_user_can( 'promote_users' ) ) {
-				return WordPressActionHelper::fail( __( 'Changing user roles requires the promote_users capability.', 'dragwyb-visual-automation' ) );
+				return WordPressActionHelper::fail( __( 'Changing user roles requires the promote_users capability.', 'dragwyb-ai-agent-workflows' ) );
 			}
 
 			$resolved = $this->resolveAssignableRole( $userRole );
@@ -203,7 +203,7 @@ final class UserWordPressService {
 	public function deleteUser( array $config ): array {
 		if ( ! current_user_can( 'delete_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Deleting users requires the delete_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Deleting users requires the delete_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -214,26 +214,26 @@ final class UserWordPressService {
 
 		if ( $useEmail ) {
 			if ( '' === $userEmail ) {
-				return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-visual-automation' ) );
+				return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-ai-agent-workflows' ) );
 			}
 
 			$user = get_user_by( 'email', $userEmail );
 
 			if ( ! $user ) {
-				return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+				return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 			}
 
 			$userId = (int) $user->ID;
 		} elseif ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( (int) get_current_user_id() === $userId ) {
-			return WordPressActionHelper::fail( __( 'You cannot delete the currently authenticated user.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'You cannot delete the currently authenticated user.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensureMediaIncludes();
@@ -241,7 +241,7 @@ final class UserWordPressService {
 		$result = wp_delete_user( $userId, $reassignUserId > 0 ? $reassignUserId : null );
 
 		if ( ! $result ) {
-			return WordPressActionHelper::fail( __( 'Failed to delete user.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to delete user.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'user_id' => $userId ) );
@@ -260,14 +260,14 @@ final class UserWordPressService {
 		if ( '' === $slug ) {
 			return array(
 				'slug'  => '',
-				'error' => __( 'User role is required.', 'dragwyb-visual-automation' ),
+				'error' => __( 'User role is required.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
 		if ( 'administrator' === $slug ) {
 			return array(
 				'slug'  => $slug,
-				'error' => __( 'Assigning the administrator role via workflows is not allowed.', 'dragwyb-visual-automation' ),
+				'error' => __( 'Assigning the administrator role via workflows is not allowed.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -298,7 +298,7 @@ final class UserWordPressService {
 			'slug'  => $slug,
 			'error' => sprintf(
 				/* translators: %s: role slug or label */
-				__( 'Invalid or unauthorized user role "%s". Use a role slug such as subscriber, customer, or editor.', 'dragwyb-visual-automation' ),
+				__( 'Invalid or unauthorized user role "%s". Use a role slug such as subscriber, customer, or editor.', 'dragwyb-ai-agent-workflows' ),
 				$role
 			),
 		);
@@ -356,7 +356,7 @@ final class UserWordPressService {
 			if ( '' === $key || ! $this->isSafeUserMetaKey( $key ) ) {
 				return sprintf(
 					/* translators: %s: meta key */
-					__( 'User meta key "%s" is not allowed.', 'dragwyb-visual-automation' ),
+					__( 'User meta key "%s" is not allowed.', 'dragwyb-ai-agent-workflows' ),
 					(string) $meta_key
 				);
 			}
@@ -439,7 +439,7 @@ final class UserWordPressService {
 			if ( in_array( $cap, $blocked, true ) ) {
 				return sprintf(
 					/* translators: %s: capability name */
-					__( 'Capability "%s" cannot be assigned via workflows.', 'dragwyb-visual-automation' ),
+					__( 'Capability "%s" cannot be assigned via workflows.', 'dragwyb-ai-agent-workflows' ),
 					$cap
 				);
 			}
@@ -464,7 +464,7 @@ final class UserWordPressService {
 		$role = WordPressActionHelper::str( $config, 'user_role' );
 
 		if ( '' === $role ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -481,13 +481,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$user = $this->fetchUserInfo( $userId );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -497,13 +497,13 @@ final class UserWordPressService {
 		$email = WordPressActionHelper::str( $config, 'user_email' );
 
 		if ( '' === $email ) {
-			return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User email is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$user = $this->fetchUserByField( 'email', $email );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -514,17 +514,17 @@ final class UserWordPressService {
 		$fieldValue = WordPressActionHelper::str( $config, 'field_value' );
 
 		if ( '' === $fieldKey ) {
-			return WordPressActionHelper::fail( __( 'Field is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Field is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $fieldValue ) {
-			return WordPressActionHelper::fail( __( 'Field value is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Field value is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$user = $this->fetchUserByField( $fieldKey, $fieldValue );
 
 		if ( array() === $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( $user );
@@ -534,13 +534,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$metadata = $this->fetchUserMeta( $userId );
 
 		if ( empty( $metadata ) ) {
-			return WordPressActionHelper::fail( __( 'User metadata not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User metadata not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( $metadata );
@@ -551,17 +551,17 @@ final class UserWordPressService {
 		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $metaKey ) {
-			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$metadata = $this->fetchUserMeta( $userId, $metaKey, true );
 
 		if ( '' === $metadata ) {
-			return WordPressActionHelper::fail( __( 'User metadata not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User metadata not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( $metaKey => $metadata ) );
@@ -571,17 +571,17 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! current_user_can( 'edit_user', $userId ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Updating user metadata requires the edit_user capability for the target user. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Updating user metadata requires the edit_user capability for the target user. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		if ( ! get_user_by( 'ID', $userId ) ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$metadataMap = WordPressActionHelper::keyValue( $config, 'metadata' );
@@ -590,7 +590,7 @@ final class UserWordPressService {
 			$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 			if ( '' === $metaKey ) {
-				return WordPressActionHelper::fail( __( 'Metadata is required.', 'dragwyb-visual-automation' ) );
+				return WordPressActionHelper::fail( __( 'Metadata is required.', 'dragwyb-ai-agent-workflows' ) );
 			}
 
 			$metadataMap[ $metaKey ] = $config['meta_value'] ?? '';
@@ -612,7 +612,7 @@ final class UserWordPressService {
 	public function createRole( array $config ): array {
 		if ( ! current_user_can( 'promote_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Creating roles requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Creating roles requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -621,15 +621,15 @@ final class UserWordPressService {
 		$capabilities    = WordPressActionHelper::parseCapabilities( $config['role_capabilities'] ?? array() );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( 'administrator' === sanitize_key( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Creating an administrator role via workflows is not allowed.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Creating an administrator role via workflows is not allowed.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $roleDisplayName ) {
-			return WordPressActionHelper::fail( __( 'Role display name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role display name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$cap_error = $this->validateAssignableCapabilities( $capabilities );
@@ -640,7 +640,7 @@ final class UserWordPressService {
 		$role = add_role( $roleName, $roleDisplayName, $capabilities );
 
 		if ( null === $role ) {
-			return WordPressActionHelper::fail( __( 'Role already exists.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role already exists.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -655,22 +655,22 @@ final class UserWordPressService {
 	public function deleteRole( array $config ): array {
 		if ( ! current_user_can( 'promote_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Deleting roles requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Deleting roles requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( 'administrator' === sanitize_key( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Deleting the administrator role via workflows is not allowed.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Deleting the administrator role via workflows is not allowed.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! wp_roles()->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		remove_role( $roleName );
@@ -681,26 +681,26 @@ final class UserWordPressService {
 	public function manageUserRole( array $config, bool $remove = false, bool $update = false ): array {
 		if ( ! current_user_can( 'promote_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Changing user roles requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Changing user roles requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$roles = WordPressActionHelper::parseList( $config['user_role'] ?? array() );
 
 		if ( array() === $roles ) {
-			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User role is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		foreach ( $roles as $index => $role ) {
@@ -756,13 +756,13 @@ final class UserWordPressService {
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$wpRoles = wp_roles();
 
 		if ( ! $wpRoles || ! $wpRoles->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$role = $wpRoles->get_role( $roleName );
@@ -773,36 +773,36 @@ final class UserWordPressService {
 	public function manageRoleCapabilities( array $config, bool $remove = false ): array {
 		if ( ! current_user_can( 'promote_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Changing role capabilities requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Changing role capabilities requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		$roleName = WordPressActionHelper::str( $config, 'role_name' );
 
 		if ( '' === $roleName ) {
-			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( 'administrator' === sanitize_key( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Modifying administrator capabilities via workflows is not allowed.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Modifying administrator capabilities via workflows is not allowed.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$wpRoles = wp_roles();
 
 		if ( ! $wpRoles || ! $wpRoles->is_role( $roleName ) ) {
-			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$role = $wpRoles->get_role( $roleName );
 
 		if ( ! $role ) {
-			return WordPressActionHelper::fail( __( 'Role object unavailable.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Role object unavailable.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$capabilities = WordPressActionHelper::parseList( $config['role_capabilities'] ?? array() );
 
 		if ( array() === $capabilities ) {
-			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$cap_map = array();
@@ -835,13 +835,13 @@ final class UserWordPressService {
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( $user->allcaps );
@@ -850,26 +850,26 @@ final class UserWordPressService {
 	public function manageUserCapabilities( array $config, bool $remove = false ): array {
 		if ( ! current_user_can( 'promote_users' ) ) {
 			return WordPressActionHelper::fail(
-				__( 'Changing user capabilities requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-visual-automation' )
+				__( 'Changing user capabilities requires the promote_users capability. This action cannot run from unauthenticated public triggers.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		$userId = WordPressActionHelper::int( $config, 'user_id' );
 
 		if ( $userId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$user = get_userdata( $userId );
 
 		if ( ! $user ) {
-			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'User not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$capabilities = WordPressActionHelper::parseList( $config['role_capabilities'] ?? array() );
 
 		if ( array() === $capabilities ) {
-			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Capabilities are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$cap_map = array();

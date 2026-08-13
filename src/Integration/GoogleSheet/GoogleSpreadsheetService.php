@@ -46,7 +46,7 @@ final class GoogleSpreadsheetService {
 		if ( ! is_string( $payload ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the spreadsheet payload.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Failed to encode the spreadsheet payload.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

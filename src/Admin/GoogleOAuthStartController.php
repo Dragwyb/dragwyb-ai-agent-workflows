@@ -47,14 +47,14 @@ class GoogleOAuthStartController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) && ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-visual-automation' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-ai-agent-workflows' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified below.
 		$connection_id = isset( $_GET['connection_id'] ) ? absint( wp_unslash( $_GET['connection_id'] ) ) : 0;
 
 		if ( $connection_id <= 0 ) {
-			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-visual-automation' ) );
+			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		check_admin_referer( 'dragwyb_af_google_oauth_authorize_' . $connection_id );
@@ -62,7 +62,7 @@ class GoogleOAuthStartController {
 		$connection = $this->connections->find( $connection_id );
 
 		if ( null === $connection || ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
-			$this->redirectWithError( $connection_id, __( 'This connection is not configured for Google OAuth.', 'dragwyb-visual-automation' ) );
+			$this->redirectWithError( $connection_id, __( 'This connection is not configured for Google OAuth.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		try {

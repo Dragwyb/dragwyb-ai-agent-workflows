@@ -96,7 +96,7 @@ final class ListTableUi {
 			echo '</select>';
 		}
 
-		submit_button( __( 'Filter', 'dragwyb-visual-automation' ), 'secondary', 'filter_action', false );
+		submit_button( __( 'Filter', 'dragwyb-ai-agent-workflows' ), 'secondary', 'filter_action', false );
 		echo '</div>';
 	}
 

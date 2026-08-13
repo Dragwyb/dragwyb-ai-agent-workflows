@@ -33,14 +33,14 @@ class WpFormsSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'WPForms Submitted', 'dragwyb-visual-automation' );
+		return __( 'WPForms Submitted', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when a WPForms form is submitted.', 'dragwyb-visual-automation' );
+		return __( 'Starts the workflow when a WPForms form is submitted.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class WpFormsSubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'string',
-				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '',
 			),
 		);

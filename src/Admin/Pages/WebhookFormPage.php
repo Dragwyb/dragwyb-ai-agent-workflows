@@ -54,14 +54,14 @@ class WebhookFormPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Webhook', 'dragwyb-visual-automation' );
+		return __( 'Webhook', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Webhook', 'dragwyb-visual-automation' );
+		return __( 'Webhook', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -95,7 +95,7 @@ class WebhookFormPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which webhook to edit.
@@ -108,16 +108,16 @@ class WebhookFormPage implements AdminPage {
 			$webhook = $this->webhooks->find( $webhook_id );
 
 			if ( null === $webhook ) {
-				echo '<div class="notice notice-error"><p>' . esc_html__( 'That webhook does not exist.', 'dragwyb-visual-automation' ) . '</p></div>';
+				echo '<div class="notice notice-error"><p>' . esc_html__( 'That webhook does not exist.', 'dragwyb-ai-agent-workflows' ) . '</p></div>';
 				echo '</div>';
 
 				return;
 			}
 
-			echo '<h1>' . esc_html__( 'Edit Webhook', 'dragwyb-visual-automation' ) . '</h1>';
+			echo '<h1>' . esc_html__( 'Edit Webhook', 'dragwyb-ai-agent-workflows' ) . '</h1>';
 			$this->renderEditForm( $webhook );
 		} else {
-			echo '<h1>' . esc_html__( 'Add New Webhook', 'dragwyb-visual-automation' ) . '</h1>';
+			echo '<h1>' . esc_html__( 'Add New Webhook', 'dragwyb-ai-agent-workflows' ) . '</h1>';
 			$this->renderCreateForm();
 		}
 
@@ -131,7 +131,7 @@ class WebhookFormPage implements AdminPage {
 		printf(
 			'<p><a href="%1$s">&larr; %2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=' . WebhooksPage::SLUG ) ),
-			esc_html__( 'Back to Webhooks', 'dragwyb-visual-automation' )
+			esc_html__( 'Back to Webhooks', 'dragwyb-ai-agent-workflows' )
 		);
 	}
 
@@ -152,7 +152,7 @@ class WebhookFormPage implements AdminPage {
 		$this->renderIpAllowListRow( array() );
 		echo '</tbody></table>';
 
-		submit_button( __( 'Create Webhook', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Create Webhook', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 	}
 
@@ -166,7 +166,7 @@ class WebhookFormPage implements AdminPage {
 		$secret_display  = $this->webhooks->displaySigningSecret( $webhook );
 		$webhook_id      = (int) $webhook->id();
 
-		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'dragwyb-visual-automation' ) . ' <code class="dragwyb-af-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
+		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'dragwyb-ai-agent-workflows' ) . ' <code class="dragwyb-af-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-webhook-form">';
 		echo '<input type="hidden" name="action" value="dragwyb_af_webhook_action" />';
@@ -180,7 +180,7 @@ class WebhookFormPage implements AdminPage {
 		$this->renderIpAllowListRow( $webhook->ipAllowList() );
 		echo '</tbody></table>';
 
-		submit_button( __( 'Update Webhook', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Update Webhook', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 	}
 
@@ -197,9 +197,9 @@ class WebhookFormPage implements AdminPage {
 			)
 		);
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-workflow">' . esc_html__( 'Workflow', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-workflow">' . esc_html__( 'Workflow', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		echo '<select name="workflow_id" id="dragwyb-af-webhook-workflow" required>';
-		echo '<option value="">' . esc_html__( 'Select a workflow…', 'dragwyb-visual-automation' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'Select a workflow…', 'dragwyb-ai-agent-workflows' ) . '</option>';
 
 		foreach ( $workflows['items'] as $workflow ) {
 			$workflow_id = (int) $workflow->id();
@@ -210,12 +210,12 @@ class WebhookFormPage implements AdminPage {
 				esc_html( $workflow->title() ),
 				Workflow::STATUS_ACTIVE === $workflow->status()
 					? ''
-					: ' ' . esc_html__( '(inactive — activate it before callers can use this webhook)', 'dragwyb-visual-automation' )
+					: ' ' . esc_html__( '(inactive — activate it before callers can use this webhook)', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Only active workflows run when the webhook is called. Draft or paused workflows return an error to the caller.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Only active workflows run when the webhook is called. Draft or paused workflows return an error to the caller.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -226,12 +226,12 @@ class WebhookFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderSigningSecretRow( ?array $secret_display, bool $require_signing ): void {
-		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-signing-secret">' . esc_html__( 'Signing secret', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-signing-secret">' . esc_html__( 'Signing secret', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 
 		if ( null !== $secret_display && $secret_display['configured'] ) {
 			printf(
 				'<p class="dragwyb-af-webhook-current-value">%1$s <code>%2$s</code></p>',
-				esc_html__( 'Currently set:', 'dragwyb-visual-automation' ),
+				esc_html__( 'Currently set:', 'dragwyb-ai-agent-workflows' ),
 				esc_html( $secret_display['display'] )
 			);
 		}
@@ -242,17 +242,17 @@ class WebhookFormPage implements AdminPage {
 		);
 
 		if ( null === $secret_display ) {
-			echo '<p class="description">' . esc_html__( 'Optional. When set, callers must send an X-dragwyb-af-Signature header (sha256=… HMAC of the raw body). Leave blank for an unsigned webhook.', 'dragwyb-visual-automation' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Optional. When set, callers must send an X-dragwyb-af-Signature header (sha256=… HMAC of the raw body). Leave blank for an unsigned webhook.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		} else {
-			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current secret. Enter a new value to rotate it.', 'dragwyb-visual-automation' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current secret. Enter a new value to rotate it.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 
 			if ( ! $require_signing && $secret_display['configured'] ) {
-				echo '<p><label><input type="checkbox" name="clear_signing_secret" value="1" /> ' . esc_html__( 'Remove signing secret', 'dragwyb-visual-automation' ) . '</label></p>';
+				echo '<p><label><input type="checkbox" name="clear_signing_secret" value="1" /> ' . esc_html__( 'Remove signing secret', 'dragwyb-ai-agent-workflows' ) . '</label></p>';
 			}
 		}
 
 		if ( $require_signing ) {
-			echo '<p class="description"><strong>' . esc_html__( 'Site settings require a signing secret on every webhook.', 'dragwyb-visual-automation' ) . '</strong></p>';
+			echo '<p class="description"><strong>' . esc_html__( 'Site settings require a signing secret on every webhook.', 'dragwyb-ai-agent-workflows' ) . '</strong></p>';
 		}
 
 		echo '</td></tr>';
@@ -264,12 +264,12 @@ class WebhookFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderIpAllowListRow( array $ip_allow_list ): void {
-		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-ip-allow-list">' . esc_html__( 'IP allow-list', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-webhook-ip-allow-list">' . esc_html__( 'IP allow-list', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
 			'<textarea name="ip_allow_list" id="dragwyb-af-webhook-ip-allow-list" class="large-text code" rows="4" cols="50">%s</textarea>',
 			esc_textarea( implode( "\n", $ip_allow_list ) )
 		);
-		echo '<p class="description">' . esc_html__( 'Optional. One IPv4/IPv6 address or IPv4 CIDR (e.g. 203.0.113.0/24) per line. Leave empty to accept requests from any IP.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Optional. One IPv4/IPv6 address or IPv4 CIDR (e.g. 203.0.113.0/24) per line. Leave empty to accept requests from any IP.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 	}
 }

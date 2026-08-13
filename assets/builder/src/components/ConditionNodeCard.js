@@ -140,7 +140,7 @@ export default function ConditionNodeCard({
 			activeBranchDrag?.conditionNodeId === node.id &&
 			activeBranchDrag?.branchId === branchId;
 		const targetLabel = targetId
-			? nodesById[targetId]?.label || __('Connected', 'dragwyb-visual-automation')
+			? nodesById[targetId]?.label || __('Connected', 'dragwyb-ai-agent-workflows')
 			: '';
 
 		return (
@@ -160,7 +160,7 @@ export default function ConditionNodeCard({
 							onDisconnectBranch(node.id, branchId);
 						}}
 					>
-						{__('×', 'dragwyb-visual-automation')}
+						{__('×', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				)}
 				<button
@@ -175,13 +175,13 @@ export default function ConditionNodeCard({
 					data-branch-id={branchId}
 					title={__(
 						'Drag this port to any step on the canvas (each condition can connect to a different step)',
-						'dragwyb-visual-automation'
+						'dragwyb-ai-agent-workflows'
 					)}
 					aria-label={sprintf(
 						/* translators: %s: condition branch label */
 						__(
 							'Drag to connect branch: %s',
-							'dragwyb-visual-automation'
+							'dragwyb-ai-agent-workflows'
 						),
 						branchLabel
 					)}
@@ -202,7 +202,7 @@ export default function ConditionNodeCard({
 
 		const branchId = row.id;
 		const targetId = row.node_id || '';
-		const branchLabel = row.label || __('Untitled Condition', 'dragwyb-visual-automation');
+		const branchLabel = row.label || __('Untitled Condition', 'dragwyb-ai-agent-workflows');
 
 		return (
 			<div key={branchId} className="dragwyb-af-condition-node__row">
@@ -225,7 +225,7 @@ export default function ConditionNodeCard({
 								onSelect(node.id);
 							}}
 						>
-							{__('Edit', 'dragwyb-visual-automation')}
+							{__('Edit', 'dragwyb-ai-agent-workflows')}
 						</Button>
 						<Button
 							variant="link"
@@ -236,7 +236,7 @@ export default function ConditionNodeCard({
 								onRemoveCondition(node.id, row.id);
 							}}
 						>
-							{__('Remove', 'dragwyb-visual-automation')}
+							{__('Remove', 'dragwyb-ai-agent-workflows')}
 						</Button>
 					</div>
 				)}
@@ -284,12 +284,12 @@ export default function ConditionNodeCard({
 					</span>
 					<div className="dragwyb-af-condition-node__header-text">
 						<span className="dragwyb-af-condition-node__title">
-							{__('Condition', 'dragwyb-visual-automation')}
+							{__('Condition', 'dragwyb-ai-agent-workflows')}
 						</span>
 						<span className="dragwyb-af-condition-node__subtitle">
 							{__(
 								'Each orange port connects to a different step — drag one port per branch',
-								'dragwyb-visual-automation'
+								'dragwyb-ai-agent-workflows'
 							)}
 						</span>
 					</div>
@@ -313,10 +313,10 @@ export default function ConditionNodeCard({
 											event.stopPropagation();
 											onAddCondition(node.id, index + 1);
 										}}
-										title={__('Add condition', 'dragwyb-visual-automation')}
+										title={__('Add condition', 'dragwyb-ai-agent-workflows')}
 										aria-label={__(
 											'Add condition',
-											'dragwyb-visual-automation'
+											'dragwyb-ai-agent-workflows'
 										)}
 									>
 										+
@@ -343,8 +343,8 @@ export default function ConditionNodeCard({
 								event.stopPropagation();
 								onAddCondition(node.id, rows.length);
 							}}
-							title={__('Add condition', 'dragwyb-visual-automation')}
-							aria-label={__('Add condition', 'dragwyb-visual-automation')}
+							title={__('Add condition', 'dragwyb-ai-agent-workflows')}
+							aria-label={__('Add condition', 'dragwyb-ai-agent-workflows')}
 						>
 							+
 						</button>
@@ -358,13 +358,13 @@ export default function ConditionNodeCard({
 						<div className="dragwyb-af-condition-node__row-main">
 							<span className="dragwyb-af-condition-node__row-index">∅</span>
 							<span className="dragwyb-af-condition-node__row-label">
-								{__('No Condition Matched', 'dragwyb-visual-automation')}
+								{__('No Condition Matched', 'dragwyb-ai-agent-workflows')}
 							</span>
 						</div>
 						{renderBranchPort(
 							'default',
 							defaultTargetId,
-							__('No Condition Matched', 'dragwyb-visual-automation')
+							__('No Condition Matched', 'dragwyb-ai-agent-workflows')
 						)}
 					</div>
 				</div>

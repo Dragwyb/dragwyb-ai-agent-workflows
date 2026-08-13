@@ -258,30 +258,30 @@ export default function TokenField({
 	const popover =
 		pickerOpen && hasVariables && popoverPos
 			? createPortal(
-					<div
-						ref={popoverRef}
-						className="dragwyb-af-token-field__popover"
-						style={{
-							position: 'fixed',
-							top: `${popoverPos.top}px`,
-							left: `${popoverPos.left}px`,
-							width: `${popoverPos.width}px`,
-							height: `${popoverPos.maxHeight}px`,
-							maxHeight: `${popoverPos.maxHeight}px`,
-						}}
-					>
-						<VariablePicker
-							sources={variableSources}
-							nodeLabels={nodeLabels}
-							onSelect={insertToken}
-							onClose={() => setPickerOpen(false)}
-							embedded
-							popover
-							showSearch
-						/>
-					</div>,
-					document.body
-			  )
+				<div
+					ref={popoverRef}
+					className="dragwyb-af-token-field__popover"
+					style={{
+						position: 'fixed',
+						top: `${popoverPos.top}px`,
+						left: `${popoverPos.left}px`,
+						width: `${popoverPos.width}px`,
+						height: `${popoverPos.maxHeight}px`,
+						maxHeight: `${popoverPos.maxHeight}px`,
+					}}
+				>
+					<VariablePicker
+						sources={variableSources}
+						nodeLabels={nodeLabels}
+						onSelect={insertToken}
+						onClose={() => setPickerOpen(false)}
+						embedded
+						popover
+						showSearch
+					/>
+				</div>,
+				document.body
+			)
 			: null;
 
 	return (
@@ -308,7 +308,7 @@ export default function TokenField({
 						className="dragwyb-af-token-field__insert"
 						onClick={openPicker}
 					>
-						{__('Insert variable', 'dragwyb-visual-automation')}
+						{__('Insert variable', 'dragwyb-ai-agent-workflows')}
 					</button>
 				)}
 			</div>
@@ -331,7 +331,7 @@ export default function TokenField({
 				<p className="dragwyb-af-token-field__hint">
 					{__(
 						'Add steps above this node, or use Test Flow → Listen to load trigger variables.',
-						'dragwyb-visual-automation'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}

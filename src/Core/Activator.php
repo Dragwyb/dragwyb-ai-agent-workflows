@@ -42,7 +42,7 @@ class Activator {
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
-				esc_html__( 'Plugin activation error', 'dragwyb-visual-automation' ),
+				esc_html__( 'Plugin activation error', 'dragwyb-ai-agent-workflows' ),
 				array( 'back_link' => true )
 			);
 		}

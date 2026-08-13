@@ -92,7 +92,7 @@ class ConnectionVerifier {
 
 			return array(
 				'success' => false,
-				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Credentials are incomplete — cannot verify this connection.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -229,7 +229,7 @@ class ConnectionVerifier {
 				? (string) $result['error']
 				: sprintf(
 					/* translators: %s: third-party service name */
-					__( 'Could not verify credentials with %s.', 'dragwyb-visual-automation' ),
+					__( 'Could not verify credentials with %s.', 'dragwyb-ai-agent-workflows' ),
 					$service
 				),
 		);

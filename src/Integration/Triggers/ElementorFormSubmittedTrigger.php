@@ -44,14 +44,14 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Elementor Form Submitted', 'dragwyb-visual-automation' );
+		return __( 'Elementor Form Submitted', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when an Elementor Pro form is submitted.', 'dragwyb-visual-automation' );
+		return __( 'Starts the workflow when an Elementor Pro form is submitted.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -61,12 +61,12 @@ class ElementorFormSubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'select',
-				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Form (optional — leave empty for all forms)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '',
 				'options' => array(
 					array(
 						'value' => '',
-						'label' => __( 'All forms', 'dragwyb-visual-automation' ),
+						'label' => __( 'All forms', 'dragwyb-ai-agent-workflows' ),
 					),
 				),
 			),

@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WorkflowImportExport {
 
-	public const FORMAT = 'dragwyb-visual-automation';
+	public const FORMAT = 'dragwyb-ai-agent-workflows';
 
 	public const FORMAT_VERSION = 1;
 
@@ -92,7 +92,7 @@ class WorkflowImportExport {
 
 		if ( '' === $json ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'The import file is empty.', 'dragwyb-visual-automation' )
+				esc_html__( 'The import file is empty.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -100,13 +100,13 @@ class WorkflowImportExport {
 
 		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'The import file is not valid JSON.', 'dragwyb-visual-automation' )
+				esc_html__( 'The import file is not valid JSON.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
 		if ( self::isList( $decoded ) ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'The import file must be a workflow JSON object, not an array.', 'dragwyb-visual-automation' )
+				esc_html__( 'The import file must be a workflow JSON object, not an array.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -125,7 +125,7 @@ class WorkflowImportExport {
 	public static function parseImportPayload( array $payload ): array {
 		if ( self::looksLikeN8n( $payload ) ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'This file looks like an n8n workflow. Import a Dragwyb AI Agent Workflows JSON export instead.', 'dragwyb-visual-automation' )
+				esc_html__( 'This file looks like an n8n workflow. Import a Dragwyb AI Agent Workflows JSON export instead.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -138,7 +138,7 @@ class WorkflowImportExport {
 		}
 
 		if ( '' === $title ) {
-			$title = __( 'Imported workflow', 'dragwyb-visual-automation' );
+			$title = __( 'Imported workflow', 'dragwyb-ai-agent-workflows' );
 		}
 
 		$graph = self::extractGraph( $payload );
@@ -147,7 +147,7 @@ class WorkflowImportExport {
 
 		if ( array() === $graph['nodes'] && ! $has_graph_keys ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'This JSON does not look like a workflow definition.', 'dragwyb-visual-automation' )
+				esc_html__( 'This JSON does not look like a workflow definition.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -204,7 +204,7 @@ class WorkflowImportExport {
 		// n8n-style connection maps are objects keyed by node name — reject those.
 		if ( ! self::isList( $connections ) && array() !== $connections ) {
 			throw new InvalidArgumentException(
-				esc_html__( 'Unsupported connections format. Expected a Dragwyb AI Agent Workflows connections array.', 'dragwyb-visual-automation' )
+				esc_html__( 'Unsupported connections format. Expected a Dragwyb AI Agent Workflows connections array.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 

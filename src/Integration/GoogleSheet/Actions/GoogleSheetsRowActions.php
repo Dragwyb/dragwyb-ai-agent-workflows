@@ -23,11 +23,11 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Add Row', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Add Row', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Appends a row of values to a worksheet.', 'dragwyb-visual-automation' );
+		return __( 'Appends a row of values to a worksheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -38,7 +38,7 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 			'values'             => $this->valuesField(),
 			'value_input_option' => array(
 				'type'    => 'string',
-				'label'   => __( 'Value input option (USER_ENTERED or RAW)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Value input option (USER_ENTERED or RAW)', 'dragwyb-ai-agent-workflows' ),
 				'default' => 'USER_ENTERED',
 			),
 		);
@@ -64,7 +64,7 @@ final class GoogleSheetsAddRowAction extends AbstractGoogleSheetsAction {
 		if ( array() === $values ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -92,11 +92,11 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Update Row', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Update Row', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Updates an existing row in a worksheet.', 'dragwyb-visual-automation' );
+		return __( 'Updates an existing row in a worksheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -106,12 +106,12 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'row_number'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Row number (1-based)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Row number (1-based)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 			'target_range'   => array(
 				'type'    => 'string',
-				'label'   => __( 'Target range (optional, e.g. A5:E5)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Target range (optional, e.g. A5:E5)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '',
 			),
 			'values'         => $this->valuesField(),
@@ -138,7 +138,7 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -147,7 +147,7 @@ final class GoogleSheetsUpdateRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -170,11 +170,11 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Append or Update Row', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Append or Update Row', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Updates a row when a column value matches, otherwise appends a new row.', 'dragwyb-visual-automation' );
+		return __( 'Updates a row when a column value matches, otherwise appends a new row.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -184,7 +184,7 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 			'sheet_title'     => $this->sheetTitleField(),
 			'column_to_match' => array(
 				'type'    => 'string',
-				'label'   => __( 'Column to match on (letter or index, e.g. A or 0)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Column to match on (letter or index, e.g. A or 0)', 'dragwyb-ai-agent-workflows' ),
 				'default' => 'A',
 			),
 			'values'          => $this->valuesField(),
@@ -211,7 +211,7 @@ final class GoogleSheetsAppendOrUpdateRowAction extends AbstractGoogleSheetsActi
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -233,11 +233,11 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Get Row', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Get Row', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Retrieves a single row by row number.', 'dragwyb-visual-automation' );
+		return __( 'Retrieves a single row by row number.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -247,7 +247,7 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'row_number'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Row number (1-based)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Row number (1-based)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -273,7 +273,7 @@ final class GoogleSheetsGetRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -294,11 +294,11 @@ final class GoogleSheetsGetAllRowsAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Get All Rows', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Get All Rows', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Retrieves all rows from a worksheet.', 'dragwyb-visual-automation' );
+		return __( 'Retrieves all rows from a worksheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -337,11 +337,11 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Delete Row', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Delete Row', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Clears all values in a row.', 'dragwyb-visual-automation' );
+		return __( 'Clears all values in a row.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -351,7 +351,7 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'row_number'     => array(
 				'type'     => 'string',
-				'label'    => __( 'Row number (1-based)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Row number (1-based)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -377,7 +377,7 @@ final class GoogleSheetsDeleteRowAction extends AbstractGoogleSheetsAction {
 		if ( $row_number <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Row number must be greater than zero.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -398,11 +398,11 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Create Column', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Create Column', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Inserts a new column and sets its header name.', 'dragwyb-visual-automation' );
+		return __( 'Inserts a new column and sets its header name.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -412,12 +412,12 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 			'sheet_title'    => $this->sheetTitleField(),
 			'column_name'    => array(
 				'type'     => 'string',
-				'label'    => __( 'Column header name', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Column header name', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 			'column_index'   => array(
 				'type'    => 'string',
-				'label'   => __( 'Column index (1-based, leave 0 to append)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Column index (1-based, leave 0 to append)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '0',
 			),
 		);
@@ -443,7 +443,7 @@ final class GoogleSheetsCreateColumnAction extends AbstractGoogleSheetsAction {
 		if ( '' === $column_name ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Column name is required.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Column name is required.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

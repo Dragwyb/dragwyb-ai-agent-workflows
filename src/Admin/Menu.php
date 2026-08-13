@@ -76,7 +76,7 @@ class Menu {
 		// own capability so unauthorized items stay hidden.
 		$hook = add_menu_page(
 			$first->pageTitle(),
-			__( 'Dragwyb AI Agent Workflows', 'dragwyb-visual-automation' ),
+			__( 'Dragwyb AI Agent Workflows', 'dragwyb-ai-agent-workflows' ),
 			Capabilities::ACCESS,
 			$first->slug(),
 			array( $this, 'renderCurrentPage' ),
@@ -170,7 +170,7 @@ class Menu {
 			}
 		}
 
-		wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ), 403 );
+		wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ), 403 );
 	}
 
 	/**

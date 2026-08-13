@@ -97,7 +97,7 @@ class NodeTypesController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_forbidden',
-				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-visual-automation' ),
+				__( 'Sorry, you are not allowed to view node types.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -162,7 +162,7 @@ class NodeTypesController {
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
 					'dragwyb_af_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-visual-automation' ) ),
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-ai-agent-workflows' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -181,7 +181,7 @@ class NodeTypesController {
 			if ( empty( $result['success'] ) ) {
 				return new WP_Error(
 					'dragwyb_af_trigger_sample_unavailable',
-					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-visual-automation' ) ),
+					(string) ( $result['error'] ?? __( 'Sample schema unavailable.', 'dragwyb-ai-agent-workflows' ) ),
 					array( 'status' => 404 )
 				);
 			}
@@ -196,7 +196,7 @@ class NodeTypesController {
 
 		return new WP_Error(
 			'dragwyb_af_trigger_sample_unsupported',
-			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-visual-automation' ),
+			__( 'This trigger type does not provide a field schema yet. Use Test Flow → Listen to capture sample data.', 'dragwyb-ai-agent-workflows' ),
 			array( 'status' => 400 )
 		);
 	}

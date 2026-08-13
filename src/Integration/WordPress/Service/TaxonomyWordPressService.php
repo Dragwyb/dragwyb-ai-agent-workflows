@@ -25,7 +25,7 @@ final class TaxonomyWordPressService {
 		$name = WordPressActionHelper::str( $config, 'name' );
 
 		if ( '' === $name ) {
-			return WordPressActionHelper::fail( __( 'Name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$args = array();
@@ -57,7 +57,7 @@ final class TaxonomyWordPressService {
 		$termId = WordPressActionHelper::int( $config, 'term_id' );
 
 		if ( $termId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Term id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Term id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$args = array();
@@ -94,13 +94,13 @@ final class TaxonomyWordPressService {
 		$termId = WordPressActionHelper::int( $config, 'term_id' );
 
 		if ( $termId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Term id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Term id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$res = wp_delete_term( $termId, $taxonomy );
 
 		if ( is_wp_error( $res ) || ! $res ) {
-			return WordPressActionHelper::fail( is_wp_error( $res ) ? $res->get_error_message() : __( 'Failed to delete term.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( is_wp_error( $res ) ? $res->get_error_message() : __( 'Failed to delete term.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'term_id' => $termId ) );
@@ -135,13 +135,13 @@ final class TaxonomyWordPressService {
 		$taxonomy = '' !== $forcedTaxonomy ? $forcedTaxonomy : WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( $termId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Term id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Term id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$term = get_term( $termId, $taxonomy );
 
 		if ( ! $term || is_wp_error( $term ) ) {
-			return WordPressActionHelper::fail( __( 'Term not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Term not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( WordPressActionHelper::serializeTerm( $term ) );
@@ -157,17 +157,17 @@ final class TaxonomyWordPressService {
 		$taxonomy   = WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( '' === $fieldKey ) {
-			return WordPressActionHelper::fail( __( 'Field key is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Field key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $fieldValue ) {
-			return WordPressActionHelper::fail( __( 'Field value is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Field value is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$term = get_term_by( $fieldKey, $fieldValue, $taxonomy );
 
 		if ( ! $term || is_wp_error( $term ) ) {
-			return WordPressActionHelper::fail( __( 'Term not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Term not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( WordPressActionHelper::serializeTerm( $term ) );
@@ -181,7 +181,7 @@ final class TaxonomyWordPressService {
 		$taxonomy = WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( '' === $taxonomy ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $this->createTermByTax( $config, $taxonomy );
@@ -191,7 +191,7 @@ final class TaxonomyWordPressService {
 		$taxonomy = WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( '' === $taxonomy ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $this->updateTermByTax( $config, $taxonomy );
@@ -201,7 +201,7 @@ final class TaxonomyWordPressService {
 		$taxonomy = WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( '' === $taxonomy ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $this->deleteTermByTax( $config, $taxonomy );
@@ -212,18 +212,18 @@ final class TaxonomyWordPressService {
 		$tags   = WordPressActionHelper::parseList( $config['tags'] ?? array() );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( array() === $tags ) {
-			return WordPressActionHelper::fail( __( 'Tags are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Tags are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$append = WordPressActionHelper::bool( $config, 'append' );
 		$res    = wp_set_post_tags( $postId, $tags, $append );
 
 		if ( false === $res || is_wp_error( $res ) ) {
-			return WordPressActionHelper::fail( __( 'Failed to assign tags to post.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to assign tags to post.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -239,11 +239,11 @@ final class TaxonomyWordPressService {
 		$removeTags = WordPressActionHelper::parseList( $config['tags'] ?? array() );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( array() === $removeTags ) {
-			return WordPressActionHelper::fail( __( 'Tags are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Tags are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$current = wp_get_post_tags( $postId, array( 'fields' => 'names' ) );
@@ -264,11 +264,11 @@ final class TaxonomyWordPressService {
 		$cats   = WordPressActionHelper::parseList( $config['categories'] ?? array() );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( array() === $cats ) {
-			return WordPressActionHelper::fail( __( 'Categories are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Categories are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$append = WordPressActionHelper::bool( $config, 'append' );
@@ -277,7 +277,7 @@ final class TaxonomyWordPressService {
 		$res = wp_set_post_categories( $postId, $catIds, $append );
 
 		if ( false === $res || is_wp_error( $res ) ) {
-			return WordPressActionHelper::fail( __( 'Failed to assign categories to post.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to assign categories to post.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -309,13 +309,13 @@ final class TaxonomyWordPressService {
 		$slug = WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( '' === $slug ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy slug is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy slug is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$obj = get_taxonomy( $slug );
 
 		if ( ! $obj ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok(
@@ -335,15 +335,15 @@ final class TaxonomyWordPressService {
 		$postTypes = WordPressActionHelper::parseList( $config['post_types'] ?? array() );
 
 		if ( '' === $slug ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy slug is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy slug is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $name ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy name is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( array() === $postTypes ) {
-			return WordPressActionHelper::fail( __( 'Post types are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post types are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$args = array(
@@ -378,11 +378,11 @@ final class TaxonomyWordPressService {
 		$slug = WordPressActionHelper::str( $config, 'taxonomy' );
 
 		if ( '' === $slug ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy slug is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy slug is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! taxonomy_exists( $slug ) ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$res = unregister_taxonomy( $slug );
@@ -400,15 +400,15 @@ final class TaxonomyWordPressService {
 		$terms    = WordPressActionHelper::parseList( $config['terms'] ?? array() );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( array() === $terms ) {
-			return WordPressActionHelper::fail( __( 'Terms are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Terms are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$append = WordPressActionHelper::bool( $config, 'append' );
@@ -433,15 +433,15 @@ final class TaxonomyWordPressService {
 		$removeTerms = WordPressActionHelper::parseList( $config['terms'] ?? array() );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( array() === $removeTerms ) {
-			return WordPressActionHelper::fail( __( 'Terms are required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Terms are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$current = wp_get_object_terms( $postId, $taxonomy, array( 'fields' => 'slugs' ) );
@@ -470,7 +470,7 @@ final class TaxonomyWordPressService {
 		$url = WordPressActionHelper::str( $config, 'url' );
 
 		if ( '' === $url ) {
-			return WordPressActionHelper::fail( __( 'Image URL is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Image URL is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensureMediaIncludes();
@@ -517,11 +517,11 @@ final class TaxonomyWordPressService {
 		$mediaId = WordPressActionHelper::int( $config, 'media_id' );
 
 		if ( $mediaId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Media id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_post( $mediaId ) ) {
-			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensureMediaIncludes();
@@ -530,7 +530,7 @@ final class TaxonomyWordPressService {
 		$res   = wp_delete_attachment( $mediaId, $force );
 
 		if ( ! $res ) {
-			return WordPressActionHelper::fail( __( 'Failed to delete media item.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Failed to delete media item.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'media_id' => $mediaId ) );
@@ -541,15 +541,15 @@ final class TaxonomyWordPressService {
 		$title   = WordPressActionHelper::str( $config, 'title' );
 
 		if ( $mediaId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Media id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $title ) {
-			return WordPressActionHelper::fail( __( 'Title is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Title is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_post( $mediaId ) ) {
-			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$res = wp_update_post(
@@ -596,7 +596,7 @@ final class TaxonomyWordPressService {
 		$title = WordPressActionHelper::str( $config, 'title' );
 
 		if ( '' === $title ) {
-			return WordPressActionHelper::fail( __( 'Title is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Title is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$attachments = get_posts(
@@ -609,7 +609,7 @@ final class TaxonomyWordPressService {
 		);
 
 		if ( empty( $attachments ) ) {
-			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( WordPressActionHelper::serializeMedia( $attachments[0] ) );
@@ -619,13 +619,13 @@ final class TaxonomyWordPressService {
 		$mediaId = WordPressActionHelper::int( $config, 'media_id' );
 
 		if ( $mediaId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Media id is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$attachment = get_post( $mediaId );
 
 		if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
-			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( WordPressActionHelper::serializeMedia( $attachment ) );

@@ -38,7 +38,7 @@ export default function MemorySubNode({
 				🧠
 			</span>
 			<span className="dragwyb-af-memory-node__label">
-				{node.label || __('Simple Memory', 'dragwyb-visual-automation')}
+				{node.label || __('Simple Memory', 'dragwyb-ai-agent-workflows')}
 			</span>
 		</div>
 	);

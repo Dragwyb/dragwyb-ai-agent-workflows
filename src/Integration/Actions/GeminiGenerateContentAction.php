@@ -23,11 +23,11 @@ class GeminiGenerateContentAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Gemini', 'dragwyb-visual-automation' );
+		return __( 'Google Gemini', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to Google Gemini and returns the reply.', 'dragwyb-visual-automation' );
+		return __( 'Sends a prompt to Google Gemini and returns the reply.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	protected function providerSlug(): string {

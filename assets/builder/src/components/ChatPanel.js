@@ -58,25 +58,25 @@ export default function ChatPanel({
 		messages.length > 0
 			? messages
 			: initialMessages.map((content, index) => ({
-					id: `welcome-${index}`,
-					role: 'assistant',
-					content,
-			  }));
+				id: `welcome-${index}`,
+				role: 'assistant',
+				content,
+			}));
 
 	return (
-		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-visual-automation')}>
+		<aside className="dragwyb-af-builder-chat" aria-label={__('Chat', 'dragwyb-ai-agent-workflows')}>
 			<div className="dragwyb-af-builder-chat__header">
 				<div>
-					<strong>{title || __('Chat', 'dragwyb-visual-automation')}</strong>
+					<strong>{title || __('Chat', 'dragwyb-ai-agent-workflows')}</strong>
 					<p className="dragwyb-af-builder-chat__subtitle">
 						{__(
 							'Send a message to run this workflow (same as n8n’s Chat button).',
-							'dragwyb-visual-automation'
+							'dragwyb-ai-agent-workflows'
 						)}
 					</p>
 				</div>
 				<Button isSmall isSecondary onClick={onClose}>
-					{__('Close', 'dragwyb-visual-automation')}
+					{__('Close', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			</div>
 
@@ -91,7 +91,7 @@ export default function ChatPanel({
 				))}
 				{sending && (
 					<div className="dragwyb-af-builder-chat__bubble dragwyb-af-builder-chat__bubble--assistant dragwyb-af-builder-chat__bubble--pending">
-						{__('Thinking…', 'dragwyb-visual-automation')}
+						{__('Thinking…', 'dragwyb-ai-agent-workflows')}
 					</div>
 				)}
 			</div>
@@ -104,18 +104,18 @@ export default function ChatPanel({
 
 			<form className="dragwyb-af-builder-chat__composer" onSubmit={handleSubmit}>
 				<TextareaControl
-					label={__('Message', 'dragwyb-visual-automation')}
+					label={__('Message', 'dragwyb-ai-agent-workflows')}
 					hideLabelFromVision
 					value={draft}
 					onChange={setDraft}
-					placeholder={__('Type a message…', 'dragwyb-visual-automation')}
+					placeholder={__('Type a message…', 'dragwyb-ai-agent-workflows')}
 					rows={2}
 					disabled={sending}
 				/>
 				<Button isPrimary type="submit" disabled={sending || !draft.trim()}>
 					{sending
-						? __('Sending…', 'dragwyb-visual-automation')
-						: __('Send', 'dragwyb-visual-automation')}
+						? __('Sending…', 'dragwyb-ai-agent-workflows')
+						: __('Send', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			</form>
 		</aside>

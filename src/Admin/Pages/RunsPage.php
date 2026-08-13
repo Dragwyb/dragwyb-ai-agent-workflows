@@ -63,14 +63,14 @@ class RunsPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Runs', 'dragwyb-visual-automation' );
+		return __( 'Runs', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Runs', 'dragwyb-visual-automation' );
+		return __( 'Runs', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class RunsPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
@@ -123,13 +123,13 @@ class RunsPage implements AdminPage {
 
 		if ( ! $table->has_items() && ! $has_filters ) {
 			EmptyState::render(
-				__( 'No runs yet', 'dragwyb-visual-automation' ),
-				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'dragwyb-visual-automation' ),
+				__( 'No runs yet', 'dragwyb-ai-agent-workflows' ),
+				__( 'Runs appear here when a workflow executes — automatically from a trigger or webhook, or when you use Run now in the editor.', 'dragwyb-ai-agent-workflows' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
-						'label'   => __( 'Go to Workflows', 'dragwyb-visual-automation' ),
+						'label'   => __( 'Go to Workflows', 'dragwyb-ai-agent-workflows' ),
 						'primary' => true,
 					),
 				)
@@ -192,17 +192,17 @@ class RunsPage implements AdminPage {
 		}
 
 		$workflow = $this->workflows->find( $workflow_id, true );
-		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-visual-automation' );
+		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-ai-agent-workflows' );
 
 		printf(
 			'<p class="dragwyb-af-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
-				esc_html__( 'Showing runs for: %s', 'dragwyb-visual-automation' ),
+				esc_html__( 'Showing runs for: %s', 'dragwyb-ai-agent-workflows' ),
 				'<strong>' . esc_html( $name ) . '</strong>'
 			),
 			esc_url( remove_query_arg( 'workflow_id' ) ),
-			esc_html__( 'Clear filter', 'dragwyb-visual-automation' )
+			esc_html__( 'Clear filter', 'dragwyb-ai-agent-workflows' )
 		);
 	}
 
@@ -215,23 +215,23 @@ class RunsPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'deleted'       => array(
-				'message' => __( 'Run deleted.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Run deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted'  => array(
-				'message' => __( 'Selected runs deleted.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Selected runs deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'delete_failed' => array(
-				'message' => __( 'That run could not be deleted.', 'dragwyb-visual-automation' ),
+				'message' => __( 'That run could not be deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 			'action_failed' => array(
-				'message' => __( 'That run action could not be completed.', 'dragwyb-visual-automation' ),
+				'message' => __( 'That run action could not be completed.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 			'rerun_failed'  => array(
-				'message' => __( 'That run could not be re-run.', 'dragwyb-visual-automation' ),
+				'message' => __( 'That run could not be re-run.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 		);

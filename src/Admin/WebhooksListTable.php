@@ -71,17 +71,17 @@ class WebhooksListTable extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'            => '<input type="checkbox" />',
-			'public_url'    => __( 'Public URL', 'dragwyb-visual-automation' ),
-			'workflow'      => __( 'Workflow', 'dragwyb-visual-automation' ),
-			'signing'       => __( 'Signing', 'dragwyb-visual-automation' ),
-			'ip_allow_list' => __( 'IP allow-list', 'dragwyb-visual-automation' ),
-			'created_at'    => __( 'Created', 'dragwyb-visual-automation' ),
+			'public_url'    => __( 'Public URL', 'dragwyb-ai-agent-workflows' ),
+			'workflow'      => __( 'Workflow', 'dragwyb-ai-agent-workflows' ),
+			'signing'       => __( 'Signing', 'dragwyb-ai-agent-workflows' ),
+			'ip_allow_list' => __( 'IP allow-list', 'dragwyb-ai-agent-workflows' ),
+			'created_at'    => __( 'Created', 'dragwyb-ai-agent-workflows' ),
 		);
 	}
 
 	protected function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'dragwyb-visual-automation' ),
+			'delete' => __( 'Delete', 'dragwyb-ai-agent-workflows' ),
 		);
 	}
 
@@ -123,7 +123,7 @@ class WebhooksListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items() {
-		esc_html_e( 'No webhooks yet.', 'dragwyb-visual-automation' );
+		esc_html_e( 'No webhooks yet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -144,7 +144,7 @@ class WebhooksListTable extends WP_List_Table {
 			$workflow               = $this->workflows->find( $workflow_id, true );
 			$titles[ $workflow_id ] = $workflow
 				? $workflow->title()
-				: __( '(deleted workflow)', 'dragwyb-visual-automation' );
+				: __( '(deleted workflow)', 'dragwyb-ai-agent-workflows' );
 		}
 
 		return $titles;
@@ -169,7 +169,7 @@ class WebhooksListTable extends WP_List_Table {
 
 	public function filterFields(): array {
 		$options = array(
-			'0' => __( 'All workflows', 'dragwyb-visual-automation' ),
+			'0' => __( 'All workflows', 'dragwyb-ai-agent-workflows' ),
 		);
 
 		foreach ( $this->workflowFilterOptions as $id => $title ) {
@@ -179,7 +179,7 @@ class WebhooksListTable extends WP_List_Table {
 		return array(
 			array(
 				'name'    => 'workflow_id',
-				'label'   => __( 'Filter by workflow', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Filter by workflow', 'dragwyb-ai-agent-workflows' ),
 				'value'   => (string) $this->currentWorkflowFilter(),
 				'options' => $options,
 			),
@@ -212,7 +212,7 @@ class WebhooksListTable extends WP_List_Table {
 		);
 
 		$actions = array(
-			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-visual-automation' ) ),
+			'edit'   => sprintf( '<a href="%1$s">%2$s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dragwyb-ai-agent-workflows' ) ),
 			'delete' => $this->deleteForm( $item->id() ),
 		);
 
@@ -231,15 +231,15 @@ class WebhooksListTable extends WP_List_Table {
 				$workflow_id = $item->workflowId();
 
 				if ( null === $workflow_id ) {
-					return esc_html__( '(none)', 'dragwyb-visual-automation' );
+					return esc_html__( '(none)', 'dragwyb-ai-agent-workflows' );
 				}
 
-				return esc_html( $this->workflowTitles[ $workflow_id ] ?? __( '(deleted workflow)', 'dragwyb-visual-automation' ) );
+				return esc_html( $this->workflowTitles[ $workflow_id ] ?? __( '(deleted workflow)', 'dragwyb-ai-agent-workflows' ) );
 
 			case 'signing':
 				return $item->hasSigningSecret()
-					? esc_html__( 'Required', 'dragwyb-visual-automation' )
-					: esc_html__( 'Off', 'dragwyb-visual-automation' );
+					? esc_html__( 'Required', 'dragwyb-ai-agent-workflows' )
+					: esc_html__( 'Off', 'dragwyb-ai-agent-workflows' );
 
 			case 'ip_allow_list':
 				$count = count( $item->ipAllowList() );
@@ -248,11 +248,11 @@ class WebhooksListTable extends WP_List_Table {
 					? esc_html(
 						sprintf(
 						/* translators: %d: number of allowed IPs/CIDRs. */
-							_n( '%d entry', '%d entries', $count, 'dragwyb-visual-automation' ),
+							_n( '%d entry', '%d entries', $count, 'dragwyb-ai-agent-workflows' ),
 							$count
 						)
 					)
-					: esc_html__( 'Any IP', 'dragwyb-visual-automation' );
+					: esc_html__( 'Any IP', 'dragwyb-ai-agent-workflows' );
 
 			case 'created_at':
 				return esc_html( RunTimestamp::format( $item->createdAt(), $this->settings ) );
@@ -300,7 +300,7 @@ class WebhooksListTable extends WP_List_Table {
 			$nonce_field
 		);
 
-		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'dragwyb-visual-automation' ) );
+		return $this->rowForms->registerButton( $form_id, $form_markup, __( 'Delete', 'dragwyb-ai-agent-workflows' ) );
 	}
 
 	private function currentWorkflowFilter(): int {

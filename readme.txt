@@ -69,7 +69,7 @@ The HTTP Request action sends the method, headers, and body you configure to a U
 
 == Installation ==
 
-1. Upload the plugin folder to `/wp-content/plugins/dragwyb-visual-automation`, or install the ZIP from Plugins → Add New.
+1. Upload the plugin folder to `/wp-content/plugins/dragwyb-ai-agent-workflows`, or install the ZIP from Plugins → Add New.
 2. Activate **Dragwyb AI Agent Workflows**.
 3. Open **Automation → Workflows** to create your first workflow.
 

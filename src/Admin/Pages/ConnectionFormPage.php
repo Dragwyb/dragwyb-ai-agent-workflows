@@ -65,14 +65,14 @@ class ConnectionFormPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Connection', 'dragwyb-visual-automation' );
+		return __( 'Connection', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Connection', 'dragwyb-visual-automation' );
+		return __( 'Connection', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -106,7 +106,7 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which connection to load/create; the admin-post controller this feeds still re-checks capability and nonce on every write.
@@ -120,14 +120,14 @@ class ConnectionFormPage implements AdminPage {
 
 			if ( null === $connection ) {
 				echo '<h1>' . esc_html( $this->pageTitle() ) . '</h1>';
-				echo '<p>' . esc_html__( 'That connection no longer exists.', 'dragwyb-visual-automation' ) . '</p>';
+				echo '<p>' . esc_html__( 'That connection no longer exists.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 				$this->renderBackLink();
 				echo '</div>';
 
 				return;
 			}
 
-			echo '<h1>' . esc_html__( 'Edit Connection', 'dragwyb-visual-automation' ) . '</h1>';
+			echo '<h1>' . esc_html__( 'Edit Connection', 'dragwyb-ai-agent-workflows' ) . '</h1>';
 			$this->renderBackLink();
 			$this->renderEditForm( $connection );
 			echo '</div>';
@@ -138,7 +138,7 @@ class ConnectionFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only step-1-to-step-2 selector for this GET-only "choose a type" screen; nothing is written until the real POST form in renderCreateForm() below.
 		$auth_type = isset( $_GET['auth_type'] ) ? sanitize_key( wp_unslash( $_GET['auth_type'] ) ) : '';
 
-		echo '<h1>' . esc_html__( 'Add New Connection', 'dragwyb-visual-automation' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Add New Connection', 'dragwyb-ai-agent-workflows' ) . '</h1>';
 		$this->renderBackLink();
 
 		if ( in_array( $auth_type, ConnectionAuthTypes::VALID, true ) ) {
@@ -166,7 +166,7 @@ class ConnectionFormPage implements AdminPage {
 		printf(
 			'<p><a href="%1$s">&larr; %2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ) ),
-			esc_html__( 'Back to Connections', 'dragwyb-visual-automation' )
+			esc_html__( 'Back to Connections', 'dragwyb-ai-agent-workflows' )
 		);
 	}
 
@@ -182,16 +182,16 @@ class ConnectionFormPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		echo '<input type="text" id="dragwyb-af-connection-integration" name="integration_slug" class="regular-text" required="required" />';
-		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		echo '<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" required="required" />';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		echo '<select id="dragwyb-af-connection-auth-type" name="auth_type">';
 		foreach ( ConnectionAuthTypes::VALID as $auth_type ) {
 			printf(
@@ -204,7 +204,7 @@ class ConnectionFormPage implements AdminPage {
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
-		submit_button( __( 'Continue', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Continue', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 	}
 
@@ -226,21 +226,21 @@ class ConnectionFormPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-integration">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
 			'<input type="text" id="dragwyb-af-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
 			esc_attr( $integration_slug )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
 			'<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $label )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $auth_type ) ) . '</p>';
 		echo '</td></tr>';
 
@@ -253,7 +253,7 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</tbody></table>';
-		submit_button( __( 'Create Connection', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Create Connection', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 	}
 
@@ -273,15 +273,15 @@ class ConnectionFormPage implements AdminPage {
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Integration', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		echo '<p>' . esc_html( $connection->integrationSlug() ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authentication type', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $connection->authType() ) ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-visual-automation' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragwyb-af-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
 			'<input type="text" id="dragwyb-af-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $connection->label() )
@@ -303,17 +303,17 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		echo '</tbody></table>';
-		submit_button( __( 'Save Connection', 'dragwyb-visual-automation' ) );
+		submit_button( __( 'Save Connection', 'dragwyb-ai-agent-workflows' ) );
 		echo '</form>';
 
-		echo '<h2>' . esc_html__( 'Delete Connection', 'dragwyb-visual-automation' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Delete Connection', 'dragwyb-ai-agent-workflows' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragwyb-af-settings-form dragwyb-af-settings-danger-zone">';
 		echo '<input type="hidden" name="action" value="dragwyb_af_connection_action" />';
 		echo '<input type="hidden" name="op" value="delete" />';
 		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
 		wp_nonce_field( 'dragwyb_af_connection_action_delete_' . $connection->id() );
-		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'dragwyb-visual-automation' ) . '</p>';
-		submit_button( __( 'Delete Connection', 'dragwyb-visual-automation' ), 'delete' );
+		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'dragwyb-ai-agent-workflows' ) . '</p>';
+		submit_button( __( 'Delete Connection', 'dragwyb-ai-agent-workflows' ), 'delete' );
 		echo '</form>';
 	}
 
@@ -338,7 +338,7 @@ class ConnectionFormPage implements AdminPage {
 		if ( $configured ) {
 			echo '<p class="description dragwyb-af-connection-current-value">' . sprintf(
 				/* translators: %s: masked or otherwise safe-to-display current value. */
-				esc_html__( 'Currently set: %s', 'dragwyb-visual-automation' ),
+				esc_html__( 'Currently set: %s', 'dragwyb-ai-agent-workflows' ),
 				'<code>' . esc_html( $current ) . '</code>'
 			) . '</p>';
 		}
@@ -352,7 +352,7 @@ class ConnectionFormPage implements AdminPage {
 		);
 
 		if ( $configured ) {
-			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current value.', 'dragwyb-visual-automation' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current value.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		}
 
 		echo '</td></tr>';
@@ -368,7 +368,7 @@ class ConnectionFormPage implements AdminPage {
 		echo wp_kses(
 			sprintf(
 				/* translators: %s: URL to Google Cloud Console credentials page */
-				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'dragwyb-visual-automation' ),
+				__( 'Create OAuth credentials in <a href="%s" target="_blank" rel="noopener noreferrer">Google Cloud Console</a> (APIs &amp; Services → Credentials → Create OAuth client ID → Web application). Enable the Google Sheets API and Google Drive API for your project.', 'dragwyb-ai-agent-workflows' ),
 				esc_url( GoogleOAuthService::GOOGLE_CREDENTIALS_URL )
 			),
 			array(
@@ -390,12 +390,12 @@ class ConnectionFormPage implements AdminPage {
 	private function renderOAuthCallbackRow(): void {
 		$callback = $this->google_oauth->callbackUrl();
 
-		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Callback URL', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		printf(
 			'<input type="text" class="large-text code" readonly="readonly" value="%s" onclick="this.select();" />',
 			esc_attr( $callback )
 		);
-		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Add this exact URL as an Authorized redirect URI in your Google OAuth client.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -407,12 +407,12 @@ class ConnectionFormPage implements AdminPage {
 	private function renderOAuthStatusRow( Connection $connection ): void {
 		$connected = $this->google_oauth->isConnected( $connection );
 
-		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 
 		if ( $connected ) {
-			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-visual-automation' ) . '</span></p>';
+			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-ai-agent-workflows' ) . '</span></p>';
 		} else {
-			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-visual-automation' ) . '</span></p>';
+			echo '<p><span class="dragwyb-af-connection-status dragwyb-af-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-ai-agent-workflows' ) . '</span></p>';
 		}
 
 		echo '</td></tr>';
@@ -435,13 +435,13 @@ class ConnectionFormPage implements AdminPage {
 			'dragwyb_af_google_oauth_authorize_' . $connection->id()
 		);
 
-		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'dragwyb-visual-automation' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 		printf(
 			'<a href="%1$s" class="button button-primary">%2$s</a>',
 			esc_url( $url ),
-			esc_html__( 'Connect with Google', 'dragwyb-visual-automation' )
+			esc_html__( 'Connect with Google', 'dragwyb-ai-agent-workflows' )
 		);
-		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Save Client ID and Client Secret first, then connect your Google account.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -454,15 +454,15 @@ class ConnectionFormPage implements AdminPage {
 
 		$notices = array(
 			'created_oauth'   => array(
-				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Connection saved. Connect your Google account using the button below.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'oauth_connected' => array(
-				'message' => __( 'Google account connected successfully.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Google account connected successfully.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'error'           => array(
-				'message' => __( 'That connection action could not be completed.', 'dragwyb-visual-automation' ),
+				'message' => __( 'That connection action could not be completed.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 		);

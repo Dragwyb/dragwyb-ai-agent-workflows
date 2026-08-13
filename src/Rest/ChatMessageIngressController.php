@@ -110,7 +110,7 @@ class ChatMessageIngressController {
 
 			return new WP_Error(
 				'dragwyb_af_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-visual-automation' ),
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -128,7 +128,7 @@ class ChatMessageIngressController {
 
 		return new WP_Error(
 			'dragwyb_af_chat_forbidden',
-			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-visual-automation' ),
+			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-ai-agent-workflows' ),
 			array( 'status' => 401 )
 		);
 	}
@@ -151,7 +151,7 @@ class ChatMessageIngressController {
 		if ( null === $match ) {
 			return new WP_Error(
 				'dragwyb_af_chat_not_found',
-				__( 'No chat endpoint found for this ID.', 'dragwyb-visual-automation' ),
+				__( 'No chat endpoint found for this ID.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -189,7 +189,7 @@ class ChatMessageIngressController {
 		if ( ! $this->checkRateLimit( $endpoint_id ) ) {
 			return new WP_Error(
 				'dragwyb_af_chat_rate_limit_exceeded',
-				__( 'Rate limit exceeded. Please try again in a minute.', 'dragwyb-visual-automation' ),
+				__( 'Rate limit exceeded. Please try again in a minute.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 429 )
 			);
 		}
@@ -199,7 +199,7 @@ class ChatMessageIngressController {
 		if ( null === $match ) {
 			return new WP_Error(
 				'dragwyb_af_chat_not_found',
-				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-visual-automation' ),
+				__( 'No active chat endpoint found for this ID. Activate the workflow first.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -230,7 +230,7 @@ class ChatMessageIngressController {
 		if ( '' === $payload['chatInput'] ) {
 			return new WP_Error(
 				'dragwyb_af_chat_empty',
-				__( 'chatInput is required.', 'dragwyb-visual-automation' ),
+				__( 'chatInput is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 422 )
 			);
 		}
@@ -246,7 +246,7 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'captured',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Payload captured for Test Flow.', 'dragwyb-visual-automation' ),
+					'message'   => __( 'Payload captured for Test Flow.', 'dragwyb-ai-agent-workflows' ),
 				)
 			);
 		}
@@ -259,7 +259,7 @@ class ChatMessageIngressController {
 				array(
 					'status'    => 'accepted',
 					'sessionId' => $payload['sessionId'],
-					'message'   => __( 'Message accepted. The workflow will run in the background.', 'dragwyb-visual-automation' ),
+					'message'   => __( 'Message accepted. The workflow will run in the background.', 'dragwyb-ai-agent-workflows' ),
 				),
 				202
 			);
@@ -274,7 +274,7 @@ class ChatMessageIngressController {
 			}
 			return new WP_Error(
 				'dragwyb_af_chat_run_failed',
-				__( 'Chat execution failed.', 'dragwyb-visual-automation' ),
+				__( 'Chat execution failed.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 500 )
 			);
 		}

@@ -37,7 +37,7 @@ class AgentValidator {
 		if ( null === $attachments['chat_model'] ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Connect a Chat Model to the AI Agent.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Connect a Chat Model to the AI Agent.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -46,7 +46,7 @@ class AgentValidator {
 		if ( ! AiClientBootstrap::isProviderConfigured( $chat['provider'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No API key configured for the chat model. Add an API key in the Chat Model node.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -58,7 +58,7 @@ class AgentValidator {
 			if ( '' === $prompt ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'No prompt configured for the AI Agent.', 'dragwyb-visual-automation' ),
+					'error'   => __( 'No prompt configured for the AI Agent.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 		}
@@ -66,7 +66,7 @@ class AgentValidator {
 		if ( ! empty( $config['require_output_format'] ) && null === $attachments['output_parser'] ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Connect an Output Parser on the canvas when output format is required.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Connect an Output Parser on the canvas when output format is required.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -74,7 +74,7 @@ class AgentValidator {
 			if ( null === $attachments['fallback_chat_model'] ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'Connect a Fallback Chat Model when fallback is enabled.', 'dragwyb-visual-automation' ),
+					'error'   => __( 'Connect a Fallback Chat Model when fallback is enabled.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -83,7 +83,7 @@ class AgentValidator {
 			if ( ! AiClientBootstrap::isProviderConfigured( $fallback['provider'] ) ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'The fallback chat model needs a configured AI connector.', 'dragwyb-visual-automation' ),
+					'error'   => __( 'The fallback chat model needs a configured AI connector.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 		}

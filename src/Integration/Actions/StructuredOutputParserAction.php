@@ -27,37 +27,37 @@ class StructuredOutputParserAction implements ActionInterface {
 	}
 
 	public function label(): string {
-		return __( 'Structured Output Parser', 'dragwyb-visual-automation' );
+		return __( 'Structured Output Parser', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Define a JSON structure the AI Agent must return (from example or JSON Schema).', 'dragwyb-visual-automation' );
+		return __( 'Define a JSON structure the AI Agent must return (from example or JSON Schema).', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
 		return array(
 			'schema_type'            => array(
 				'type'    => 'select',
-				'label'   => __( 'Schema Type', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Schema Type', 'dragwyb-ai-agent-workflows' ),
 				'default' => 'from_json',
 				'options' => array(
 					array(
 						'value' => 'from_json',
-						'label' => __( 'Generate From JSON Example', 'dragwyb-visual-automation' ),
+						'label' => __( 'Generate From JSON Example', 'dragwyb-ai-agent-workflows' ),
 					),
 					array(
 						'value' => 'manual',
-						'label' => __( 'Define using JSON Schema', 'dragwyb-visual-automation' ),
+						'label' => __( 'Define using JSON Schema', 'dragwyb-ai-agent-workflows' ),
 					),
 				),
 			),
 			'json_example'           => array(
 				'type'      => 'string',
-				'label'     => __( 'JSON Example', 'dragwyb-visual-automation' ),
+				'label'     => __( 'JSON Example', 'dragwyb-ai-agent-workflows' ),
 				'default'   => "{\n  \"state\": \"California\",\n  \"cities\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}",
 				'multiline' => true,
 				'rows'      => 10,
-				'help'      => __( 'All properties will be required. To make them optional, use the JSON Schema schema type instead.', 'dragwyb-visual-automation' ),
+				'help'      => __( 'All properties will be required. To make them optional, use the JSON Schema schema type instead.', 'dragwyb-ai-agent-workflows' ),
 				'show_when' => array(
 					array(
 						'field'  => 'schema_type',
@@ -67,11 +67,11 @@ class StructuredOutputParserAction implements ActionInterface {
 			),
 			'json_schema'            => array(
 				'type'      => 'string',
-				'label'     => __( 'Input Schema', 'dragwyb-visual-automation' ),
+				'label'     => __( 'Input Schema', 'dragwyb-ai-agent-workflows' ),
 				'default'   => "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"state\": {\n      \"type\": \"string\"\n    },\n    \"cities\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}",
 				'multiline' => true,
 				'rows'      => 12,
-				'help'      => __( 'Use JSON Schema format. $refs syntax is not supported.', 'dragwyb-visual-automation' ),
+				'help'      => __( 'Use JSON Schema format. $refs syntax is not supported.', 'dragwyb-ai-agent-workflows' ),
 				'show_when' => array(
 					array(
 						'field'  => 'schema_type',
@@ -81,13 +81,13 @@ class StructuredOutputParserAction implements ActionInterface {
 			),
 			'auto_fix'               => array(
 				'type'    => 'boolean',
-				'label'   => __( 'Auto-Fix Format', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Auto-Fix Format', 'dragwyb-ai-agent-workflows' ),
 				'default' => true,
-				'help'    => __( 'If the reply does not match the schema, ask the connected Model to fix it once.', 'dragwyb-visual-automation' ),
+				'help'    => __( 'If the reply does not match the schema, ask the connected Model to fix it once.', 'dragwyb-ai-agent-workflows' ),
 			),
 			'customize_retry_prompt' => array(
 				'type'      => 'boolean',
-				'label'     => __( 'Customize Retry Prompt', 'dragwyb-visual-automation' ),
+				'label'     => __( 'Customize Retry Prompt', 'dragwyb-ai-agent-workflows' ),
 				'default'   => false,
 				'show_when' => array(
 					array(
@@ -98,11 +98,11 @@ class StructuredOutputParserAction implements ActionInterface {
 			),
 			'retry_prompt'           => array(
 				'type'      => 'string',
-				'label'     => __( 'Retry Prompt', 'dragwyb-visual-automation' ),
+				'label'     => __( 'Retry Prompt', 'dragwyb-ai-agent-workflows' ),
 				'default'   => '',
 				'multiline' => true,
 				'rows'      => 8,
-				'help'      => __( 'Placeholders: {instructions}, {completion}, {error}', 'dragwyb-visual-automation' ),
+				'help'      => __( 'Placeholders: {instructions}, {completion}, {error}', 'dragwyb-ai-agent-workflows' ),
 				'show_when' => array(
 					array(
 						'field'  => 'auto_fix',
@@ -168,7 +168,7 @@ class StructuredOutputParserAction implements ActionInterface {
 
 		return array(
 			'success'        => true,
-			'message'        => __( 'Structured Output Parser schema is valid. It runs with the AI Agent; Auto-Fix uses the Model connected under this node.', 'dragwyb-visual-automation' ),
+			'message'        => __( 'Structured Output Parser schema is valid. It runs with the AI Agent; Auto-Fix uses the Model connected under this node.', 'dragwyb-ai-agent-workflows' ),
 			'schema'         => $resolved['schema'],
 			'auto_fix'       => $auto_fix,
 			'auto_fix_model' => $has_model,

@@ -184,7 +184,7 @@ export default function TestDataTree({ title, data, embedded = false }) {
 
 			{!hasData ? (
 				<p className="dragwyb-af-test-io__empty">
-					{__('No data', 'dragwyb-visual-automation')}
+					{__('No data', 'dragwyb-ai-agent-workflows')}
 				</p>
 			) : (
 				<div className="dragwyb-af-test-io__tree-wrap">
@@ -201,7 +201,7 @@ export default function TestDataTree({ title, data, embedded = false }) {
 								<span className="dragwyb-af-test-io__count">
 									{sprintf(
 										/* translators: %d: number of fields */
-										__('%d items', 'dragwyb-visual-automation'),
+										__('%d items', 'dragwyb-ai-agent-workflows'),
 										itemCount
 									)}
 								</span>
@@ -273,7 +273,7 @@ function ReadOnlyBranch({ node, depth }) {
 				<span className="dragwyb-af-test-io__count">
 					{sprintf(
 						/* translators: %d: number of nested fields */
-						__('%d items', 'dragwyb-visual-automation'),
+						__('%d items', 'dragwyb-ai-agent-workflows'),
 						childCount
 					)}
 				</span>

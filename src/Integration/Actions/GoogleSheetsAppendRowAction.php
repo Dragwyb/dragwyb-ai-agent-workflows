@@ -27,11 +27,11 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Sheets Append Row', 'dragwyb-visual-automation' );
+		return __( 'Google Sheets Append Row', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Appends a row of values to a Google Sheet.', 'dragwyb-visual-automation' );
+		return __( 'Appends a row of values to a Google Sheet.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function configSchema(): array {
@@ -40,7 +40,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 			'spreadsheet_id' => $this->spreadsheetIdField(),
 			'range'          => array(
 				'type'    => 'string',
-				'label'   => __( 'Range / tab (e.g. Sheet1!A1)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'Range / tab (e.g. Sheet1!A1)', 'dragwyb-ai-agent-workflows' ),
 				'default' => 'Sheet1!A1',
 			),
 			'values'         => $this->valuesField(),
@@ -67,7 +67,7 @@ class GoogleSheetsAppendRowAction extends AbstractGoogleSheetsAction {
 		if ( '' === $values_raw ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No row values configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No row values configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

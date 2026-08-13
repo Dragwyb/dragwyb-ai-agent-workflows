@@ -41,59 +41,59 @@ export default function Palette({ triggers, actions, onOpenPicker }) {
 	return (
 		<nav
 			className="dragwyb-af-builder-palette"
-			aria-label={__('Node palette', 'dragwyb-visual-automation')}
+			aria-label={__('Node palette', 'dragwyb-ai-agent-workflows')}
 		>
 			<div className="dragwyb-af-builder-palette__search">
 				<TextControl
-					label={__('Search nodes', 'dragwyb-visual-automation')}
+					label={__('Search nodes', 'dragwyb-ai-agent-workflows')}
 					hideLabelFromVision
-					placeholder={__('Search nodes…', 'dragwyb-visual-automation')}
+					placeholder={__('Search nodes…', 'dragwyb-ai-agent-workflows')}
 					value={query}
 					onChange={setQuery}
 				/>
 			</div>
 			<PaletteSection
-				title={__('Triggers', 'dragwyb-visual-automation')}
+				title={__('Triggers', 'dragwyb-ai-agent-workflows')}
 				apps={triggerApps}
 				kind="trigger"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No triggers match your search.', 'dragwyb-visual-automation')
-						: __('No triggers are registered.', 'dragwyb-visual-automation')
+						? __('No triggers match your search.', 'dragwyb-ai-agent-workflows')
+						: __('No triggers are registered.', 'dragwyb-ai-agent-workflows')
 				}
 			/>
 			<PaletteSection
-				title={__('Agents', 'dragwyb-visual-automation')}
+				title={__('Agents', 'dragwyb-ai-agent-workflows')}
 				apps={agentApps}
 				kind="agent"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No agents match your search.', 'dragwyb-visual-automation')
-						: __('No agents are registered.', 'dragwyb-visual-automation')
+						? __('No agents match your search.', 'dragwyb-ai-agent-workflows')
+						: __('No agents are registered.', 'dragwyb-ai-agent-workflows')
 				}
 			/>
 			<PaletteSection
-				title={__('Tools', 'dragwyb-visual-automation')}
+				title={__('Tools', 'dragwyb-ai-agent-workflows')}
 				apps={toolApps}
 				kind="tool"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No tools match your search.', 'dragwyb-visual-automation')
-						: __('No tools are registered.', 'dragwyb-visual-automation')
+						? __('No tools match your search.', 'dragwyb-ai-agent-workflows')
+						: __('No tools are registered.', 'dragwyb-ai-agent-workflows')
 				}
 			/>
 			<PaletteSection
-				title={__('Actions', 'dragwyb-visual-automation')}
+				title={__('Actions', 'dragwyb-ai-agent-workflows')}
 				apps={actionApps}
 				kind="action"
 				onOpenPicker={onOpenPicker}
 				emptyMessage={
 					query
-						? __('No actions match your search.', 'dragwyb-visual-automation')
-						: __('No actions are registered.', 'dragwyb-visual-automation')
+						? __('No actions match your search.', 'dragwyb-ai-agent-workflows')
+						: __('No actions are registered.', 'dragwyb-ai-agent-workflows')
 				}
 			/>
 		</nav>
@@ -116,9 +116,9 @@ function PaletteSection({ title, apps, kind, onOpenPicker, emptyMessage }) {
 							/* translators: %s: plugin name, e.g. WooCommerce */
 							__(
 								'Activate %s to use this trigger.',
-								'dragwyb-visual-automation'
+								'dragwyb-ai-agent-workflows'
 							),
-							app.requiresPlugin || __('this plugin', 'dragwyb-visual-automation')
+							app.requiresPlugin || __('this plugin', 'dragwyb-ai-agent-workflows')
 						)
 						: '';
 

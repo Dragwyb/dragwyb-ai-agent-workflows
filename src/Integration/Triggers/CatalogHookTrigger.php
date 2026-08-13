@@ -41,10 +41,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		$hook = (string) ( $this->definition['hook_name'] ?? '' );
 
 		if ( self::isPostContentHook( $hook ) ) {
-			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'dragwyb-visual-automation' );
+			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'dragwyb-ai-agent-workflows' );
 		}
 
-		return __( 'Starts the workflow when this WordPress event fires.', 'dragwyb-visual-automation' );
+		return __( 'Starts the workflow when this WordPress event fires.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function group(): string {
@@ -81,10 +81,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		if ( self::isPostContentHook( (string) $this->definition['hook_name'] ) ) {
 			$schema['post_types'] = array(
 				'type'        => 'string',
-				'label'       => __( 'Post Types', 'dragwyb-visual-automation' ),
+				'label'       => __( 'Post Types', 'dragwyb-ai-agent-workflows' ),
 				'default'     => '',
-				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'dragwyb-visual-automation' ),
-				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'dragwyb-visual-automation' ),
+				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'dragwyb-ai-agent-workflows' ),
+				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

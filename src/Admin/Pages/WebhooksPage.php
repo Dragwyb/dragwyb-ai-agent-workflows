@@ -59,14 +59,14 @@ class WebhooksPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Webhooks', 'dragwyb-visual-automation' );
+		return __( 'Webhooks', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Webhooks', 'dragwyb-visual-automation' );
+		return __( 'Webhooks', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -100,7 +100,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-visual-automation' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$table = new WebhooksListTable( $this->webhooks, $this->workflows, $this->settings );
@@ -111,27 +111,27 @@ class WebhooksPage implements AdminPage {
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ) ),
-			esc_html__( 'Add New', 'dragwyb-visual-automation' )
+			esc_html__( 'Add New', 'dragwyb-ai-agent-workflows' )
 		);
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
 
-		echo '<p class="description">' . esc_html__( 'Public endpoints that start a workflow when an external service POSTs to them. Optional HMAC signing and IP allow-lists protect each endpoint.', 'dragwyb-visual-automation' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Public endpoints that start a workflow when an external service POSTs to them. Optional HMAC signing and IP allow-lists protect each endpoint.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 
 		if ( $this->settings->requireWebhookSigning() ) {
-			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'dragwyb-visual-automation' ) . '</p></div>';
+			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'dragwyb-ai-agent-workflows' ) . '</p></div>';
 		}
 
 		if ( ! $table->has_items() ) {
 			EmptyState::render(
-				__( 'No webhooks yet', 'dragwyb-visual-automation' ),
-				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'dragwyb-visual-automation' ),
+				__( 'No webhooks yet', 'dragwyb-ai-agent-workflows' ),
+				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'dragwyb-ai-agent-workflows' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ),
-						'label'   => __( 'Add webhook', 'dragwyb-visual-automation' ),
+						'label'   => __( 'Add webhook', 'dragwyb-ai-agent-workflows' ),
 						'primary' => true,
 					),
 				)
@@ -162,23 +162,23 @@ class WebhooksPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'created'      => array(
-				'message' => __( 'Webhook created.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Webhook created.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'updated'      => array(
-				'message' => __( 'Webhook updated.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Webhook updated.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'deleted'      => array(
-				'message' => __( 'Webhook deleted.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Webhook deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
-				'message' => __( 'Selected webhooks deleted.', 'dragwyb-visual-automation' ),
+				'message' => __( 'Selected webhooks deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'error'        => array(
-				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'dragwyb-visual-automation' ),
+				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 		);

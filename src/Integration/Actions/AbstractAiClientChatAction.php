@@ -44,12 +44,12 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		return array(
 			'api_credentials' => array(
 				'type'     => 'ai_credentials',
-				'label'    => __( 'API key', 'dragwyb-visual-automation' ),
+				'label'    => __( 'API key', 'dragwyb-ai-agent-workflows' ),
 				'provider' => $this->providerSlug(),
 			),
 			'model'           => array(
 				'type'           => 'dynamic_select',
-				'label'          => __( 'Model', 'dragwyb-visual-automation' ),
+				'label'          => __( 'Model', 'dragwyb-ai-agent-workflows' ),
 				'default'        => $this->defaultModel(),
 				'options_source' => 'ai_models',
 				'provider_field' => 'provider',
@@ -57,12 +57,12 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 			),
 			'system_prompt'   => array(
 				'type'    => 'string',
-				'label'   => __( 'System prompt (optional)', 'dragwyb-visual-automation' ),
+				'label'   => __( 'System prompt (optional)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '',
 			),
 			'prompt'          => array(
 				'type'     => 'string',
-				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -76,7 +76,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		if ( '' === $prompt ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No prompt configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No prompt configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

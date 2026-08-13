@@ -25,7 +25,7 @@ final class PluginWordPressService {
 		$file = WordPressActionHelper::str( $config, 'plugin_file' );
 
 		if ( '' === $file ) {
-			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensurePluginIncludes();
@@ -44,7 +44,7 @@ final class PluginWordPressService {
 		$file = WordPressActionHelper::str( $config, 'plugin_file' );
 
 		if ( '' === $file ) {
-			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-visual-automation' ) );
+			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensurePluginIncludes();

@@ -39,7 +39,7 @@ class ConnectionSecretResolver {
 		if ( $connection_id <= 0 ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No connection configured for this action.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No connection configured for this action.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -48,7 +48,7 @@ class ConnectionSecretResolver {
 		if ( null === $connection ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'The connection configured for this action no longer exists.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'The connection configured for this action no longer exists.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -56,7 +56,7 @@ class ConnectionSecretResolver {
 			if ( null === $this->google_oauth ) {
 				return array(
 					'success' => false,
-					'error'   => __( 'Google OAuth is not available.', 'dragwyb-visual-automation' ),
+					'error'   => __( 'Google OAuth is not available.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -78,7 +78,7 @@ class ConnectionSecretResolver {
 				if ( null === $token || '' === (string) $token ) {
 					return array(
 						'success' => false,
-						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' ),
+						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-ai-agent-workflows' ),
 					);
 				}
 
@@ -91,7 +91,7 @@ class ConnectionSecretResolver {
 				if ( null === $api_key || '' === (string) $api_key ) {
 					return array(
 						'success' => false,
-						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-visual-automation' ),
+						'error'   => __( 'Unable to decrypt this connection\'s credentials. Please re-enter them.', 'dragwyb-ai-agent-workflows' ),
 					);
 				}
 

@@ -98,12 +98,12 @@ class WorkflowTestController {
 					$this->idArgs(),
 					array(
 						'node_id' => array(
-							'description' => __( 'Client-side node id from the workflow graph.', 'dragwyb-visual-automation' ),
+							'description' => __( 'Client-side node id from the workflow graph.', 'dragwyb-ai-agent-workflows' ),
 							'type'        => 'string',
 							'required'    => true,
 						),
 						'graph'   => array(
-							'description' => __( 'Optional unsaved workflow graph (nodes + connections).', 'dragwyb-visual-automation' ),
+							'description' => __( 'Optional unsaved workflow graph (nodes + connections).', 'dragwyb-ai-agent-workflows' ),
 							'type'        => 'object',
 							'required'    => false,
 						),
@@ -119,7 +119,7 @@ class WorkflowTestController {
 	private function idArgs(): array {
 		return array(
 			'id' => array(
-				'description' => __( 'Unique identifier for the workflow.', 'dragwyb-visual-automation' ),
+				'description' => __( 'Unique identifier for the workflow.', 'dragwyb-ai-agent-workflows' ),
 				'type'        => 'integer',
 				'required'    => true,
 			),
@@ -135,7 +135,7 @@ class WorkflowTestController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_forbidden',
-				__( 'Sorry, you are not allowed to test workflows.', 'dragwyb-visual-automation' ),
+				__( 'Sorry, you are not allowed to test workflows.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -154,7 +154,7 @@ class WorkflowTestController {
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_not_found',
-				__( 'Workflow not found.', 'dragwyb-visual-automation' ),
+				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -175,7 +175,7 @@ class WorkflowTestController {
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_not_found',
-				__( 'Workflow not found.', 'dragwyb-visual-automation' ),
+				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -196,7 +196,7 @@ class WorkflowTestController {
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_not_found',
-				__( 'Workflow not found.', 'dragwyb-visual-automation' ),
+				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -215,7 +215,7 @@ class WorkflowTestController {
 		if ( null === $this->workflows->find( $id ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_not_found',
-				__( 'Workflow not found.', 'dragwyb-visual-automation' ),
+				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -239,7 +239,7 @@ class WorkflowTestController {
 		if ( null === $workflow ) {
 			return new WP_Error(
 				'dragwyb_af_rest_not_found',
-				__( 'Workflow not found.', 'dragwyb-visual-automation' ),
+				__( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -247,7 +247,7 @@ class WorkflowTestController {
 		if ( '' === $node_id ) {
 			return new WP_Error(
 				'dragwyb_af_rest_invalid_param',
-				__( 'A node id is required.', 'dragwyb-visual-automation' ),
+				__( 'A node id is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}

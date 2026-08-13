@@ -45,14 +45,14 @@ class TelegramSendMessageAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Telegram Send Message', 'dragwyb-visual-automation' );
+		return __( 'Telegram Send Message', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends a text message with a Telegram bot.', 'dragwyb-visual-automation' );
+		return __( 'Sends a text message with a Telegram bot.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -62,18 +62,18 @@ class TelegramSendMessageAction implements ActionInterface {
 		return array(
 			'connection_id' => array(
 				'type'     => 'connection',
-				'label'    => __( 'Telegram bot token connection', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Telegram bot token connection', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 				'default'  => 0,
 			),
 			'chat_id'       => array(
 				'type'     => 'string',
-				'label'    => __( 'Chat ID', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Chat ID', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 			'message'       => array(
 				'type'     => 'string',
-				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -97,14 +97,14 @@ class TelegramSendMessageAction implements ActionInterface {
 		if ( '' === $chat_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No Telegram chat ID configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No Telegram chat ID configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
 		if ( '' === trim( $message ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No message configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No message configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -120,7 +120,7 @@ class TelegramSendMessageAction implements ActionInterface {
 		if ( ! is_string( $body ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the Telegram payload.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Failed to encode the Telegram payload.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -165,7 +165,7 @@ class TelegramSendMessageAction implements ActionInterface {
 				'success'     => false,
 				'error'       => sprintf(
 					/* translators: 1: service name, 2: HTTP status, 3: error detail */
-					__( '%1$s returned HTTP %2$d: %3$s', 'dragwyb-visual-automation' ),
+					__( '%1$s returned HTTP %2$d: %3$s', 'dragwyb-ai-agent-workflows' ),
 					$service,
 					$status_code,
 					$detail
@@ -179,7 +179,7 @@ class TelegramSendMessageAction implements ActionInterface {
 				'success' => false,
 				'error'   => isset( $decoded['description'] )
 					? (string) $decoded['description']
-					: __( 'Telegram reported failure.', 'dragwyb-visual-automation' ),
+					: __( 'Telegram reported failure.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

@@ -49,16 +49,16 @@ export default function BranchConnectSidebar({
 	return (
 		<aside
 			className="dragwyb-af-builder-picker dragwyb-af-builder-picker--branch-connect"
-			aria-label={__('Connect branch to node', 'dragwyb-visual-automation')}
+			aria-label={__('Connect branch to node', 'dragwyb-ai-agent-workflows')}
 		>
 			<div className="dragwyb-af-builder-picker__header">
 				<h2 className="dragwyb-af-builder-picker__title">
-					{__('Connect branch', 'dragwyb-visual-automation')}
+					{__('Connect branch', 'dragwyb-ai-agent-workflows')}
 				</h2>
 				<Button
 					className="dragwyb-af-builder-picker__close"
 					icon="no-alt"
-					label={__('Close', 'dragwyb-visual-automation')}
+					label={__('Close', 'dragwyb-ai-agent-workflows')}
 					onClick={onClose}
 				/>
 			</div>
@@ -66,16 +66,16 @@ export default function BranchConnectSidebar({
 			<p className="dragwyb-af-builder-picker__hint">
 				{__(
 					'Choose any step on the canvas for',
-					'dragwyb-visual-automation'
+					'dragwyb-ai-agent-workflows'
 				)}{' '}
 				<strong>{branchLabel}</strong>
 			</p>
 
 			<div className="dragwyb-af-builder-picker__search">
 				<TextControl
-					label={__('Search nodes', 'dragwyb-visual-automation')}
+					label={__('Search nodes', 'dragwyb-ai-agent-workflows')}
 					hideLabelFromVision
-					placeholder={__('Search nodes…', 'dragwyb-visual-automation')}
+					placeholder={__('Search nodes…', 'dragwyb-ai-agent-workflows')}
 					value={query}
 					onChange={setQuery}
 				/>
@@ -85,7 +85,7 @@ export default function BranchConnectSidebar({
 				<p className="dragwyb-af-builder-picker__empty">
 					{__(
 						'No steps on the canvas yet. Add an AI Agent or action first.',
-						'dragwyb-visual-automation'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			) : (
@@ -121,17 +121,17 @@ export default function BranchConnectSidebar({
 										</span>
 										<span className="dragwyb-af-builder-picker__item-hint">
 											{node.type === 'ai_agent_action'
-												? __('AI Agent', 'dragwyb-visual-automation')
+												? __('AI Agent', 'dragwyb-ai-agent-workflows')
 												: node.type === 'condition_action'
-													? __('Condition', 'dragwyb-visual-automation')
+													? __('Condition', 'dragwyb-ai-agent-workflows')
 													: node.type === 'router_action'
-														? __('Router', 'dragwyb-visual-automation')
-														: __('Action', 'dragwyb-visual-automation')}
+														? __('Router', 'dragwyb-ai-agent-workflows')
+														: __('Action', 'dragwyb-ai-agent-workflows')}
 										</span>
 									</span>
 									{isCurrent && (
 										<span className="dragwyb-af-builder-picker__item-badge">
-											{__('Connected', 'dragwyb-visual-automation')}
+											{__('Connected', 'dragwyb-ai-agent-workflows')}
 										</span>
 									)}
 								</button>

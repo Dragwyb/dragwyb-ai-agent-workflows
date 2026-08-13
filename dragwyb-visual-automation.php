@@ -10,7 +10,7 @@
  * Author URI:        https://dragwyb.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       dragwyb-visual-automation
+ * Text Domain:       dragwyb-ai-agent-workflows
  * Domain Path:       /languages
  *
  * @package DragwybVisualAutomation\Plugin
@@ -55,7 +55,7 @@ function dragwyb_af_php_version_notice() {
 		esc_html(
 			sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version. */
-				__( 'Dragwyb AI Agent Workflows requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-visual-automation' ),
+				__( 'Dragwyb AI Agent Workflows requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-ai-agent-workflows' ),
 				DRAGWYB_AF_MIN_PHP_VERSION,
 				PHP_VERSION
 			)

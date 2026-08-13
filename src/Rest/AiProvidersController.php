@@ -136,7 +136,7 @@ class AiProvidersController extends WP_REST_Controller {
 		if ( '' === $key ) {
 			return new WP_Error(
 				'dragwyb_af_rest_invalid',
-				__( 'Provider is required.', 'dragwyb-visual-automation' ),
+				__( 'Provider is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}

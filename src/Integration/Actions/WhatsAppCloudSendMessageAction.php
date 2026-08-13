@@ -45,14 +45,14 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'WhatsApp Cloud Send Message', 'dragwyb-visual-automation' );
+		return __( 'WhatsApp Cloud Send Message', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Sends a text message via the WhatsApp Cloud API (Meta).', 'dragwyb-visual-automation' );
+		return __( 'Sends a text message via the WhatsApp Cloud API (Meta).', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -62,23 +62,23 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		return array(
 			'connection_id'   => array(
 				'type'     => 'connection',
-				'label'    => __( 'WhatsApp access token connection', 'dragwyb-visual-automation' ),
+				'label'    => __( 'WhatsApp access token connection', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 				'default'  => 0,
 			),
 			'phone_number_id' => array(
 				'type'     => 'string',
-				'label'    => __( 'Phone number ID (from Meta)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Phone number ID (from Meta)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 			'to'              => array(
 				'type'     => 'string',
-				'label'    => __( 'Recipient phone (digits, country code, no +)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Recipient phone (digits, country code, no +)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 			'message'         => array(
 				'type'     => 'string',
-				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'dragwyb-visual-automation' ),
+				'label'    => __( 'Message (supports {{trigger.fields.*}} tokens)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -105,21 +105,21 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		if ( '' === $phone_number_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No WhatsApp phone number ID configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No WhatsApp phone number ID configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
 		if ( '' === $to ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No recipient phone number configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No recipient phone number configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
 		if ( '' === trim( $message ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No message configured.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'No message configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -140,7 +140,7 @@ class WhatsAppCloudSendMessageAction implements ActionInterface {
 		if ( ! is_string( $body ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Failed to encode the WhatsApp payload.', 'dragwyb-visual-automation' ),
+				'error'   => __( 'Failed to encode the WhatsApp payload.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
