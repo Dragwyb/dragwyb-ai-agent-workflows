@@ -92,7 +92,7 @@ User create/update/delete actions only run when the current request has the matc
 = 0.1.0=
 * Update plugin name, plugin slug & prefix.
 * Added default password required for create user and add currnet user can promoter user capability check.
-* Use wp_iniline_script
+* Use wp_iniline_script instead of direct script.
 
 = 0.0.0 =
 * Initial Release
