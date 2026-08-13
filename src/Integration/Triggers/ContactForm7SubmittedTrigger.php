@@ -2,14 +2,14 @@
 /**
  * Contact Form 7 submission trigger.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Triggers;
+namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,14 +33,14 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 	 * {@inheritDoc}
 	 */
 	public function label(): string {
-		return __( 'Contact Form 7 Submitted', 'dragwyb-agentflow' );
+		return __( 'Contact Form 7 Submitted', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function description(): string {
-		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'dragwyb-agentflow' );
+		return __( 'Starts the workflow when a Contact Form 7 form is submitted.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class ContactForm7SubmittedTrigger implements TriggerInterface {
 		return array(
 			'form_id' => array(
 				'type'    => 'string',
-				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-agentflow' ),
+				'label'   => __( 'Form ID (optional — leave empty for all forms)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '',
 			),
 		);

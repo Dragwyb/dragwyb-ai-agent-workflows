@@ -9,18 +9,17 @@ class ComposerStaticInit018fb7cb1d7c1fe2e991f119c462a6fd
     public static $prefixLengthsPsr4 = array (
         'W' =>
         array (
-            'DragwybAgentFlow\\AiProviders\\' => 29,
             'WordPress\\OpenAiAiProvider\\' => 27,
             'WordPress\\GoogleAiProvider\\' => 27,
             'WordPress\\AnthropicAiProvider\\' => 30,
         ),
+        'D' =>
+        array (
+            'DragwybVisualAutomation\\AiProviders\\' => 36,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'DragwybAgentFlow\\AiProviders\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src',
-        ),
         'WordPress\\OpenAiAiProvider\\' =>
         array (
             0 => __DIR__ . '/..' . '/wordpress/ai-provider-for-openai/src',
@@ -33,10 +32,20 @@ class ComposerStaticInit018fb7cb1d7c1fe2e991f119c462a6fd
         array (
             0 => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src',
         ),
+        'DragwybVisualAutomation\\AiProviders\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'DragwybVisualAutomation\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => __DIR__ . '/../..' . '/src/Compatible/AbstractCompatibleApiProvider.php',
+        'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => __DIR__ . '/../..' . '/src/Compatible/CompatibleModelMetadataDirectory.php',
+        'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => __DIR__ . '/../..' . '/src/Compatible/CompatibleTextGenerationModel.php',
+        'DragwybVisualAutomation\\AiProviders\\DeepSeek\\DeepSeekProvider' => __DIR__ . '/../..' . '/src/DeepSeek/DeepSeekProvider.php',
+        'DragwybVisualAutomation\\AiProviders\\Groq\\GroqProvider' => __DIR__ . '/../..' . '/src/Groq/GroqProvider.php',
+        'DragwybVisualAutomation\\AiProviders\\OpenRouter\\OpenRouterProvider' => __DIR__ . '/../..' . '/src/OpenRouter/OpenRouterProvider.php',
         'WordPress\\AnthropicAiProvider\\Authentication\\AnthropicApiKeyRequestAuthentication' => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src/Authentication/AnthropicApiKeyRequestAuthentication.php',
         'WordPress\\AnthropicAiProvider\\Metadata\\AnthropicModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src/Metadata/AnthropicModelMetadataDirectory.php',
         'WordPress\\AnthropicAiProvider\\Models\\AnthropicTextGenerationModel' => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src/Models/AnthropicTextGenerationModel.php',
@@ -52,12 +61,6 @@ class ComposerStaticInit018fb7cb1d7c1fe2e991f119c462a6fd
         'WordPress\\OpenAiAiProvider\\Models\\OpenAiImageGenerationModel' => __DIR__ . '/..' . '/wordpress/ai-provider-for-openai/src/Models/OpenAiImageGenerationModel.php',
         'WordPress\\OpenAiAiProvider\\Models\\OpenAiTextGenerationModel' => __DIR__ . '/..' . '/wordpress/ai-provider-for-openai/src/Models/OpenAiTextGenerationModel.php',
         'WordPress\\OpenAiAiProvider\\Provider\\OpenAiProvider' => __DIR__ . '/..' . '/wordpress/ai-provider-for-openai/src/Provider/OpenAiProvider.php',
-        'DragwybAgentFlow\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => __DIR__ . '/../..' . '/src/Compatible/AbstractCompatibleApiProvider.php',
-        'DragwybAgentFlow\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => __DIR__ . '/../..' . '/src/Compatible/CompatibleModelMetadataDirectory.php',
-        'DragwybAgentFlow\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => __DIR__ . '/../..' . '/src/Compatible/CompatibleTextGenerationModel.php',
-        'DragwybAgentFlow\\AiProviders\\DeepSeek\\DeepSeekProvider' => __DIR__ . '/../..' . '/src/DeepSeek/DeepSeekProvider.php',
-        'DragwybAgentFlow\\AiProviders\\Groq\\GroqProvider' => __DIR__ . '/../..' . '/src/Groq/GroqProvider.php',
-        'DragwybAgentFlow\\AiProviders\\OpenRouter\\OpenRouterProvider' => __DIR__ . '/../..' . '/src/OpenRouter/OpenRouterProvider.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

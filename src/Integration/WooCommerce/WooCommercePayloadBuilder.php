@@ -2,12 +2,12 @@
 /**
  * Structured WooCommerce trigger payloads for the builder variable picker.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WooCommerce;
+namespace DragwybVisualAutomation\Plugin\Integration\WooCommerce;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

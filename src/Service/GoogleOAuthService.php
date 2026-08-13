@@ -2,16 +2,16 @@
 /**
  * Google OAuth 2.0 authorization and token lifecycle.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Domain\Connection;
-use DragwybAgentFlow\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DragwybVisualAutomation\Plugin\Domain\Connection;
+use DragwybVisualAutomation\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -87,7 +87,7 @@ class GoogleOAuthService {
 
 		if ( '' === $client_id ) {
 			throw new RuntimeException(
-				esc_html__( 'Client ID is missing. Save your Google OAuth credentials first.', 'dragwyb-agentflow' )
+				esc_html__( 'Client ID is missing. Save your Google OAuth credentials first.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -163,7 +163,7 @@ class GoogleOAuthService {
 		if ( '' === $code ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google did not return an authorization code.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Google did not return an authorization code.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -174,7 +174,7 @@ class GoogleOAuthService {
 		if ( '' === $client_id || '' === $client_secret ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Client ID and Client Secret are required before connecting to Google.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Client ID and Client Secret are required before connecting to Google.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -207,7 +207,7 @@ class GoogleOAuthService {
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'This connection is not a Google OAuth connection.', 'dragwyb-agentflow' ),
+				'error'   => __( 'This connection is not a Google OAuth connection.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -224,7 +224,7 @@ class GoogleOAuthService {
 		if ( '' === $refresh ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google access token expired. Reconnect this connection in Connections.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Google access token expired. Reconnect this connection in Connections.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -234,7 +234,7 @@ class GoogleOAuthService {
 		if ( '' === $client_id || '' === $client_secret ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google OAuth client credentials are missing.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Google OAuth client credentials are missing.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -259,7 +259,7 @@ class GoogleOAuthService {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to refresh the Google access token.', 'dragwyb-agentflow' ),
+				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to refresh the Google access token.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -268,7 +268,7 @@ class GoogleOAuthService {
 		if ( null === $updated ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'The connection no longer exists.', 'dragwyb-agentflow' ),
+				'error'   => __( 'The connection no longer exists.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -278,7 +278,7 @@ class GoogleOAuthService {
 		if ( '' === $token ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Unable to read the refreshed Google access token.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Unable to read the refreshed Google access token.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -298,7 +298,7 @@ class GoogleOAuthService {
 				'success' => false,
 				'error'   => isset( $result['error'] )
 					? (string) $result['error']
-					: __( 'Google OAuth token request failed.', 'dragwyb-agentflow' ),
+					: __( 'Google OAuth token request failed.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -310,7 +310,7 @@ class GoogleOAuthService {
 		if ( '' === $access_token ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'Google did not return an access token.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Google did not return an access token.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

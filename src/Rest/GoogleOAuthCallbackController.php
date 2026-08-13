@@ -2,16 +2,16 @@
 /**
  * Google OAuth callback REST endpoint.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
 use WP_REST_Request;
 
 // Prevent direct file access.
@@ -81,7 +81,7 @@ class GoogleOAuthCallbackController {
 				'error',
 				sprintf(
 					/* translators: %s: Google OAuth error code */
-					__( 'Google authorization was denied or failed (%s).', 'dragwyb-agentflow' ),
+					__( 'Google authorization was denied or failed (%s).', 'dragwyb-ai-agent-workflows' ),
 					$error
 				)
 			);
@@ -93,7 +93,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				0,
 				'error',
-				__( 'OAuth state expired or was invalid. Please try connecting again.', 'dragwyb-agentflow' )
+				__( 'OAuth state expired or was invalid. Please try connecting again.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -103,7 +103,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				0,
 				'error',
-				__( 'The connection for this authorization no longer exists.', 'dragwyb-agentflow' ),
+				__( 'The connection for this authorization no longer exists.', 'dragwyb-ai-agent-workflows' ),
 				$state_payload
 			);
 		}
@@ -117,7 +117,7 @@ class GoogleOAuthCallbackController {
 			$this->redirectWithNotice(
 				$connection->id(),
 				'error',
-				isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to connect to Google.', 'dragwyb-agentflow' ),
+				isset( $result['error'] ) ? (string) $result['error'] : __( 'Failed to connect to Google.', 'dragwyb-ai-agent-workflows' ),
 				$state_payload
 			);
 		}

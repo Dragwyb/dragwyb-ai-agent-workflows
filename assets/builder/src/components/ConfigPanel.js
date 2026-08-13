@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { createConnection, fetchAiProviderModels, fetchAiProviderStatus, saveAiProviderCredentials, clearAiProviderCredentials, fetchGoogleOAuthAuthorizeUrl, fetchTriggerSampleSchema, getBootstrap, testWorkflowNode} from '../api';
+import { createConnection, fetchAiProviderModels, fetchAiProviderStatus, saveAiProviderCredentials, clearAiProviderCredentials, fetchGoogleOAuthAuthorizeUrl, fetchTriggerSampleSchema, getBootstrap, testWorkflowNode } from '../api';
 import CapturedResponse from './CapturedResponse';
 import NodeTestResult from './NodeTestResult';
 import AgentConfigPanel from './AgentConfigPanel';
@@ -55,13 +55,13 @@ function isGoogleSheetsAction(slug) {
 const INTEGRATION_CONNECTION_SETTINGS = {
 	telegram_send_message_action: {
 		authType: 'api_key',
-		secretLabel: __('Bot token', 'dragwyb-agentflow'),
+		secretLabel: __('Bot token', 'dragwyb-ai-agent-workflows'),
 		secretFieldName: 'api_key',
 		hideAuthTypeSelect: true,
 	},
 	whatsapp_cloud_send_message_action: {
 		authType: 'bearer_token',
-		secretLabel: __('Access token', 'dragwyb-agentflow'),
+		secretLabel: __('Access token', 'dragwyb-ai-agent-workflows'),
 	},
 };
 
@@ -142,22 +142,22 @@ const AGENT_PROVIDER_NODE_SLUGS = {
 /** @type {Record<string, { secretLabel: string }>} */
 const AGENT_PROVIDER_CONNECTION_SETTINGS = {
 	openai: {
-		secretLabel: __('OpenAI API key', 'dragwyb-agentflow'),
+		secretLabel: __('OpenAI API key', 'dragwyb-ai-agent-workflows'),
 	},
 	gemini: {
-		secretLabel: __('Google AI API key', 'dragwyb-agentflow'),
+		secretLabel: __('Google AI API key', 'dragwyb-ai-agent-workflows'),
 	},
 	claude: {
-		secretLabel: __('Anthropic API key', 'dragwyb-agentflow'),
+		secretLabel: __('Anthropic API key', 'dragwyb-ai-agent-workflows'),
 	},
 	openrouter: {
-		secretLabel: __('OpenRouter API key', 'dragwyb-agentflow'),
+		secretLabel: __('OpenRouter API key', 'dragwyb-ai-agent-workflows'),
 	},
 	groq: {
-		secretLabel: __('Groq API key', 'dragwyb-agentflow'),
+		secretLabel: __('Groq API key', 'dragwyb-ai-agent-workflows'),
 	},
 	deepseek: {
-		secretLabel: __('DeepSeek API key', 'dragwyb-agentflow'),
+		secretLabel: __('DeepSeek API key', 'dragwyb-ai-agent-workflows'),
 	},
 };
 
@@ -429,7 +429,7 @@ export default function ConfigPanel({
 				error:
 					error && error.message
 						? error.message
-						: __('Could not test this node.', 'dragwyb-agentflow'),
+						: __('Could not test this node.', 'dragwyb-ai-agent-workflows'),
 			});
 		} finally {
 			setTesting(false);
@@ -440,12 +440,12 @@ export default function ConfigPanel({
 		return (
 			<aside
 				className="dragwyb-af-builder-config dragwyb-af-builder-config--empty"
-				aria-label={__('Node settings', 'dragwyb-agentflow')}
+				aria-label={__('Node settings', 'dragwyb-ai-agent-workflows')}
 			>
 				<p>
 					{__(
 						'Select a node to edit its settings.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			</aside>
@@ -459,20 +459,20 @@ export default function ConfigPanel({
 					? 'dragwyb-af-builder-config dragwyb-af-builder-config--agent'
 					: 'dragwyb-af-builder-config'
 			}
-			aria-label={__('Node settings', 'dragwyb-agentflow')}
+			aria-label={__('Node settings', 'dragwyb-ai-agent-workflows')}
 		>
 			<div className="dragwyb-af-builder-config__header">
 				<h2>{nodeType ? nodeType.label : node.type}</h2>
 				<Button
 					className="dragwyb-af-builder-config__close"
 					icon="no-alt"
-					label={__('Close', 'dragwyb-agentflow')}
+					label={__('Close', 'dragwyb-ai-agent-workflows')}
 					onClick={onClose}
 				/>
 			</div>
 
 			<TextControl
-				label={__('Node label', 'dragwyb-agentflow')}
+				label={__('Node label', 'dragwyb-ai-agent-workflows')}
 				value={node.label}
 				onChange={onChangeLabel}
 			/>
@@ -481,7 +481,7 @@ export default function ConfigPanel({
 				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'This tool is attached to your AI Agent. Remove it from the agent or delete it here.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}
@@ -490,7 +490,7 @@ export default function ConfigPanel({
 				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Chat model linked to your agent. Add an API key and pick a model below.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}
@@ -499,7 +499,7 @@ export default function ConfigPanel({
 				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Fallback chat model used when the primary model fails.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}
@@ -509,7 +509,7 @@ export default function ConfigPanel({
 					<p className="dragwyb-af-builder-config__field-help">
 						{__(
 							'JSON structure for the AI Agent reply. Connect a Model* on the canvas for Auto-Fix.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 					</p>
 					{onAddParserChatModel &&
@@ -522,7 +522,7 @@ export default function ConfigPanel({
 								variant="secondary"
 								onClick={() => onAddParserChatModel(node.id)}
 							>
-								{__('Connect model', 'dragwyb-agentflow')}
+								{__('Connect model', 'dragwyb-ai-agent-workflows')}
 							</Button>
 						)}
 				</>
@@ -532,7 +532,7 @@ export default function ConfigPanel({
 				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Simple memory keeps conversation context for this agent run.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}
@@ -541,7 +541,7 @@ export default function ConfigPanel({
 				<p className="dragwyb-af-builder-config__field-help">
 					{__(
 						'Each condition has its own orange port on the right — drag each port to a different step (AI Agent, actions, etc.). Or pick targets under “Then run” for each condition below.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}
@@ -570,7 +570,7 @@ export default function ConfigPanel({
 					<p className="dragwyb-af-builder-config__field-help">
 						{__(
 							'Click Chat in the header to open the chat panel and send messages (same idea as n8n). Save the workflow first if you just added this trigger.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 					</p>
 				)}
@@ -587,7 +587,7 @@ export default function ConfigPanel({
 				<p className="dragwyb-af-builder-config__warning">
 					{__(
 						'This node\u2019s type is not currently registered (the plugin or code that provided it may be inactive). Its saved configuration is preserved but cannot be edited here.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			)}
@@ -615,28 +615,28 @@ export default function ConfigPanel({
 						return true;
 					})
 					.map((fieldName) => (
-					<div
-						key={`${node.id}-${fieldName}`}
-						className="dragwyb-af-builder-config__field"
-					>
-						<ConfigField
-							fieldName={fieldName}
-							fieldSchema={nodeType.config_schema[fieldName]}
-							value={node.config ? node.config[fieldName] : undefined}
-							connections={connections}
-							nodeTypeSlug={nodeType.slug}
-							nodeTypeLabel={nodeType.label}
-							nodeId={node.id}
-							nodeCategory={node.category}
-							nodeConfig={node.config || {}}
-							variableSources={variableSources}
-							nodeLabels={nodeLabels}
-							graphNodes={graphNodes}
-							onConnectionsChange={onConnectionsChange}
-							onChange={(value) => onChangeConfig(fieldName, value)}
-						/>
-					</div>
-				))}
+						<div
+							key={`${node.id}-${fieldName}`}
+							className="dragwyb-af-builder-config__field"
+						>
+							<ConfigField
+								fieldName={fieldName}
+								fieldSchema={nodeType.config_schema[fieldName]}
+								value={node.config ? node.config[fieldName] : undefined}
+								connections={connections}
+								nodeTypeSlug={nodeType.slug}
+								nodeTypeLabel={nodeType.label}
+								nodeId={node.id}
+								nodeCategory={node.category}
+								nodeConfig={node.config || {}}
+								variableSources={variableSources}
+								nodeLabels={nodeLabels}
+								graphNodes={graphNodes}
+								onConnectionsChange={onConnectionsChange}
+								onChange={(value) => onChangeConfig(fieldName, value)}
+							/>
+						</div>
+					))}
 
 			{testResult && (
 				<NodeTestResult
@@ -655,7 +655,7 @@ export default function ConfigPanel({
 					disabled={testing || !workflowId}
 					className="dragwyb-af-builder-config__test"
 				>
-					{__('Test node', 'dragwyb-agentflow')}
+					{__('Test node', 'dragwyb-ai-agent-workflows')}
 				</Button>
 
 				<Button
@@ -664,7 +664,7 @@ export default function ConfigPanel({
 					onClick={onDelete}
 					className="dragwyb-af-builder-config__delete"
 				>
-					{__('Delete node', 'dragwyb-agentflow')}
+					{__('Delete node', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			</div>
 		</aside>
@@ -720,11 +720,11 @@ function ConfigField({
 			? selectedOption.pages.filter((page) => page?.url)
 			: selectedOption?.url
 				? [
-						{
-							label: selectedOption.label || '',
-							url: selectedOption.url,
-						},
-					]
+					{
+						label: selectedOption.label || '',
+						url: selectedOption.url,
+					},
+				]
 				: [];
 
 		return (
@@ -746,7 +746,7 @@ function ConfigField({
 							>
 								{__(
 									'Open form page',
-									'dragwyb-agentflow'
+									'dragwyb-ai-agent-workflows'
 								)}
 								{pageLinks[0].label
 									? ` — ${pageLinks[0].label}`
@@ -755,7 +755,7 @@ function ConfigField({
 						) : (
 							<>
 								<span className="dragwyb-af-builder-config__form-page-link-label">
-									{__('Form pages:', 'dragwyb-agentflow')}
+									{__('Form pages:', 'dragwyb-ai-agent-workflows')}
 								</span>
 								<ul className="dragwyb-af-builder-config__form-page-link-list">
 									{pageLinks.map((page) => (
@@ -768,7 +768,7 @@ function ConfigField({
 												{page.label ||
 													__(
 														'Open form page',
-														'dragwyb-agentflow'
+														'dragwyb-ai-agent-workflows'
 													)}
 											</a>
 										</li>
@@ -1038,11 +1038,11 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 				const mapped =
 					providers[providerId] ??
 					providers[
-						providerId === 'claude'
-							? 'anthropic'
-							: providerId === 'gemini'
-								? 'google'
-								: providerId
+					providerId === 'claude'
+						? 'anthropic'
+						: providerId === 'gemini'
+							? 'google'
+							: providerId
 					];
 				setConfigured(Boolean(mapped));
 			})
@@ -1077,7 +1077,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 
 	const handleSave = async () => {
 		if (!apiKey.trim()) {
-			setError(__('Enter an API key.', 'dragwyb-agentflow'));
+			setError(__('Enter an API key.', 'dragwyb-ai-agent-workflows'));
 			return;
 		}
 
@@ -1090,16 +1090,16 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			setApiKey('');
 			setReplacing(false);
 			setConfigured(true);
-			setNotice(__('API key saved.', 'dragwyb-agentflow'));
+			setNotice(__('API key saved.', 'dragwyb-ai-agent-workflows'));
 			notifyModels();
 		} catch (err) {
 			setError(
 				err && err.message
 					? err.message
 					: __(
-							'Could not save API key. Check that the key is valid.',
-							'dragwyb-agentflow'
-						)
+						'Could not save API key. Check that the key is valid.',
+						'dragwyb-ai-agent-workflows'
+					)
 			);
 		} finally {
 			setSaving(false);
@@ -1115,13 +1115,13 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			await clearAiProviderCredentials(provider);
 			setConfigured(false);
 			setReplacing(true);
-			setNotice(__('API key removed.', 'dragwyb-agentflow'));
+			setNotice(__('API key removed.', 'dragwyb-ai-agent-workflows'));
 			notifyModels();
 		} catch (err) {
 			setError(
 				err && err.message
 					? err.message
-					: __('Could not remove API key.', 'dragwyb-agentflow')
+					: __('Could not remove API key.', 'dragwyb-ai-agent-workflows')
 			);
 		} finally {
 			setClearing(false);
@@ -1132,7 +1132,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 		return (
 			<div className="dragwyb-af-field dragwyb-af-field--ai-credentials">
 				<p className="dragwyb-af-builder-config__field-help">
-					{__('Checking API key…', 'dragwyb-agentflow')}
+					{__('Checking API key…', 'dragwyb-ai-agent-workflows')}
 				</p>
 			</div>
 		);
@@ -1143,7 +1143,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			<div className="dragwyb-af-field dragwyb-af-field--ai-credentials">
 				<strong>{label}</strong>
 				<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
-					{__('API key saved for this site.', 'dragwyb-agentflow')}
+					{__('API key saved for this site.', 'dragwyb-ai-agent-workflows')}
 				</p>
 				{notice ? (
 					<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
@@ -1165,7 +1165,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 							setNotice('');
 						}}
 					>
-						{__('Replace API key', 'dragwyb-agentflow')}
+						{__('Replace API key', 'dragwyb-ai-agent-workflows')}
 					</Button>
 					<Button
 						variant="link"
@@ -1174,8 +1174,8 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 						disabled={clearing}
 					>
 						{clearing
-							? __('Removing…', 'dragwyb-agentflow')
-							: __('Remove', 'dragwyb-agentflow')}
+							? __('Removing…', 'dragwyb-ai-agent-workflows')
+							: __('Remove', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				</div>
 			</div>
@@ -1192,7 +1192,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 				autoComplete="off"
 				help={__(
 					'Saved for this WordPress site and used by all workflows.',
-					'dragwyb-agentflow'
+					'dragwyb-ai-agent-workflows'
 				)}
 			/>
 			{error ? (
@@ -1208,8 +1208,8 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 			<div className="dragwyb-af-builder-config__connection-actions">
 				<Button isPrimary onClick={handleSave} disabled={saving}>
 					{saving
-						? __('Saving…', 'dragwyb-agentflow')
-						: __('Save API key', 'dragwyb-agentflow')}
+						? __('Saving…', 'dragwyb-ai-agent-workflows')
+						: __('Save API key', 'dragwyb-ai-agent-workflows')}
 				</Button>
 				{configured || replacing ? (
 					<Button
@@ -1221,7 +1221,7 @@ function AiCredentialsField({ label, provider, onCredentialsChange }) {
 						}}
 						disabled={saving}
 					>
-						{__('Cancel', 'dragwyb-agentflow')}
+						{__('Cancel', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				) : null}
 			</div>
@@ -1301,7 +1301,7 @@ function AiModelField({
 				setError(
 					err && err.message
 						? err.message
-						: __('Could not load models.', 'dragwyb-agentflow')
+						: __('Could not load models.', 'dragwyb-ai-agent-workflows')
 				);
 			})
 			.finally(() => {
@@ -1334,7 +1334,7 @@ function AiModelField({
 				options={[
 					{
 						value: value || defaultValue || '',
-						label: __('Loading models…', 'dragwyb-agentflow'),
+						label: __('Loading models…', 'dragwyb-ai-agent-workflows'),
 					},
 				]}
 				disabled
@@ -1353,7 +1353,7 @@ function AiModelField({
 					error ||
 					__(
 						'No models listed. Enter a model id manually or save an API key above.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)
 				}
 			/>
@@ -1418,8 +1418,8 @@ function ConnectionField({
 	const integrationSettings = isGoogleSheetsAction(nodeTypeSlug)
 		? GOOGLE_SHEETS_OAUTH_SETTINGS
 		: INTEGRATION_CONNECTION_SETTINGS[nodeTypeSlug] ||
-			AGENT_PROVIDER_CONNECTION_SETTINGS[nodeConfig.provider] ||
-			{};
+		AGENT_PROVIDER_CONNECTION_SETTINGS[nodeConfig.provider] ||
+		{};
 	const defaultAuthType = integrationSettings.authType || 'api_key';
 	const isGoogleOAuth = Boolean(integrationSettings.oauthConnection);
 
@@ -1447,7 +1447,7 @@ function ConnectionField({
 	const [connectionLabel, setConnectionLabel] = useState(
 		nodeTypeLabel
 			? `${nodeTypeLabel}`
-			: __('New connection', 'dragwyb-agentflow')
+			: __('New connection', 'dragwyb-ai-agent-workflows')
 	);
 	const [authType, setAuthType] = useState(defaultAuthType);
 	const [secret, setSecret] = useState('');
@@ -1464,7 +1464,7 @@ function ConnectionField({
 
 		if ('oauth_connected' === notice) {
 			setOauthNotice(
-				__('Google account connected successfully.', 'dragwyb-agentflow')
+				__('Google account connected successfully.', 'dragwyb-ai-agent-workflows')
 			);
 		} else if ('error' === notice && params.get('dragwyb_af_error')) {
 			setOauthNotice(String(params.get('dragwyb_af_error')));
@@ -1477,7 +1477,7 @@ function ConnectionField({
 		setConnectionLabel(
 			nodeTypeLabel
 				? `${nodeTypeLabel}`
-				: __('New connection', 'dragwyb-agentflow')
+				: __('New connection', 'dragwyb-ai-agent-workflows')
 		);
 		setAuthType(defaultAuthType);
 		setSecret('');
@@ -1513,7 +1513,7 @@ function ConnectionField({
 	}, [required, selectedId, matchingConnections, onChange]);
 
 	const options = [
-		{ value: '0', label: __('None', 'dragwyb-agentflow') },
+		{ value: '0', label: __('None', 'dragwyb-ai-agent-workflows') },
 		...matchingConnections.map((connection) => ({
 			value: String(connection.id),
 			label: `${connection.label} (${connection.auth_type_label})`,
@@ -1526,14 +1526,14 @@ function ConnectionField({
 	const secretFieldLabel =
 		integrationSettings.secretLabel ||
 		(authType === 'bearer_token'
-			? __('Bearer token / access token', 'dragwyb-agentflow')
-			: __('API key', 'dragwyb-agentflow'));
+			? __('Bearer token / access token', 'dragwyb-ai-agent-workflows')
+			: __('API key', 'dragwyb-ai-agent-workflows'));
 
 	const handleSaveConnection = async () => {
 		const trimmedLabel = connectionLabel.trim();
 
 		if (!trimmedLabel) {
-			setError(__('Enter a name for this connection.', 'dragwyb-agentflow'));
+			setError(__('Enter a name for this connection.', 'dragwyb-ai-agent-workflows'));
 			return;
 		}
 
@@ -1545,7 +1545,7 @@ function ConnectionField({
 				setError(
 					__(
 						'Enter both Client ID and Client Secret.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)
 				);
 				return;
@@ -1582,7 +1582,7 @@ function ConnectionField({
 						? err.message
 						: __(
 							'Could not save the connection. Check your permissions and try again.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)
 				);
 			} finally {
@@ -1595,7 +1595,7 @@ function ConnectionField({
 		const trimmedSecret = secret.trim();
 
 		if (!trimmedSecret) {
-			setError(__('Enter your API key or token.', 'dragwyb-agentflow'));
+			setError(__('Enter your API key or token.', 'dragwyb-ai-agent-workflows'));
 			return;
 		}
 
@@ -1629,7 +1629,7 @@ function ConnectionField({
 					? err.message
 					: __(
 						'Could not save the connection. Check your permissions and try again.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)
 			);
 		} finally {
@@ -1658,7 +1658,7 @@ function ConnectionField({
 			setError(
 				__(
 					'Save your Client ID and Client Secret first.',
-					'dragwyb-agentflow'
+					'dragwyb-ai-agent-workflows'
 				)
 			);
 			return;
@@ -1681,7 +1681,7 @@ function ConnectionField({
 			setError(
 				__(
 					'Could not start Google authorization.',
-					'dragwyb-agentflow'
+					'dragwyb-ai-agent-workflows'
 				)
 			);
 		} catch (err) {
@@ -1690,7 +1690,7 @@ function ConnectionField({
 					? err.message
 					: __(
 						'Could not start Google authorization.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)
 			);
 		} finally {
@@ -1717,11 +1717,11 @@ function ConnectionField({
 						? isGoogleOAuth
 							? __(
 								'Required — add your Google OAuth credentials below, then connect your Google account.',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)
 							: __(
 								'Required — add an API key below or pick an existing connection.',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)
 						: undefined
 				}
@@ -1748,7 +1748,7 @@ function ConnectionField({
 						<p className="dragwyb-af-builder-config__connection-form-help">
 							{__(
 								'Credentials saved. Connect your Google account to finish setup.',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 						</p>
 						<Button
@@ -1757,8 +1757,8 @@ function ConnectionField({
 							disabled={connecting}
 						>
 							{connecting
-								? __('Connecting…', 'dragwyb-agentflow')
-								: __('Connect with Google', 'dragwyb-agentflow')}
+								? __('Connecting…', 'dragwyb-ai-agent-workflows')
+								: __('Connect with Google', 'dragwyb-ai-agent-workflows')}
 						</Button>
 					</div>
 				)}
@@ -1768,7 +1768,7 @@ function ConnectionField({
 				isGoogleOAuth &&
 				selectedConnection.oauth_connected && (
 					<p className="dragwyb-af-builder-config__connection-notice dragwyb-af-builder-config__connection-notice--success">
-						{__('Google account connected.', 'dragwyb-agentflow')}
+						{__('Google account connected.', 'dragwyb-ai-agent-workflows')}
 					</p>
 				)}
 
@@ -1783,7 +1783,7 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('+ Add API key here', 'dragwyb-agentflow')}
+					{__('+ Add API key here', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			)}
 
@@ -1798,7 +1798,7 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('+ Add Google OAuth connection', 'dragwyb-agentflow')}
+					{__('+ Add Google OAuth connection', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			)}
 
@@ -1813,7 +1813,7 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('Use a different API key', 'dragwyb-agentflow')}
+					{__('Use a different API key', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			)}
 
@@ -1829,14 +1829,14 @@ function ConnectionField({
 						setShowAddForm(true);
 					}}
 				>
-					{__('Use different Google credentials', 'dragwyb-agentflow')}
+					{__('Use different Google credentials', 'dragwyb-ai-agent-workflows')}
 				</Button>
 			)}
 
 			{showAddForm && isGoogleOAuth && (
 				<div className="dragwyb-af-builder-config__connection-form">
 					<p className="dragwyb-af-builder-config__connection-form-title">
-						{__('Google OAuth connection', 'dragwyb-agentflow')}
+						{__('Google OAuth connection', 'dragwyb-ai-agent-workflows')}
 					</p>
 					<p className="dragwyb-af-builder-config__connection-form-help">
 						<a
@@ -1846,44 +1846,44 @@ function ConnectionField({
 						>
 							{__(
 								'Create credentials in Google Cloud Console',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 						</a>
 						{' · '}
 						{__(
 							'Enable Google Sheets API and Google Drive API.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 					</p>
 					<TextControl
-						label={__('Connection name', 'dragwyb-agentflow')}
+						label={__('Connection name', 'dragwyb-ai-agent-workflows')}
 						value={connectionLabel}
 						onChange={setConnectionLabel}
 					/>
 					<TextControl
-						label={__('Client ID', 'dragwyb-agentflow')}
+						label={__('Client ID', 'dragwyb-ai-agent-workflows')}
 						value={clientId}
 						onChange={setClientId}
 						autoComplete="off"
 					/>
 					<TextControl
-						label={__('Client Secret', 'dragwyb-agentflow')}
+						label={__('Client Secret', 'dragwyb-ai-agent-workflows')}
 						type="password"
 						value={clientSecret}
 						onChange={setClientSecret}
 						autoComplete="off"
 						help={__(
 							'Saved encrypted. You will not see it again after saving.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 					/>
 					<TextControl
-						label={__('Callback URL', 'dragwyb-agentflow')}
+						label={__('Callback URL', 'dragwyb-ai-agent-workflows')}
 						value={bootstrap.googleOAuthCallbackUrl || ''}
 						readOnly
 						help={__(
 							'Add this exact URL as an Authorized redirect URI in your Google OAuth client.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 						onFocus={(event) => event.target.select()}
 					/>
@@ -1899,8 +1899,8 @@ function ConnectionField({
 							disabled={saving || connecting}
 						>
 							{saving
-								? __('Saving…', 'dragwyb-agentflow')
-								: __('Save credentials', 'dragwyb-agentflow')}
+								? __('Saving…', 'dragwyb-ai-agent-workflows')
+								: __('Save credentials', 'dragwyb-ai-agent-workflows')}
 						</Button>
 						<Button
 							isPrimary
@@ -1922,7 +1922,7 @@ function ConnectionField({
 									setError(
 										__(
 											'Enter connection name, Client ID, and Client Secret first.',
-											'dragwyb-agentflow'
+											'dragwyb-ai-agent-workflows'
 										)
 									);
 									return;
@@ -1960,7 +1960,7 @@ function ConnectionField({
 											? err.message
 											: __(
 												'Could not save the connection.',
-												'dragwyb-agentflow'
+												'dragwyb-ai-agent-workflows'
 											)
 									);
 								} finally {
@@ -1970,8 +1970,8 @@ function ConnectionField({
 							disabled={saving || connecting}
 						>
 							{connecting
-								? __('Connecting…', 'dragwyb-agentflow')
-								: __('Connect with Google', 'dragwyb-agentflow')}
+								? __('Connecting…', 'dragwyb-ai-agent-workflows')
+								: __('Connect with Google', 'dragwyb-ai-agent-workflows')}
 						</Button>
 						{!needsConnection && (
 							<Button
@@ -1983,7 +1983,7 @@ function ConnectionField({
 								}}
 								disabled={saving || connecting}
 							>
-								{__('Cancel', 'dragwyb-agentflow')}
+								{__('Cancel', 'dragwyb-ai-agent-workflows')}
 							</Button>
 						)}
 					</div>
@@ -1998,32 +1998,32 @@ function ConnectionField({
 								/* translators: %s: integration label */
 								__(
 									'Credentials for %s',
-									'dragwyb-agentflow'
+									'dragwyb-ai-agent-workflows'
 								),
 								nodeTypeLabel
 							)
 							: __(
 								'Add credentials for this node',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 					</p>
 					<TextControl
-						label={__('Connection name', 'dragwyb-agentflow')}
+						label={__('Connection name', 'dragwyb-ai-agent-workflows')}
 						value={connectionLabel}
 						onChange={setConnectionLabel}
 					/>
 					{!integrationSettings.hideAuthTypeSelect && (
 						<SelectControl
-							label={__('Auth type', 'dragwyb-agentflow')}
+							label={__('Auth type', 'dragwyb-ai-agent-workflows')}
 							value={authType}
 							options={[
 								{
 									value: 'api_key',
-									label: __('API Key', 'dragwyb-agentflow'),
+									label: __('API Key', 'dragwyb-ai-agent-workflows'),
 								},
 								{
 									value: 'bearer_token',
-									label: __('Bearer Token', 'dragwyb-agentflow'),
+									label: __('Bearer Token', 'dragwyb-ai-agent-workflows'),
 								},
 							]}
 							onChange={setAuthType}
@@ -2037,7 +2037,7 @@ function ConnectionField({
 						onChange={setSecret}
 						help={__(
 							'Saved encrypted. You will not see it again after saving.',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 					/>
 					{error && (
@@ -2052,8 +2052,8 @@ function ConnectionField({
 							disabled={saving}
 						>
 							{saving
-								? __('Saving…', 'dragwyb-agentflow')
-								: __('Save & use connection', 'dragwyb-agentflow')}
+								? __('Saving…', 'dragwyb-ai-agent-workflows')
+								: __('Save & use connection', 'dragwyb-ai-agent-workflows')}
 						</Button>
 						{!needsConnection && (
 							<Button
@@ -2065,7 +2065,7 @@ function ConnectionField({
 								}}
 								disabled={saving}
 							>
-								{__('Cancel', 'dragwyb-agentflow')}
+								{__('Cancel', 'dragwyb-ai-agent-workflows')}
 							</Button>
 						)}
 					</div>
@@ -2115,11 +2115,10 @@ function isFieldVisible(fieldSchema, nodeConfig = {}) {
 function NodeSelectField({ label, value, help, nodeId, graphNodes, onChange }) {
 	const connectable = getConnectableCanvasNodes(graphNodes, nodeId);
 	const options = [
-		{ label: __('— None —', 'dragwyb-agentflow'), value: '' },
+		{ label: __('— None —', 'dragwyb-ai-agent-workflows'), value: '' },
 		...connectable.map((graphNode) => ({
-			label: `${graphNode.label || graphNode.type}${
-				graphNode.type === 'ai_agent_action' ? ' (AI Agent)' : ''
-			}`,
+			label: `${graphNode.label || graphNode.type}${graphNode.type === 'ai_agent_action' ? ' (AI Agent)' : ''
+				}`,
 			value: graphNode.id,
 		})),
 	];
@@ -2178,14 +2177,14 @@ function ConditionRoutesField({
 					className="dragwyb-af-builder-config__condition-route"
 				>
 					<TextControl
-						label={__('Label', 'dragwyb-agentflow')}
+						label={__('Label', 'dragwyb-ai-agent-workflows')}
 						value={row.label || ''}
 						onChange={(nextValue) =>
 							updateRow(index, 'label', nextValue)
 						}
 					/>
 					<TokenField
-						label={__('Value to check', 'dragwyb-agentflow')}
+						label={__('Value to check', 'dragwyb-ai-agent-workflows')}
 						value={row.field || ''}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
@@ -2194,7 +2193,7 @@ function ConditionRoutesField({
 						}
 					/>
 					<SelectControl
-						label={__('Comparison', 'dragwyb-agentflow')}
+						label={__('Comparison', 'dragwyb-ai-agent-workflows')}
 						value={row.operator || 'equals'}
 						options={getConditionOperatorSelectOptions()}
 						onChange={(nextValue) => {
@@ -2207,7 +2206,7 @@ function ConditionRoutesField({
 					/>
 					{conditionOperatorNeedsValue(row.operator || 'equals') && (
 						<TextControl
-							label={__('Compare to', 'dragwyb-agentflow')}
+							label={__('Compare to', 'dragwyb-ai-agent-workflows')}
 							value={row.value || ''}
 							onChange={(nextValue) =>
 								updateRow(index, 'value', nextValue)
@@ -2215,7 +2214,7 @@ function ConditionRoutesField({
 						/>
 					)}
 					<NodeSelectField
-						label={__('Then run', 'dragwyb-agentflow')}
+						label={__('Then run', 'dragwyb-ai-agent-workflows')}
 						value={row.node_id || ''}
 						nodeId={nodeId}
 						graphNodes={graphNodes}
@@ -2228,12 +2227,12 @@ function ConditionRoutesField({
 						variant="tertiary"
 						onClick={() => removeRow(index)}
 					>
-						{__('Remove condition', 'dragwyb-agentflow')}
+						{__('Remove condition', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				</div>
 			))}
 			<Button variant="secondary" onClick={addRow}>
-				{__('Add condition', 'dragwyb-agentflow')}
+				{__('Add condition', 'dragwyb-ai-agent-workflows')}
 			</Button>
 		</div>
 	);
@@ -2292,7 +2291,7 @@ function KeyValueField({
 					className="dragwyb-af-builder-config__key-value-row"
 				>
 					<TokenField
-						label={__('Name', 'dragwyb-agentflow')}
+						label={__('Name', 'dragwyb-ai-agent-workflows')}
 						value={row.name || ''}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
@@ -2301,7 +2300,7 @@ function KeyValueField({
 						}
 					/>
 					<TokenField
-						label={__('Value', 'dragwyb-agentflow')}
+						label={__('Value', 'dragwyb-ai-agent-workflows')}
 						value={row.value || ''}
 						variableSources={variableSources}
 						nodeLabels={nodeLabels}
@@ -2315,7 +2314,7 @@ function KeyValueField({
 						className="dragwyb-af-builder-config__key-value-remove"
 						onClick={() => removeRow(index)}
 					>
-						{__('Remove', 'dragwyb-agentflow')}
+						{__('Remove', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				</div>
 			))}
@@ -2324,7 +2323,7 @@ function KeyValueField({
 				className="dragwyb-af-builder-config__key-value-add"
 				onClick={addRow}
 			>
-				{addLabel || __('Add Field', 'dragwyb-agentflow')}
+				{addLabel || __('Add Field', 'dragwyb-ai-agent-workflows')}
 			</Button>
 		</div>
 	);
@@ -2358,7 +2357,7 @@ function JsonField({ label, value, onChange }) {
 			setError(
 				__(
 					'Invalid JSON — changes here are not saved until this is fixed.',
-					'dragwyb-agentflow'
+					'dragwyb-ai-agent-workflows'
 				)
 			);
 		}

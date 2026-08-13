@@ -391,317 +391,317 @@ export default function Canvas({
 
 	return (
 		<div className="dragwyb-af-builder-canvas-host">
-		<div
-			ref={setCanvasRef}
-			className={
-				connectionDrag
-					? 'dragwyb-af-builder-canvas dragwyb-af-builder-canvas--connecting'
-					: 'dragwyb-af-builder-canvas'
-			}
-			style={{ '--dragwyb-af-canvas-zoom': String(zoom) }}
-			role="region"
-			aria-label={__('Workflow canvas', 'dragwyb-agentflow')}
-			onClick={onCanvasClick}
-		>
 			<div
-				className="dragwyb-af-builder-canvas__scaler"
-				style={{
-					width: bounds.w * zoom,
-					height: bounds.h * zoom,
-				}}
+				ref={setCanvasRef}
+				className={
+					connectionDrag
+						? 'dragwyb-af-builder-canvas dragwyb-af-builder-canvas--connecting'
+						: 'dragwyb-af-builder-canvas'
+				}
+				style={{ '--dragwyb-af-canvas-zoom': String(zoom) }}
+				role="region"
+				aria-label={__('Workflow canvas', 'dragwyb-ai-agent-workflows')}
+				onClick={onCanvasClick}
 			>
 				<div
-					className="dragwyb-af-builder-canvas__world"
+					className="dragwyb-af-builder-canvas__scaler"
 					style={{
-						width: bounds.w,
-						height: bounds.h,
-						transform: `scale(${zoom})`,
+						width: bounds.w * zoom,
+						height: bounds.h * zoom,
 					}}
 				>
-			{(flowEdges.length > 0 ||
-				attachmentEdges.length > 0 ||
-				branchEdges.length > 0 ||
-				connectionDrag) && (
-				<svg
-					className="dragwyb-af-builder-canvas__edges"
-
-					aria-hidden="true"
-
-					focusable="false"
-				>
-					{flowEdges.map((edge) => {
-						const isSelected =
-							edge.sourceId === selectedNodeId ||
-							edge.targetId === selectedNodeId ||
-							(selectedConnection?.id === edge.id &&
-								selectedConnection?.kind === 'flow');
-
-						return (
-							<path
-								key={edge.id}
-								className={
-									isSelected
-										? 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--selected'
-										: 'dragwyb-af-builder-canvas__edge'
-								}
-								d={edge.path}
-								fill="none"
-							/>
-						);
-					})}
-
-					{branchEdges.map((edge) => {
-						const isSelected =
-							selectedConnection?.id === edge.id &&
-							selectedConnection?.kind === 'branch';
-
-						return (
-							<path
-								key={edge.id}
-								className={
-									isSelected
-										? 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--branch dragwyb-af-builder-canvas__edge--selected'
-										: 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--branch'
-								}
-								d={edge.path}
-								fill="none"
-							/>
-						);
-					})}
-
-					{connectionDrag && (
-						<path
-							className={
-								connectionDrag.kind === 'branch'
-									? 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--branch dragwyb-af-builder-canvas__edge--preview'
-									: 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--preview'
-							}
-							d={
-								connectionDrag.kind === 'branch'
-									? branchPath(
-											connectionDrag.from,
-											connectionDrag.pointer
-										)
-									: flowPath(
-											connectionDrag.from,
-											connectionDrag.pointer
-										)
-							}
-							fill="none"
-						/>
-					)}
-
-					{attachmentEdges.map((edge) => (
-						<path
-							key={edge.id}
-
-							className="dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--attachment"
-
-							d={dashedPath(edge.from, edge.to)}
-
-							fill="none"
-						/>
-					))}
-				</svg>
-			)}
-
-			<FlowEdgeControls
-				flowEdges={flowEdges}
-				branchEdges={branchEdges}
-				selectedConnection={selectedConnection}
-				onSelectConnection={onSelectConnection}
-				onDeleteConnection={onDeleteConnection}
-				onInsertOnConnection={onInsertOnConnection}
-			/>
-
-			{nodes.length === 0 && <EmptyCanvasGuide />}
-
-			{canvasNodes.map((node) => {
-				if (isAgentNode(node)) {
-					const chatModel = chatModelForAgent(nodes, node.id);
-
-					const memory = memoryForAgent(nodes, node.id);
-
-					return (
-						<AgentNodeCard
-							key={node.id}
-							node={node}
-							selected={node.id === selectedNodeId}
-							isLinkTarget={isDropTarget(node)}
-							hasUnknownType={!knownTypeSlugs.includes(node.type)}
-							hasChatModel={Boolean(chatModel)}
-							hasMemory={Boolean(memory)}
-							chatModelId={chatModel?.id || null}
-							onSelect={onSelectNode}
-							onMove={onMoveNode}
-							onAddChatModel={onAddAgentChatModel}
-							onAddMemory={onAddAgentMemory}
-							onAddTool={onAddAgentTool}
-							canStartFlowConnection={canStartFlowConnection(node)}
-							onStartFlowConnectionDrag={onStartFlowConnectionDrag}
-							registerRef={registerNodeRef}
-						/>
-					);
-				}
-
-				if (node.type === 'condition_action') {
-					return (
-						<ConditionNodeCard
-							key={node.id}
-							node={node}
-							selected={node.id === selectedNodeId}
-							hasUnknownType={!knownTypeSlugs.includes(node.type)}
-							nodesById={nodesById}
-							activeBranchDrag={
-								connectionDrag?.kind === 'branch'
-									? connectionDrag
-									: null
-							}
-							hoverTargetNodeId={connectionDrag?.hoverTargetNodeId}
-							onSelect={onSelectNode}
-							onMove={onMoveNode}
-							onAddCondition={onAddCondition}
-							onRemoveCondition={onRemoveCondition}
-							onStartBranchConnectionDrag={onStartBranchConnectionDrag}
-							onDisconnectBranch={onDisconnectBranch}
-							registerRef={registerNodeRef}
-						/>
-					);
-				}
-
-				return (
-					<NodeCard
-						key={node.id}
-
-						node={node}
-
-						selected={node.id === selectedNodeId}
-
-						isLinkTarget={isDropTarget(node)}
-
-						hasUnknownType={!knownTypeSlugs.includes(node.type)}
-
-						canStartFlowConnection={canStartFlowConnection(node)}
-
-						onSelect={onSelectNode}
-
-						onMove={onMoveNode}
-
-						onStartFlowConnectionDrag={onStartFlowConnectionDrag}
-
-						registerRef={registerNodeRef}
-					/>
-				);
-			})}
-
-			{nodes
-
-				.filter(
-					(node) =>
-						(isChatModelAttachment(node) ||
-							isFallbackChatModelAttachment(node) ||
-							isParserChatModelAttachment(node)) &&
-						node.parent_agent_id
-				)
-
-				.map((chatModel) => (
 					<div
-						key={chatModel.id}
-						className="dragwyb-af-chat-model-node-wrap"
+						className="dragwyb-af-builder-canvas__world"
 						style={{
-							transform: `translate(${chatModel.x}px, ${chatModel.y}px)`,
+							width: bounds.w,
+							height: bounds.h,
+							transform: `scale(${zoom})`,
 						}}
 					>
-						<ChatModelSubNode
-							node={chatModel}
-							selected={chatModel.id === selectedNodeId}
-							onSelect={onSelectNode}
-							onMove={onMoveNode}
-						/>
-					</div>
-				))}
+						{(flowEdges.length > 0 ||
+							attachmentEdges.length > 0 ||
+							branchEdges.length > 0 ||
+							connectionDrag) && (
+								<svg
+									className="dragwyb-af-builder-canvas__edges"
 
-			{nodes
+									aria-hidden="true"
 
-				.filter(
-					(node) => isMemoryAttachment(node) && node.parent_agent_id
-				)
+									focusable="false"
+								>
+									{flowEdges.map((edge) => {
+										const isSelected =
+											edge.sourceId === selectedNodeId ||
+											edge.targetId === selectedNodeId ||
+											(selectedConnection?.id === edge.id &&
+												selectedConnection?.kind === 'flow');
 
-				.map((memory) => (
-					<div
-						key={memory.id}
-						className="dragwyb-af-memory-node-wrap"
-						style={{
-							transform: `translate(${memory.x}px, ${memory.y}px)`,
-						}}
-					>
-						<MemorySubNode
-							node={memory}
-							selected={memory.id === selectedNodeId}
-							onSelect={onSelectNode}
-							onMove={onMoveNode}
-						/>
-					</div>
-				))}
+										return (
+											<path
+												key={edge.id}
+												className={
+													isSelected
+														? 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--selected'
+														: 'dragwyb-af-builder-canvas__edge'
+												}
+												d={edge.path}
+												fill="none"
+											/>
+										);
+									})}
 
-			{nodes
+									{branchEdges.map((edge) => {
+										const isSelected =
+											selectedConnection?.id === edge.id &&
+											selectedConnection?.kind === 'branch';
 
-				.filter(
-					(node) =>
-						isOutputParserAttachment(node) && node.parent_agent_id
-				)
+										return (
+											<path
+												key={edge.id}
+												className={
+													isSelected
+														? 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--branch dragwyb-af-builder-canvas__edge--selected'
+														: 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--branch'
+												}
+												d={edge.path}
+												fill="none"
+											/>
+										);
+									})}
 
-				.map((parser) => (
-					<div
-						key={parser.id}
-						className="dragwyb-af-output-parser-node-wrap"
-						style={{
-							transform: `translate(${parser.x}px, ${parser.y}px)`,
-						}}
-					>
-						<OutputParserSubNode
-							node={parser}
-							selected={parser.id === selectedNodeId}
-							hasChatModel={Boolean(
-								chatModelForOutputParser(nodes, parser.id)
+									{connectionDrag && (
+										<path
+											className={
+												connectionDrag.kind === 'branch'
+													? 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--branch dragwyb-af-builder-canvas__edge--preview'
+													: 'dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--preview'
+											}
+											d={
+												connectionDrag.kind === 'branch'
+													? branchPath(
+														connectionDrag.from,
+														connectionDrag.pointer
+													)
+													: flowPath(
+														connectionDrag.from,
+														connectionDrag.pointer
+													)
+											}
+											fill="none"
+										/>
+									)}
+
+									{attachmentEdges.map((edge) => (
+										<path
+											key={edge.id}
+
+											className="dragwyb-af-builder-canvas__edge dragwyb-af-builder-canvas__edge--attachment"
+
+											d={dashedPath(edge.from, edge.to)}
+
+											fill="none"
+										/>
+									))}
+								</svg>
 							)}
-							onSelect={onSelectNode}
-							onMove={onMoveNode}
-							onAddChatModel={onAddParserChatModel}
+
+						<FlowEdgeControls
+							flowEdges={flowEdges}
+							branchEdges={branchEdges}
+							selectedConnection={selectedConnection}
+							onSelectConnection={onSelectConnection}
+							onDeleteConnection={onDeleteConnection}
+							onInsertOnConnection={onInsertOnConnection}
 						/>
+
+						{nodes.length === 0 && <EmptyCanvasGuide />}
+
+						{canvasNodes.map((node) => {
+							if (isAgentNode(node)) {
+								const chatModel = chatModelForAgent(nodes, node.id);
+
+								const memory = memoryForAgent(nodes, node.id);
+
+								return (
+									<AgentNodeCard
+										key={node.id}
+										node={node}
+										selected={node.id === selectedNodeId}
+										isLinkTarget={isDropTarget(node)}
+										hasUnknownType={!knownTypeSlugs.includes(node.type)}
+										hasChatModel={Boolean(chatModel)}
+										hasMemory={Boolean(memory)}
+										chatModelId={chatModel?.id || null}
+										onSelect={onSelectNode}
+										onMove={onMoveNode}
+										onAddChatModel={onAddAgentChatModel}
+										onAddMemory={onAddAgentMemory}
+										onAddTool={onAddAgentTool}
+										canStartFlowConnection={canStartFlowConnection(node)}
+										onStartFlowConnectionDrag={onStartFlowConnectionDrag}
+										registerRef={registerNodeRef}
+									/>
+								);
+							}
+
+							if (node.type === 'condition_action') {
+								return (
+									<ConditionNodeCard
+										key={node.id}
+										node={node}
+										selected={node.id === selectedNodeId}
+										hasUnknownType={!knownTypeSlugs.includes(node.type)}
+										nodesById={nodesById}
+										activeBranchDrag={
+											connectionDrag?.kind === 'branch'
+												? connectionDrag
+												: null
+										}
+										hoverTargetNodeId={connectionDrag?.hoverTargetNodeId}
+										onSelect={onSelectNode}
+										onMove={onMoveNode}
+										onAddCondition={onAddCondition}
+										onRemoveCondition={onRemoveCondition}
+										onStartBranchConnectionDrag={onStartBranchConnectionDrag}
+										onDisconnectBranch={onDisconnectBranch}
+										registerRef={registerNodeRef}
+									/>
+								);
+							}
+
+							return (
+								<NodeCard
+									key={node.id}
+
+									node={node}
+
+									selected={node.id === selectedNodeId}
+
+									isLinkTarget={isDropTarget(node)}
+
+									hasUnknownType={!knownTypeSlugs.includes(node.type)}
+
+									canStartFlowConnection={canStartFlowConnection(node)}
+
+									onSelect={onSelectNode}
+
+									onMove={onMoveNode}
+
+									onStartFlowConnectionDrag={onStartFlowConnectionDrag}
+
+									registerRef={registerNodeRef}
+								/>
+							);
+						})}
+
+						{nodes
+
+							.filter(
+								(node) =>
+									(isChatModelAttachment(node) ||
+										isFallbackChatModelAttachment(node) ||
+										isParserChatModelAttachment(node)) &&
+									node.parent_agent_id
+							)
+
+							.map((chatModel) => (
+								<div
+									key={chatModel.id}
+									className="dragwyb-af-chat-model-node-wrap"
+									style={{
+										transform: `translate(${chatModel.x}px, ${chatModel.y}px)`,
+									}}
+								>
+									<ChatModelSubNode
+										node={chatModel}
+										selected={chatModel.id === selectedNodeId}
+										onSelect={onSelectNode}
+										onMove={onMoveNode}
+									/>
+								</div>
+							))}
+
+						{nodes
+
+							.filter(
+								(node) => isMemoryAttachment(node) && node.parent_agent_id
+							)
+
+							.map((memory) => (
+								<div
+									key={memory.id}
+									className="dragwyb-af-memory-node-wrap"
+									style={{
+										transform: `translate(${memory.x}px, ${memory.y}px)`,
+									}}
+								>
+									<MemorySubNode
+										node={memory}
+										selected={memory.id === selectedNodeId}
+										onSelect={onSelectNode}
+										onMove={onMoveNode}
+									/>
+								</div>
+							))}
+
+						{nodes
+
+							.filter(
+								(node) =>
+									isOutputParserAttachment(node) && node.parent_agent_id
+							)
+
+							.map((parser) => (
+								<div
+									key={parser.id}
+									className="dragwyb-af-output-parser-node-wrap"
+									style={{
+										transform: `translate(${parser.x}px, ${parser.y}px)`,
+									}}
+								>
+									<OutputParserSubNode
+										node={parser}
+										selected={parser.id === selectedNodeId}
+										hasChatModel={Boolean(
+											chatModelForOutputParser(nodes, parser.id)
+										)}
+										onSelect={onSelectNode}
+										onMove={onMoveNode}
+										onAddChatModel={onAddParserChatModel}
+									/>
+								</div>
+							))}
+
+						{nodes
+
+							.filter(
+								(node) => isToolAttachment(node) && node.parent_agent_id
+							)
+
+							.map((tool) => (
+								<div
+									key={tool.id}
+									className="dragwyb-af-tool-node-wrap"
+									style={{
+										transform: `translate(${tool.x}px, ${tool.y}px)`,
+									}}
+								>
+									<ToolNodeCard
+										node={tool}
+										selected={tool.id === selectedNodeId}
+										onSelect={onSelectNode}
+										onMove={onMoveNode}
+									/>
+								</div>
+							))}
 					</div>
-				))}
-
-			{nodes
-
-				.filter(
-					(node) => isToolAttachment(node) && node.parent_agent_id
-				)
-
-				.map((tool) => (
-					<div
-						key={tool.id}
-						className="dragwyb-af-tool-node-wrap"
-						style={{
-							transform: `translate(${tool.x}px, ${tool.y}px)`,
-						}}
-					>
-						<ToolNodeCard
-							node={tool}
-							selected={tool.id === selectedNodeId}
-							onSelect={onSelectNode}
-							onMove={onMoveNode}
-						/>
-					</div>
-				))}
 				</div>
 			</div>
-		</div>
-			<div className="dragwyb-af-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'dragwyb-agentflow')}>
+			<div className="dragwyb-af-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'dragwyb-ai-agent-workflows')}>
 				<button
 					type="button"
 					className="dragwyb-af-builder-canvas__zoom-btn"
-					aria-label={__('Zoom out', 'dragwyb-agentflow')}
+					aria-label={__('Zoom out', 'dragwyb-ai-agent-workflows')}
 					disabled={zoom <= ZOOM_MIN}
 					onClick={(event) => {
 						event.stopPropagation();
@@ -716,7 +716,7 @@ export default function Canvas({
 				<button
 					type="button"
 					className="dragwyb-af-builder-canvas__zoom-btn"
-					aria-label={__('Zoom in', 'dragwyb-agentflow')}
+					aria-label={__('Zoom in', 'dragwyb-ai-agent-workflows')}
 					disabled={zoom >= ZOOM_MAX}
 					onClick={(event) => {
 						event.stopPropagation();
@@ -734,7 +734,7 @@ function EmptyCanvasGuide() {
 	return (
 		<div className="dragwyb-af-builder-canvas__guide" role="status">
 			<h2 className="dragwyb-af-builder-canvas__guide-title">
-				{__('Build your workflow', 'dragwyb-agentflow')}
+				{__('Build your workflow', 'dragwyb-ai-agent-workflows')}
 			</h2>
 
 			<ol className="dragwyb-af-builder-canvas__guide-steps">
@@ -742,7 +742,7 @@ function EmptyCanvasGuide() {
 					{__(
 						'Add a trigger, then add an AI Agent from the Agents section.',
 
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</li>
 
@@ -750,14 +750,14 @@ function EmptyCanvasGuide() {
 					{__(
 						'Click + under Chat Model to pick OpenAI, Gemini, or Claude.',
 
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</li>
 
 				<li>
 					{__(
 						'Add Condition from Tools, then use + on each branch to connect different flows.',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)}
 				</li>
 			</ol>

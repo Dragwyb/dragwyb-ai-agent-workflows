@@ -2,15 +2,15 @@
 /**
  * Builds LLM tool schemas from attached workflow action nodes.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service\Agent;
+namespace DragwybVisualAutomation\Plugin\Service\Agent;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -120,6 +120,18 @@ class AgentToolSchemaBuilder {
 		$label = isset( $tool_node['label'] ) ? trim( (string) $tool_node['label'] ) : '';
 		if ( '' !== $label && $label !== $action->label() ) {
 			$description = $label . ' — ' . $description;
+		}
+
+		if ( 'wp_create_user_action' === $node_type ) {
+			$role = isset( $config['user_role'] ) ? trim( (string) $config['user_role'] ) : '';
+			if ( '' === $role ) {
+				$role = 'subscriber';
+			}
+			$description .= ' ' . sprintf(
+				/* translators: %s: WordPress role slug */
+				__( 'Pass email and username only. Role is fixed on this tool node (currently "%s"; use the role slug e.g. customer, not the label). Password is auto-generated. The model cannot change the role via tool arguments.', 'dragwyb-ai-agent-workflows' ),
+				$role
+			);
 		}
 
 		return array(
@@ -256,19 +268,19 @@ class AgentToolSchemaBuilder {
 		$parts = array( $description );
 
 		if ( in_array( $field_key, array( 'message', 'prompt', 'text', 'body', 'content' ), true ) ) {
-			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-agentflow' );
+			$parts[] = __( 'Provide the complete final text with actual values from the workflow data. Do not use {{placeholder}} templates.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( 'post_type' === $field_key ) {
-			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-agentflow' );
+			$parts[] = __( 'Prefer the trigger post_type from workflow data (page vs post vs CPT) unless the user explicitly asks for a different type.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( 'array' === $field_type ) {
-			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-agentflow' );
+			$parts[] = __( 'Pass a JSON array of strings (or a comma-separated string).', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( 'key_value' === $field_type ) {
-			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-agentflow' );
+			$parts[] = __( 'Pass a flat JSON object of key → value pairs, e.g. {"seo_title":"…","_custom":"…"}.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		if ( array_key_exists( $field_key, $config ) && ! $this->configValueIsEmpty( $config[ $field_key ] ) ) {
@@ -276,7 +288,7 @@ class AgentToolSchemaBuilder {
 			if ( is_scalar( $default ) ) {
 				$parts[] = sprintf(
 					/* translators: %s: current default value */
-					__( 'Current node default: %s. You may override this value.', 'dragwyb-agentflow' ),
+					__( 'Current node default: %s. You may override this value.', 'dragwyb-ai-agent-workflows' ),
 					(string) $default
 				);
 			}
@@ -370,6 +382,25 @@ class AgentToolSchemaBuilder {
 			}
 		}
 
-		return null;
+		// Models sometimes mangle the type prefix (e.g. wp_create_user_user_action__hash).
+		// Match uniquely on the stable 8-char hash suffix when present.
+		$parsed = self::parseToolName( $tool_name );
+		if ( null === $parsed ) {
+			return null;
+		}
+
+		$hash           = $parsed['id'];
+		$hash_matches   = array();
+		foreach ( $graph_nodes as $graph_node ) {
+			if ( ! is_array( $graph_node ) || empty( $graph_node['id'] ) || empty( $graph_node['type'] ) ) {
+				continue;
+			}
+
+			if ( substr( md5( (string) $graph_node['id'] ), 0, 8 ) === $hash ) {
+				$hash_matches[] = $graph_node;
+			}
+		}
+
+		return 1 === count( $hash_matches ) ? $hash_matches[0] : null;
 	}
 }

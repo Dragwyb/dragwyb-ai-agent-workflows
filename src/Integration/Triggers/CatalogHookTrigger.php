@@ -2,18 +2,18 @@
 /**
  * Catalog-defined WordPress hook trigger.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Triggers;
+namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerGroupInterface;
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
-use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
-use DragwybAgentFlow\Plugin\Service\TriggerPayloadNormalizer;
-use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybVisualAutomation\Plugin\Service\TriggerPayloadNormalizer;
+use DragwybVisualAutomation\Plugin\Service\TriggerReentrancyGuard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -41,10 +41,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		$hook = (string) ( $this->definition['hook_name'] ?? '' );
 
 		if ( self::isPostContentHook( $hook ) ) {
-			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'dragwyb-agentflow' );
+			return __( 'Starts the workflow when this WordPress post event fires for posts, pages, or custom post types (filterable via Post Types).', 'dragwyb-ai-agent-workflows' );
 		}
 
-		return __( 'Starts the workflow when this WordPress event fires.', 'dragwyb-agentflow' );
+		return __( 'Starts the workflow when this WordPress event fires.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function group(): string {
@@ -81,10 +81,10 @@ class CatalogHookTrigger implements TriggerInterface, TriggerGroupInterface {
 		if ( self::isPostContentHook( (string) $this->definition['hook_name'] ) ) {
 			$schema['post_types'] = array(
 				'type'        => 'string',
-				'label'       => __( 'Post Types', 'dragwyb-agentflow' ),
+				'label'       => __( 'Post Types', 'dragwyb-ai-agent-workflows' ),
 				'default'     => '',
-				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'dragwyb-agentflow' ),
-				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'dragwyb-agentflow' ),
+				'description' => __( 'Leave empty to run for posts, pages, and custom post types. Or comma-separated slugs, e.g. post,page.', 'dragwyb-ai-agent-workflows' ),
+				'help'        => __( 'Empty = all content types (including pages). Example: page — only pages. Internal types (attachments, revisions, templates) are always skipped.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

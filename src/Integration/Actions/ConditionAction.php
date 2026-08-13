@@ -4,18 +4,18 @@
 
  * ConditionAction - Branch filtering.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
 
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
 
-use DragwybAgentFlow\Plugin\Service\ContextPathResolver;
+use DragwybVisualAutomation\Plugin\Service\ContextPathResolver;
 
 
 
@@ -40,14 +40,14 @@ class ConditionAction implements ActionInterface {
 
 	public function label(): string {
 
-		return __( 'Condition', 'dragwyb-agentflow' );
+		return __( 'Condition', 'dragwyb-ai-agent-workflows' );
 	}
 
 
 
 	public function description(): string {
 
-		return __( 'Route the workflow down different branches when conditions match.', 'dragwyb-agentflow' );
+		return __( 'Route the workflow down different branches when conditions match.', 'dragwyb-ai-agent-workflows' );
 	}
 
 
@@ -60,7 +60,7 @@ class ConditionAction implements ActionInterface {
 
 				'type'    => 'condition_routes',
 
-				'label'   => __( 'Conditions', 'dragwyb-agentflow' ),
+				'label'   => __( 'Conditions', 'dragwyb-ai-agent-workflows' ),
 
 				'default' => array(),
 
@@ -70,7 +70,7 @@ class ConditionAction implements ActionInterface {
 
 				'type'    => 'node_select',
 
-				'label'   => __( 'No Condition Matched', 'dragwyb-agentflow' ),
+				'label'   => __( 'No Condition Matched', 'dragwyb-ai-agent-workflows' ),
 
 				'default' => '',
 
@@ -137,7 +137,7 @@ class ConditionAction implements ActionInterface {
 
 			'matched_condition_id'    => 'default',
 
-			'matched_condition_label' => __( 'No Condition Matched', 'dragwyb-agentflow' ),
+			'matched_condition_label' => __( 'No Condition Matched', 'dragwyb-ai-agent-workflows' ),
 
 			'evaluated_value'         => '',
 
@@ -184,7 +184,7 @@ class ConditionAction implements ActionInterface {
 
 				'id'       => 'legacy-true',
 
-				'label'    => __( 'If yes', 'dragwyb-agentflow' ),
+				'label'    => __( 'If yes', 'dragwyb-ai-agent-workflows' ),
 
 				'field'    => $field,
 

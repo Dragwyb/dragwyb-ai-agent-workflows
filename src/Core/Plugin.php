@@ -2,70 +2,70 @@
 /**
  * Main plugin bootstrap class.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Core;
+namespace DragwybVisualAutomation\Plugin\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use DragwybAgentFlow\Plugin\Admin\ConnectionActionsController;
-use DragwybAgentFlow\Plugin\Admin\GoogleOAuthStartController;
-use DragwybAgentFlow\Plugin\Admin\Menu;
-use DragwybAgentFlow\Plugin\Admin\Pages\BuilderPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionsPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\RunDetailPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\RunsPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\SettingsPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\WebhookFormPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\WebhooksPage;
-use DragwybAgentFlow\Plugin\Admin\Pages\WorkflowsPage;
-use DragwybAgentFlow\Plugin\Admin\RunActionsController;
-use DragwybAgentFlow\Plugin\Admin\SettingsController;
-use DragwybAgentFlow\Plugin\Admin\WebhookActionsController;
-use DragwybAgentFlow\Plugin\Admin\WorkflowActionsController;
-use DragwybAgentFlow\Plugin\Database\MigrationRunner;
-use DragwybAgentFlow\Plugin\Database\SchemaMigrations;
-use DragwybAgentFlow\Plugin\Integration\BuiltInNodeTypes;
-use DragwybAgentFlow\Plugin\Integration\WorkflowTriggerBinder;
-use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
-use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
-use DragwybAgentFlow\Plugin\Rest\RestApi;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentService;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentToolExecutor;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
-use DragwybAgentFlow\Plugin\Service\AiModelsService;
-use DragwybAgentFlow\Plugin\Service\BackgroundRunner;
-use DragwybAgentFlow\Plugin\Service\ChatMessageService;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\ConnectionVerifier;
-use DragwybAgentFlow\Plugin\Service\ElementorFormsService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
-use DragwybAgentFlow\Plugin\Service\NodeExecutionService;
-use DragwybAgentFlow\Plugin\Service\NodeTypeRegistry;
-use DragwybAgentFlow\Plugin\Service\RunRetentionService;
-use DragwybAgentFlow\Plugin\Service\SettingsService;
-use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
-use DragwybAgentFlow\Plugin\Service\WebhookService;
-use DragwybAgentFlow\Plugin\Service\WorkflowExecutionService;
-use DragwybAgentFlow\Plugin\Service\WorkflowService;
-use DragwybAgentFlow\Plugin\Service\WorkflowNodeTestService;
-use DragwybAgentFlow\Plugin\Service\WorkflowTestListenerService;
-use DragwybAgentFlow\Plugin\Provider\PersistenceServiceProvider;
-use DragwybAgentFlow\Plugin\Provider\AdminServiceProvider;
-use DragwybAgentFlow\Plugin\Provider\RestServiceProvider;
-use DragwybAgentFlow\Plugin\Provider\ExecutionServiceProvider;
+use DragwybVisualAutomation\Plugin\Admin\ConnectionActionsController;
+use DragwybVisualAutomation\Plugin\Admin\GoogleOAuthStartController;
+use DragwybVisualAutomation\Plugin\Admin\Menu;
+use DragwybVisualAutomation\Plugin\Admin\Pages\BuilderPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionsPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\RunDetailPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\RunsPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\SettingsPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\WebhookFormPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\WebhooksPage;
+use DragwybVisualAutomation\Plugin\Admin\Pages\WorkflowsPage;
+use DragwybVisualAutomation\Plugin\Admin\RunActionsController;
+use DragwybVisualAutomation\Plugin\Admin\SettingsController;
+use DragwybVisualAutomation\Plugin\Admin\WebhookActionsController;
+use DragwybVisualAutomation\Plugin\Admin\WorkflowActionsController;
+use DragwybVisualAutomation\Plugin\Database\MigrationRunner;
+use DragwybVisualAutomation\Plugin\Database\SchemaMigrations;
+use DragwybVisualAutomation\Plugin\Integration\BuiltInNodeTypes;
+use DragwybVisualAutomation\Plugin\Integration\WorkflowTriggerBinder;
+use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WebhookRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Rest\RestApi;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentAiClient;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentService;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentToolExecutor;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybVisualAutomation\Plugin\Service\AiModelsService;
+use DragwybVisualAutomation\Plugin\Service\BackgroundRunner;
+use DragwybVisualAutomation\Plugin\Service\ChatMessageService;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\ConnectionVerifier;
+use DragwybVisualAutomation\Plugin\Service\ElementorFormsService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Service\NodeExecutionService;
+use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
+use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
+use DragwybVisualAutomation\Plugin\Service\SettingsService;
+use DragwybVisualAutomation\Plugin\Service\TriggerReentrancyGuard;
+use DragwybVisualAutomation\Plugin\Service\WebhookService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowNodeTestService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowTestListenerService;
+use DragwybVisualAutomation\Plugin\Provider\PersistenceServiceProvider;
+use DragwybVisualAutomation\Plugin\Provider\AdminServiceProvider;
+use DragwybVisualAutomation\Plugin\Provider\RestServiceProvider;
+use DragwybVisualAutomation\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

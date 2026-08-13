@@ -2,12 +2,12 @@
 /**
  * Formats GMT-stored timestamps for admin display.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -53,7 +53,7 @@ class RunTimestamp {
 
 		return sprintf(
 			/* translators: %s: formatted date/time. */
-			__( '%s UTC', 'dragwyb-agentflow' ),
+			__( '%s UTC', 'dragwyb-ai-agent-workflows' ),
 			gmdate( $format, $timestamp )
 		);
 	}

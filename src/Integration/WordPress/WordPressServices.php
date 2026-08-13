@@ -2,18 +2,18 @@
 /**
  * Implements every WordPress workflow action's business logic.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
 
-use DragwybAgentFlow\Plugin\Integration\WordPress\Service\CommentWordPressService;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Service\PluginWordPressService;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Service\PostWordPressService;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Service\TaxonomyWordPressService;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Service\UserWordPressService;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Service\CommentWordPressService;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Service\PluginWordPressService;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Service\PostWordPressService;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Service\TaxonomyWordPressService;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Service\UserWordPressService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

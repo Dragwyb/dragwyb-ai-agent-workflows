@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\AiProviders\DeepSeek;
+namespace DragwybVisualAutomation\AiProviders\DeepSeek;
 
-use DragwybAgentFlow\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use DragwybVisualAutomation\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * DeepSeek AI provider (OpenAI-compatible).

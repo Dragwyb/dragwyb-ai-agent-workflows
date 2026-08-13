@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Plugin management actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress\Service;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Service;
 
-use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +25,7 @@ final class PluginWordPressService {
 		$file = WordPressActionHelper::str( $config, 'plugin_file' );
 
 		if ( '' === $file ) {
-			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensurePluginIncludes();
@@ -44,7 +44,7 @@ final class PluginWordPressService {
 		$file = WordPressActionHelper::str( $config, 'plugin_file' );
 
 		if ( '' === $file ) {
-			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		WordPressActionHelper::ensurePluginIncludes();

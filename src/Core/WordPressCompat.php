@@ -2,7 +2,7 @@
 /**
  * WordPress version helpers and polyfills for declared minimum support.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 // Prevent direct file access.

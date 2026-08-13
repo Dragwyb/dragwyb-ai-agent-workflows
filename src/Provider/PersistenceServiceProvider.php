@@ -2,20 +2,20 @@
 /**
  * Registers persistence repositories against the container.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Provider;
+namespace DragwybVisualAutomation\Plugin\Provider;
 
-use DragwybAgentFlow\Plugin\Core\Container;
-use DragwybAgentFlow\Plugin\Persistence\ConnectionRepository;
-use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Core\Container;
+use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WebhookRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,12 +2,12 @@
 /**
  * DeepSeek Chat Completions action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -20,11 +20,11 @@ class DeepSeekChatAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'DeepSeek Chat', 'dragwyb-agentflow' );
+		return __( 'DeepSeek Chat', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to DeepSeek and returns the reply.', 'dragwyb-agentflow' );
+		return __( 'Sends a prompt to DeepSeek and returns the reply.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	protected function providerSlug(): string {

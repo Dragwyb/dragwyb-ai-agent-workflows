@@ -41,11 +41,11 @@ export default function OutputParserSubNode({
 			</span>
 			<span className="dragwyb-af-output-parser-node__label">
 				{node.label ||
-					__('Structured Output Parser', 'dragwyb-agentflow')}
+					__('Structured Output Parser', 'dragwyb-ai-agent-workflows')}
 			</span>
 			<div className="dragwyb-af-output-parser-node__model-row">
 				<span className="dragwyb-af-output-parser-node__model-label">
-					{__('Model', 'dragwyb-agentflow')}
+					{__('Model', 'dragwyb-ai-agent-workflows')}
 					{!hasChatModel ? '*' : ''}
 				</span>
 				{!hasChatModel && onAddChatModel ? (
@@ -56,7 +56,7 @@ export default function OutputParserSubNode({
 							event.stopPropagation();
 							onAddChatModel(node.id);
 						}}
-						aria-label={__('Connect model', 'dragwyb-agentflow')}
+						aria-label={__('Connect model', 'dragwyb-ai-agent-workflows')}
 					>
 						+
 					</button>

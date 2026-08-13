@@ -89,7 +89,7 @@ export default function AgentNodeCard({
 					<div className="dragwyb-af-builder-node__text">
 						<span className="dragwyb-af-builder-node__label">{node.label}</span>
 						<span className="dragwyb-af-builder-node__subtitle">
-							{__('AI Agent', 'dragwyb-agentflow')}
+							{__('AI Agent', 'dragwyb-ai-agent-workflows')}
 						</span>
 					</div>
 				</div>
@@ -100,11 +100,11 @@ export default function AgentNodeCard({
 						className="dragwyb-af-builder-node__output-port dragwyb-af-builder-node__output-port--side"
 						title={__(
 							'Drag to the next step to connect',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 						aria-label={__(
 							'Drag to the next step to connect',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 						onPointerDown={(event) => {
 							stopPointer(event);
@@ -120,17 +120,17 @@ export default function AgentNodeCard({
 			>
 				<div className="dragwyb-af-agent-node__port">
 					<span className="dragwyb-af-agent-node__port-label">
-						{__('Chat Model', 'dragwyb-agentflow')}
+						{__('Chat Model', 'dragwyb-ai-agent-workflows')}
 						<span className="dragwyb-af-agent-node__required">*</span>
 					</span>
 					{hasChatModel ? (
 						<button
 							type="button"
 							className="dragwyb-af-agent-node__port-dot dragwyb-af-agent-node__port-dot--ok dragwyb-af-agent-node__port-dot--link"
-							title={__('Open chat model settings', 'dragwyb-agentflow')}
+							title={__('Open chat model settings', 'dragwyb-ai-agent-workflows')}
 							aria-label={__(
 								'Open chat model settings',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -146,11 +146,11 @@ export default function AgentNodeCard({
 							className="dragwyb-af-agent-node__add-port"
 							aria-label={__(
 								'Add chat model to agent',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							title={__(
 								'Select OpenAI, Gemini, Claude, OpenRouter, Groq, or DeepSeek',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
@@ -165,19 +165,19 @@ export default function AgentNodeCard({
 
 				<div className="dragwyb-af-agent-node__port">
 					<span className="dragwyb-af-agent-node__port-label">
-						{__('Memory', 'dragwyb-agentflow')}
+						{__('Memory', 'dragwyb-ai-agent-workflows')}
 					</span>
 					{hasMemory ? (
 						<span
 							className="dragwyb-af-agent-node__port-dot dragwyb-af-agent-node__port-dot--ok"
-							title={__('Memory connected', 'dragwyb-agentflow')}
+							title={__('Memory connected', 'dragwyb-ai-agent-workflows')}
 						/>
 					) : (
 						<button
 							type="button"
 							className="dragwyb-af-agent-node__add-port dragwyb-af-agent-node__add-port--muted"
-							aria-label={__('Add memory to agent', 'dragwyb-agentflow')}
-							title={__('Add simple memory', 'dragwyb-agentflow')}
+							aria-label={__('Add memory to agent', 'dragwyb-ai-agent-workflows')}
+							title={__('Add simple memory', 'dragwyb-ai-agent-workflows')}
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -191,15 +191,15 @@ export default function AgentNodeCard({
 
 				<div className="dragwyb-af-agent-node__port dragwyb-af-agent-node__port--tool">
 					<span className="dragwyb-af-agent-node__port-label">
-						{__('Tool', 'dragwyb-agentflow')}
+						{__('Tool', 'dragwyb-ai-agent-workflows')}
 					</span>
 					<button
 						type="button"
 						className="dragwyb-af-agent-node__add-port"
-						aria-label={__('Add tool to agent', 'dragwyb-agentflow')}
+						aria-label={__('Add tool to agent', 'dragwyb-ai-agent-workflows')}
 						title={__(
 							'Add an action as an agent tool',
-							'dragwyb-agentflow'
+							'dragwyb-ai-agent-workflows'
 						)}
 						onPointerDown={stopPointer}
 						onClick={(event) => {

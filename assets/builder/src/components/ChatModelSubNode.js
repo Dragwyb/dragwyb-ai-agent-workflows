@@ -50,10 +50,10 @@ export default function ChatModelSubNode({
 				<span className="dragwyb-af-chat-model-node__icon">{meta.icon}</span>
 			</span>
 			<span className="dragwyb-af-chat-model-node__label">
-				{node.label || __('Chat Model', 'dragwyb-agentflow')}
+				{node.label || __('Chat Model', 'dragwyb-ai-agent-workflows')}
 			</span>
 			<span className="dragwyb-af-chat-model-node__subtitle">
-				{__('Chat Model', 'dragwyb-agentflow')}
+				{__('Chat Model', 'dragwyb-ai-agent-workflows')}
 			</span>
 		</div>
 	);

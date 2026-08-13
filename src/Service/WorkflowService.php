@@ -2,22 +2,22 @@
 /**
  * Workflow application service.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Domain\Workflow;
-use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
-use DragwybAgentFlow\Plugin\Persistence\WebhookRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowNodeRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Domain\Workflow;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
+use DragwybVisualAutomation\Plugin\Persistence\WebhookRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowNodeRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,7 +74,7 @@ class WorkflowService {
 		$title = isset( $attributes['title'] ) ? trim( (string) $attributes['title'] ) : '';
 
 		if ( '' === $title ) {
-			throw new InvalidArgumentException( esc_html__( 'A workflow title is required.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'A workflow title is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$workflow = $this->workflows->insert(
@@ -87,7 +87,7 @@ class WorkflowService {
 		);
 
 		if ( null === $workflow ) {
-			throw new RuntimeException( esc_html__( 'Failed to create the workflow.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'Failed to create the workflow.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $workflow;
@@ -122,7 +122,7 @@ class WorkflowService {
 			$attributes['title'] = trim( (string) $attributes['title'] );
 
 			if ( '' === $attributes['title'] ) {
-				throw new InvalidArgumentException( esc_html__( 'A workflow title cannot be empty.', 'dragwyb-agentflow' ) );
+				throw new InvalidArgumentException( esc_html__( 'A workflow title cannot be empty.', 'dragwyb-ai-agent-workflows' ) );
 			}
 		}
 
@@ -141,7 +141,7 @@ class WorkflowService {
 	 */
 	public function changeStatus( int $id, int $status ): ?Workflow {
 		if ( ! in_array( $status, Workflow::VALID_STATUSES, true ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Invalid workflow status.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'Invalid workflow status.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $this->workflows->update( $id, array( 'status' => $status ) );
@@ -211,14 +211,14 @@ class WorkflowService {
 	 */
 	public function addNode( int $workflow_id, array $attributes ): WorkflowNode {
 		if ( null === $this->workflows->find( $workflow_id, true ) ) {
-			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'The specified workflow does not exist.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$client_node_id = isset( $attributes['client_node_id'] ) ? trim( (string) $attributes['client_node_id'] ) : '';
 		$node_type      = isset( $attributes['node_type'] ) ? trim( (string) $attributes['node_type'] ) : '';
 
 		if ( '' === $client_node_id || '' === $node_type ) {
-			throw new InvalidArgumentException( esc_html__( 'A node requires both a client node id and a node type.', 'dragwyb-agentflow' ) );
+			throw new InvalidArgumentException( esc_html__( 'A node requires both a client node id and a node type.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$node = $this->nodes->insert(
@@ -232,7 +232,7 @@ class WorkflowService {
 		);
 
 		if ( null === $node ) {
-			throw new RuntimeException( esc_html__( 'Failed to add the node. Its client node id may already be used in this workflow.', 'dragwyb-agentflow' ) );
+			throw new RuntimeException( esc_html__( 'Failed to add the node. Its client node id may already be used in this workflow.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return $node;

@@ -2,17 +2,17 @@
 /**
  * Executes a single builder node for "Test node" previews.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Domain\Workflow;
-use DragwybAgentFlow\Plugin\Domain\WorkflowNode;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentGraphHelper;
-use DragwybAgentFlow\Plugin\Service\ConfigInterpolator;
+use DragwybVisualAutomation\Plugin\Domain\Workflow;
+use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentGraphHelper;
+use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -57,7 +57,7 @@ class WorkflowNodeTestService {
 			return array(
 				'success' => false,
 				'kind'    => 'unknown',
-				'error'   => __( 'Workflow not found.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -71,7 +71,7 @@ class WorkflowNodeTestService {
 			return array(
 				'success' => false,
 				'kind'    => 'unknown',
-				'error'   => __( 'This workflow has no nodes to test.', 'dragwyb-agentflow' ),
+				'error'   => __( 'This workflow has no nodes to test.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -89,7 +89,7 @@ class WorkflowNodeTestService {
 			return array(
 				'success' => false,
 				'kind'    => 'unknown',
-				'error'   => __( 'Node not found in this workflow.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Node not found in this workflow.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -101,7 +101,7 @@ class WorkflowNodeTestService {
 				return array(
 					'success' => false,
 					'kind'    => 'trigger',
-					'error'   => __( 'No captured trigger data yet. Use Test Flow → Listen new response first.', 'dragwyb-agentflow' ),
+					'error'   => __( 'No captured trigger data yet. Use Test Flow → Listen new response first.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -165,7 +165,7 @@ class WorkflowNodeTestService {
 					'kind'    => 'action',
 					'error'   => sprintf(
 						/* translators: %s: prior node label */
-						__( 'A prior step failed (%s), so this node could not be tested.', 'dragwyb-agentflow' ),
+						__( 'A prior step failed (%s), so this node could not be tested.', 'dragwyb-ai-agent-workflows' ),
 						$label
 					),
 					'input'   => $this->buildTestInput( $target, $context ),
@@ -179,7 +179,7 @@ class WorkflowNodeTestService {
 		return array(
 			'success' => false,
 			'kind'    => 'unknown',
-			'error'   => __( 'Node not found in execution order.', 'dragwyb-agentflow' ),
+			'error'   => __( 'Node not found in execution order.', 'dragwyb-ai-agent-workflows' ),
 		);
 	}
 
@@ -194,7 +194,7 @@ class WorkflowNodeTestService {
 		if ( null === $this->registry->action( (string) $graph_node['type'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'This node type is not registered or cannot be executed.', 'dragwyb-agentflow' ),
+				'error'   => __( 'This node type is not registered or cannot be executed.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -243,7 +243,7 @@ class WorkflowNodeTestService {
 		if ( empty( $result['success'] ) ) {
 			$response['error'] = isset( $result['error'] ) && is_string( $result['error'] ) && '' !== $result['error']
 				? $result['error']
-				: __( 'The node failed without a specific error message.', 'dragwyb-agentflow' );
+				: __( 'The node failed without a specific error message.', 'dragwyb-ai-agent-workflows' );
 		}
 
 		return $response;

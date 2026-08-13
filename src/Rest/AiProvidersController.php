@@ -2,16 +2,16 @@
 /**
  * REST controller for AI provider models / credentials.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
-use DragwybAgentFlow\Plugin\Service\AiModelsService;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybVisualAutomation\Plugin\Service\AiModelsService;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -136,7 +136,7 @@ class AiProvidersController extends WP_REST_Controller {
 		if ( '' === $key ) {
 			return new WP_Error(
 				'dragwyb_af_rest_invalid',
-				__( 'Provider is required.', 'dragwyb-agentflow' ),
+				__( 'Provider is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}

@@ -2,16 +2,16 @@
 /**
  * Base class for Google Sheets workflow actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\GoogleSheet;
+namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,7 +32,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	protected function connectionField(): array {
 		return array(
 			'type'     => 'connection',
-			'label'    => __( 'Google connection', 'dragwyb-agentflow' ),
+			'label'    => __( 'Google connection', 'dragwyb-ai-agent-workflows' ),
 			'required' => true,
 			'default'  => 0,
 		);
@@ -44,7 +44,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	protected function spreadsheetIdField(): array {
 		return array(
 			'type'     => 'string',
-			'label'    => __( 'Spreadsheet ID (from the sheet URL)', 'dragwyb-agentflow' ),
+			'label'    => __( 'Spreadsheet ID (from the sheet URL)', 'dragwyb-ai-agent-workflows' ),
 			'required' => true,
 		);
 	}
@@ -55,7 +55,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	protected function sheetTitleField(): array {
 		return array(
 			'type'     => 'string',
-			'label'    => __( 'Sheet tab name', 'dragwyb-agentflow' ),
+			'label'    => __( 'Sheet tab name', 'dragwyb-ai-agent-workflows' ),
 			'default'  => 'Sheet1',
 			'required' => true,
 		);
@@ -67,7 +67,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	protected function valuesField(): array {
 		return array(
 			'type'     => 'string',
-			'label'    => __( 'Row values, comma-separated (supports {{trigger.fields.*}})', 'dragwyb-agentflow' ),
+			'label'    => __( 'Row values, comma-separated (supports {{trigger.fields.*}})', 'dragwyb-ai-agent-workflows' ),
 			'required' => true,
 		);
 	}
@@ -80,8 +80,8 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 	protected function optionalValuesField(): array {
 		return array(
 			'type'           => 'string',
-			'label'          => __( 'Row values', 'dragwyb-agentflow' ),
-			'description'    => __( 'Comma-separated cell values for a data row (map fields from trigger/post data). Optional.', 'dragwyb-agentflow' ),
+			'label'          => __( 'Row values', 'dragwyb-ai-agent-workflows' ),
+			'description'    => __( 'Comma-separated cell values for a data row (map fields from trigger/post data). Optional.', 'dragwyb-ai-agent-workflows' ),
 			'agent_fillable' => true,
 		);
 	}
@@ -152,7 +152,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 		if ( empty( $result['success'] ) ) {
 			return array(
 				'success' => false,
-				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Google Sheets request failed.', 'dragwyb-agentflow' ),
+				'error'   => isset( $result['error'] ) ? (string) $result['error'] : __( 'Google Sheets request failed.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -199,7 +199,7 @@ abstract class AbstractGoogleSheetsAction implements ActionInterface {
 		if ( '' === $spreadsheet_id ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No spreadsheet ID configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No spreadsheet ID configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

@@ -2,16 +2,16 @@
 /**
  * Generic action node type driven by a `WordPressActionCatalog` entry.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionGroupInterface;
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\TriggerReentrancyGuard;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionGroupInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\TriggerReentrancyGuard;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

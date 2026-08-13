@@ -2,17 +2,17 @@
 /**
  * Boots WordPress AI Client and registers providers.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service\Ai;
+namespace DragwybVisualAutomation\Plugin\Service\Ai;
 
-use DragwybAgentFlow\AiProviders\DeepSeek\DeepSeekProvider;
-use DragwybAgentFlow\AiProviders\Groq\GroqProvider;
-use DragwybAgentFlow\AiProviders\OpenRouter\OpenRouterProvider;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\AiProviders\DeepSeek\DeepSeekProvider;
+use DragwybVisualAutomation\AiProviders\Groq\GroqProvider;
+use DragwybVisualAutomation\AiProviders\OpenRouter\OpenRouterProvider;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
 use WordPress\AnthropicAiProvider\Provider\AnthropicProvider;
@@ -30,6 +30,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AiClientBootstrap {
 
 	public const MIGRATION_OPTION = 'dragwyb_af_ai_credentials_migrated_to_wp70';
+
+	/**
+	 * Prefixed storage for provider API keys (vendor SDK path, below WP 7).
+	 */
+	public const CREDENTIALS_OPTION = 'dragwyb_af_ai_provider_credentials';
+
+	/**
+	 * Legacy option written before prefix hardening (do not write; migrate only).
+	 */
+	private const LEGACY_CREDENTIALS_OPTION = 'wp_ai_client_provider_credentials';
 
 	/**
 	 * Provider id map: dragwyb_af slug → AiClient / Connectors id.
@@ -220,6 +230,25 @@ class AiClientBootstrap {
 	}
 
 	/**
+	 * Prefixed credentials map, migrating once from the legacy unprefixed option.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function getCredentialsMap(): array {
+		$credentials = get_option( self::CREDENTIALS_OPTION, null );
+
+		if ( ! is_array( $credentials ) ) {
+			$legacy = get_option( self::LEGACY_CREDENTIALS_OPTION, array() );
+			$credentials = is_array( $legacy ) ? $legacy : array();
+			if ( array() !== $credentials ) {
+				update_option( self::CREDENTIALS_OPTION, $credentials );
+			}
+		}
+
+		return $credentials;
+	}
+
+	/**
 	 * Read the stored API key for a provider (never logs or exposes it).
 	 */
 	public static function getStoredApiKey( string $dragwyb_af_provider ): string {
@@ -233,8 +262,8 @@ class AiClientBootstrap {
 			return is_string( $key ) ? trim( $key ) : '';
 		}
 
-		$credentials = get_option( 'wp_ai_client_provider_credentials', array() );
-		if ( ! is_array( $credentials ) || empty( $credentials[ $provider_id ] ) || ! is_string( $credentials[ $provider_id ] ) ) {
+		$credentials = self::getCredentialsMap();
+		if ( empty( $credentials[ $provider_id ] ) || ! is_string( $credentials[ $provider_id ] ) ) {
 			return '';
 		}
 
@@ -284,7 +313,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'dragwyb-agentflow' ),
+				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -295,7 +324,7 @@ class AiClientBootstrap {
 		if ( '' === $api_key ) {
 			return new WP_Error(
 				'dragwyb_af_ai_missing_key',
-				__( 'No API key configured for this provider. Add an API key in this node.', 'dragwyb-agentflow' ),
+				__( 'No API key configured for this provider. Add an API key in this node.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -308,7 +337,7 @@ class AiClientBootstrap {
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'dragwyb_af_ai_auth_failed',
-				__( 'Could not attach API credentials for this provider.', 'dragwyb-agentflow' ),
+				__( 'Could not attach API credentials for this provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -320,7 +349,7 @@ class AiClientBootstrap {
 	 * Validate and persist a site-wide API key for a provider.
 	 *
 	 * WP 7+: stores in connectors_ai_{id}_api_key.
-	 * Below WP 7: merges into wp_ai_client_provider_credentials.
+	 * Below WP 7: merges into dragwyb_af_ai_provider_credentials.
 	 *
 	 * @param string $dragwyb_af_provider Provider slug (openai, claude, openrouter, …).
 	 * @param string $api_key      Raw API key.
@@ -331,7 +360,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'dragwyb-agentflow' ),
+				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -342,7 +371,7 @@ class AiClientBootstrap {
 		if ( '' === $provider_id ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unknown_provider',
-				__( 'Unknown AI provider.', 'dragwyb-agentflow' ),
+				__( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -350,7 +379,7 @@ class AiClientBootstrap {
 		if ( '' === $api_key ) {
 			return new WP_Error(
 				'dragwyb_af_ai_empty_key',
-				__( 'API key is required.', 'dragwyb-agentflow' ),
+				__( 'API key is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -362,7 +391,7 @@ class AiClientBootstrap {
 				'dragwyb_af_ai_provider_unregistered',
 				sprintf(
 					/* translators: %s: provider id */
-					__( 'AI provider "%s" is not registered.', 'dragwyb-agentflow' ),
+					__( 'AI provider "%s" is not registered.', 'dragwyb-ai-agent-workflows' ),
 					$provider_id
 				),
 				array( 'status' => 400 )
@@ -382,7 +411,7 @@ class AiClientBootstrap {
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'dragwyb_af_ai_key_invalid',
-				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-agentflow' ),
+				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -390,12 +419,12 @@ class AiClientBootstrap {
 		if ( self::usesCoreConnectors() ) {
 			update_option( self::connectorsOptionName( $provider_id ), $api_key );
 		} else {
-			$credentials = get_option( 'wp_ai_client_provider_credentials', array() );
+			$credentials = self::getCredentialsMap();
 			if ( ! is_array( $credentials ) ) {
 				$credentials = array();
 			}
 			$credentials[ $provider_id ] = $api_key;
-			update_option( 'wp_ai_client_provider_credentials', $credentials );
+			update_option( self::CREDENTIALS_OPTION, $credentials );
 		}
 
 		delete_transient( 'dragwyb_af_ai_models_' . $provider_id );
@@ -427,7 +456,7 @@ class AiClientBootstrap {
 			if ( is_wp_error( $response ) ) {
 				return new WP_Error(
 					'dragwyb_af_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-agentflow' ),
+					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -436,7 +465,7 @@ class AiClientBootstrap {
 			if ( 200 !== $code ) {
 				return new WP_Error(
 					'dragwyb_af_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-agentflow' ),
+					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -455,14 +484,14 @@ class AiClientBootstrap {
 			if ( ! $registry->isProviderConfigured( $provider_id ) ) {
 				return new WP_Error(
 					'dragwyb_af_ai_key_invalid',
-					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-agentflow' ),
+					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
 				'dragwyb_af_ai_key_invalid',
-				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-agentflow' ),
+				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -488,7 +517,7 @@ class AiClientBootstrap {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unavailable',
-				__( 'WordPress AI Client is not available.', 'dragwyb-agentflow' ),
+				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
@@ -497,7 +526,7 @@ class AiClientBootstrap {
 		if ( '' === $provider_id ) {
 			return new WP_Error(
 				'dragwyb_af_ai_unknown_provider',
-				__( 'Unknown AI provider.', 'dragwyb-agentflow' ),
+				__( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -505,10 +534,10 @@ class AiClientBootstrap {
 		if ( self::usesCoreConnectors() ) {
 			update_option( self::connectorsOptionName( $provider_id ), '' );
 		} else {
-			$credentials = get_option( 'wp_ai_client_provider_credentials', array() );
+			$credentials = self::getCredentialsMap();
 			if ( is_array( $credentials ) && isset( $credentials[ $provider_id ] ) ) {
 				unset( $credentials[ $provider_id ] );
-				update_option( 'wp_ai_client_provider_credentials', $credentials );
+				update_option( self::CREDENTIALS_OPTION, $credentials );
 			}
 		}
 
@@ -551,7 +580,7 @@ class AiClientBootstrap {
 			return;
 		}
 
-		$legacy = get_option( 'wp_ai_client_provider_credentials', array() );
+		$legacy = self::getCredentialsMap();
 		if ( is_array( $legacy ) ) {
 			foreach ( $legacy as $provider => $key ) {
 				$provider_id = self::resolveProviderId( (string) $provider );
@@ -578,14 +607,14 @@ class AiClientBootstrap {
 	}
 
 	/**
-	 * One-time migration: dragwyb_af AI connections → wp_ai_client_provider_credentials below WP 7.
+	 * One-time migration: dragwyb_af AI connections → dragwyb_af_ai_provider_credentials below WP 7.
 	 */
 	private static function migrateCredentialsToLegacyOption(): void {
 		if ( get_option( 'dragwyb_af_ai_credentials_migrated_to_sdk' ) ) {
 			return;
 		}
 
-		$credentials = get_option( 'wp_ai_client_provider_credentials', array() );
+		$credentials = self::getCredentialsMap();
 		if ( ! is_array( $credentials ) ) {
 			$credentials = array();
 		}
@@ -599,7 +628,7 @@ class AiClientBootstrap {
 		);
 
 		if ( ! empty( $credentials ) ) {
-			update_option( 'wp_ai_client_provider_credentials', $credentials );
+			update_option( self::CREDENTIALS_OPTION, $credentials );
 		}
 
 		update_option( 'dragwyb_af_ai_credentials_migrated_to_sdk', true );
@@ -614,7 +643,7 @@ class AiClientBootstrap {
 		}
 
 		try {
-			$plugin = \DragwybAgentFlow\Plugin\Core\Plugin::instance();
+			$plugin = \DragwybVisualAutomation\Plugin\Core\Plugin::instance();
 			/** @var ConnectionService $connections */
 			$connections = $plugin->container()->get( ConnectionService::class );
 		} catch ( \Throwable $e ) {

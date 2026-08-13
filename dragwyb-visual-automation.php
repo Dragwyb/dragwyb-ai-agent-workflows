@@ -1,19 +1,19 @@
 <?php
 /**
- * Plugin Name:       Dragwyb AgentFlow: Visual workflow builder and automation
- * Plugin URI:        https://dragwyb.com/dragwyb-agentflow
- * Description:       Build and run visual, multi-step automation workflows in WordPress.
- * Version:           0.0.0
+ * Plugin Name:       Dragwyb AI Agent Workflows
+ * Plugin URI:        https://dragwyb.com
+ * Description:       Build and run visual multi-step automation workflows, webhooks, and AI agent actions in WordPress.
+ * Version:           0.1.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Dragwyb
  * Author URI:        https://dragwyb.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       dragwyb-agentflow
+ * Text Domain:       dragwyb-ai-agent-workflows
  * Domain Path:       /languages
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 // Prevent direct file access.
@@ -55,7 +55,7 @@ function dragwyb_af_php_version_notice() {
 		esc_html(
 			sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version. */
-				__( 'Workflow Automate requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-agentflow' ),
+				__( 'Dragwyb AI Agent Workflows requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-ai-agent-workflows' ),
 				DRAGWYB_AF_MIN_PHP_VERSION,
 				PHP_VERSION
 			)
@@ -117,7 +117,7 @@ if ( file_exists( DRAGWYB_AF_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload
 	require_once DRAGWYB_AF_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
 }
 
-register_activation_hook( DRAGWYB_AF_PLUGIN_FILE, array( 'DragwybAgentFlow\\Plugin\\Core\\Activator', 'activate' ) );
-register_deactivation_hook( DRAGWYB_AF_PLUGIN_FILE, array( 'DragwybAgentFlow\\Plugin\\Core\\Deactivator', 'deactivate' ) );
+register_activation_hook( DRAGWYB_AF_PLUGIN_FILE, array( 'DragwybVisualAutomation\\Plugin\\Core\\Activator', 'activate' ) );
+register_deactivation_hook( DRAGWYB_AF_PLUGIN_FILE, array( 'DragwybVisualAutomation\\Plugin\\Core\\Deactivator', 'deactivate' ) );
 
-DragwybAgentFlow\Plugin\Core\Plugin::instance()->boot();
+DragwybVisualAutomation\Plugin\Core\Plugin::instance()->boot();

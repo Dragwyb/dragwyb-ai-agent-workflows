@@ -2,12 +2,12 @@
 /**
  * Google Gemini generateContent action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,11 +23,11 @@ class GeminiGenerateContentAction extends AbstractAiClientChatAction {
 	}
 
 	public function label(): string {
-		return __( 'Google Gemini', 'dragwyb-agentflow' );
+		return __( 'Google Gemini', 'dragwyb-ai-agent-workflows' );
 	}
 
 	public function description(): string {
-		return __( 'Sends a prompt to Google Gemini and returns the reply.', 'dragwyb-agentflow' );
+		return __( 'Sends a prompt to Google Gemini and returns the reply.', 'dragwyb-ai-agent-workflows' );
 	}
 
 	protected function providerSlug(): string {

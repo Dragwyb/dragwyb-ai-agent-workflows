@@ -70,11 +70,11 @@ export default function FlowEdgeControls({
 							className="dragwyb-af-builder-edge-toolbar__btn dragwyb-af-builder-edge-toolbar__btn--add"
 							title={__(
 								'Add a step between these nodes',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							aria-label={__(
 								'Add a step between these nodes',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							onClick={() => onInsertOnConnection(edge)}
 						>
@@ -85,15 +85,15 @@ export default function FlowEdgeControls({
 							className="dragwyb-af-builder-edge-toolbar__btn dragwyb-af-builder-edge-toolbar__btn--delete"
 							title={__(
 								'Delete this connection',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							aria-label={__(
 								'Delete this connection',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							)}
 							onClick={() => onDeleteConnection(edge)}
 						>
-							{__('×', 'dragwyb-agentflow')}
+							{__('×', 'dragwyb-ai-agent-workflows')}
 						</button>
 					</div>
 				);

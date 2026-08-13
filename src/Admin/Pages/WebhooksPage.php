@@ -2,22 +2,22 @@
 /**
  * Webhooks admin page.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin\Pages;
+namespace DragwybVisualAutomation\Plugin\Admin\Pages;
 
-use DragwybAgentFlow\Plugin\Admin\AdminPage;
-use DragwybAgentFlow\Plugin\Admin\EmptyState;
-use DragwybAgentFlow\Plugin\Admin\ListTableUi;
-use DragwybAgentFlow\Plugin\Admin\WebhookActionsController;
-use DragwybAgentFlow\Plugin\Admin\WebhooksListTable;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Service\SettingsService;
-use DragwybAgentFlow\Plugin\Service\WebhookService;
-use DragwybAgentFlow\Plugin\Service\WorkflowService;
+use DragwybVisualAutomation\Plugin\Admin\AdminPage;
+use DragwybVisualAutomation\Plugin\Admin\EmptyState;
+use DragwybVisualAutomation\Plugin\Admin\ListTableUi;
+use DragwybVisualAutomation\Plugin\Admin\WebhookActionsController;
+use DragwybVisualAutomation\Plugin\Admin\WebhooksListTable;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Service\SettingsService;
+use DragwybVisualAutomation\Plugin\Service\WebhookService;
+use DragwybVisualAutomation\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,14 +59,14 @@ class WebhooksPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function pageTitle(): string {
-		return __( 'Webhooks', 'dragwyb-agentflow' );
+		return __( 'Webhooks', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function menuTitle(): string {
-		return __( 'Webhooks', 'dragwyb-agentflow' );
+		return __( 'Webhooks', 'dragwyb-ai-agent-workflows' );
 	}
 
 	/**
@@ -100,7 +100,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( $this->capability() ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-agentflow' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$table = new WebhooksListTable( $this->webhooks, $this->workflows, $this->settings );
@@ -111,27 +111,27 @@ class WebhooksPage implements AdminPage {
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			esc_url( admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ) ),
-			esc_html__( 'Add New', 'dragwyb-agentflow' )
+			esc_html__( 'Add New', 'dragwyb-ai-agent-workflows' )
 		);
 		echo '<hr class="wp-header-end" />';
 
 		$this->renderNotice();
 
-		echo '<p class="description">' . esc_html__( 'Public endpoints that start a workflow when an external service POSTs to them. Optional HMAC signing and IP allow-lists protect each endpoint.', 'dragwyb-agentflow' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Public endpoints that start a workflow when an external service POSTs to them. Optional HMAC signing and IP allow-lists protect each endpoint.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 
 		if ( $this->settings->requireWebhookSigning() ) {
-			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'dragwyb-agentflow' ) . '</p></div>';
+			echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Site settings currently require every webhook to use a signing secret.', 'dragwyb-ai-agent-workflows' ) . '</p></div>';
 		}
 
 		if ( ! $table->has_items() ) {
 			EmptyState::render(
-				__( 'No webhooks yet', 'dragwyb-agentflow' ),
-				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'dragwyb-agentflow' ),
+				__( 'No webhooks yet', 'dragwyb-ai-agent-workflows' ),
+				__( 'Create a public URL that starts a workflow when an external service sends a POST request. You can require a signing secret and limit callers by IP.', 'dragwyb-ai-agent-workflows' ),
 				array(),
 				array(
 					array(
 						'url'     => admin_url( 'admin.php?page=' . WebhookFormPage::SLUG ),
-						'label'   => __( 'Add webhook', 'dragwyb-agentflow' ),
+						'label'   => __( 'Add webhook', 'dragwyb-ai-agent-workflows' ),
 						'primary' => true,
 					),
 				)
@@ -162,23 +162,23 @@ class WebhooksPage implements AdminPage {
 	private function notices(): array {
 		return array(
 			'created'      => array(
-				'message' => __( 'Webhook created.', 'dragwyb-agentflow' ),
+				'message' => __( 'Webhook created.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'updated'      => array(
-				'message' => __( 'Webhook updated.', 'dragwyb-agentflow' ),
+				'message' => __( 'Webhook updated.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'deleted'      => array(
-				'message' => __( 'Webhook deleted.', 'dragwyb-agentflow' ),
+				'message' => __( 'Webhook deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'bulk_deleted' => array(
-				'message' => __( 'Selected webhooks deleted.', 'dragwyb-agentflow' ),
+				'message' => __( 'Selected webhooks deleted.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'success',
 			),
 			'error'        => array(
-				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'dragwyb-agentflow' ),
+				'message' => __( 'That webhook action could not be completed. Double-check the required fields and try again.', 'dragwyb-ai-agent-workflows' ),
 				'type'    => 'error',
 			),
 		);

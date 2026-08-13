@@ -2,14 +2,14 @@
 /**
  * WP-Cron-driven background execution worker.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Persistence\WorkflowRunRepository;
+use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -83,7 +83,7 @@ class BackgroundRunner {
 	public static function registerCronSchedule( array $schedules ): array {
 		$schedules[ self::CRON_SCHEDULE ] = array(
 			'interval' => MINUTE_IN_SECONDS,
-			'display'  => __( 'Every minute (Workflow Automate queue)', 'dragwyb-agentflow' ),
+			'display'  => __( 'Every minute (Dragwyb AI Agent Workflows queue)', 'dragwyb-ai-agent-workflows' ),
 		);
 
 		return $schedules;

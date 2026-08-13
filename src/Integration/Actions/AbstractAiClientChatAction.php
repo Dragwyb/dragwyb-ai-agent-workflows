@@ -2,15 +2,15 @@
 /**
  * Shared AI chat action backed by WordPress AI Client.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\Actions;
+namespace DragwybVisualAutomation\Plugin\Integration\Actions;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Service\Agent\AgentAiClient;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Service\Agent\AgentAiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -44,12 +44,12 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		return array(
 			'api_credentials' => array(
 				'type'     => 'ai_credentials',
-				'label'    => __( 'API key', 'dragwyb-agentflow' ),
+				'label'    => __( 'API key', 'dragwyb-ai-agent-workflows' ),
 				'provider' => $this->providerSlug(),
 			),
 			'model'           => array(
 				'type'           => 'dynamic_select',
-				'label'          => __( 'Model', 'dragwyb-agentflow' ),
+				'label'          => __( 'Model', 'dragwyb-ai-agent-workflows' ),
 				'default'        => $this->defaultModel(),
 				'options_source' => 'ai_models',
 				'provider_field' => 'provider',
@@ -57,12 +57,12 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 			),
 			'system_prompt'   => array(
 				'type'    => 'string',
-				'label'   => __( 'System prompt (optional)', 'dragwyb-agentflow' ),
+				'label'   => __( 'System prompt (optional)', 'dragwyb-ai-agent-workflows' ),
 				'default' => '',
 			),
 			'prompt'          => array(
 				'type'     => 'string',
-				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-agentflow' ),
+				'label'    => __( 'User prompt (supports {{trigger.fields.field_id}} tokens)', 'dragwyb-ai-agent-workflows' ),
 				'required' => true,
 			),
 		);
@@ -76,7 +76,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 		if ( '' === $prompt ) {
 			return array(
 				'success' => false,
-				'error'   => __( 'No prompt configured.', 'dragwyb-agentflow' ),
+				'error'   => __( 'No prompt configured.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 

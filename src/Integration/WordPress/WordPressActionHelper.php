@@ -2,12 +2,12 @@
 /**
  * Shared helpers for WordPress workflow actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -289,11 +289,11 @@ final class WordPressActionHelper {
 	 */
 	public static function insertTerm( string $name, string $taxonomy, array $args = array() ): array {
 		if ( '' === $name ) {
-			return self::fail( __( 'Term name is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term name is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$term = wp_insert_term( $name, $taxonomy, array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } ) );
@@ -315,21 +315,21 @@ final class WordPressActionHelper {
 	 */
 	public static function updateTerm( int $termId, string $taxonomy, array $args ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
-			return self::fail( __( 'Term not found.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$args = array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } );
 
 		if ( array() === $args ) {
-			return self::fail( __( 'Nothing to update.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Nothing to update.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$term = wp_update_term( $termId, $taxonomy, $args );
@@ -348,15 +348,15 @@ final class WordPressActionHelper {
 	 */
 	public static function deleteTerm( int $termId, string $taxonomy, array $args = array() ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
-			return self::fail( __( 'Term not found.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$result = wp_delete_term( $termId, $taxonomy, $args );
@@ -366,7 +366,7 @@ final class WordPressActionHelper {
 		}
 
 		if ( ! $result ) {
-			return self::fail( __( 'Failed to delete term.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Failed to delete term.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return self::ok( array( 'term_id' => $termId ) );
@@ -377,17 +377,17 @@ final class WordPressActionHelper {
 	 */
 	public static function getTerm( int $termId, string $taxonomy ): array {
 		if ( $termId <= 0 ) {
-			return self::fail( __( 'Term id is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $taxonomy ) {
-			return self::fail( __( 'Taxonomy is required.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$term = get_term( $termId, $taxonomy );
 
 		if ( ! $term || is_wp_error( $term ) ) {
-			return self::fail( __( 'Term not found.', 'dragwyb-agentflow' ) );
+			return self::fail( __( 'Term not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return self::ok( (array) $term );
@@ -506,7 +506,7 @@ final class WordPressActionHelper {
 			'comment_type'         => 'comment',
 			'comment_parent'       => isset( $config['parent_id'] ) ? (int) $config['parent_id'] : 0,
 			'comment_author_IP'    => '',
-			'comment_agent'        => 'Workflow Automate',
+			'comment_agent'        => 'Dragwyb AI Agent Workflows',
 			'comment_date'         => gmdate( 'Y-m-d H:i:s' ),
 			'comment_approved'     => 1,
 		);
@@ -537,7 +537,7 @@ final class WordPressActionHelper {
 		if ( $imageId <= 0 ) {
 			if ( ! filter_var( $imageUrl, FILTER_VALIDATE_URL ) ) {
 				return array(
-					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'dragwyb-agentflow' ),
+					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'dragwyb-ai-agent-workflows' ),
 				);
 			}
 
@@ -548,7 +548,7 @@ final class WordPressActionHelper {
 				return array(
 					'warning' => sprintf(
 						/* translators: %s: error message */
-						__( 'Featured image skipped: %s', 'dragwyb-agentflow' ),
+						__( 'Featured image skipped: %s', 'dragwyb-ai-agent-workflows' ),
 						$sideloaded->get_error_message()
 					),
 				);
@@ -559,13 +559,13 @@ final class WordPressActionHelper {
 
 		if ( $imageId <= 0 || ! wp_attachment_is_image( $imageId ) ) {
 			return array(
-				'warning' => __( 'Featured image skipped: invalid attachment.', 'dragwyb-agentflow' ),
+				'warning' => __( 'Featured image skipped: invalid attachment.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
 		if ( ! set_post_thumbnail( $postId, $imageId ) ) {
 			return array(
-				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'dragwyb-agentflow' ),
+				'warning' => __( 'Featured image skipped: could not set thumbnail.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
@@ -698,7 +698,7 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * Marks a post as created/updated by Workflow Automate.
+	 * Marks a post as created/updated by Dragwyb AI Agent Workflows.
 	 *
 	 * Stores a unix timestamp so triggers only suppress the brief follow-up
 	 * saves right after our write — not forever. Permanent suppression blocked

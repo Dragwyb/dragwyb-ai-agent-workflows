@@ -2,21 +2,21 @@
 /**
  * Ordered list of all schema migrations.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Database;
+namespace DragwybVisualAutomation\Plugin\Database;
 
-use DragwybAgentFlow\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\CreateConnectionsTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\CreateWebhooksTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowNodesTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowRunsTable;
-use DragwybAgentFlow\Plugin\Database\Migrations\CreateWorkflowsTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\AddNodeSnapshotColumnsToWorkflowRunLogsTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\AddQueueColumnsToWorkflowRunsTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\CreateConnectionsTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\CreateWebhooksTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\CreateWorkflowNodesTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\CreateWorkflowRunLogsTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\CreateWorkflowRunsTable;
+use DragwybVisualAutomation\Plugin\Database\Migrations\CreateWorkflowsTable;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

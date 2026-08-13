@@ -2,14 +2,14 @@
 /**
  * Renders a Connection status as a small colored badge.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
-use DragwybAgentFlow\Plugin\Domain\Connection;
+use DragwybVisualAutomation\Plugin\Domain\Connection;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,11 +62,11 @@ class ConnectionStatusBadge {
 	private static function label( int $status ): string {
 		switch ( $status ) {
 			case Connection::STATUS_VERIFIED:
-				return __( 'Verified', 'dragwyb-agentflow' );
+				return __( 'Verified', 'dragwyb-ai-agent-workflows' );
 			case Connection::STATUS_FAILED:
-				return __( 'Failed', 'dragwyb-agentflow' );
+				return __( 'Failed', 'dragwyb-ai-agent-workflows' );
 			default:
-				return __( 'Not yet verified', 'dragwyb-agentflow' );
+				return __( 'Not yet verified', 'dragwyb-ai-agent-workflows' );
 		}
 	}
 }

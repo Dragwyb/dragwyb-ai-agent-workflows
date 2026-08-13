@@ -6,7 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'DragwybAgentFlow\\Plugin\\' => array($baseDir . '/src'),
     'WordPress\\AiClient\\' => array($vendorDir . '/wordpress/php-ai-client/src'),
     'WordPress\\AI_Client\\' => array($vendorDir . '/wordpress/wp-ai-client/includes'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
@@ -17,4 +16,5 @@ return array(
     'Http\\Promise\\' => array($vendorDir . '/php-http/promise/src'),
     'Http\\Discovery\\' => array($vendorDir . '/php-http/discovery/src'),
     'Http\\Client\\' => array($vendorDir . '/php-http/httplug/src'),
+    'DragwybVisualAutomation\\Plugin\\' => array($baseDir . '/src'),
 );

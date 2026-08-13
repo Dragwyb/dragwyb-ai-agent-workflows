@@ -2,15 +2,15 @@
 /**
  * Node type registry.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Domain\Contracts\ActionInterface;
-use DragwybAgentFlow\Plugin\Domain\Contracts\TriggerInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
+use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -107,7 +107,7 @@ class NodeTypeRegistry {
 			self::class . '::register' . esc_html( ucfirst( $kind ) ),
 			sprintf(
 				/* translators: 1: node type kind (trigger/action), 2: slug. */
-				esc_html__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'dragwyb-agentflow' ),
+				esc_html__( 'A %1$s with the slug "%2$s" is already registered. The previous registration has been replaced.', 'dragwyb-ai-agent-workflows' ),
 				esc_html( $kind ),
 				esc_html( $slug )
 			),

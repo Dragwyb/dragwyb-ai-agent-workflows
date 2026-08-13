@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Post and Post Type actions.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress\Service;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Service;
 
-use DragwybAgentFlow\Plugin\Integration\WordPress\WordPressActionHelper;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,13 +71,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$post = get_post( $postId );
 
 		if ( ! $post ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( WordPressActionHelper::serializePost( $post, true ) );
@@ -87,7 +87,7 @@ final class PostWordPressService {
 		$postType = WordPressActionHelper::str( $config, 'post_type' );
 
 		if ( '' === $postType ) {
-			return WordPressActionHelper::fail( __( 'Post type is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$limit = WordPressActionHelper::int( $config, 'limit' );
@@ -112,15 +112,15 @@ final class PostWordPressService {
 		$metaValue = WordPressActionHelper::str( $config, 'meta_value' );
 
 		if ( '' === $postType ) {
-			return WordPressActionHelper::fail( __( 'Post type is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $metaKey ) {
-			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $metaValue ) {
-			return WordPressActionHelper::fail( __( 'Meta value is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Meta value is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$limit = WordPressActionHelper::int( $config, 'limit' );
@@ -146,13 +146,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$meta = get_post_meta( $postId );
 
 		if ( empty( $meta ) ) {
-			return WordPressActionHelper::fail( __( 'Post metadata not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post metadata not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( $meta );
@@ -163,17 +163,17 @@ final class PostWordPressService {
 		$metaKey = WordPressActionHelper::str( $config, 'meta_key' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $metaKey ) {
-			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$val = get_post_meta( $postId, $metaKey, true );
 
 		if ( '' === $val ) {
-			return WordPressActionHelper::fail( __( 'Post metadata not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post metadata not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( $metaKey => $val ) );
@@ -183,13 +183,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$permalink = get_permalink( $postId );
 
 		if ( ! $permalink ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'permalink' => $permalink ) );
@@ -199,13 +199,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$post = get_post( $postId );
 
 		if ( ! $post ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'content' => $post->post_content ) );
@@ -215,13 +215,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$post = get_post( $postId );
 
 		if ( ! $post ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'excerpt' => $post->post_excerpt ) );
@@ -231,13 +231,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$status = get_post_status( $postId );
 
 		if ( ! $status ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'post_status' => $status ) );
@@ -247,7 +247,7 @@ final class PostWordPressService {
 		$title = WordPressActionHelper::str( $config, 'title' );
 
 		if ( '' === $title ) {
-			return WordPressActionHelper::fail( __( 'Title is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Title is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$postType = WordPressActionHelper::str( $config, 'post_type', 'post' );
@@ -326,13 +326,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$post = get_post( $postId );
 
 		if ( ! $post ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$postData = array( 'ID' => $postId );
@@ -424,15 +424,15 @@ final class PostWordPressService {
 		$status = WordPressActionHelper::str( $config, 'post_status' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $status ) {
-			return WordPressActionHelper::fail( __( 'Post status is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post status is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_post( $postId ) ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$res = wp_update_post(
@@ -459,18 +459,18 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_post( $postId ) ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );
 		$res   = wp_delete_post( $postId, $force );
 
 		if ( ! $res ) {
-			return WordPressActionHelper::fail( __( 'Failed to delete post.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Failed to delete post.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'post_id' => $postId ) );
@@ -497,13 +497,13 @@ final class PostWordPressService {
 		$postId = WordPressActionHelper::int( $config, 'post_id' );
 
 		if ( $postId <= 0 ) {
-			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$type = get_post_type( $postId );
 
 		if ( false === $type ) {
-			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		return WordPressActionHelper::ok( array( 'post_type' => $type ) );
@@ -514,11 +514,11 @@ final class PostWordPressService {
 		$label = WordPressActionHelper::str( $config, 'label' );
 
 		if ( '' === $key ) {
-			return WordPressActionHelper::fail( __( 'Post type key is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( '' === $label ) {
-			return WordPressActionHelper::fail( __( 'Label is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Label is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$supports = WordPressActionHelper::parseList( $config['supports'] ?? array( 'title', 'editor' ) );
@@ -563,11 +563,11 @@ final class PostWordPressService {
 		$key = WordPressActionHelper::str( $config, 'key' );
 
 		if ( '' === $key ) {
-			return WordPressActionHelper::fail( __( 'Post type key is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! post_type_exists( $key ) ) {
-			return WordPressActionHelper::fail( __( 'Post type not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$res = unregister_post_type( $key );
@@ -583,17 +583,17 @@ final class PostWordPressService {
 		$key = WordPressActionHelper::str( $config, 'key' );
 
 		if ( '' === $key ) {
-			return WordPressActionHelper::fail( __( 'Post type key is required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type key is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! post_type_exists( $key ) ) {
-			return WordPressActionHelper::fail( __( 'Post type not found.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Post type not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$supports = WordPressActionHelper::parseList( $config['supports'] ?? array() );
 
 		if ( array() === $supports ) {
-			return WordPressActionHelper::fail( __( 'Features (supports) are required.', 'dragwyb-agentflow' ) );
+			return WordPressActionHelper::fail( __( 'Features (supports) are required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		foreach ( $supports as $feature ) {

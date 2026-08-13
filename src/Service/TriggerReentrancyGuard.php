@@ -2,12 +2,12 @@
 /**
  * Request-scoped workflow trigger reentrancy guard.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -115,7 +115,7 @@ class TriggerReentrancyGuard {
 	}
 
 	/**
-	 * Marks that a Workflow Automate action is mutating WordPress state.
+	 * Marks that a Dragwyb AI Agent Workflows action is mutating WordPress state.
 	 *
 	 * @return void
 	 */

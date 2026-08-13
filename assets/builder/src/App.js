@@ -235,7 +235,7 @@ export default function App() {
 					workflow = await fetchWorkflow(bootstrap.workflowId);
 				} else {
 					workflow = await createWorkflow({
-						title: __('Untitled workflow', 'dragwyb-agentflow'),
+						title: __('Untitled workflow', 'dragwyb-ai-agent-workflows'),
 						graph: emptyGraph(),
 					});
 
@@ -282,12 +282,12 @@ export default function App() {
 						nodes: previous.nodes.map((node) =>
 							node.id === oauthNodeId
 								? {
-										...node,
-										config: {
-											...(node.config || {}),
-											connection_id: oauthConnectionId,
-										},
-									}
+									...node,
+									config: {
+										...(node.config || {}),
+										connection_id: oauthConnectionId,
+									},
+								}
 								: node
 						),
 					}));
@@ -334,9 +334,9 @@ export default function App() {
 						error && error.message
 							? error.message
 							: __(
-									'Failed to load the workflow.',
-									'dragwyb-agentflow'
-								)
+								'Failed to load the workflow.',
+								'dragwyb-ai-agent-workflows'
+							)
 					);
 				}
 			} finally {
@@ -428,7 +428,7 @@ export default function App() {
 
 		downloadWorkflowJson(
 			payload,
-			exportFilenameFromTitle(current.title || __('workflow', 'dragwyb-agentflow'))
+			exportFilenameFromTitle(current.title || __('workflow', 'dragwyb-ai-agent-workflows'))
 		);
 	}, [workflowStatus]);
 
@@ -448,7 +448,7 @@ export default function App() {
 				!window.confirm(
 					__(
 						'Importing will replace the current workflow on the canvas. Continue?',
-						'dragwyb-agentflow'
+						'dragwyb-ai-agent-workflows'
 					)
 				)
 			) {
@@ -485,9 +485,9 @@ export default function App() {
 					error && error.message
 						? error.message
 						: __(
-								'Failed to import the workflow JSON.',
-								'dragwyb-agentflow'
-							)
+							'Failed to import the workflow JSON.',
+							'dragwyb-ai-agent-workflows'
+						)
 				);
 			}
 		},
@@ -552,7 +552,7 @@ export default function App() {
 			if (next && !chatSessionId) {
 				const id =
 					typeof crypto !== 'undefined' &&
-					typeof crypto.randomUUID === 'function'
+						typeof crypto.randomUUID === 'function'
 						? crypto.randomUUID()
 						: `session-${Date.now()}`;
 				setChatSessionId(id);
@@ -577,7 +577,7 @@ export default function App() {
 			const sessionId =
 				chatSessionId ||
 				(typeof crypto !== 'undefined' &&
-				typeof crypto.randomUUID === 'function'
+					typeof crypto.randomUUID === 'function'
 					? crypto.randomUUID()
 					: `session-${Date.now()}`);
 
@@ -612,7 +612,7 @@ export default function App() {
 							reply ||
 							__(
 								'(Workflow finished with no chat reply. Check the AI Agent output.)',
-								'dragwyb-agentflow'
+								'dragwyb-ai-agent-workflows'
 							),
 					},
 				]);
@@ -623,7 +623,7 @@ export default function App() {
 			} catch (error) {
 				const message =
 					error?.message ||
-					__('Chat request failed.', 'dragwyb-agentflow');
+					__('Chat request failed.', 'dragwyb-ai-agent-workflows');
 				setChatError(message);
 			} finally {
 				setChatSending(false);
@@ -667,7 +667,7 @@ export default function App() {
 					setCapturedPayload(sample.payload);
 					setCapturedAt(sample.capturedAt);
 				})
-				.catch(() => {});
+				.catch(() => { });
 		},
 	});
 
@@ -710,7 +710,7 @@ export default function App() {
 					setCapturedAt(sample.capturedAt);
 				}
 			})
-			.catch(() => {});
+			.catch(() => { });
 
 		return () => {
 			cancelled = true;
@@ -723,8 +723,8 @@ export default function App() {
 		const existingTrigger =
 			category === 'trigger'
 				? latestRef.current.graph.nodes.find(
-						(node) => node.category === 'trigger'
-					)
+					(node) => node.category === 'trigger'
+				)
 				: null;
 
 		if (existingTrigger) {
@@ -733,7 +733,7 @@ export default function App() {
 			setCapturedAt(null);
 
 			if (workflowId) {
-				clearTestSample(workflowId).catch(() => {});
+				clearTestSample(workflowId).catch(() => { });
 			}
 
 			setGraph((current) => ({
@@ -741,11 +741,11 @@ export default function App() {
 				nodes: current.nodes.map((node) =>
 					node.id === existingTrigger.id
 						? {
-								...node,
-								type: nodeTypeDefinition.slug,
-								label: nodeTypeDefinition.label,
-								config: defaultConfigFor(nodeTypeDefinition),
-							}
+							...node,
+							type: nodeTypeDefinition.slug,
+							label: nodeTypeDefinition.label,
+							config: defaultConfigFor(nodeTypeDefinition),
+						}
 						: node
 				),
 			}));
@@ -870,9 +870,9 @@ export default function App() {
 
 		return Boolean(
 			targetNode &&
-				!targetNode.parent_agent_id &&
-				targetNode.category !== 'trigger' &&
-				targetNode.id !== conditionNodeId
+			!targetNode.parent_agent_id &&
+			targetNode.category !== 'trigger' &&
+			targetNode.id !== conditionNodeId
 		);
 	};
 
@@ -915,13 +915,13 @@ export default function App() {
 			nodes: current.nodes.map((node) =>
 				node.id === conditionNodeId
 					? {
-							...node,
-							config: setConditionBranchTarget(
-								node.config || {},
-								branchId,
-								targetNodeId
-							),
-						}
+						...node,
+						config: setConditionBranchTarget(
+							node.config || {},
+							branchId,
+							targetNodeId
+						),
+					}
 					: node
 			),
 		}));
@@ -1250,13 +1250,13 @@ export default function App() {
 				.map((node) =>
 					node.id === conditionNodeId
 						? {
-								...node,
-								config: setConditionBranchTarget(
-									node.config || {},
-									branchId,
-									newNode.id
-								),
-							}
+							...node,
+							config: setConditionBranchTarget(
+								node.config || {},
+								branchId,
+								newNode.id
+							),
+						}
 						: node
 				)
 				.concat(newNode),
@@ -1276,12 +1276,12 @@ export default function App() {
 			nodes: current.nodes.map((node) =>
 				node.id === conditionNodeId
 					? {
-							...node,
-							config: clearConditionBranchTarget(
-								node.config || {},
-								branchId
-							),
-						}
+						...node,
+						config: clearConditionBranchTarget(
+							node.config || {},
+							branchId
+						),
+					}
 					: node
 			),
 		}));
@@ -1329,13 +1329,13 @@ export default function App() {
 				.map((node) =>
 					node.id === conditionNodeId
 						? {
-								...node,
-								config: setConditionBranchTarget(
-									node.config || {},
-									branchId,
-									newNode.id
-								),
-							}
+							...node,
+							config: setConditionBranchTarget(
+								node.config || {},
+								branchId,
+								newNode.id
+							),
+						}
 						: node
 				)
 				.concat(newNode),
@@ -1383,7 +1383,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'agent_output_parser',
 			category: 'action',
-			label: __('Structured Output Parser', 'dragwyb-agentflow'),
+			label: __('Structured Output Parser', 'dragwyb-ai-agent-workflows'),
 			parent_agent_id: agentId,
 			attachment_type: 'output_parser',
 			x: position.x,
@@ -1437,7 +1437,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: nodeTypeDefinition.slug,
 			category: 'action',
-			label: `${nodeTypeDefinition.label} (${__('Fallback', 'dragwyb-agentflow')})`,
+			label: `${nodeTypeDefinition.label} (${__('Fallback', 'dragwyb-ai-agent-workflows')})`,
 			parent_agent_id: agentId,
 			attachment_type: 'fallback_chat_model',
 			x: position.x,
@@ -1502,7 +1502,7 @@ export default function App() {
 			id: generateNodeId(),
 			type: 'simple_memory',
 			category: 'action',
-			label: __('Simple Memory', 'dragwyb-agentflow'),
+			label: __('Simple Memory', 'dragwyb-ai-agent-workflows'),
 			parent_agent_id: agentId,
 			attachment_type: 'memory',
 			x: position.x,
@@ -1815,13 +1815,13 @@ export default function App() {
 				nodes = nodes.map((node) =>
 					node.id === deletingNode.parent_agent_id
 						? {
-								...node,
-								config: {
-									...node.config,
-									connection_id: 0,
-									model: '',
-								},
-							}
+							...node,
+							config: {
+								...node.config,
+								connection_id: 0,
+								model: '',
+							},
+						}
 						: node
 				);
 			}
@@ -1846,7 +1846,7 @@ export default function App() {
 	if (loading) {
 		return (
 			<div className="dragwyb-af-builder-loading" role="status">
-				{__('Loading…', 'dragwyb-agentflow')}
+				{__('Loading…', 'dragwyb-ai-agent-workflows')}
 			</div>
 		);
 	}
@@ -1868,7 +1868,7 @@ export default function App() {
 	const knownTypeSlugs = allTypes.map((type) => type.slug);
 	const triggerNode = graph.nodes.find((item) => item.category === 'trigger');
 	const triggerLabel =
-		triggerNode?.label || __('Trigger', 'dragwyb-agentflow');
+		triggerNode?.label || __('Trigger', 'dragwyb-ai-agent-workflows');
 	const hasExistingTrigger = Boolean(triggerNode);
 	const hasChatTrigger =
 		triggerNode?.type === 'chat_message_received_trigger';
@@ -1905,55 +1905,55 @@ export default function App() {
 					onOpenPicker={handleOpenPicker}
 				/>
 				<div className="dragwyb-af-builder__canvas-wrap">
-				<Canvas
-					nodes={graph.nodes}
-					connections={graph.connections}
-					knownTypeSlugs={knownTypeSlugs}
-					selectedNodeId={selectedNodeId}
-					connectionDrag={connectionDrag}
-					isValidBranchDropTarget={isValidBranchDropTarget}
-					isValidFlowDropTarget={isValidFlowDropTarget}
-					onRegisterCanvas={(element) => {
-						canvasRef.current = element;
-					}}
-					onSelectNode={(nodeId) => {
-						setPicker(null);
-						setConnectionDrag(null);
-						setSelectedConnection(null);
-						setSelectedNodeId(nodeId);
-					}}
-					onMoveNode={handleMoveNode}
-					onAddAgentChatModel={handleAddAgentChatModel}
-					onAddAgentMemory={handleAddAgentMemory}
-					onAddAgentTool={handleAddAgentTool}
-					onAddParserChatModel={handleAddParserChatModel}
-					onAddCondition={handleAddCondition}
-					onRemoveCondition={handleRemoveCondition}
-					onStartBranchConnectionDrag={handleStartBranchConnectionDrag}
-					onStartFlowConnectionDrag={handleStartFlowConnectionDrag}
-					onDisconnectBranch={handleDisconnectBranch}
-					selectedConnection={selectedConnection}
-					onSelectConnection={handleSelectConnection}
-					onDeleteConnection={handleDeleteConnection}
-					onInsertOnConnection={handleInsertOnConnection}
-					registerNodeRef={registerNodeRef}
-					onCanvasClick={(event) => {
-						if (event.target === event.currentTarget) {
-							setSelectedNodeId(null);
+					<Canvas
+						nodes={graph.nodes}
+						connections={graph.connections}
+						knownTypeSlugs={knownTypeSlugs}
+						selectedNodeId={selectedNodeId}
+						connectionDrag={connectionDrag}
+						isValidBranchDropTarget={isValidBranchDropTarget}
+						isValidFlowDropTarget={isValidFlowDropTarget}
+						onRegisterCanvas={(element) => {
+							canvasRef.current = element;
+						}}
+						onSelectNode={(nodeId) => {
+							setPicker(null);
+							setConnectionDrag(null);
 							setSelectedConnection(null);
-						}
-					}}
-				/>
-				<ChatPanel
-					open={chatOpen}
-					onClose={() => setChatOpen(false)}
-					messages={chatMessages}
-					sending={chatSending}
-					error={chatError}
-					onSend={handleSendChat}
-					title={triggerNode?.config?.title || __('Chat', 'dragwyb-agentflow')}
-					initialMessages={chatInitialMessages}
-				/>
+							setSelectedNodeId(nodeId);
+						}}
+						onMoveNode={handleMoveNode}
+						onAddAgentChatModel={handleAddAgentChatModel}
+						onAddAgentMemory={handleAddAgentMemory}
+						onAddAgentTool={handleAddAgentTool}
+						onAddParserChatModel={handleAddParserChatModel}
+						onAddCondition={handleAddCondition}
+						onRemoveCondition={handleRemoveCondition}
+						onStartBranchConnectionDrag={handleStartBranchConnectionDrag}
+						onStartFlowConnectionDrag={handleStartFlowConnectionDrag}
+						onDisconnectBranch={handleDisconnectBranch}
+						selectedConnection={selectedConnection}
+						onSelectConnection={handleSelectConnection}
+						onDeleteConnection={handleDeleteConnection}
+						onInsertOnConnection={handleInsertOnConnection}
+						registerNodeRef={registerNodeRef}
+						onCanvasClick={(event) => {
+							if (event.target === event.currentTarget) {
+								setSelectedNodeId(null);
+								setSelectedConnection(null);
+							}
+						}}
+					/>
+					<ChatPanel
+						open={chatOpen}
+						onClose={() => setChatOpen(false)}
+						messages={chatMessages}
+						sending={chatSending}
+						error={chatError}
+						onSend={handleSendChat}
+						title={triggerNode?.config?.title || __('Chat', 'dragwyb-ai-agent-workflows')}
+						initialMessages={chatInitialMessages}
+					/>
 				</div>
 				{picker ? (
 					<PickerSidebar
@@ -1965,51 +1965,51 @@ export default function App() {
 						onSelect={
 							picker.kind === 'branch-action'
 								? (item) =>
-										handleAttachBranchNode(
-											item,
-											picker.conditionNodeId,
-											picker.branchId
-										)
+									handleAttachBranchNode(
+										item,
+										picker.conditionNodeId,
+										picker.branchId
+									)
 								: picker.kind === 'edge-insert'
 									? (item) =>
-											handleInsertNodeOnEdge(
-												item,
-												picker.fromNodeId,
-												picker.toNodeId
-											)
+										handleInsertNodeOnEdge(
+											item,
+											picker.fromNodeId,
+											picker.toNodeId
+										)
 									: picker.kind === 'edge-branch-insert'
 										? (item) =>
-												handleInsertNodeOnBranchEdge(
-													item,
-													picker.conditionNodeId,
-													picker.branchId,
-													picker.targetNodeId
-												)
-								: picker.kind === 'agent-tool'
-								? (item) =>
-										handleAttachAgentTool(
-											item,
-											picker.agentId
-										)
-								: picker.kind === 'agent-chat-model'
-									? (item) =>
-											handleAttachAgentChatModel(
+											handleInsertNodeOnBranchEdge(
 												item,
-												picker.agentId
+												picker.conditionNodeId,
+												picker.branchId,
+												picker.targetNodeId
 											)
-									: picker.kind === 'parser-chat-model'
-										? (item) =>
-												handleAttachParserChatModel(
-													item,
-													picker.parserId
-												)
-									: picker.kind === 'agent-fallback-chat-model'
-										? (item) =>
-												handleAttachAgentFallbackChatModel(
+										: picker.kind === 'agent-tool'
+											? (item) =>
+												handleAttachAgentTool(
 													item,
 													picker.agentId
 												)
-									: handleAddNode
+											: picker.kind === 'agent-chat-model'
+												? (item) =>
+													handleAttachAgentChatModel(
+														item,
+														picker.agentId
+													)
+												: picker.kind === 'parser-chat-model'
+													? (item) =>
+														handleAttachParserChatModel(
+															item,
+															picker.parserId
+														)
+													: picker.kind === 'agent-fallback-chat-model'
+														? (item) =>
+															handleAttachAgentFallbackChatModel(
+																item,
+																picker.agentId
+															)
+														: handleAddNode
 						}
 						onClose={() => setPicker(null)}
 					/>

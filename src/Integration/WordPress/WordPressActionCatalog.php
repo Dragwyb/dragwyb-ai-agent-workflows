@@ -2,17 +2,17 @@
 /**
  * Static catalog of every built-in WordPress workflow action.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Integration\WordPress;
+namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
 
-use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
-use DragwybAgentFlow\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
+use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,23 +59,23 @@ final class WordPressActionCatalog {
 	 */
 	public static function definitions(): array {
 		$groups = array(
-			'user'             => __( 'User Management', 'dragwyb-agentflow' ),
-			'user_retrieval'   => __( 'User Retrieval', 'dragwyb-agentflow' ),
-			'user_metadata'    => __( 'User Metadata', 'dragwyb-agentflow' ),
-			'role'             => __( 'Role Management', 'dragwyb-agentflow' ),
-			'capabilities'     => __( 'Capabilities Management', 'dragwyb-agentflow' ),
-			'post'             => __( 'Post Management', 'dragwyb-agentflow' ),
-			'comment'          => __( 'Comment Management', 'dragwyb-agentflow' ),
-			'post_type'        => __( 'Post Type Management', 'dragwyb-agentflow' ),
-			'post_tag'         => __( 'Post Tag Management', 'dragwyb-agentflow' ),
-			'media'            => __( 'Media Management', 'dragwyb-agentflow' ),
-			'term'             => __( 'Term Management', 'dragwyb-agentflow' ),
-			'taxonomy'         => __( 'Taxonomy Management', 'dragwyb-agentflow' ),
-			'category'         => __( 'Category Management', 'dragwyb-agentflow' ),
-			'product_tag'      => __( 'Product Tag Management', 'dragwyb-agentflow' ),
-			'product_category' => __( 'Product Category Management', 'dragwyb-agentflow' ),
-			'product_type'     => __( 'Product Type Management', 'dragwyb-agentflow' ),
-			'plugin'           => __( 'Plugin Management', 'dragwyb-agentflow' ),
+			'user'             => __( 'User Management', 'dragwyb-ai-agent-workflows' ),
+			'user_retrieval'   => __( 'User Retrieval', 'dragwyb-ai-agent-workflows' ),
+			'user_metadata'    => __( 'User Metadata', 'dragwyb-ai-agent-workflows' ),
+			'role'             => __( 'Role Management', 'dragwyb-ai-agent-workflows' ),
+			'capabilities'     => __( 'Capabilities Management', 'dragwyb-ai-agent-workflows' ),
+			'post'             => __( 'Post Management', 'dragwyb-ai-agent-workflows' ),
+			'comment'          => __( 'Comment Management', 'dragwyb-ai-agent-workflows' ),
+			'post_type'        => __( 'Post Type Management', 'dragwyb-ai-agent-workflows' ),
+			'post_tag'         => __( 'Post Tag Management', 'dragwyb-ai-agent-workflows' ),
+			'media'            => __( 'Media Management', 'dragwyb-ai-agent-workflows' ),
+			'term'             => __( 'Term Management', 'dragwyb-ai-agent-workflows' ),
+			'taxonomy'         => __( 'Taxonomy Management', 'dragwyb-ai-agent-workflows' ),
+			'category'         => __( 'Category Management', 'dragwyb-ai-agent-workflows' ),
+			'product_tag'      => __( 'Product Tag Management', 'dragwyb-ai-agent-workflows' ),
+			'product_category' => __( 'Product Category Management', 'dragwyb-ai-agent-workflows' ),
+			'product_type'     => __( 'Product Type Management', 'dragwyb-ai-agent-workflows' ),
+			'plugin'           => __( 'Plugin Management', 'dragwyb-ai-agent-workflows' ),
 		);
 
 		$field_fn  = array( self::class, 'field' );

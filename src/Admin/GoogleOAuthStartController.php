@@ -2,19 +2,19 @@
 /**
  * Starts the Google OAuth authorization redirect from wp-admin.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Admin;
+namespace DragwybVisualAutomation\Plugin\Admin;
 
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,14 +47,14 @@ class GoogleOAuthStartController {
 	 */
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) && ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-agentflow' ), 403 );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-ai-agent-workflows' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified below.
 		$connection_id = isset( $_GET['connection_id'] ) ? absint( wp_unslash( $_GET['connection_id'] ) ) : 0;
 
 		if ( $connection_id <= 0 ) {
-			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-agentflow' ) );
+			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		check_admin_referer( 'dragwyb_af_google_oauth_authorize_' . $connection_id );
@@ -62,7 +62,7 @@ class GoogleOAuthStartController {
 		$connection = $this->connections->find( $connection_id );
 
 		if ( null === $connection || ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
-			$this->redirectWithError( $connection_id, __( 'This connection is not configured for Google OAuth.', 'dragwyb-agentflow' ) );
+			$this->redirectWithError( $connection_id, __( 'This connection is not configured for Google OAuth.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		try {

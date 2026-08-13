@@ -2,14 +2,14 @@
 /**
  * Lists AI models via WordPress AI Client provider registry.
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Service;
+namespace DragwybVisualAutomation\Plugin\Service;
 
-use DragwybAgentFlow\Plugin\Service\Ai\AiClientBootstrap;
+use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
 use WordPress\AiClient\AiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,14 +49,14 @@ class AiModelsService {
 		if ( '' === $provider ) {
 			return array(
 				'options' => array(),
-				'error'   => __( 'Unknown AI provider.', 'dragwyb-agentflow' ),
+				'error'   => __( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 			);
 		}
 
 		if ( ! AiClientBootstrap::isAvailable() ) {
 			return array(
 				'options'    => array(),
-				'error'      => __( 'WordPress AI Client is not available.', 'dragwyb-agentflow' ),
+				'error'      => __( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				'configured' => false,
 			);
 		}
@@ -73,7 +73,7 @@ class AiModelsService {
 		if ( ! AiClientBootstrap::isProviderConfigured( $provider ) ) {
 			return array(
 				'options'    => array(),
-				'error'      => __( 'No API key configured for this provider. Add one in this node.', 'dragwyb-agentflow' ),
+				'error'      => __( 'No API key configured for this provider. Add one in this node.', 'dragwyb-ai-agent-workflows' ),
 				'configured' => false,
 			);
 		}
@@ -125,7 +125,7 @@ class AiModelsService {
 
 			$result = array(
 				'options' => $options,
-				'error'   => empty( $options ) ? __( 'No text-generation models returned by the provider.', 'dragwyb-agentflow' ) : null,
+				'error'   => empty( $options ) ? __( 'No text-generation models returned by the provider.', 'dragwyb-ai-agent-workflows' ) : null,
 			);
 
 			set_transient( $cache_key, $result, self::CACHE_TTL );

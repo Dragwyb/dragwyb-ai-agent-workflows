@@ -2,21 +2,21 @@
 /**
  * Connections REST controller (list + create for the builder).
  *
- * @package DragwybAgentFlow\Plugin
+ * @package DragwybVisualAutomation\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybAgentFlow\Plugin\Rest;
+namespace DragwybVisualAutomation\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybAgentFlow\Plugin\Core\Capabilities;
-use DragwybAgentFlow\Plugin\Domain\Connection;
-use DragwybAgentFlow\Plugin\Service\AiModelsService;
-use DragwybAgentFlow\Plugin\Service\ConnectionAuthTypes;
-use DragwybAgentFlow\Plugin\Service\ConnectionService;
-use DragwybAgentFlow\Plugin\Service\GoogleOAuthService;
+use DragwybVisualAutomation\Plugin\Core\Capabilities;
+use DragwybVisualAutomation\Plugin\Domain\Connection;
+use DragwybVisualAutomation\Plugin\Service\AiModelsService;
+use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
+use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -155,7 +155,7 @@ class ConnectionsController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_forbidden',
-				__( 'Sorry, you are not allowed to view connections.', 'dragwyb-agentflow' ),
+				__( 'Sorry, you are not allowed to view connections.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -175,7 +175,7 @@ class ConnectionsController {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_forbidden',
-				__( 'Sorry, you are not allowed to create connections.', 'dragwyb-agentflow' ),
+				__( 'Sorry, you are not allowed to create connections.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -210,7 +210,7 @@ class ConnectionsController {
 		if ( ! is_array( $credentials ) ) {
 			return new WP_Error(
 				'dragwyb_af_rest_invalid',
-				__( 'Credentials must be an object of field values.', 'dragwyb-agentflow' ),
+				__( 'Credentials must be an object of field values.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -275,7 +275,7 @@ class ConnectionsController {
 		if ( null === $connection ) {
 			return new WP_Error(
 				'dragwyb_af_rest_not_found',
-				__( 'Connection not found.', 'dragwyb-agentflow' ),
+				__( 'Connection not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -283,7 +283,7 @@ class ConnectionsController {
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
 			return new WP_Error(
 				'dragwyb_af_rest_invalid',
-				__( 'This connection is not a Google OAuth connection.', 'dragwyb-agentflow' ),
+				__( 'This connection is not a Google OAuth connection.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
 		}
