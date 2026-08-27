@@ -67,6 +67,13 @@ The builder may load the Inter font from Google Fonts.
 ### Generic HTTP requests
 The HTTP Request action sends the method, headers, and body you configure to a URL you choose. Review that destination’s terms and privacy policy before use.
 
+*   GitHub Repository: [https://github.com/Dragwyb/dragwyb-agentflow](https://github.com/Dragwyb/dragwyb-agentflow)
+
+**Build Files & UI Source**
+The React-based visual workflow builder is bundled within the plugin. 
+*   The compiled build files are located in: `assets/builder/`
+*   The uncompiled source files for the visual builder can be found in: `assets/builder/src/`
+
 == Installation ==
 
 1. Upload the plugin folder to `/wp-content/plugins/dragwyb-ai-agent-workflows`, or install the ZIP from Plugins → Add New.
