@@ -67,7 +67,7 @@ The builder may load the Inter font from Google Fonts.
 ### Generic HTTP requests
 The HTTP Request action sends the method, headers, and body you configure to a URL you choose. Review that destination’s terms and privacy policy before use.
 
-*   GitHub Repository: [https://github.com/Dragwyb/dragwyb-agentflow](https://github.com/Dragwyb/dragwyb-agentflow)
+*   GitHub Repository: [https://github.com/Dragwyb/dragwyb-ai-agent-workflows](https://github.com/Dragwyb/dragwyb-ai-agent-workflows)
 
 **Build Files & UI Source**
 The React-based visual workflow builder is bundled within the plugin. 
