@@ -2,7 +2,7 @@
 Contributors: dragwyb
 Tags: automation, workflow, ai, webhooks, woocommerce
 Requires at least: 5.8
-Tested up to: 7.0.2
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 0.1.0
 License: GPL-2.0-or-later
