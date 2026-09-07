@@ -29,8 +29,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class AiClientBootstrap {
 
-	public const MIGRATION_OPTION = 'daiaw_ai_credentials_migrated_to_wp70';
-
 	/**
 	 * Prefixed storage for provider API keys (vendor SDK path, below WP 7).
 	 */
@@ -125,12 +123,7 @@ class AiClientBootstrap {
 
 		self::registerProviders();
 
-		if ( $is_wp70 ) {
-			self::migrateCredentialsToConnectors();
-			// After Connectors core pass (init:20), re-apply our stored keys so
-			// custom providers (OpenRouter/Groq/DeepSeek) always get Authorization.
-			add_action( 'init', array( self::class, 'applyStoredCredentials' ), 25 );
-		} else {
+		if ( ! $is_wp70 ) {
 			\WordPress\AI_Client\AI_Client::init();
 			try {
 				$http_transporter = \WordPress\AiClient\Providers\Http\HttpTransporterFactory::createTransporter();
@@ -138,8 +131,15 @@ class AiClientBootstrap {
 			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 				// Transporter may already be set by AI_Client::init().
 			}
-			self::migrateCredentialsToLegacyOption();
-			self::applyStoredCredentials();
+		}
+
+		self::migrateCredentialsToPluginOption();
+		self::applyStoredCredentials();
+
+		if ( $is_wp70 ) {
+			// After Connectors core pass (init:20), re-apply our stored keys so
+			// custom providers (OpenRouter/Groq/DeepSeek) always get Authorization.
+			add_action( 'init', array( self::class, 'applyStoredCredentials' ), 25 );
 		}
 	}
 
@@ -257,17 +257,19 @@ class AiClientBootstrap {
 			return '';
 		}
 
+		$credentials = self::getCredentialsMap();
+		if ( ! empty( $credentials[ $provider_id ] ) && is_string( $credentials[ $provider_id ] ) ) {
+			return trim( $credentials[ $provider_id ] );
+		}
+
 		if ( self::usesCoreConnectors() ) {
 			$key = get_option( self::connectorsOptionName( $provider_id ), '' );
-			return is_string( $key ) ? trim( $key ) : '';
+			if ( is_string( $key ) && '' !== trim( $key ) ) {
+				return trim( $key );
+			}
 		}
 
-		$credentials = self::getCredentialsMap();
-		if ( empty( $credentials[ $provider_id ] ) || ! is_string( $credentials[ $provider_id ] ) ) {
-			return '';
-		}
-
-		return trim( $credentials[ $provider_id ] );
+		return '';
 	}
 
 	/**
@@ -416,16 +418,12 @@ class AiClientBootstrap {
 			);
 		}
 
-		if ( self::usesCoreConnectors() ) {
-			update_option( self::connectorsOptionName( $provider_id ), $api_key );
-		} else {
-			$credentials = self::getCredentialsMap();
-			if ( ! is_array( $credentials ) ) {
-				$credentials = array();
-			}
-			$credentials[ $provider_id ] = $api_key;
-			update_option( self::CREDENTIALS_OPTION, $credentials );
+		$credentials = self::getCredentialsMap();
+		if ( ! is_array( $credentials ) ) {
+			$credentials = array();
 		}
+		$credentials[ $provider_id ] = $api_key;
+		update_option( self::CREDENTIALS_OPTION, $credentials );
 
 		delete_transient( 'daiaw_ai_models_' . $provider_id );
 
@@ -531,14 +529,10 @@ class AiClientBootstrap {
 			);
 		}
 
-		if ( self::usesCoreConnectors() ) {
-			update_option( self::connectorsOptionName( $provider_id ), '' );
-		} else {
-			$credentials = self::getCredentialsMap();
-			if ( is_array( $credentials ) && isset( $credentials[ $provider_id ] ) ) {
-				unset( $credentials[ $provider_id ] );
-				update_option( self::CREDENTIALS_OPTION, $credentials );
-			}
+		$credentials = self::getCredentialsMap();
+		if ( is_array( $credentials ) && isset( $credentials[ $provider_id ] ) ) {
+			unset( $credentials[ $provider_id ] );
+			update_option( self::CREDENTIALS_OPTION, $credentials );
 		}
 
 		delete_transient( 'daiaw_ai_models_' . $provider_id );
@@ -573,43 +567,9 @@ class AiClientBootstrap {
 	}
 
 	/**
-	 * One-time migration: daiaw AI connections → connectors_ai_* on WP 7+.
+	 * One-time migration: daiaw AI connections / legacy options → daiaw_ai_provider_credentials.
 	 */
-	private static function migrateCredentialsToConnectors(): void {
-		if ( get_option( self::MIGRATION_OPTION ) ) {
-			return;
-		}
-
-		$legacy = self::getCredentialsMap();
-		if ( is_array( $legacy ) ) {
-			foreach ( $legacy as $provider => $key ) {
-				$provider_id = self::resolveProviderId( (string) $provider );
-				if ( '' === $provider_id || ! is_string( $key ) || '' === $key ) {
-					continue;
-				}
-				$option = 'connectors_ai_' . $provider_id . '_api_key';
-				if ( '' === (string) get_option( $option, '' ) ) {
-					update_option( $option, $key );
-				}
-			}
-		}
-
-		self::migrateFromConnectionsTable(
-			static function ( string $provider_id, string $api_key ): void {
-				$option = 'connectors_ai_' . $provider_id . '_api_key';
-				if ( '' === (string) get_option( $option, '' ) ) {
-					update_option( $option, $api_key );
-				}
-			}
-		);
-
-		update_option( self::MIGRATION_OPTION, true );
-	}
-
-	/**
-	 * One-time migration: daiaw AI connections → daiaw_ai_provider_credentials below WP 7.
-	 */
-	private static function migrateCredentialsToLegacyOption(): void {
+	private static function migrateCredentialsToPluginOption(): void {
 		if ( get_option( 'daiaw_ai_credentials_migrated_to_sdk' ) ) {
 			return;
 		}
