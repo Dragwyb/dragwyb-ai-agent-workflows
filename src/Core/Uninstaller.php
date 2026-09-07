@@ -64,6 +64,11 @@ class Uninstaller {
 		foreach ( self::OWNED_OPTIONS as $option ) {
 			Options::delete( $option );
 		}
+
+		delete_option( 'daiaw_ai_provider_credentials' );
+		delete_option( 'daiaw_ai_credentials_migrated_to_sdk' );
+		delete_option( 'daiaw_ai_credentials_migrated_to_wp70' );
+		delete_option( 'wp_ai_client_provider_credentials' );
 	}
 
 	/**

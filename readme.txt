@@ -2,9 +2,9 @@
 Contributors: dragwyb
 Tags: automation, workflow, ai, webhooks, woocommerce
 Requires at least: 5.8
-Tested up to: 7.0.2
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,14 @@ The builder may load the Inter font from Google Fonts.
 ### Generic HTTP requests
 The HTTP Request action sends the method, headers, and body you configure to a URL you choose. Review that destination’s terms and privacy policy before use.
 
+### Gitbub Repository
+*   GitHub Repository: [https://github.com/Dragwyb/dragwyb-ai-agent-workflows](https://github.com/Dragwyb/dragwyb-ai-agent-workflows)
+
+* **Build Files & UI Source**
+    The React-based visual workflow builder is bundled within the plugin. 
+    *   The compiled build files are located in: `assets/builder/`
+    *   The uncompiled source files for the visual builder can be found in: `assets/builder/src/`
+
 == Installation ==
 
 1. Upload the plugin folder to `/wp-content/plugins/dragwyb-ai-agent-workflows`, or install the ZIP from Plugins → Add New.
@@ -89,7 +97,16 @@ User create/update/delete actions only run when the current request has the matc
 
 == Changelog ==
 
-= 0.1.0=
+= 0.1.1 =
+* Fixed WordPress.org review compliance issues.
+* Removed unnecessary `plugin.php` loading from the media helper.
+* Improved REST API permissions for private chat endpoints.
+* Restricted private chats to users with proper workflow permissions.
+* Updated plugin metadata and WordPress compatibility information.
+* Improved source/build documentation for generated assets.
+
+
+= 0.1.0 =
 * Update plugin name, plugin slug & prefix.
 * Improve create, update and insert user validation and capability check.
 * Use wp_iniline_script instead of direct script.

@@ -473,7 +473,11 @@ final class TaxonomyWordPressService {
 			return WordPressActionHelper::fail( __( 'Image URL is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		WordPressActionHelper::ensureMediaIncludes();
+		if ( ! function_exists( 'download_url' ) || ! function_exists( 'media_handle_sideload' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/media.php';
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
 
 		$tmp = download_url( $url );
 		if ( is_wp_error( $tmp ) ) {
@@ -523,8 +527,6 @@ final class TaxonomyWordPressService {
 		if ( ! get_post( $mediaId ) ) {
 			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
-
-		WordPressActionHelper::ensureMediaIncludes();
 
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );
 		$res   = wp_delete_attachment( $mediaId, $force );

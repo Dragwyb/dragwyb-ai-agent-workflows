@@ -122,14 +122,14 @@ class ChatMessageIngressController {
 			return true;
 		}
 
-		if ( current_user_can( Capabilities::MANAGE_WORKFLOWS ) || current_user_can( Capabilities::ACCESS ) ) {
+		if ( current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return true;
 		}
 
 		return new WP_Error(
 			'daiaw_chat_forbidden',
-			__( 'This chat requires a logged-in WordPress user.', 'dragwyb-ai-agent-workflows' ),
-			array( 'status' => 401 )
+			__( 'This chat requires permission to manage workflows.', 'dragwyb-ai-agent-workflows' ),
+			array( 'status' => is_user_logged_in() ? 403 : 401 )
 		);
 	}
 

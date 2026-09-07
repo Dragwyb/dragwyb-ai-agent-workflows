@@ -30,7 +30,9 @@ class CreateWorkflowsTable extends Migration {
 	public function up(): void {
 		global $wpdb;
 
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		if ( ! function_exists( 'dbDelta' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		}
 
 		$table           = Table::name( 'workflows' );
 		$charset_collate = $wpdb->get_charset_collate();

@@ -28,7 +28,9 @@ final class PluginWordPressService {
 			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		WordPressActionHelper::ensurePluginIncludes();
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
 
 		$active = is_plugin_active( $file );
 
@@ -47,7 +49,9 @@ final class PluginWordPressService {
 			return WordPressActionHelper::fail( __( 'Plugin file is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		WordPressActionHelper::ensurePluginIncludes();
+		if ( ! function_exists( 'is_plugin_active' ) || ! function_exists( 'activate_plugin' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
 
 		if ( is_plugin_active( $file ) ) {
 			return WordPressActionHelper::ok(

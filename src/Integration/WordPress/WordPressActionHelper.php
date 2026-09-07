@@ -532,13 +532,17 @@ final class WordPressActionHelper {
 			return null;
 		}
 
-		self::ensureMediaIncludes();
-
 		if ( $imageId <= 0 ) {
 			if ( ! filter_var( $imageUrl, FILTER_VALIDATE_URL ) ) {
 				return array(
 					'warning' => __( 'Featured image skipped: URL is not valid. Omit featured_image unless you have a real direct image URL.', 'dragwyb-ai-agent-workflows' ),
 				);
+			}
+
+			if ( ! function_exists( 'media_sideload_image' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/media.php';
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				require_once ABSPATH . 'wp-admin/includes/image.php';
 			}
 
 			$sanitizedUrl = filter_var( $imageUrl, FILTER_SANITIZE_URL );
@@ -890,34 +894,6 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * Loads the wp-admin includes needed by media, plugin, and upload
-	 * helpers when running outside the admin (e.g. during a workflow run).
-	 *
-	 * @return void
-	 */
-	public static function ensureMediaIncludes(): void {
-		if ( ! function_exists( 'wp_insert_attachment' ) || ! function_exists( 'media_sideload_image' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-		}
-
-		if ( ! function_exists( 'wp_handle_upload' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
-
-		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-		}
-
-		if ( ! function_exists( 'is_plugin_active' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		if ( ! function_exists( 'wp_delete_user' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/user.php';
-		}
-	}
-
-	/**
 	 * Resolves post content from config keys (content, design_sections, html).
 	 *
 	 * @param array<string, mixed> $config Action config.
@@ -944,23 +920,12 @@ final class WordPressActionHelper {
 	 * Sets/attaches featured image to post from id or URL.
 	 *
 	 * @param int                  $postId Target post id.
-	 * @param array<string, mixed> $config Action config.
+	 * @param array<string, mixed> $config Action config (`featured_image_id` or `featured_image`).
 	 *
 	 * @return null|array{warning: string}
 	 */
 	public static function attachFeaturedImage( int $postId, array $config ): ?array {
 		return self::setPostFeaturedImage( $postId, $config );
-	}
-
-	/**
-	 * Loads wp-admin/includes/plugin.php if needed.
-	 *
-	 * @return void
-	 */
-	public static function ensurePluginIncludes(): void {
-		if ( ! function_exists( 'is_plugin_active' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
 	}
 
 	/**
