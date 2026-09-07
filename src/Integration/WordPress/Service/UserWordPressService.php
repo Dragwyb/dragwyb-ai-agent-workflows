@@ -236,7 +236,7 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'You cannot delete the currently authenticated user.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		WordPressActionHelper::ensureMediaIncludes();
+		WordPressActionHelper::ensureUserIncludes();
 
 		$result = wp_delete_user( $userId, $reassignUserId > 0 ? $reassignUserId : null );
 
@@ -272,7 +272,7 @@ final class UserWordPressService {
 		}
 
 		// get_editable_roles() lives in wp-admin/includes/user.php (not loaded on front-end triggers).
-		WordPressActionHelper::ensureMediaIncludes();
+		WordPressActionHelper::ensureUserIncludes();
 
 		$editable = function_exists( 'get_editable_roles' ) ? get_editable_roles() : array();
 		if ( ! is_array( $editable ) || array() === $editable ) {

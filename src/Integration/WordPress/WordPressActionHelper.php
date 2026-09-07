@@ -907,14 +907,6 @@ final class WordPressActionHelper {
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/image.php';
 		}
-
-		if ( ! function_exists( 'is_plugin_active' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		if ( ! function_exists( 'wp_delete_user' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/user.php';
-		}
 	}
 
 	/**
@@ -944,7 +936,7 @@ final class WordPressActionHelper {
 	 * Sets/attaches featured image to post from id or URL.
 	 *
 	 * @param int                  $postId Target post id.
-	 * @param array<string, mixed> $config Action config.
+	 * @param array<string, mixed> $config Action config (`featured_image_id` or `featured_image`).
 	 *
 	 * @return null|array{warning: string}
 	 */
@@ -960,6 +952,17 @@ final class WordPressActionHelper {
 	public static function ensurePluginIncludes(): void {
 		if ( ! function_exists( 'is_plugin_active' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+	}
+
+	/**
+	 * Loads wp-admin/includes/user.php if needed.
+	 *
+	 * @return void
+	 */
+	public static function ensureUserIncludes(): void {
+		if ( ! function_exists( 'wp_delete_user' ) || ! function_exists( 'get_editable_roles' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/user.php';
 		}
 	}
 
