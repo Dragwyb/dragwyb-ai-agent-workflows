@@ -323,18 +323,7 @@ final class UserWordPressService {
 
 		return $candidate;
 	}
-
-	/**
-	 * @deprecated Use resolveAssignableRole().
-	 *
-	 * @param string $role Role slug.
-	 *
-	 * @return string|null Error message or null when valid.
-	 */
-	private function validateAssignableRole( string $role ): ?string {
-		return $this->resolveAssignableRole( $role )['error'];
-	}
-
+	
 	/**
 	 * Writes only non-sensitive user meta keys.
 	 *
