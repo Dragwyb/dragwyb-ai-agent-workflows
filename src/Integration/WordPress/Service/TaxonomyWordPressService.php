@@ -34,12 +34,9 @@ final class TaxonomyWordPressService {
 			);
 		}
 
-		$manageTermsCapability = $taxObj->cap->manage_terms ?? '';
+		$manageTermsCapability = $taxObj->cap->manage_terms ?? ( $taxObj->cap->edit_terms ?? 'manage_categories' );
 
-		if (
-			'' === $manageTermsCapability
-			|| ! current_user_can( $manageTermsCapability )
-		) {
+		if ( ! current_user_can( $manageTermsCapability ) ) {
 			return WordPressActionHelper::fail(
 				__( 'You do not have permission to create terms in this taxonomy.', 'dragwyb-ai-agent-workflows' )
 			);

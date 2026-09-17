@@ -309,9 +309,16 @@ final class PostWordPressService {
 		}
 
 		$publishCap = $postTypeObj->cap->publish_posts ?? ( 'page' === $postType ? 'publish_pages' : 'publish_posts' );
-		if ( 'publish' === $postStatus && ! current_user_can( $publishCap ) ) {
+		if ( in_array( $postStatus, array( 'publish', 'future' ), true ) && ! current_user_can( $publishCap ) ) {
 			return WordPressActionHelper::fail(
 				__( 'You do not have permission to publish posts of this type.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$privateCap = $postTypeObj->cap->edit_private_posts ?? ( 'page' === $postType ? 'edit_private_pages' : 'edit_private_posts' );
+		if ( 'private' === $postStatus && ! current_user_can( $privateCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to set posts of this type to private.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
@@ -453,9 +460,16 @@ final class PostWordPressService {
 			}
 
 			$publishCap = $postTypeObj->cap->publish_posts ?? ( 'page' === $post->post_type ? 'publish_pages' : 'publish_posts' );
-			if ( 'publish' === $status && ! current_user_can( $publishCap ) ) {
+			if ( in_array( $status, array( 'publish', 'future' ), true ) && ! current_user_can( $publishCap ) ) {
 				return WordPressActionHelper::fail(
 					__( 'You do not have permission to publish posts of this type.', 'dragwyb-ai-agent-workflows' )
+				);
+			}
+
+			$privateCap = $postTypeObj->cap->edit_private_posts ?? ( 'page' === $post->post_type ? 'edit_private_pages' : 'edit_private_posts' );
+			if ( 'private' === $status && ! current_user_can( $privateCap ) ) {
+				return WordPressActionHelper::fail(
+					__( 'You do not have permission to set posts of this type to private.', 'dragwyb-ai-agent-workflows' )
 				);
 			}
 
@@ -570,9 +584,16 @@ final class PostWordPressService {
 
 		$postTypeObj = get_post_type_object( $post->post_type );
 		$publishCap  = $postTypeObj->cap->publish_posts ?? ( 'page' === $post->post_type ? 'publish_pages' : 'publish_posts' );
-		if ( 'publish' === $status && ! current_user_can( $publishCap ) ) {
+		if ( in_array( $status, array( 'publish', 'future' ), true ) && ! current_user_can( $publishCap ) ) {
 			return WordPressActionHelper::fail(
 				__( 'You do not have permission to publish posts of this type.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$privateCap = $postTypeObj->cap->edit_private_posts ?? ( 'page' === $post->post_type ? 'edit_private_pages' : 'edit_private_posts' );
+		if ( 'private' === $status && ! current_user_can( $privateCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to set posts of this type to private.', 'dragwyb-ai-agent-workflows' )
 			);
 		}
 
