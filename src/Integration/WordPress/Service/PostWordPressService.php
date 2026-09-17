@@ -291,8 +291,14 @@ final class PostWordPressService {
 		}
 
 		$postStatus    = WordPressActionHelper::str( $config, 'post_status', 'draft' );
-		$validStatuses = array_keys( get_post_stati() );
-		if ( ! in_array( $postStatus, $validStatuses, true ) ) {
+		$allowedStatuses = array(
+			'draft',
+			'pending',
+			'private',
+			'publish',
+			'future',
+		);
+		if ( ! in_array( $postStatus, $allowedStatuses, true ) ) {
 			return WordPressActionHelper::fail(
 				sprintf(
 					/* translators: %s: post status */
@@ -429,8 +435,14 @@ final class PostWordPressService {
 
 		$status = WordPressActionHelper::str( $config, 'post_status' );
 		if ( '' !== $status ) {
-			$validStatuses = array_keys( get_post_stati() );
-			if ( ! in_array( $status, $validStatuses, true ) ) {
+			$allowedStatuses = array(
+				'draft',
+				'pending',	
+				'private',
+				'publish',
+				'future',
+			);
+			if ( ! in_array( $status, $allowedStatuses, true ) ) {
 				return WordPressActionHelper::fail(
 					sprintf(
 						/* translators: %s: post status */
@@ -538,8 +550,15 @@ final class PostWordPressService {
 			);
 		}
 
-		$validStatuses = array_keys( get_post_stati() );
-		if ( ! in_array( $status, $validStatuses, true ) ) {
+		$allowedStatuses = array(
+			'draft',
+			'pending',	
+			'private',
+			'publish',
+			'future',
+		);
+
+		if ( ! in_array( $status, $allowedStatuses, true ) ) {
 			return WordPressActionHelper::fail(
 				sprintf(
 					/* translators: %s: post status */
