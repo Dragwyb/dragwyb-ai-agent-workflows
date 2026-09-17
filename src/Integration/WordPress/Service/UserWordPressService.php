@@ -75,13 +75,8 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
-		$password     = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
-
-		// Agent tools cannot pass passwords (excluded); generate when none is configured.
-		if ( '' === $password ) {
-			$password = wp_generate_password();
-		}
+		// Always generate a strong, random password automatically to avoid storing plain text passwords in workflow definitions.
+		$password = wp_generate_password( 24, true, true );
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
@@ -175,11 +170,6 @@ final class UserWordPressService {
 			$userData['role'] = $resolved['slug'];
 		}
 
-		$password = WordPressActionHelper::str( $config, 'password' );
-
-		if ( '' !== $password ) {
-			$userData['user_pass'] = $password;
-		}
 
 		$result = wp_update_user( $userData );
 

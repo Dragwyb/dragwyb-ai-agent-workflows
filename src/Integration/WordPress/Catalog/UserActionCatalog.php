@@ -33,7 +33,7 @@ final class UserActionCatalog {
 		$definitions[] = array(
 			'slug'          => 'wp_create_user_action',
 			'label'         => __( 'Create New User', 'dragwyb-ai-agent-workflows' ),
-			'description'   => __( 'Creates a new WordPress user account.', 'dragwyb-ai-agent-workflows' ),
+			'description'   => __( 'Creates a new WordPress user account with a secure auto-generated password.', 'dragwyb-ai-agent-workflows' ),
 			'group'         => 'user',
 			'group_label'   => $groups['user'],
 			'method'        => 'createUser',
@@ -41,8 +41,6 @@ final class UserActionCatalog {
 			'config_schema' => array(
 				'email'              => $field( 'string', __( 'Email', 'dragwyb-ai-agent-workflows' ), array( 'required' => true ) ),
 				'username'           => $field( 'string', __( 'Username', 'dragwyb-ai-agent-workflows' ), array( 'required' => true ) ),
-				'password'           => $field( 'string', __( 'Password', 'dragwyb-ai-agent-workflows' ) ),
-				'auto_password'      => $field( 'boolean', __( 'Auto-generate password', 'dragwyb-ai-agent-workflows' ), array( 'default' => true ) ),
 				'nickname'           => $field( 'string', __( 'Nickname', 'dragwyb-ai-agent-workflows' ) ),
 				'display_name'       => $field( 'string', __( 'Display Name', 'dragwyb-ai-agent-workflows' ) ),
 				'first_name'         => $field( 'string', __( 'First Name', 'dragwyb-ai-agent-workflows' ) ),
@@ -63,7 +61,7 @@ final class UserActionCatalog {
 						'default' => 'none',
 						'options' => array(
 							$option( 'none', __( 'None', 'dragwyb-ai-agent-workflows' ) ),
-							$option( 'user', __( 'Notify user only', 'dragwyb-ai-agent-workflows' ) ),
+							$option( 'user', __( 'Notify user only (sends password set link)', 'dragwyb-ai-agent-workflows' ) ),
 							$option( 'admin', __( 'Notify admin only', 'dragwyb-ai-agent-workflows' ) ),
 							$option( 'both', __( 'Notify user and admin', 'dragwyb-ai-agent-workflows' ) ),
 						),
@@ -85,7 +83,6 @@ final class UserActionCatalog {
 				'user_id'      => $field( 'string', __( 'User ID', 'dragwyb-ai-agent-workflows' ), array( 'required' => true ) ),
 				'username'     => $field( 'string', __( 'Username', 'dragwyb-ai-agent-workflows' ) ),
 				'email'        => $field( 'string', __( 'Email', 'dragwyb-ai-agent-workflows' ) ),
-				'password'     => $field( 'string', __( 'New Password (leave blank to keep current)', 'dragwyb-ai-agent-workflows' ) ),
 				'nickname'     => $field( 'string', __( 'Nickname', 'dragwyb-ai-agent-workflows' ) ),
 				'display_name' => $field( 'string', __( 'Display Name', 'dragwyb-ai-agent-workflows' ) ),
 				'first_name'   => $field( 'string', __( 'First Name', 'dragwyb-ai-agent-workflows' ) ),
