@@ -124,6 +124,12 @@ final class PostWordPressService {
 		}
 
 		$limit = WordPressActionHelper::int( $config, 'limit' );
+		// Verify the current user has permission to query posts of the given type.
+		$postTypeObj = get_post_type_object( $postType );
+		$capability  = $postTypeObj && isset( $postTypeObj->cap->edit_posts ) ? $postTypeObj->cap->edit_posts : 'edit_posts';
+		if ( ! current_user_can( $capability ) ) {
+			return WordPressActionHelper::fail( __( 'Insufficient permissions to query posts of this type.', 'dragwyb-ai-agent-workflows' ) );
+		}
 		$posts = get_posts(
 			array(
 				'post_type'   => $postType,
