@@ -3,7 +3,7 @@
  * Plugin Name:       Dragwyb AI Agent Workflows
  * Plugin URI:        https://dragwyb.com/product/ai-workflows/
  * Description:       Build and run visual multi-step automation workflows, webhooks, and AI agent actions in WordPress.
- * Version:           0.1.1
+ * Version:           0.1.2
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Dragwyb
@@ -63,7 +63,7 @@ function dragaiw_php_version_notice() {
 	);
 }
 
-define( 'DRAGAIW_VERSION', '0.1.1' );
+define( 'DRAGAIW_VERSION', '0.1.2' );
 define( 'DRAGAIW_PLUGIN_FILE', __FILE__ );
 define( 'DRAGAIW_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DRAGAIW_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
