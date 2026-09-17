@@ -2,16 +2,16 @@
 /**
  * Executes an AI Agent tool call against a workflow action node.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service\Agent;
+namespace DRAGAIW\Plugin\Service\Agent;
 
-use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
-use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
-use DragwybVisualAutomation\Plugin\Service\NodeExecutionService;
+use DRAGAIW\Plugin\Domain\WorkflowNode;
+use DRAGAIW\Plugin\Service\ConfigInterpolator;
+use DRAGAIW\Plugin\Service\NodeExecutionService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,16 +2,16 @@
 /**
  * Google OAuth callback REST endpoint.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Rest;
+namespace DRAGAIW\Plugin\Rest;
 
-use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Admin\Pages\ConnectionFormPage;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 use WP_REST_Request;
 
 // Prevent direct file access.
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class GoogleOAuthCallbackController {
 
-	private const API_NAMESPACE = 'daiaw/v1';
+	private const API_NAMESPACE = 'dragaiw/v1';
 
 	private ConnectionService $connections;
 
@@ -138,21 +138,21 @@ class GoogleOAuthCallbackController {
 
 		if ( '' !== $return_url ) {
 			$args = array(
-				'daiaw_notice' => $notice,
+				'dragaiw_notice' => $notice,
 			);
 
 			if ( $connection_id > 0 ) {
-				$args['daiaw_connection'] = $connection_id;
+				$args['dragaiw_connection'] = $connection_id;
 			}
 
 			$node_id = isset( $state_payload['node_id'] ) ? (string) $state_payload['node_id'] : '';
 
 			if ( '' !== $node_id ) {
-				$args['daiaw_node'] = $node_id;
+				$args['dragaiw_node'] = $node_id;
 			}
 
 			if ( '' !== $detail ) {
-				$args['daiaw_error'] = $detail;
+				$args['dragaiw_error'] = $detail;
 			}
 
 			wp_safe_redirect( add_query_arg( $args, $return_url ) );
@@ -161,7 +161,7 @@ class GoogleOAuthCallbackController {
 
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'daiaw_notice' => $notice,
+			'dragaiw_notice' => $notice,
 		);
 
 		if ( $connection_id > 0 ) {
@@ -169,7 +169,7 @@ class GoogleOAuthCallbackController {
 		}
 
 		if ( '' !== $detail ) {
-			$args['daiaw_error'] = $detail;
+			$args['dragaiw_error'] = $detail;
 		}
 
 		wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php' ) ) );

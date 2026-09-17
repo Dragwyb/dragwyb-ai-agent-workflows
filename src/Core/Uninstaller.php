@@ -2,14 +2,14 @@
 /**
  * Plugin uninstall handler.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Core;
+namespace DRAGAIW\Plugin\Core;
 
-use DragwybVisualAutomation\Plugin\Database\SchemaMigrations;
+use DRAGAIW\Plugin\Database\SchemaMigrations;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -65,9 +65,9 @@ class Uninstaller {
 			Options::delete( $option );
 		}
 
-		delete_option( 'daiaw_ai_provider_credentials' );
-		delete_option( 'daiaw_ai_credentials_migrated_to_sdk' );
-		delete_option( 'daiaw_ai_credentials_migrated_to_wp70' );
+		delete_option( 'dragaiw_ai_provider_credentials' );
+		delete_option( 'dragaiw_ai_credentials_migrated_to_sdk' );
+		delete_option( 'dragaiw_ai_credentials_migrated_to_wp70' );
 		delete_option( 'wp_ai_client_provider_credentials' );
 	}
 

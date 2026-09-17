@@ -2,12 +2,12 @@
 /**
  * Post, Comment, and Post Type catalog definitions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog;
+namespace DRAGAIW\Plugin\Integration\WordPress\Catalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,18 +2,18 @@
 /**
  * Connection application service.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Core\Encryption;
-use DragwybVisualAutomation\Plugin\Domain\Connection;
-use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
+use DRAGAIW\Plugin\Core\Encryption;
+use DRAGAIW\Plugin\Domain\Connection;
+use DRAGAIW\Plugin\Persistence\ConnectionRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,12 +2,12 @@
 /**
  * Built-in WordPress core hook trigger catalog.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration;
+namespace DRAGAIW\Plugin\Integration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

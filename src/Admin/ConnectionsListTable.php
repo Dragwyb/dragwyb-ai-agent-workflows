@@ -2,18 +2,18 @@
 /**
  * Connections admin list table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
-use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybVisualAutomation\Plugin\Domain\Connection;
-use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Admin\Pages\ConnectionFormPage;
+use DRAGAIW\Plugin\Domain\Connection;
+use DRAGAIW\Plugin\Service\ConnectionAuthTypes;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\SettingsService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -200,7 +200,7 @@ class ConnectionsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'daiaw-connections-table' );
+		return array( 'widefat', 'fixed', 'striped', 'dragaiw-connections-table' );
 	}
 
 	/**
@@ -215,12 +215,12 @@ class ConnectionsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id     = 'daiaw-connection-delete-' . $id;
-		$nonce_field = wp_nonce_field( 'daiaw_connection_action_delete_' . $id, '_wpnonce', true, false );
+		$form_id     = 'dragaiw-connection-delete-' . $id;
+		$nonce_field = wp_nonce_field( 'dragaiw_connection_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="daiaw-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="daiaw_connection_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="dragaiw-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="dragaiw_connection_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
 				. '<input type="hidden" name="connection_id" value="%3$d" />'
 				. '%4$s'

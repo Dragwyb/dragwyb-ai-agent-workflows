@@ -2,15 +2,15 @@
 /**
  * Shared AI chat action backed by WordPress AI Client.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\Actions;
+namespace DRAGAIW\Plugin\Integration\Actions;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentAiClient;
+use DRAGAIW\Plugin\Domain\Contracts\ActionInterface;
+use DRAGAIW\Plugin\Service\Agent\AgentAiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,7 +34,7 @@ abstract class AbstractAiClientChatAction implements ActionInterface {
 	abstract public function description(): string;
 
 	/**
-	 * daiaw provider slug (openai|claude|gemini|openrouter|groq|deepseek).
+	 * dragaiw provider slug (openai|claude|gemini|openrouter|groq|deepseek).
 	 */
 	abstract protected function providerSlug(): string;
 

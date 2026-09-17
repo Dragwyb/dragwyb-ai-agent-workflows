@@ -2,17 +2,17 @@
 /**
  * Handles state-changing Settings admin actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
-use DragwybVisualAutomation\Plugin\Admin\Pages\SettingsPage;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Admin\Pages\SettingsPage;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Service\RunRetentionService;
+use DRAGAIW\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin_post.php?action=daiaw_settings_action` POST submitted
+ * Receives the `admin_post.php?action=dragaiw_settings_action` POST submitted
  * by each of SettingsPage's per-tab forms.
  *
  * One op per form, matching one SettingsService method each, rather than
@@ -49,7 +49,7 @@ class SettingsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_daiaw_settings_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragaiw_settings_action', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -69,7 +69,7 @@ class SettingsController {
 			$this->redirect( 'general', 'error' );
 		}
 
-		check_admin_referer( 'daiaw_settings_action_' . $op );
+		check_admin_referer( 'dragaiw_settings_action_' . $op );
 
 		switch ( $op ) {
 			case 'general':
@@ -160,7 +160,7 @@ class SettingsController {
 				array(
 					'page'       => SettingsPage::SLUG,
 					'tab'        => 'retention',
-					'daiaw_notice' => 'purged',
+					'dragaiw_notice' => 'purged',
 					'count'      => $count,
 				),
 				admin_url( 'admin.php' )
@@ -183,7 +183,7 @@ class SettingsController {
 				array(
 					'page'       => SettingsPage::SLUG,
 					'tab'        => $tab,
-					'daiaw_notice' => $notice,
+					'dragaiw_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)

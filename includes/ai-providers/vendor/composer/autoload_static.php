@@ -15,7 +15,7 @@ class ComposerStaticInit018fb7cb1d7c1fe2e991f119c462a6fd
         ),
         'D' =>
         array (
-            'DragwybVisualAutomation\\AiProviders\\' => 36,
+            'DRAGAIW\\AiProviders\\' => 36,
         ),
     );
 
@@ -32,7 +32,7 @@ class ComposerStaticInit018fb7cb1d7c1fe2e991f119c462a6fd
         array (
             0 => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src',
         ),
-        'DragwybVisualAutomation\\AiProviders\\' =>
+        'DRAGAIW\\AiProviders\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
@@ -40,12 +40,12 @@ class ComposerStaticInit018fb7cb1d7c1fe2e991f119c462a6fd
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'DragwybVisualAutomation\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => __DIR__ . '/../..' . '/src/Compatible/AbstractCompatibleApiProvider.php',
-        'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => __DIR__ . '/../..' . '/src/Compatible/CompatibleModelMetadataDirectory.php',
-        'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => __DIR__ . '/../..' . '/src/Compatible/CompatibleTextGenerationModel.php',
-        'DragwybVisualAutomation\\AiProviders\\DeepSeek\\DeepSeekProvider' => __DIR__ . '/../..' . '/src/DeepSeek/DeepSeekProvider.php',
-        'DragwybVisualAutomation\\AiProviders\\Groq\\GroqProvider' => __DIR__ . '/../..' . '/src/Groq/GroqProvider.php',
-        'DragwybVisualAutomation\\AiProviders\\OpenRouter\\OpenRouterProvider' => __DIR__ . '/../..' . '/src/OpenRouter/OpenRouterProvider.php',
+        'DRAGAIW\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => __DIR__ . '/../..' . '/src/Compatible/AbstractCompatibleApiProvider.php',
+        'DRAGAIW\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => __DIR__ . '/../..' . '/src/Compatible/CompatibleModelMetadataDirectory.php',
+        'DRAGAIW\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => __DIR__ . '/../..' . '/src/Compatible/CompatibleTextGenerationModel.php',
+        'DRAGAIW\\AiProviders\\DeepSeek\\DeepSeekProvider' => __DIR__ . '/../..' . '/src/DeepSeek/DeepSeekProvider.php',
+        'DRAGAIW\\AiProviders\\Groq\\GroqProvider' => __DIR__ . '/../..' . '/src/Groq/GroqProvider.php',
+        'DRAGAIW\\AiProviders\\OpenRouter\\OpenRouterProvider' => __DIR__ . '/../..' . '/src/OpenRouter/OpenRouterProvider.php',
         'WordPress\\AnthropicAiProvider\\Authentication\\AnthropicApiKeyRequestAuthentication' => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src/Authentication/AnthropicApiKeyRequestAuthentication.php',
         'WordPress\\AnthropicAiProvider\\Metadata\\AnthropicModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src/Metadata/AnthropicModelMetadataDirectory.php',
         'WordPress\\AnthropicAiProvider\\Models\\AnthropicTextGenerationModel' => __DIR__ . '/..' . '/wordpress/ai-provider-for-anthropic/src/Models/AnthropicTextGenerationModel.php',

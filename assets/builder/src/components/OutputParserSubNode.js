@@ -24,8 +24,8 @@ export default function OutputParserSubNode({
 	return (
 		<div
 			className={[
-				'daiaw-output-parser-node',
-				selected ? 'daiaw-output-parser-node--selected' : '',
+				'dragaiw-output-parser-node',
+				selected ? 'dragaiw-output-parser-node--selected' : '',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -35,23 +35,23 @@ export default function OutputParserSubNode({
 			onPointerDown={handlePointerDown}
 			onKeyDown={handleKeyDown}
 		>
-			<span className="daiaw-output-parser-node__input-dot" aria-hidden="true" />
-			<span className="daiaw-output-parser-node__icon" aria-hidden="true">
+			<span className="dragaiw-output-parser-node__input-dot" aria-hidden="true" />
+			<span className="dragaiw-output-parser-node__icon" aria-hidden="true">
 				{'{✓}'}
 			</span>
-			<span className="daiaw-output-parser-node__label">
+			<span className="dragaiw-output-parser-node__label">
 				{node.label ||
 					__('Structured Output Parser', 'dragwyb-ai-agent-workflows')}
 			</span>
-			<div className="daiaw-output-parser-node__model-row">
-				<span className="daiaw-output-parser-node__model-label">
+			<div className="dragaiw-output-parser-node__model-row">
+				<span className="dragaiw-output-parser-node__model-label">
 					{__('Model', 'dragwyb-ai-agent-workflows')}
 					{!hasChatModel ? '*' : ''}
 				</span>
 				{!hasChatModel && onAddChatModel ? (
 					<button
 						type="button"
-						className="daiaw-output-parser-node__model-add"
+						className="dragaiw-output-parser-node__model-add"
 						onClick={(event) => {
 							event.stopPropagation();
 							onAddChatModel(node.id);
@@ -62,7 +62,7 @@ export default function OutputParserSubNode({
 					</button>
 				) : (
 					<span
-						className="daiaw-output-parser-node__model-dot"
+						className="dragaiw-output-parser-node__model-dot"
 						aria-hidden="true"
 					/>
 				)}

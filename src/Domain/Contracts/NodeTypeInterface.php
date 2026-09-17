@@ -2,12 +2,12 @@
 /**
  * Shared node type metadata contract.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Domain\Contracts;
+namespace DRAGAIW\Plugin\Domain\Contracts;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,7 +26,7 @@ interface NodeTypeInterface {
 
 	/**
 	 * A stable, unique identifier for this node type (e.g. `wp_hook_trigger`).
-	 * Stored in `daiaw_workflow_nodes.node_type`; must never change once
+	 * Stored in `dragaiw_workflow_nodes.node_type`; must never change once
 	 * workflows may reference it.
 	 *
 	 * @return string

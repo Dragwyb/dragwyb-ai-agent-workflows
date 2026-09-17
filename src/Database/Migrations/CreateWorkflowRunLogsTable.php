@@ -2,15 +2,15 @@
 /**
  * Creates the workflow run logs table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Database\Migrations;
+namespace DRAGAIW\Plugin\Database\Migrations;
 
-use DragwybVisualAutomation\Plugin\Database\Migration;
-use DragwybVisualAutomation\Plugin\Database\Table;
+use DRAGAIW\Plugin\Database\Migration;
+use DRAGAIW\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `daiaw_workflow_run_logs` holds one row per node outcome within a workflow
+ * `dragaiw_workflow_run_logs` holds one row per node outcome within a workflow
  * run. `node_id` intentionally has no `NOT NULL` constraint: it references
- * `daiaw_workflow_nodes.id`, but a node can later be removed from the builder
+ * `dragaiw_workflow_nodes.id`, but a node can later be removed from the builder
  * graph (which deletes its row) while its historical run logs are kept, so
  * `node_id` on an old log entry may point to a node that no longer exists.
  * A future "Runs" UI (roadmap item 9) is expected to resolve `node_id`

@@ -2,15 +2,15 @@
 /**
  * Creates the workflow nodes table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Database\Migrations;
+namespace DRAGAIW\Plugin\Database\Migrations;
 
-use DragwybVisualAutomation\Plugin\Database\Migration;
-use DragwybVisualAutomation\Plugin\Database\Table;
+use DRAGAIW\Plugin\Database\Migration;
+use DRAGAIW\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `daiaw_workflow_nodes` holds one row per node in a workflow's graph. There
- * is no SQL-level FOREIGN KEY to `daiaw_workflows` because `dbDelta()` does
+ * `dragaiw_workflow_nodes` holds one row per node in a workflow's graph. There
+ * is no SQL-level FOREIGN KEY to `dragaiw_workflows` because `dbDelta()` does
  * not reliably manage foreign key constraints; cascade-on-delete is instead
  * enforced explicitly in the repository/service layer. See
  * docs/internal/architecture.md §2.3.

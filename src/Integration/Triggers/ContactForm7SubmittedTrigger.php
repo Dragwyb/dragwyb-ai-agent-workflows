@@ -2,14 +2,14 @@
 /**
  * Contact Form 7 submission trigger.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
+namespace DRAGAIW\Plugin\Integration\Triggers;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
+use DRAGAIW\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -41,11 +41,11 @@ export default function AgentNodeCard({
 	};
 
 	const classNames = [
-		'daiaw-builder-node',
-		'daiaw-builder-node--agent',
-		selected ? 'daiaw-builder-node--selected' : '',
-		hasUnknownType ? 'daiaw-builder-node--unknown' : '',
-		isLinkTarget ? 'daiaw-builder-node--link-target' : '',
+		'dragaiw-builder-node',
+		'dragaiw-builder-node--agent',
+		selected ? 'dragaiw-builder-node--selected' : '',
+		hasUnknownType ? 'dragaiw-builder-node--unknown' : '',
+		isLinkTarget ? 'dragaiw-builder-node--link-target' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -67,17 +67,17 @@ export default function AgentNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<div
-				className="daiaw-agent-node__main"
+				className="dragaiw-agent-node__main"
 				style={{ minHeight: `${AGENT_BODY_HEIGHT}px` }}
 			>
 				<span
-					className="daiaw-builder-node__handle daiaw-builder-node__handle--input"
+					className="dragaiw-builder-node__handle dragaiw-builder-node__handle--input"
 					aria-hidden="true"
 				/>
 
-				<div className="daiaw-builder-node__body">
+				<div className="dragaiw-builder-node__body">
 					<span
-						className="daiaw-builder-node__icon"
+						className="dragaiw-builder-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -86,9 +86,9 @@ export default function AgentNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="daiaw-builder-node__text">
-						<span className="daiaw-builder-node__label">{node.label}</span>
-						<span className="daiaw-builder-node__subtitle">
+					<div className="dragaiw-builder-node__text">
+						<span className="dragaiw-builder-node__label">{node.label}</span>
+						<span className="dragaiw-builder-node__subtitle">
 							{__('AI Agent', 'dragwyb-ai-agent-workflows')}
 						</span>
 					</div>
@@ -97,7 +97,7 @@ export default function AgentNodeCard({
 				{canStartFlowConnection && onStartFlowConnectionDrag && (
 					<button
 						type="button"
-						className="daiaw-builder-node__output-port daiaw-builder-node__output-port--side"
+						className="dragaiw-builder-node__output-port dragaiw-builder-node__output-port--side"
 						title={__(
 							'Drag to the next step to connect',
 							'dragwyb-ai-agent-workflows'
@@ -115,18 +115,18 @@ export default function AgentNodeCard({
 			</div>
 
 			<div
-				className="daiaw-agent-node__ports"
+				className="dragaiw-agent-node__ports"
 				style={{ minHeight: `${AGENT_PORTS_HEIGHT}px` }}
 			>
-				<div className="daiaw-agent-node__port">
-					<span className="daiaw-agent-node__port-label">
+				<div className="dragaiw-agent-node__port">
+					<span className="dragaiw-agent-node__port-label">
 						{__('Chat Model', 'dragwyb-ai-agent-workflows')}
-						<span className="daiaw-agent-node__required">*</span>
+						<span className="dragaiw-agent-node__required">*</span>
 					</span>
 					{hasChatModel ? (
 						<button
 							type="button"
-							className="daiaw-agent-node__port-dot daiaw-agent-node__port-dot--ok daiaw-agent-node__port-dot--link"
+							className="dragaiw-agent-node__port-dot dragaiw-agent-node__port-dot--ok dragaiw-agent-node__port-dot--link"
 							title={__('Open chat model settings', 'dragwyb-ai-agent-workflows')}
 							aria-label={__(
 								'Open chat model settings',
@@ -143,7 +143,7 @@ export default function AgentNodeCard({
 					) : (
 						<button
 							type="button"
-							className="daiaw-agent-node__add-port"
+							className="dragaiw-agent-node__add-port"
 							aria-label={__(
 								'Add chat model to agent',
 								'dragwyb-ai-agent-workflows'
@@ -163,19 +163,19 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="daiaw-agent-node__port">
-					<span className="daiaw-agent-node__port-label">
+				<div className="dragaiw-agent-node__port">
+					<span className="dragaiw-agent-node__port-label">
 						{__('Memory', 'dragwyb-ai-agent-workflows')}
 					</span>
 					{hasMemory ? (
 						<span
-							className="daiaw-agent-node__port-dot daiaw-agent-node__port-dot--ok"
+							className="dragaiw-agent-node__port-dot dragaiw-agent-node__port-dot--ok"
 							title={__('Memory connected', 'dragwyb-ai-agent-workflows')}
 						/>
 					) : (
 						<button
 							type="button"
-							className="daiaw-agent-node__add-port daiaw-agent-node__add-port--muted"
+							className="dragaiw-agent-node__add-port dragaiw-agent-node__add-port--muted"
 							aria-label={__('Add memory to agent', 'dragwyb-ai-agent-workflows')}
 							title={__('Add simple memory', 'dragwyb-ai-agent-workflows')}
 							onPointerDown={stopPointer}
@@ -189,13 +189,13 @@ export default function AgentNodeCard({
 					)}
 				</div>
 
-				<div className="daiaw-agent-node__port daiaw-agent-node__port--tool">
-					<span className="daiaw-agent-node__port-label">
+				<div className="dragaiw-agent-node__port dragaiw-agent-node__port--tool">
+					<span className="dragaiw-agent-node__port-label">
 						{__('Tool', 'dragwyb-ai-agent-workflows')}
 					</span>
 					<button
 						type="button"
-						className="daiaw-agent-node__add-port"
+						className="dragaiw-agent-node__add-port"
 						aria-label={__('Add tool to agent', 'dragwyb-ai-agent-workflows')}
 						title={__(
 							'Add an action as an agent tool',

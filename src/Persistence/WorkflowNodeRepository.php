@@ -2,15 +2,15 @@
 /**
  * Workflow node repository.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Persistence;
+namespace DRAGAIW\Plugin\Persistence;
 
-use DragwybVisualAutomation\Plugin\Database\Table;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
+use DRAGAIW\Plugin\Database\Table;
+use DRAGAIW\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `daiaw_workflow_nodes` access goes through this class.
+ * All `dragaiw_workflow_nodes` access goes through this class.
  */
 class WorkflowNodeRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'daiaw_workflow_nodes';
+	private const CACHE_GROUP = 'dragaiw_workflow_nodes';
 
 	/**
 	 * Defensive upper bound on nodes fetched for a single workflow. A

@@ -2,15 +2,15 @@
 /**
  * Workflow JSON import/export (n8n-style portable definition).
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use InvalidArgumentException;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,16 +2,16 @@
 /**
  * Base class for Google Sheets workflow actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet;
+namespace DRAGAIW\Plugin\Integration\GoogleSheet;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Domain\Contracts\ActionInterface;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

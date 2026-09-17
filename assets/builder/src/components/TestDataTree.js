@@ -174,31 +174,31 @@ export default function TestDataTree({ title, data, embedded = false }) {
 		<div
 			className={
 				embedded
-					? 'daiaw-test-io__panel daiaw-test-io__panel--embedded'
-					: 'daiaw-test-io__panel'
+					? 'dragaiw-test-io__panel dragaiw-test-io__panel--embedded'
+					: 'dragaiw-test-io__panel'
 			}
 		>
 			{!embedded && title && (
-				<h4 className="daiaw-test-io__panel-title">{title}</h4>
+				<h4 className="dragaiw-test-io__panel-title">{title}</h4>
 			)}
 
 			{!hasData ? (
-				<p className="daiaw-test-io__empty">
+				<p className="dragaiw-test-io__empty">
 					{__('No data', 'dragwyb-ai-agent-workflows')}
 				</p>
 			) : (
-				<div className="daiaw-test-io__tree-wrap">
-					<ul className="daiaw-test-io__tree">
-						<li className="daiaw-test-io__branch">
+				<div className="dragaiw-test-io__tree-wrap">
+					<ul className="dragaiw-test-io__tree">
+						<li className="dragaiw-test-io__branch">
 							<button
 								type="button"
-								className="daiaw-test-io__branch-btn"
+								className="dragaiw-test-io__branch-btn"
 								aria-expanded
 								disabled
 							>
-								<span className="daiaw-test-io__chevron">▾</span>
-								<span className="daiaw-test-io__branch-label">root</span>
-								<span className="daiaw-test-io__count">
+								<span className="dragaiw-test-io__chevron">▾</span>
+								<span className="dragaiw-test-io__branch-label">root</span>
+								<span className="dragaiw-test-io__count">
 									{sprintf(
 										/* translators: %d: number of fields */
 										__('%d items', 'dragwyb-ai-agent-workflows'),
@@ -206,7 +206,7 @@ export default function TestDataTree({ title, data, embedded = false }) {
 									)}
 								</span>
 							</button>
-							<ul className="daiaw-test-io__tree daiaw-test-io__tree--nested">
+							<ul className="dragaiw-test-io__tree dragaiw-test-io__tree--nested">
 								{(tree.children || []).map((child) => (
 									<ReadOnlyBranch key={child.id} node={child} depth={0} />
 								))}
@@ -234,17 +234,17 @@ function ReadOnlyBranch({ node, depth }) {
 		const rawValue = node.value;
 
 		return (
-			<li className="daiaw-test-io__leaf">
+			<li className="dragaiw-test-io__leaf">
 				<div
-					className={`daiaw-test-io__field${isResponse ? ' daiaw-test-io__field--response' : ''}`}
+					className={`dragaiw-test-io__field${isResponse ? ' dragaiw-test-io__field--response' : ''}`}
 					style={{ paddingLeft: `${8 + depth * 14}px` }}
 				>
-					<span className="daiaw-test-io__key">{fieldKey}</span>
-					<span className="daiaw-test-io__colon">:</span>
+					<span className="dragaiw-test-io__key">{fieldKey}</span>
+					<span className="dragaiw-test-io__colon">:</span>
 					{isResponse && typeof rawValue === 'string' ? (
-						<pre className="daiaw-test-io__response">{rawValue}</pre>
+						<pre className="dragaiw-test-io__response">{rawValue}</pre>
 					) : (
-						<span className="daiaw-test-io__value">
+						<span className="dragaiw-test-io__value">
 							{formatScalarValue(rawValue)}
 						</span>
 					)}
@@ -260,17 +260,17 @@ function ReadOnlyBranch({ node, depth }) {
 	const childCount = children.length;
 
 	return (
-		<li className="daiaw-test-io__branch">
+		<li className="dragaiw-test-io__branch">
 			<button
 				type="button"
-				className="daiaw-test-io__branch-btn"
+				className="dragaiw-test-io__branch-btn"
 				style={{ paddingLeft: `${8 + depth * 14}px` }}
 				onClick={() => setOpen(!open)}
 				aria-expanded={open}
 			>
-				<span className="daiaw-test-io__chevron">{open ? '▾' : '▸'}</span>
-				<span className="daiaw-test-io__branch-label">{node.label}</span>
-				<span className="daiaw-test-io__count">
+				<span className="dragaiw-test-io__chevron">{open ? '▾' : '▸'}</span>
+				<span className="dragaiw-test-io__branch-label">{node.label}</span>
+				<span className="dragaiw-test-io__count">
 					{sprintf(
 						/* translators: %d: number of nested fields */
 						__('%d items', 'dragwyb-ai-agent-workflows'),
@@ -279,7 +279,7 @@ function ReadOnlyBranch({ node, depth }) {
 				</span>
 			</button>
 			{open && (
-				<ul className="daiaw-test-io__tree daiaw-test-io__tree--nested">
+				<ul className="dragaiw-test-io__tree dragaiw-test-io__tree--nested">
 					{children.map((child) => (
 						<ReadOnlyBranch
 							key={child.id}

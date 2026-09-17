@@ -2,18 +2,18 @@
 /**
  * Catalog-defined WordPress hook trigger.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
+namespace DRAGAIW\Plugin\Integration\Triggers;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerGroupInterface;
-use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
-use DragwybVisualAutomation\Plugin\Service\TriggerPayloadNormalizer;
-use DragwybVisualAutomation\Plugin\Service\TriggerReentrancyGuard;
+use DRAGAIW\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DRAGAIW\Plugin\Domain\Contracts\TriggerInterface;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionHelper;
+use DRAGAIW\Plugin\Service\TriggerPayloadNormalizer;
+use DRAGAIW\Plugin\Service\TriggerReentrancyGuard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

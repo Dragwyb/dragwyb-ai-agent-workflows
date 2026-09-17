@@ -2,15 +2,15 @@
 /**
  * Chat Message Received trigger (n8n-style Chat Trigger).
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\Triggers;
+namespace DRAGAIW\Plugin\Integration\Triggers;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerGroupInterface;
-use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
+use DRAGAIW\Plugin\Domain\Contracts\TriggerGroupInterface;
+use DRAGAIW\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ingress URL. Payload mirrors n8n's Chat Trigger (`chatInput`, `sessionId`)
  * so AI Agent "Connected Chat Trigger Node" prompt source works out of the box.
  *
- * Fired via {@see do_action( 'daiaw_chat_message_received', $payload )} from
- * {@see \DragwybVisualAutomation\Plugin\Rest\ChatMessageIngressController}.
+ * Fired via {@see do_action( 'dragaiw_chat_message_received', $payload )} from
+ * {@see \DRAGAIW\Plugin\Rest\ChatMessageIngressController}.
  */
 class ChatMessageReceivedTrigger implements TriggerInterface, TriggerGroupInterface {
 
-	public const HOOK = 'daiaw_chat_message_received';
+	public const HOOK = 'dragaiw_chat_message_received';
 
 	public const SLUG = 'chat_message_received_trigger';
 

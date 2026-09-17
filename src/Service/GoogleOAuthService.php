@@ -2,16 +2,16 @@
 /**
  * Google OAuth 2.0 authorization and token lifecycle.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Domain\Connection;
-use DragwybVisualAutomation\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DRAGAIW\Plugin\Domain\Connection;
+use DRAGAIW\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +56,7 @@ class GoogleOAuthService {
 	 * OAuth redirect URI registered in Google Cloud Console.
 	 */
 	public function callbackUrl(): string {
-		return rest_url( 'daiaw/v1/oauth/google/callback' );
+		return rest_url( 'dragaiw/v1/oauth/google/callback' );
 	}
 
 	/**
@@ -334,7 +334,7 @@ class GoogleOAuthService {
 	}
 
 	private function stateTransientKey( string $state ): string {
-		return 'daiaw_google_oauth_' . md5( $state );
+		return 'dragaiw_google_oauth_' . md5( $state );
 	}
 
 	private function sanitizeReturnUrl( string $return_url ): string {

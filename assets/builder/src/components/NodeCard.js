@@ -122,15 +122,15 @@ export default function NodeCard({
 		);
 	};
 
-	const classNames = ['daiaw-builder-node'];
+	const classNames = ['dragaiw-builder-node'];
 	if (selected) {
-		classNames.push('daiaw-builder-node--selected');
+		classNames.push('dragaiw-builder-node--selected');
 	}
 	if (hasUnknownType) {
-		classNames.push('daiaw-builder-node--unknown');
+		classNames.push('dragaiw-builder-node--unknown');
 	}
 	if (isLinkTarget) {
-		classNames.push('daiaw-builder-node--link-target');
+		classNames.push('dragaiw-builder-node--link-target');
 	}
 
 	const ariaLabel = [
@@ -161,12 +161,12 @@ export default function NodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="daiaw-builder-node__handle daiaw-builder-node__handle--top"
+				className="dragaiw-builder-node__handle dragaiw-builder-node__handle--top"
 				aria-hidden="true"
 			/>
-			<div className="daiaw-builder-node__body">
+			<div className="dragaiw-builder-node__body">
 				<span
-					className="daiaw-builder-node__icon"
+					className="dragaiw-builder-node__icon"
 					style={{
 						backgroundColor: meta.bg,
 						color: meta.accent,
@@ -175,23 +175,23 @@ export default function NodeCard({
 				>
 					{meta.icon}
 				</span>
-				<div className="daiaw-builder-node__text">
-					<span className="daiaw-builder-node__label" aria-hidden="true">
+				<div className="dragaiw-builder-node__text">
+					<span className="dragaiw-builder-node__label" aria-hidden="true">
 						{node.label}
 					</span>
-					<span className="daiaw-builder-node__subtitle" aria-hidden="true">
+					<span className="dragaiw-builder-node__subtitle" aria-hidden="true">
 						{meta.categoryLabel}
 					</span>
 				</div>
 			</div>
 			<span
-				className="daiaw-builder-node__handle daiaw-builder-node__handle--bottom"
+				className="dragaiw-builder-node__handle dragaiw-builder-node__handle--bottom"
 				aria-hidden="true"
 			/>
 			{canStartFlowConnection && onStartFlowConnectionDrag && (
 				<button
 					type="button"
-					className="daiaw-builder-node__output-port"
+					className="dragaiw-builder-node__output-port"
 					title={__(
 						'Drag to the next step to connect',
 						'dragwyb-ai-agent-workflows'

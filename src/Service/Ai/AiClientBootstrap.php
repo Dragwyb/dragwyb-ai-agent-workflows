@@ -2,17 +2,17 @@
 /**
  * Boots WordPress AI Client and registers providers.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service\Ai;
+namespace DRAGAIW\Plugin\Service\Ai;
 
-use DragwybVisualAutomation\AiProviders\DeepSeek\DeepSeekProvider;
-use DragwybVisualAutomation\AiProviders\Groq\GroqProvider;
-use DragwybVisualAutomation\AiProviders\OpenRouter\OpenRouterProvider;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
+use DRAGAIW\AiProviders\DeepSeek\DeepSeekProvider;
+use DRAGAIW\AiProviders\Groq\GroqProvider;
+use DRAGAIW\AiProviders\OpenRouter\OpenRouterProvider;
+use DRAGAIW\Plugin\Service\ConnectionService;
 use WordPress\AiClient\AiClient;
 use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
 use WordPress\AnthropicAiProvider\Provider\AnthropicProvider;
@@ -32,7 +32,7 @@ class AiClientBootstrap {
 	/**
 	 * Prefixed storage for provider API keys (vendor SDK path, below WP 7).
 	 */
-	public const CREDENTIALS_OPTION = 'daiaw_ai_provider_credentials';
+	public const CREDENTIALS_OPTION = 'dragaiw_ai_provider_credentials';
 
 	/**
 	 * Legacy option written before prefix hardening (do not write; migrate only).
@@ -40,7 +40,7 @@ class AiClientBootstrap {
 	private const LEGACY_CREDENTIALS_OPTION = 'wp_ai_client_provider_credentials';
 
 	/**
-	 * Provider id map: daiaw slug → AiClient / Connectors id.
+	 * Provider id map: dragaiw slug → AiClient / Connectors id.
 	 *
 	 * @var array<string, string>
 	 */
@@ -56,7 +56,7 @@ class AiClientBootstrap {
 	);
 
 	/**
-	 * Integration slugs on daiaw_connections that hold AI API keys.
+	 * Integration slugs on dragaiw_connections that hold AI API keys.
 	 *
 	 * @var array<string, string>
 	 */
@@ -100,10 +100,10 @@ class AiClientBootstrap {
 		// Use the official version gate, not function_exists().
 		$is_wp70 = function_exists( 'wp_has_ai_client' )
 			? wp_has_ai_client()
-			: version_compare( daiaw_wp_version(), '7.0-alpha', '>=' );
+			: version_compare( dragaiw_wp_version(), '7.0-alpha', '>=' );
 
 		if ( ! $is_wp70 ) {
-			$sdk_autoload = DAIAW_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
+			$sdk_autoload = DRAGAIW_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
 			if ( file_exists( $sdk_autoload ) ) {
 				require_once $sdk_autoload;
 			}
@@ -112,7 +112,7 @@ class AiClientBootstrap {
 			}
 		}
 
-		$providers_autoload = DAIAW_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
+		$providers_autoload = DRAGAIW_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
 		if ( file_exists( $providers_autoload ) ) {
 			require_once $providers_autoload;
 		}
@@ -169,10 +169,10 @@ class AiClientBootstrap {
 	}
 
 	/**
-	 * Map daiaw provider slug to AiClient provider id.
+	 * Map dragaiw provider slug to AiClient provider id.
 	 */
-	public static function resolveProviderId( string $daiaw_provider ): string {
-		$key = strtolower( trim( $daiaw_provider ) );
+	public static function resolveProviderId( string $dragaiw_provider ): string {
+		$key = strtolower( trim( $dragaiw_provider ) );
 
 		return self::PROVIDER_IDS[ $key ] ?? $key;
 	}
@@ -191,18 +191,18 @@ class AiClientBootstrap {
 	/**
 	 * Whether a provider has a configured API key.
 	 */
-	public static function isProviderConfigured( string $daiaw_provider ): bool {
+	public static function isProviderConfigured( string $dragaiw_provider ): bool {
 		if ( ! self::isAvailable() ) {
 			return false;
 		}
 
-		if ( ! self::hasStoredProviderApiKey( $daiaw_provider ) ) {
+		if ( ! self::hasStoredProviderApiKey( $dragaiw_provider ) ) {
 			return false;
 		}
 
-		self::ensureProviderAuthentication( $daiaw_provider );
+		self::ensureProviderAuthentication( $dragaiw_provider );
 
-		$provider_id = self::resolveProviderId( $daiaw_provider );
+		$provider_id = self::resolveProviderId( $dragaiw_provider );
 
 		try {
 			return AiClient::defaultRegistry()->isProviderConfigured( $provider_id );
@@ -219,7 +219,7 @@ class AiClientBootstrap {
 			return wp_has_ai_client();
 		}
 
-		return version_compare( daiaw_wp_version(), '7.0-alpha', '>=' );
+		return version_compare( dragaiw_wp_version(), '7.0-alpha', '>=' );
 	}
 
 	/**
@@ -251,8 +251,8 @@ class AiClientBootstrap {
 	/**
 	 * Read the stored API key for a provider (never logs or exposes it).
 	 */
-	public static function getStoredApiKey( string $daiaw_provider ): string {
-		$provider_id = self::resolveProviderId( $daiaw_provider );
+	public static function getStoredApiKey( string $dragaiw_provider ): string {
+		$provider_id = self::resolveProviderId( $dragaiw_provider );
 		if ( '' === $provider_id ) {
 			return '';
 		}
@@ -311,21 +311,21 @@ class AiClientBootstrap {
 	 *
 	 * @return true|WP_Error
 	 */
-	public static function ensureProviderAuthentication( string $daiaw_provider ) {
+	public static function ensureProviderAuthentication( string $dragaiw_provider ) {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
-				'daiaw_ai_unavailable',
+				'dragaiw_ai_unavailable',
 				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
 
-		$provider_id = self::resolveProviderId( $daiaw_provider );
+		$provider_id = self::resolveProviderId( $dragaiw_provider );
 		$api_key     = self::getStoredApiKey( $provider_id );
 
 		if ( '' === $api_key ) {
 			return new WP_Error(
-				'daiaw_ai_missing_key',
+				'dragaiw_ai_missing_key',
 				__( 'No API key configured for this provider. Add an API key in this node.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -338,7 +338,7 @@ class AiClientBootstrap {
 			);
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
-				'daiaw_ai_auth_failed',
+				'dragaiw_ai_auth_failed',
 				__( 'Could not attach API credentials for this provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 500 )
 			);
@@ -351,28 +351,28 @@ class AiClientBootstrap {
 	 * Validate and persist a site-wide API key for a provider.
 	 *
 	 * WP 7+: stores in connectors_ai_{id}_api_key.
-	 * Below WP 7: merges into daiaw_ai_provider_credentials.
+	 * Below WP 7: merges into dragaiw_ai_provider_credentials.
 	 *
-	 * @param string $daiaw_provider Provider slug (openai, claude, openrouter, …).
+	 * @param string $dragaiw_provider Provider slug (openai, claude, openrouter, …).
 	 * @param string $api_key      Raw API key.
 	 *
 	 * @return true|WP_Error
 	 */
-	public static function saveProviderApiKey( string $daiaw_provider, string $api_key ) {
+	public static function saveProviderApiKey( string $dragaiw_provider, string $api_key ) {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
-				'daiaw_ai_unavailable',
+				'dragaiw_ai_unavailable',
 				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
 
-		$provider_id = self::resolveProviderId( $daiaw_provider );
+		$provider_id = self::resolveProviderId( $dragaiw_provider );
 		$api_key     = trim( $api_key );
 
 		if ( '' === $provider_id ) {
 			return new WP_Error(
-				'daiaw_ai_unknown_provider',
+				'dragaiw_ai_unknown_provider',
 				__( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -380,7 +380,7 @@ class AiClientBootstrap {
 
 		if ( '' === $api_key ) {
 			return new WP_Error(
-				'daiaw_ai_empty_key',
+				'dragaiw_ai_empty_key',
 				__( 'API key is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -390,7 +390,7 @@ class AiClientBootstrap {
 
 		if ( ! $registry->hasProvider( $provider_id ) ) {
 			return new WP_Error(
-				'daiaw_ai_provider_unregistered',
+				'dragaiw_ai_provider_unregistered',
 				sprintf(
 					/* translators: %s: provider id */
 					__( 'AI provider "%s" is not registered.', 'dragwyb-ai-agent-workflows' ),
@@ -412,7 +412,7 @@ class AiClientBootstrap {
 			);
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
-				'daiaw_ai_key_invalid',
+				'dragaiw_ai_key_invalid',
 				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -425,7 +425,7 @@ class AiClientBootstrap {
 		$credentials[ $provider_id ] = $api_key;
 		update_option( self::CREDENTIALS_OPTION, $credentials );
 
-		delete_transient( 'daiaw_ai_models_' . $provider_id );
+		delete_transient( 'dragaiw_ai_models_' . $provider_id );
 
 		return true;
 	}
@@ -453,7 +453,7 @@ class AiClientBootstrap {
 
 			if ( is_wp_error( $response ) ) {
 				return new WP_Error(
-					'daiaw_ai_key_invalid',
+					'dragaiw_ai_key_invalid',
 					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
@@ -462,7 +462,7 @@ class AiClientBootstrap {
 			$code = (int) wp_remote_retrieve_response_code( $response );
 			if ( 200 !== $code ) {
 				return new WP_Error(
-					'daiaw_ai_key_invalid',
+					'dragaiw_ai_key_invalid',
 					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
@@ -481,14 +481,14 @@ class AiClientBootstrap {
 
 			if ( ! $registry->isProviderConfigured( $provider_id ) ) {
 				return new WP_Error(
-					'daiaw_ai_key_invalid',
+					'dragaiw_ai_key_invalid',
 					__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 					array( 'status' => 400 )
 				);
 			}
 		} catch ( \Throwable $e ) {
 			return new WP_Error(
-				'daiaw_ai_key_invalid',
+				'dragaiw_ai_key_invalid',
 				__( 'It was not possible to connect to the provider using this key.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -500,30 +500,30 @@ class AiClientBootstrap {
 	/**
 	 * Whether a stored API key exists for the provider (does not call the network).
 	 */
-	public static function hasStoredProviderApiKey( string $daiaw_provider ): bool {
-		return '' !== self::getStoredApiKey( $daiaw_provider );
+	public static function hasStoredProviderApiKey( string $dragaiw_provider ): bool {
+		return '' !== self::getStoredApiKey( $dragaiw_provider );
 	}
 
 	/**
 	 * Remove a site-wide API key for a provider.
 	 *
-	 * @param string $daiaw_provider Provider slug.
+	 * @param string $dragaiw_provider Provider slug.
 	 *
 	 * @return true|WP_Error
 	 */
-	public static function clearProviderApiKey( string $daiaw_provider ) {
+	public static function clearProviderApiKey( string $dragaiw_provider ) {
 		if ( ! self::isAvailable() ) {
 			return new WP_Error(
-				'daiaw_ai_unavailable',
+				'dragaiw_ai_unavailable',
 				__( 'WordPress AI Client is not available.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 503 )
 			);
 		}
 
-		$provider_id = self::resolveProviderId( $daiaw_provider );
+		$provider_id = self::resolveProviderId( $dragaiw_provider );
 		if ( '' === $provider_id ) {
 			return new WP_Error(
-				'daiaw_ai_unknown_provider',
+				'dragaiw_ai_unknown_provider',
 				__( 'Unknown AI provider.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -535,7 +535,7 @@ class AiClientBootstrap {
 			update_option( self::CREDENTIALS_OPTION, $credentials );
 		}
 
-		delete_transient( 'daiaw_ai_models_' . $provider_id );
+		delete_transient( 'dragaiw_ai_models_' . $provider_id );
 
 		return true;
 	}
@@ -567,10 +567,10 @@ class AiClientBootstrap {
 	}
 
 	/**
-	 * One-time migration: daiaw AI connections / legacy options → daiaw_ai_provider_credentials.
+	 * One-time migration: dragaiw AI connections / legacy options → dragaiw_ai_provider_credentials.
 	 */
 	private static function migrateCredentialsToPluginOption(): void {
-		if ( get_option( 'daiaw_ai_credentials_migrated_to_sdk' ) ) {
+		if ( get_option( 'dragaiw_ai_credentials_migrated_to_sdk' ) ) {
 			return;
 		}
 
@@ -591,7 +591,7 @@ class AiClientBootstrap {
 			update_option( self::CREDENTIALS_OPTION, $credentials );
 		}
 
-		update_option( 'daiaw_ai_credentials_migrated_to_sdk', true );
+		update_option( 'dragaiw_ai_credentials_migrated_to_sdk', true );
 	}
 
 	/**
@@ -603,7 +603,7 @@ class AiClientBootstrap {
 		}
 
 		try {
-			$plugin = \DragwybVisualAutomation\Plugin\Core\Plugin::instance();
+			$plugin = \DRAGAIW\Plugin\Core\Plugin::instance();
 			/** @var ConnectionService $connections */
 			$connections = $plugin->container()->get( ConnectionService::class );
 		} catch ( \Throwable $e ) {

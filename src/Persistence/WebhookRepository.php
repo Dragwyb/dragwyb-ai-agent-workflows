@@ -2,15 +2,15 @@
 /**
  * Webhook repository.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Persistence;
+namespace DRAGAIW\Plugin\Persistence;
 
-use DragwybVisualAutomation\Plugin\Database\Table;
-use DragwybVisualAutomation\Plugin\Domain\Webhook;
+use DRAGAIW\Plugin\Database\Table;
+use DRAGAIW\Plugin\Domain\Webhook;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `daiaw_webhooks` access goes through this class. Never decrypts the
+ * All `dragaiw_webhooks` access goes through this class. Never decrypts the
  * signing secret — that stays the job of `Service\WebhookService`.
  */
 class WebhookRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'daiaw_webhooks';
+	private const CACHE_GROUP = 'dragaiw_webhooks';
 
 	private const MAX_PER_PAGE = 100;
 

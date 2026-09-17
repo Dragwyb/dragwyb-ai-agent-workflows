@@ -2,15 +2,15 @@
 /**
  * AI Agent execution engine (tool-calling loop).
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service\Agent;
+namespace DRAGAIW\Plugin\Service\Agent;
 
-use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
-use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
+use DRAGAIW\Plugin\Service\Ai\AiClientBootstrap;
+use DRAGAIW\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -559,7 +559,7 @@ class AgentService {
 		 * @param int                  $max    Requested iterations.
 		 * @param array<string, mixed> $config Agent node config.
 		 */
-		$max = (int) apply_filters( 'daiaw_agent_max_iterations', $max, $config );
+		$max = (int) apply_filters( 'dragaiw_agent_max_iterations', $max, $config );
 
 		if ( $max < 1 ) {
 			$max = self::DEFAULT_MAX_ITERATIONS;

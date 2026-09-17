@@ -2,22 +2,22 @@
 /**
  * Workflow application service.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
-use DragwybVisualAutomation\Plugin\Persistence\WebhookRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowNodeRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Domain\WorkflowNode;
+use DRAGAIW\Plugin\Persistence\WebhookRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowNodeRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -273,13 +273,13 @@ class WorkflowService {
 	}
 
 	/**
-	 * Reconciles `daiaw_workflow_nodes` rows with a workflow's current
+	 * Reconciles `dragaiw_workflow_nodes` rows with a workflow's current
 	 * `graph_json` (the builder's source of truth for node identity and
 	 * configuration): existing nodes are updated, new ones inserted, and
 	 * ones no longer present in the graph are removed.
 	 *
 	 * The builder (roadmap item 6) only ever writes the whole graph as JSON
-	 * via update(); nothing keeps `daiaw_workflow_nodes` in sync with it as
+	 * via update(); nothing keeps `dragaiw_workflow_nodes` in sync with it as
 	 * that happens, since nothing read that table until the execution
 	 * engine needed real, stable node ids to log run outcomes against.
 	 * Rather than pay a sync cost on every autosave, this is called lazily,

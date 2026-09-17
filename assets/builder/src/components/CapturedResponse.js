@@ -23,11 +23,11 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 	};
 
 	return (
-		<div className="daiaw-builder-config__captured">
-			<div className="daiaw-builder-config__captured-header">
+		<div className="dragaiw-builder-config__captured">
+			<div className="dragaiw-builder-config__captured-header">
 				<h3>{__('Captured response', 'dragwyb-ai-agent-workflows')}</h3>
 				{capturedAt && (
-					<span className="daiaw-builder-config__captured-time">
+					<span className="dragaiw-builder-config__captured-time">
 						{capturedAt}
 					</span>
 				)}
@@ -41,7 +41,7 @@ export default function CapturedResponse({ payload, capturedAt, sourceLabel }) {
 					embedded
 				/>
 			) : (
-				<p className="daiaw-builder-config__captured-empty">
+				<p className="dragaiw-builder-config__captured-empty">
 					{__(
 						'No captured data for this trigger yet. Use Test Flow → Listen new response, then fire the trigger.',
 						'dragwyb-ai-agent-workflows'

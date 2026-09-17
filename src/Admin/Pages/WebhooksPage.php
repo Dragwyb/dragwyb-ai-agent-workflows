@@ -2,22 +2,22 @@
 /**
  * Webhooks admin page.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin\Pages;
+namespace DRAGAIW\Plugin\Admin\Pages;
 
-use DragwybVisualAutomation\Plugin\Admin\AdminPage;
-use DragwybVisualAutomation\Plugin\Admin\EmptyState;
-use DragwybVisualAutomation\Plugin\Admin\ListTableUi;
-use DragwybVisualAutomation\Plugin\Admin\WebhookActionsController;
-use DragwybVisualAutomation\Plugin\Admin\WebhooksListTable;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\WebhookService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Admin\AdminPage;
+use DRAGAIW\Plugin\Admin\EmptyState;
+use DRAGAIW\Plugin\Admin\ListTableUi;
+use DRAGAIW\Plugin\Admin\WebhookActionsController;
+use DRAGAIW\Plugin\Admin\WebhooksListTable;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\WebhookService;
+use DRAGAIW\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WebhooksPage implements AdminPage {
 
-	public const SLUG = 'daiaw-webhooks';
+	public const SLUG = 'dragaiw-webhooks';
 
 	private WebhookService $webhooks;
 
@@ -88,10 +88,10 @@ class WebhooksPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'daiaw-admin',
-			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragaiw-admin',
+			DRAGAIW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DAIAW_VERSION
+			DRAGAIW_VERSION
 		);
 	}
 
@@ -106,7 +106,7 @@ class WebhooksPage implements AdminPage {
 		$table = new WebhooksListTable( $this->webhooks, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap daiaw-admin-page">';
+		echo '<div class="wrap dragaiw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
@@ -141,12 +141,12 @@ class WebhooksPage implements AdminPage {
 			return;
 		}
 
-		echo '<form method="get" class="daiaw-list-table-filters-form">';
+		echo '<form method="get" class="dragaiw-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 		ListTableUi::renderFilterBar( 'top', $table->filterFields() );
 		echo '</form>';
 
-		ListTableUi::openBulkForm( $this->slug(), 'daiaw_webhook_bulk_action', 'daiaw_webhook_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'dragaiw_webhook_bulk_action', 'dragaiw_webhook_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -189,7 +189,7 @@ class WebhooksPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
+		$key     = isset( $_GET['dragaiw_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragaiw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

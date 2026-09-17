@@ -2,21 +2,21 @@
 /**
  * Workflow execution service.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRunLog;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentGraphHelper;
+use DRAGAIW\Plugin\Domain\WorkflowNode;
+use DRAGAIW\Plugin\Domain\WorkflowRun;
+use DRAGAIW\Plugin\Domain\WorkflowRunLog;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Service\Agent\AgentGraphHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -327,7 +327,7 @@ class WorkflowExecutionService {
 
 		/**
 		 * Fires immediately before a workflow run starts executing nodes.
-		 * The `daiaw_workflow_runs` row already exists with status `running`.
+		 * The `dragaiw_workflow_runs` row already exists with status `running`.
 		 * See docs/hooks-reference.md.
 		 *
 		 * @since 0.1.0
@@ -335,7 +335,7 @@ class WorkflowExecutionService {
 		 * @param int                   $workflow_id     The workflow about to run.
 		 * @param array<string, mixed>  $trigger_payload Data the triggering event provided; empty for a manual run.
 		 */
-		do_action( 'daiaw/workflow/before_run', $workflow_id, $trigger_payload );
+		do_action( 'dragaiw/workflow/before_run', $workflow_id, $trigger_payload );
 
 		$nodes = $this->workflows->syncNodesFromGraph( $workflow_id );
 
@@ -523,7 +523,7 @@ class WorkflowExecutionService {
 			throw new RuntimeException( esc_html__( 'Failed to finalize the workflow run.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		do_action( 'daiaw/workflow/after_run', $finished, $trigger_payload );
+		do_action( 'dragaiw/workflow/after_run', $finished, $trigger_payload );
 
 		return $finished;
 	}

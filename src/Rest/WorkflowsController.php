@@ -2,23 +2,23 @@
 /**
  * Workflows REST controller.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Rest;
+namespace DRAGAIW\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRunLog;
-use DragwybVisualAutomation\Plugin\Service\ChatMessageService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Domain\WorkflowRun;
+use DRAGAIW\Plugin\Domain\WorkflowRunLog;
+use DRAGAIW\Plugin\Service\ChatMessageService;
+use DRAGAIW\Plugin\Service\WorkflowExecutionService;
+use DRAGAIW\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Exposes `daiaw/v1/workflows` for workflow CRUD, plus a `restore` action for
+ * Exposes `dragaiw/v1/workflows` for workflow CRUD, plus a `restore` action for
  * un-trashing a soft-deleted workflow. Every route has an explicit
  * permission callback and a JSON-Schema argument definition; no route ever
  * relies on `__return_true` or skips input validation.
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Node-level endpoints (`workflow_nodes`) are intentionally out of scope
  * for this increment and will be added when the visual builder needs them.
  *
- * A dedicated, paginated `daiaw/v1/runs` resource (for the run history UI) is
+ * A dedicated, paginated `dragaiw/v1/runs` resource (for the run history UI) is
  * deferred to that later roadmap item; `run_item()` here only exists so the
  * synchronous execution engine (roadmap item 7) is testable/usable before
  * that UI exists, and returns a single run's outcome plus its logs inline
@@ -68,7 +68,7 @@ class WorkflowsController extends WP_REST_Controller {
 		WorkflowExecutionService $executor,
 		ChatMessageService $chat
 	) {
-		$this->namespace = 'daiaw/v1';
+		$this->namespace = 'dragaiw/v1';
 		$this->rest_base = 'workflows';
 		$this->workflows = $workflows;
 		$this->executor  = $executor;
@@ -225,7 +225,7 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	/**
-	 * All routes on this controller require `daiaw_manage_workflows`
+	 * All routes on this controller require `dragaiw_manage_workflows`
 	 * (administrators and anyone with `manage_options` receive it via
 	 * `Core\Capabilities::filterUserHasCap()`).
 	 *
@@ -234,7 +234,7 @@ class WorkflowsController extends WP_REST_Controller {
 	private function checkPermission() {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) ) {
 			return new WP_Error(
-				'daiaw_rest_forbidden',
+				'dragaiw_rest_forbidden',
 				__( 'Sorry, you are not allowed to manage workflows.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -356,9 +356,9 @@ class WorkflowsController extends WP_REST_Controller {
 				)
 			);
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'daiaw_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'dragaiw_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		} catch ( RuntimeException $exception ) {
-			return new WP_Error( 'daiaw_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
+			return new WP_Error( 'dragaiw_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
 		}
 
 		$response = rest_ensure_response( $this->prepare_item_for_response( $workflow, $request ) );
@@ -393,7 +393,7 @@ class WorkflowsController extends WP_REST_Controller {
 				$workflow = $this->workflows->changeStatus( $id, (int) $request->get_param( 'status' ) );
 			}
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'daiaw_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'dragaiw_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		}
 
 		if ( null === $workflow ) {
@@ -423,7 +423,7 @@ class WorkflowsController extends WP_REST_Controller {
 		$previous = $this->prepare_item_for_response( $workflow, $request );
 
 		if ( ! $this->workflows->delete( $id, $force ) ) {
-			return new WP_Error( 'daiaw_rest_cannot_delete', __( 'Failed to delete the workflow.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
+			return new WP_Error( 'dragaiw_rest_cannot_delete', __( 'Failed to delete the workflow.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(
@@ -449,7 +449,7 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		if ( ! $this->workflows->restore( $id ) ) {
-			return new WP_Error( 'daiaw_rest_cannot_restore', __( 'Failed to restore the workflow.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
+			return new WP_Error( 'dragaiw_rest_cannot_restore', __( 'Failed to restore the workflow.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
 		}
 
 		$workflow = $this->workflows->find( $id, true );
@@ -480,7 +480,7 @@ class WorkflowsController extends WP_REST_Controller {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST runs.
 				error_log( 'WorkflowAutomate REST Run Error: ' . $exception->getMessage() );
 			}
-			return new WP_Error( 'daiaw_rest_run_failed', __( 'Workflow execution failed.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
+			return new WP_Error( 'dragaiw_rest_run_failed', __( 'Workflow execution failed.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response( $this->serializeRun( $run ) );
@@ -516,7 +516,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( ! $has_chat_trigger ) {
 			return new WP_Error(
-				'daiaw_chat_trigger_required',
+				'dragaiw_chat_trigger_required',
 				__( 'Add a “When chat message received” trigger to use Chat.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -526,7 +526,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( '' === $chat_input ) {
 			return new WP_Error(
-				'daiaw_chat_empty',
+				'dragaiw_chat_empty',
 				__( 'chatInput is required.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 422 )
 			);
@@ -551,7 +551,7 @@ class WorkflowsController extends WP_REST_Controller {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- server-side diagnostic for failed REST chat runs.
 				error_log( 'WorkflowAutomate REST Chat Error: ' . $exception->getMessage() );
 			}
-			return new WP_Error( 'daiaw_rest_run_failed', __( 'Chat execution failed.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
+			return new WP_Error( 'dragaiw_rest_run_failed', __( 'Chat execution failed.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response(
@@ -646,7 +646,7 @@ class WorkflowsController extends WP_REST_Controller {
 	 * @return WP_Error
 	 */
 	private function notFoundError(): WP_Error {
-		return new WP_Error( 'daiaw_rest_not_found', __( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 404 ) );
+		return new WP_Error( 'dragaiw_rest_not_found', __( 'Workflow not found.', 'dragwyb-ai-agent-workflows' ), array( 'status' => 404 ) );
 	}
 
 	/**

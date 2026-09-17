@@ -2,33 +2,33 @@
 /**
  * Registers all Google Sheets workflow actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet;
+namespace DRAGAIW\Plugin\Integration\GoogleSheet;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
-use DragwybVisualAutomation\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateColumnAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSpreadsheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteRowAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSpreadsheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAddRowAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAppendOrUpdateRowAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsClearSheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCopySheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsExportSheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSheetAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSpreadsheetsAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetAllRowsAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetRowAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsUpdateRowAction;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Domain\Contracts\ActionInterface;
+use DRAGAIW\Plugin\Integration\Actions\GoogleSheetsAppendRowAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateColumnAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCreateSpreadsheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteRowAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsDeleteSpreadsheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAddRowAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsAppendOrUpdateRowAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsClearSheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsCopySheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsExportSheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSheetAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsFindSpreadsheetsAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetAllRowsAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsGetRowAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Actions\GoogleSheetsUpdateRowAction;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

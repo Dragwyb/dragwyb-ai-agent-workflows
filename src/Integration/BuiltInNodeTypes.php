@@ -2,38 +2,38 @@
 /**
  * Registers the plugin's own built-in node types.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration;
+namespace DRAGAIW\Plugin\Integration;
 
-use DragwybVisualAutomation\Plugin\Integration\Actions\AiAgentAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\ClaudeMessagesAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\ConditionAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\GeminiGenerateContentAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\HttpRequestAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\DeepSeekChatAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\GroqChatAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\OpenAiChatAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\OpenRouterChatAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\RouterAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\SendEmailAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\SlackIncomingWebhookAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\StructuredOutputParserAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\TelegramSendMessageAction;
-use DragwybVisualAutomation\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\CatalogHookTrigger;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionRegistrar;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentAiClient;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentService;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
-use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
+use DRAGAIW\Plugin\Integration\Actions\AiAgentAction;
+use DRAGAIW\Plugin\Integration\Actions\ClaudeMessagesAction;
+use DRAGAIW\Plugin\Integration\Actions\ConditionAction;
+use DRAGAIW\Plugin\Integration\Actions\GeminiGenerateContentAction;
+use DRAGAIW\Plugin\Integration\Actions\HttpRequestAction;
+use DRAGAIW\Plugin\Integration\Actions\DeepSeekChatAction;
+use DRAGAIW\Plugin\Integration\Actions\GroqChatAction;
+use DRAGAIW\Plugin\Integration\Actions\OpenAiChatAction;
+use DRAGAIW\Plugin\Integration\Actions\OpenRouterChatAction;
+use DRAGAIW\Plugin\Integration\Actions\RouterAction;
+use DRAGAIW\Plugin\Integration\Actions\SendEmailAction;
+use DRAGAIW\Plugin\Integration\Actions\SlackIncomingWebhookAction;
+use DRAGAIW\Plugin\Integration\Actions\StructuredOutputParserAction;
+use DRAGAIW\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DRAGAIW\Plugin\Integration\Actions\WhatsAppCloudSendMessageAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\GoogleSheetsActionRegistrar;
+use DRAGAIW\Plugin\Integration\Triggers\CatalogHookTrigger;
+use DRAGAIW\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionRegistrar;
+use DRAGAIW\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DRAGAIW\Plugin\Service\Agent\AgentAiClient;
+use DRAGAIW\Plugin\Service\Agent\AgentService;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Service\NodeTypeRegistry;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Listens on the public `daiaw/nodes/register` action to add this plugin's
+ * Listens on the public `dragaiw/nodes/register` action to add this plugin's
  * own built-in trigger/action node types.
  *
  * Optional co-plugin integrations are registered only when that plugin is

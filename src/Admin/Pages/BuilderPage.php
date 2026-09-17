@@ -2,16 +2,16 @@
 /**
  * Workflow builder admin page.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin\Pages;
+namespace DRAGAIW\Plugin\Admin\Pages;
 
-use DragwybVisualAutomation\Plugin\Admin\AdminPage;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Admin\AdminPage;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class BuilderPage implements AdminPage {
 	 * needing an instantiated `BuilderPage` (see `WorkflowsPage::SLUG` for
 	 * the same pattern used in reverse, for this page's back-to-list link).
 	 */
-	public const SLUG = 'daiaw-builder';
+	public const SLUG = 'dragaiw-builder';
 
 	/**
 	 * {@inheritDoc}
@@ -79,7 +79,7 @@ class BuilderPage implements AdminPage {
 	 * {@inheritDoc}
 	 */
 	public function enqueueAssets(): void {
-		$asset_file = DAIAW_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
+		$asset_file = DRAGAIW_PLUGIN_DIR . 'assets/builder/build/index.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			// The React app hasn't been built (e.g. a git checkout without
@@ -93,21 +93,21 @@ class BuilderPage implements AdminPage {
 		$asset   = require $asset_file;
 		$version = isset( $asset['version'] ) ? (string) $asset['version'] : null;
 		// Bust browser caches when the built bundle changes on disk.
-		$built_js = DAIAW_PLUGIN_DIR . 'assets/builder/build/index.js';
+		$built_js = DRAGAIW_PLUGIN_DIR . 'assets/builder/build/index.js';
 		if ( file_exists( $built_js ) ) {
 			$version = (string) filemtime( $built_js );
 		}
 
 		wp_enqueue_style(
-			'daiaw-builder-font',
+			'dragaiw-builder-font',
 			'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap',
 			array(),
-			DAIAW_VERSION
+			DRAGAIW_VERSION
 		);
 
 		wp_enqueue_script(
-			'daiaw-builder',
-			DAIAW_PLUGIN_URL . 'assets/builder/build/index.js',
+			'dragaiw-builder',
+			DRAGAIW_PLUGIN_URL . 'assets/builder/build/index.js',
 			$asset['dependencies'],
 			$version,
 			true
@@ -116,18 +116,18 @@ class BuilderPage implements AdminPage {
 		// wp-scripts' MiniCssExtractPlugin config names the extracted
 		// stylesheet "style-{entry}.css" (plus an auto-generated
 		// "-rtl.css" companion), not "{entry}.css".
-		if ( file_exists( DAIAW_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
+		if ( file_exists( DRAGAIW_PLUGIN_DIR . 'assets/builder/build/style-index.css' ) ) {
 			wp_enqueue_style(
-				'daiaw-builder',
-				DAIAW_PLUGIN_URL . 'assets/builder/build/style-index.css',
-				array( 'wp-components', 'daiaw-builder-font' ),
+				'dragaiw-builder',
+				DRAGAIW_PLUGIN_URL . 'assets/builder/build/style-index.css',
+				array( 'wp-components', 'dragaiw-builder-font' ),
 				$version
 			);
-			wp_style_add_data( 'daiaw-builder', 'rtl', 'replace' );
+			wp_style_add_data( 'dragaiw-builder', 'rtl', 'replace' );
 		}
 
 		wp_add_inline_script(
-			'daiaw-builder',
+			'dragaiw-builder',
 			'var dragwybAFBuilderSettings = ' . wp_json_encode( $this->bootstrapSettings() ) . ';',
 			'before'
 		);
@@ -145,9 +145,9 @@ class BuilderPage implements AdminPage {
 			// Same namespace as WorkflowsPage, so no `use` import is needed.
 			'listUrl'                => admin_url( 'admin.php?page=' . WorkflowsPage::SLUG ),
 			'connectionsUrl'         => admin_url( 'admin.php?page=' . ConnectionsPage::SLUG ),
-			'aiCredentialsUrl'       => \DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
+			'aiCredentialsUrl'       => \DRAGAIW\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
-			'googleOAuthCallbackUrl' => rest_url( 'daiaw/v1/oauth/google/callback' ),
+			'googleOAuthCallbackUrl' => rest_url( 'dragaiw/v1/oauth/google/callback' ),
 		);
 	}
 
@@ -172,9 +172,9 @@ class BuilderPage implements AdminPage {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		echo '<div class="wrap daiaw-admin-page daiaw-builder-page">';
+		echo '<div class="wrap dragaiw-admin-page dragaiw-builder-page">';
 		$this->renderImportNotice();
-		echo '<div id="daiaw-builder-root"></div>';
+		echo '<div id="dragaiw-builder-root"></div>';
 		echo '</div>';
 	}
 
@@ -185,7 +185,7 @@ class BuilderPage implements AdminPage {
 	 */
 	private function renderImportNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
+		$key = isset( $_GET['dragaiw_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragaiw_notice'] ) ) : '';
 
 		if ( 'imported' !== $key ) {
 			return;

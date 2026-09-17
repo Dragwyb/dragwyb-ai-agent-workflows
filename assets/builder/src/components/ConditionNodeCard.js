@@ -127,10 +127,10 @@ export default function ConditionNodeCard({
 	};
 
 	const classNames = [
-		'daiaw-builder-node',
-		'daiaw-builder-node--condition',
-		selected ? 'daiaw-builder-node--selected' : '',
-		hasUnknownType ? 'daiaw-builder-node--unknown' : '',
+		'dragaiw-builder-node',
+		'dragaiw-builder-node--condition',
+		selected ? 'dragaiw-builder-node--selected' : '',
+		hasUnknownType ? 'dragaiw-builder-node--unknown' : '',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -144,16 +144,16 @@ export default function ConditionNodeCard({
 			: '';
 
 		return (
-			<div className="daiaw-condition-node__row-port">
+			<div className="dragaiw-condition-node__row-port">
 				{targetId && (
-					<span className="daiaw-condition-node__link-chip" title={targetLabel}>
+					<span className="dragaiw-condition-node__link-chip" title={targetLabel}>
 						→ {targetLabel}
 					</span>
 				)}
 				{targetId && (
 					<Button
 						variant="link"
-						className="daiaw-condition-node__row-btn daiaw-condition-node__row-btn--danger"
+						className="dragaiw-condition-node__row-btn dragaiw-condition-node__row-btn--danger"
 						onPointerDown={stopPointer}
 						onClick={(event) => {
 							event.stopPropagation();
@@ -167,10 +167,10 @@ export default function ConditionNodeCard({
 					type="button"
 					className={
 						targetId
-							? 'daiaw-condition-node__port-dot daiaw-condition-node__port-dot--connected'
+							? 'dragaiw-condition-node__port-dot dragaiw-condition-node__port-dot--connected'
 							: isDragging
-								? 'daiaw-condition-node__port-dot daiaw-condition-node__port-dot--dragging'
-								: 'daiaw-condition-node__port-dot'
+								? 'dragaiw-condition-node__port-dot dragaiw-condition-node__port-dot--dragging'
+								: 'dragaiw-condition-node__port-dot'
 					}
 					data-branch-id={branchId}
 					title={__(
@@ -205,20 +205,20 @@ export default function ConditionNodeCard({
 		const branchLabel = row.label || __('Untitled Condition', 'dragwyb-ai-agent-workflows');
 
 		return (
-			<div key={branchId} className="daiaw-condition-node__row">
-				<div className="daiaw-condition-node__row-main">
-					<span className="daiaw-condition-node__row-index">
+			<div key={branchId} className="dragaiw-condition-node__row">
+				<div className="dragaiw-condition-node__row-main">
+					<span className="dragaiw-condition-node__row-index">
 						{index + 1}
 					</span>
-					<span className="daiaw-condition-node__row-label">
+					<span className="dragaiw-condition-node__row-label">
 						{branchLabel}
 					</span>
 				</div>
 				{row && (
-					<div className="daiaw-condition-node__row-tools">
+					<div className="dragaiw-condition-node__row-tools">
 						<Button
 							variant="link"
-							className="daiaw-condition-node__row-btn"
+							className="dragaiw-condition-node__row-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -229,7 +229,7 @@ export default function ConditionNodeCard({
 						</Button>
 						<Button
 							variant="link"
-							className="daiaw-condition-node__row-btn daiaw-condition-node__row-btn--danger"
+							className="dragaiw-condition-node__row-btn dragaiw-condition-node__row-btn--danger"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -266,14 +266,14 @@ export default function ConditionNodeCard({
 			onKeyDown={handleKeyDown}
 		>
 			<span
-				className="daiaw-condition-node__input-dot"
+				className="dragaiw-condition-node__input-dot"
 				aria-hidden="true"
 			/>
 
-			<div className="daiaw-condition-node__card">
-				<div className="daiaw-condition-node__header">
+			<div className="dragaiw-condition-node__card">
+				<div className="dragaiw-condition-node__header">
 					<span
-						className="daiaw-condition-node__icon"
+						className="dragaiw-condition-node__icon"
 						style={{
 							backgroundColor: meta.bg,
 							color: meta.accent,
@@ -282,11 +282,11 @@ export default function ConditionNodeCard({
 					>
 						{meta.icon}
 					</span>
-					<div className="daiaw-condition-node__header-text">
-						<span className="daiaw-condition-node__title">
+					<div className="dragaiw-condition-node__header-text">
+						<span className="dragaiw-condition-node__title">
 							{__('Condition', 'dragwyb-ai-agent-workflows')}
 						</span>
-						<span className="daiaw-condition-node__subtitle">
+						<span className="dragaiw-condition-node__subtitle">
 							{__(
 								'Each orange port connects to a different step — drag one port per branch',
 								'dragwyb-ai-agent-workflows'
@@ -295,19 +295,19 @@ export default function ConditionNodeCard({
 					</div>
 				</div>
 
-				<div className="daiaw-condition-node__body">
+				<div className="dragaiw-condition-node__body">
 					{displayRows.map((row, index) => (
 						<div key={row?.id || `row-${index}`}>
 							{renderBranchRow(row, index)}
 							{index < displayRows.length - 1 && (
-								<div className="daiaw-condition-node__add-between">
+								<div className="dragaiw-condition-node__add-between">
 									<span
-										className="daiaw-condition-node__add-line"
+										className="dragaiw-condition-node__add-line"
 										aria-hidden="true"
 									/>
 									<button
 										type="button"
-										className="daiaw-condition-node__add-btn"
+										className="dragaiw-condition-node__add-btn"
 										onPointerDown={stopPointer}
 										onClick={(event) => {
 											event.stopPropagation();
@@ -322,7 +322,7 @@ export default function ConditionNodeCard({
 										+
 									</button>
 									<span
-										className="daiaw-condition-node__add-line"
+										className="dragaiw-condition-node__add-line"
 										aria-hidden="true"
 									/>
 								</div>
@@ -330,14 +330,14 @@ export default function ConditionNodeCard({
 						</div>
 					))}
 
-					<div className="daiaw-condition-node__add-between">
+					<div className="dragaiw-condition-node__add-between">
 						<span
-							className="daiaw-condition-node__add-line"
+							className="dragaiw-condition-node__add-line"
 							aria-hidden="true"
 						/>
 						<button
 							type="button"
-							className="daiaw-condition-node__add-btn"
+							className="dragaiw-condition-node__add-btn"
 							onPointerDown={stopPointer}
 							onClick={(event) => {
 								event.stopPropagation();
@@ -349,15 +349,15 @@ export default function ConditionNodeCard({
 							+
 						</button>
 						<span
-							className="daiaw-condition-node__add-line"
+							className="dragaiw-condition-node__add-line"
 							aria-hidden="true"
 						/>
 					</div>
 
-					<div className="daiaw-condition-node__row daiaw-condition-node__row--default">
-						<div className="daiaw-condition-node__row-main">
-							<span className="daiaw-condition-node__row-index">∅</span>
-							<span className="daiaw-condition-node__row-label">
+					<div className="dragaiw-condition-node__row dragaiw-condition-node__row--default">
+						<div className="dragaiw-condition-node__row-main">
+							<span className="dragaiw-condition-node__row-index">∅</span>
+							<span className="dragaiw-condition-node__row-label">
 								{__('No Condition Matched', 'dragwyb-ai-agent-workflows')}
 							</span>
 						</div>

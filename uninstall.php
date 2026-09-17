@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is deleted via the WordPress admin.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 // If this file is called directly and not by WordPress, abort.
@@ -18,12 +18,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  */
 require_once __DIR__ . '/src/Core/WordPressCompat.php';
 
-$daiaw_has_core_ai_client = daiaw_has_core_ai_client();
+$dragaiw_has_core_ai_client = dragaiw_has_core_ai_client();
 
-if ( ! $daiaw_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( ! $dragaiw_has_core_ai_client && file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 } else {
 	require_once __DIR__ . '/src/autoload.php';
 }
 
-DragwybVisualAutomation\Plugin\Core\Uninstaller::uninstall();
+DRAGAIW\Plugin\Core\Uninstaller::uninstall();

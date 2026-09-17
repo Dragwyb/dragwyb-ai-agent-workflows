@@ -2,22 +2,22 @@
 /**
  * Runs (execution history) admin page.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin\Pages;
+namespace DRAGAIW\Plugin\Admin\Pages;
 
-use DragwybVisualAutomation\Plugin\Admin\AdminPage;
-use DragwybVisualAutomation\Plugin\Admin\EmptyState;
-use DragwybVisualAutomation\Plugin\Admin\ListTableUi;
-use DragwybVisualAutomation\Plugin\Admin\RunActionsController;
-use DragwybVisualAutomation\Plugin\Admin\RunsListTable;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Admin\AdminPage;
+use DRAGAIW\Plugin\Admin\EmptyState;
+use DRAGAIW\Plugin\Admin\ListTableUi;
+use DRAGAIW\Plugin\Admin\RunActionsController;
+use DRAGAIW\Plugin\Admin\RunsListTable;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Persistence\WorkflowRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Service\SettingsService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunsPage implements AdminPage {
 
-	public const SLUG = 'daiaw-runs';
+	public const SLUG = 'dragaiw-runs';
 
 	private WorkflowRunRepository $runs;
 
@@ -92,10 +92,10 @@ class RunsPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'daiaw-admin',
-			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragaiw-admin',
+			DRAGAIW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DAIAW_VERSION
+			DRAGAIW_VERSION
 		);
 	}
 
@@ -110,7 +110,7 @@ class RunsPage implements AdminPage {
 		$table = new RunsListTable( $this->runs, $this->workflows, $this->settings );
 		$table->prepare_items();
 
-		echo '<div class="wrap daiaw-admin-page">';
+		echo '<div class="wrap dragaiw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -141,7 +141,7 @@ class RunsPage implements AdminPage {
 
 		$table->views();
 
-		ListTableUi::openBulkForm( $this->slug(), 'daiaw_run_bulk_action', 'daiaw_run_bulk' );
+		ListTableUi::openBulkForm( $this->slug(), 'dragaiw_run_bulk_action', 'dragaiw_run_bulk' );
 		ListTableUi::renderPreservedFilters( $table->preservedFilters() );
 		$table->display();
 		ListTableUi::closeBulkForm();
@@ -160,7 +160,7 @@ class RunsPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter form.
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
 
-		echo '<form method="get" class="daiaw-list-table-filters-form">';
+		echo '<form method="get" class="dragaiw-list-table-filters-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $this->slug() ) );
 
 		if ( '' !== $status ) {
@@ -195,7 +195,7 @@ class RunsPage implements AdminPage {
 		$name     = $workflow ? $workflow->title() : __( '(deleted workflow)', 'dragwyb-ai-agent-workflows' );
 
 		printf(
-			'<p class="daiaw-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
+			'<p class="dragaiw-runs-filter-notice">%1$s <a href="%2$s">%3$s</a></p>',
 			sprintf(
 				/* translators: %s: workflow title. */
 				esc_html__( 'Showing runs for: %s', 'dragwyb-ai-agent-workflows' ),
@@ -208,7 +208,7 @@ class RunsPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?daiaw_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragaiw_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -242,7 +242,7 @@ class RunsPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
+		$key     = isset( $_GET['dragaiw_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragaiw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

@@ -2,70 +2,70 @@
 /**
  * Main plugin bootstrap class.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Core;
+namespace DRAGAIW\Plugin\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use DragwybVisualAutomation\Plugin\Admin\ConnectionActionsController;
-use DragwybVisualAutomation\Plugin\Admin\GoogleOAuthStartController;
-use DragwybVisualAutomation\Plugin\Admin\Menu;
-use DragwybVisualAutomation\Plugin\Admin\Pages\BuilderPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionsPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\RunDetailPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\RunsPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\SettingsPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\WebhookFormPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\WebhooksPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\WorkflowsPage;
-use DragwybVisualAutomation\Plugin\Admin\RunActionsController;
-use DragwybVisualAutomation\Plugin\Admin\SettingsController;
-use DragwybVisualAutomation\Plugin\Admin\WebhookActionsController;
-use DragwybVisualAutomation\Plugin\Admin\WorkflowActionsController;
-use DragwybVisualAutomation\Plugin\Database\MigrationRunner;
-use DragwybVisualAutomation\Plugin\Database\SchemaMigrations;
-use DragwybVisualAutomation\Plugin\Integration\BuiltInNodeTypes;
-use DragwybVisualAutomation\Plugin\Integration\WorkflowTriggerBinder;
-use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WebhookRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowNodeRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
-use DragwybVisualAutomation\Plugin\Rest\RestApi;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentAiClient;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentService;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentToolExecutor;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentToolSchemaBuilder;
-use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
-use DragwybVisualAutomation\Plugin\Service\AiModelsService;
-use DragwybVisualAutomation\Plugin\Service\BackgroundRunner;
-use DragwybVisualAutomation\Plugin\Service\ChatMessageService;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\ConnectionVerifier;
-use DragwybVisualAutomation\Plugin\Service\ElementorFormsService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
-use DragwybVisualAutomation\Plugin\Service\NodeExecutionService;
-use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
-use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\TriggerReentrancyGuard;
-use DragwybVisualAutomation\Plugin\Service\WebhookService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowNodeTestService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowTestListenerService;
-use DragwybVisualAutomation\Plugin\Provider\PersistenceServiceProvider;
-use DragwybVisualAutomation\Plugin\Provider\AdminServiceProvider;
-use DragwybVisualAutomation\Plugin\Provider\RestServiceProvider;
-use DragwybVisualAutomation\Plugin\Provider\ExecutionServiceProvider;
+use DRAGAIW\Plugin\Admin\ConnectionActionsController;
+use DRAGAIW\Plugin\Admin\GoogleOAuthStartController;
+use DRAGAIW\Plugin\Admin\Menu;
+use DRAGAIW\Plugin\Admin\Pages\BuilderPage;
+use DRAGAIW\Plugin\Admin\Pages\ConnectionFormPage;
+use DRAGAIW\Plugin\Admin\Pages\ConnectionsPage;
+use DRAGAIW\Plugin\Admin\Pages\RunDetailPage;
+use DRAGAIW\Plugin\Admin\Pages\RunsPage;
+use DRAGAIW\Plugin\Admin\Pages\SettingsPage;
+use DRAGAIW\Plugin\Admin\Pages\WebhookFormPage;
+use DRAGAIW\Plugin\Admin\Pages\WebhooksPage;
+use DRAGAIW\Plugin\Admin\Pages\WorkflowsPage;
+use DRAGAIW\Plugin\Admin\RunActionsController;
+use DRAGAIW\Plugin\Admin\SettingsController;
+use DRAGAIW\Plugin\Admin\WebhookActionsController;
+use DRAGAIW\Plugin\Admin\WorkflowActionsController;
+use DRAGAIW\Plugin\Database\MigrationRunner;
+use DRAGAIW\Plugin\Database\SchemaMigrations;
+use DRAGAIW\Plugin\Integration\BuiltInNodeTypes;
+use DRAGAIW\Plugin\Integration\WorkflowTriggerBinder;
+use DRAGAIW\Plugin\Persistence\ConnectionRepository;
+use DRAGAIW\Plugin\Persistence\WebhookRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowNodeRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Rest\RestApi;
+use DRAGAIW\Plugin\Service\Agent\AgentAiClient;
+use DRAGAIW\Plugin\Service\Agent\AgentService;
+use DRAGAIW\Plugin\Service\Agent\AgentToolExecutor;
+use DRAGAIW\Plugin\Service\Agent\AgentToolSchemaBuilder;
+use DRAGAIW\Plugin\Service\Ai\AiClientBootstrap;
+use DRAGAIW\Plugin\Service\AiModelsService;
+use DRAGAIW\Plugin\Service\BackgroundRunner;
+use DRAGAIW\Plugin\Service\ChatMessageService;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\ConnectionVerifier;
+use DRAGAIW\Plugin\Service\ElementorFormsService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Service\NodeExecutionService;
+use DRAGAIW\Plugin\Service\NodeTypeRegistry;
+use DRAGAIW\Plugin\Service\RunRetentionService;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\TriggerReentrancyGuard;
+use DRAGAIW\Plugin\Service\WebhookService;
+use DRAGAIW\Plugin\Service\WorkflowExecutionService;
+use DRAGAIW\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Service\WorkflowNodeTestService;
+use DRAGAIW\Plugin\Service\WorkflowTestListenerService;
+use DRAGAIW\Plugin\Provider\PersistenceServiceProvider;
+use DRAGAIW\Plugin\Provider\AdminServiceProvider;
+use DRAGAIW\Plugin\Provider\RestServiceProvider;
+use DRAGAIW\Plugin\Provider\ExecutionServiceProvider;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -200,7 +200,7 @@ class Plugin {
 		 *
 		 * @param Container $container The plugin's service container.
 		 */
-		do_action( 'daiaw/loaded', $this->container );
+		do_action( 'dragaiw/loaded', $this->container );
 	}
 
 	/**
@@ -234,11 +234,11 @@ class Plugin {
 	 * Registers the node type registry and, on `init`, fires the extension
 	 * point that populates it.
 	 *
-	 * The `daiaw/nodes/register` action is deliberately fired on `init` rather
+	 * The `dragaiw/nodes/register` action is deliberately fired on `init` rather
 	 * than directly from here (this method itself runs during our own
 	 * `plugins_loaded` callback): by `init`, every other plugin's
 	 * `plugins_loaded` callback has already run, so third-party code hooking
-	 * `daiaw/nodes/register` from inside its own `plugins_loaded` handler is
+	 * `dragaiw/nodes/register` from inside its own `plugins_loaded` handler is
 	 * guaranteed to have registered before this fires. Firing immediately
 	 * here would make that depend on plugin load order.
 	 *
@@ -259,7 +259,7 @@ class Plugin {
 			$this->container->get( AgentAiClient::class )
 		);
 
-		add_action( 'daiaw/nodes/register', array( $built_in_node_types, 'register' ) );
+		add_action( 'dragaiw/nodes/register', array( $built_in_node_types, 'register' ) );
 
 		add_action(
 			'init',
@@ -272,7 +272,7 @@ class Plugin {
 				 *
 				 * @param NodeTypeRegistry $registry The plugin's node type registry.
 				 */
-				do_action( 'daiaw/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
+				do_action( 'dragaiw/nodes/register', $this->container->get( NodeTypeRegistry::class ) );
 			}
 		);
 	}

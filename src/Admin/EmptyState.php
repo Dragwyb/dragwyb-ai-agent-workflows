@@ -2,12 +2,12 @@
 /**
  * Shared empty-state markup for admin list screens.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,12 +31,12 @@ class EmptyState {
 	 * @return void
 	 */
 	public static function render( string $title, string $description, array $steps = array(), array $actions = array() ): void {
-		echo '<div class="daiaw-empty-state" role="status">';
-		echo '<h2 class="daiaw-empty-state__title">' . esc_html( $title ) . '</h2>';
-		echo '<p class="daiaw-empty-state__description">' . esc_html( $description ) . '</p>';
+		echo '<div class="dragaiw-empty-state" role="status">';
+		echo '<h2 class="dragaiw-empty-state__title">' . esc_html( $title ) . '</h2>';
+		echo '<p class="dragaiw-empty-state__description">' . esc_html( $description ) . '</p>';
 
 		if ( array() !== $steps ) {
-			echo '<ol class="daiaw-empty-state__steps">';
+			echo '<ol class="dragaiw-empty-state__steps">';
 			foreach ( $steps as $step ) {
 				echo '<li>' . esc_html( (string) $step ) . '</li>';
 			}
@@ -44,7 +44,7 @@ class EmptyState {
 		}
 
 		if ( array() !== $actions ) {
-			echo '<p class="daiaw-empty-state__actions">';
+			echo '<p class="dragaiw-empty-state__actions">';
 			foreach ( $actions as $action ) {
 				$class = ! empty( $action['primary'] ) ? 'button button-primary' : 'button';
 				printf(

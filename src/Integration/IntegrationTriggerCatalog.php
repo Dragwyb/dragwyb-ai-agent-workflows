@@ -2,18 +2,18 @@
 /**
  * Optional co-plugin triggers — catalog + availability checks.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration;
+namespace DRAGAIW\Plugin\Integration;
 
-use DragwybVisualAutomation\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
+use DRAGAIW\Plugin\Integration\Triggers\ContactForm7SubmittedTrigger;
+use DRAGAIW\Plugin\Integration\Triggers\ElementorAtomicFormSubmittedTrigger;
+use DRAGAIW\Plugin\Integration\Triggers\ElementorFormSubmittedTrigger;
+use DRAGAIW\Plugin\Integration\Triggers\WooCommerceCatalogTrigger;
+use DRAGAIW\Plugin\Integration\Triggers\WpFormsSubmittedTrigger;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

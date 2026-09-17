@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\AiProviders\OpenRouter;
+namespace DRAGAIW\AiProviders\OpenRouter;
 
-use DragwybVisualAutomation\AiProviders\Compatible\AbstractCompatibleApiProvider;
+use DRAGAIW\AiProviders\Compatible\AbstractCompatibleApiProvider;
 
 /**
  * OpenRouter AI provider (OpenAI-compatible).

@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress User, Role, and Capability actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Service;
+namespace DRAGAIW\Plugin\Integration\WordPress\Service;
 
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -323,7 +323,7 @@ final class UserWordPressService {
 
 		return $candidate;
 	}
-	
+
 	/**
 	 * Writes only non-sensitive user meta keys.
 	 *

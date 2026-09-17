@@ -2,19 +2,19 @@
 /**
  * Registers admin domain services against the container.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Provider;
+namespace DRAGAIW\Plugin\Provider;
 
-use DragwybVisualAutomation\Plugin\Core\Container;
-use DragwybVisualAutomation\Plugin\Persistence\ConnectionRepository;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\ConnectionVerifier;
+use DRAGAIW\Plugin\Core\Container;
+use DRAGAIW\Plugin\Persistence\ConnectionRepository;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\ConnectionVerifier;
 
 
 // Prevent direct file access.

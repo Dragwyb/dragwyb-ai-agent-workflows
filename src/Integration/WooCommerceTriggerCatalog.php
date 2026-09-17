@@ -2,12 +2,12 @@
 /**
  * WooCommerce trigger catalog — curated hooks for the builder palette.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration;
+namespace DRAGAIW\Plugin\Integration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

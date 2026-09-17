@@ -2,12 +2,12 @@
 /**
  * Resolves {{nodes.id.path}} and literal values from execution context.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

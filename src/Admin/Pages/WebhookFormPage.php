@@ -2,20 +2,20 @@
 /**
  * Webhook create/edit admin page.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin\Pages;
+namespace DRAGAIW\Plugin\Admin\Pages;
 
-use DragwybVisualAutomation\Plugin\Admin\AdminPage;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Domain\Webhook;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\WebhookService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Admin\AdminPage;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Domain\Webhook;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\WebhookService;
+use DRAGAIW\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WebhookFormPage implements AdminPage {
 
-	public const SLUG = 'daiaw-webhook-form';
+	public const SLUG = 'dragaiw-webhook-form';
 
 	private WebhookService $webhooks;
 
@@ -83,10 +83,10 @@ class WebhookFormPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'daiaw-admin',
-			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragaiw-admin',
+			DRAGAIW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DAIAW_VERSION
+			DRAGAIW_VERSION
 		);
 	}
 
@@ -101,7 +101,7 @@ class WebhookFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which webhook to edit.
 		$webhook_id = isset( $_GET['webhook'] ) ? absint( wp_unslash( $_GET['webhook'] ) ) : 0;
 
-		echo '<div class="wrap daiaw-admin-page">';
+		echo '<div class="wrap dragaiw-admin-page">';
 		$this->renderBackLink();
 
 		if ( $webhook_id > 0 ) {
@@ -141,10 +141,10 @@ class WebhookFormPage implements AdminPage {
 	private function renderCreateForm(): void {
 		$require_signing = $this->settings->requireWebhookSigning();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-webhook-form">';
-		echo '<input type="hidden" name="action" value="daiaw_webhook_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragaiw-webhook-form">';
+		echo '<input type="hidden" name="action" value="dragaiw_webhook_action" />';
 		echo '<input type="hidden" name="op" value="create" />';
-		wp_nonce_field( 'daiaw_webhook_action_create' );
+		wp_nonce_field( 'dragaiw_webhook_action_create' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 		$this->renderWorkflowRow( 0 );
@@ -166,13 +166,13 @@ class WebhookFormPage implements AdminPage {
 		$secret_display  = $this->webhooks->displaySigningSecret( $webhook );
 		$webhook_id      = (int) $webhook->id();
 
-		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'dragwyb-ai-agent-workflows' ) . ' <code class="daiaw-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
+		echo '<p class="description">' . esc_html__( 'Public URL (POST):', 'dragwyb-ai-agent-workflows' ) . ' <code class="dragaiw-webhook-url">' . esc_html( $this->webhooks->publicUrl( $webhook ) ) . '</code></p>';
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-webhook-form">';
-		echo '<input type="hidden" name="action" value="daiaw_webhook_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragaiw-webhook-form">';
+		echo '<input type="hidden" name="action" value="dragaiw_webhook_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
 		printf( '<input type="hidden" name="webhook_id" value="%s" />', esc_attr( $webhook_id ) );
-		wp_nonce_field( 'daiaw_webhook_action_update_' . $webhook_id );
+		wp_nonce_field( 'dragaiw_webhook_action_update_' . $webhook_id );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 		$this->renderWorkflowRow( (int) ( $webhook->workflowId() ?? 0 ) );
@@ -197,8 +197,8 @@ class WebhookFormPage implements AdminPage {
 			)
 		);
 
-		echo '<tr><th scope="row"><label for="daiaw-webhook-workflow">' . esc_html__( 'Workflow', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
-		echo '<select name="workflow_id" id="daiaw-webhook-workflow" required>';
+		echo '<tr><th scope="row"><label for="dragaiw-webhook-workflow">' . esc_html__( 'Workflow', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<select name="workflow_id" id="dragaiw-webhook-workflow" required>';
 		echo '<option value="">' . esc_html__( 'Select a workflow…', 'dragwyb-ai-agent-workflows' ) . '</option>';
 
 		foreach ( $workflows['items'] as $workflow ) {
@@ -226,23 +226,23 @@ class WebhookFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderSigningSecretRow( ?array $secret_display, bool $require_signing ): void {
-		echo '<tr><th scope="row"><label for="daiaw-webhook-signing-secret">' . esc_html__( 'Signing secret', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragaiw-webhook-signing-secret">' . esc_html__( 'Signing secret', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 
 		if ( null !== $secret_display && $secret_display['configured'] ) {
 			printf(
-				'<p class="daiaw-webhook-current-value">%1$s <code>%2$s</code></p>',
+				'<p class="dragaiw-webhook-current-value">%1$s <code>%2$s</code></p>',
 				esc_html__( 'Currently set:', 'dragwyb-ai-agent-workflows' ),
 				esc_html( $secret_display['display'] )
 			);
 		}
 
 		printf(
-			'<input type="text" class="regular-text" name="signing_secret" id="daiaw-webhook-signing-secret" value="" autocomplete="off" %1$s />',
+			'<input type="text" class="regular-text" name="signing_secret" id="dragaiw-webhook-signing-secret" value="" autocomplete="off" %1$s />',
 			( $require_signing && ( null === $secret_display || ! $secret_display['configured'] ) ) ? 'required' : ''
 		);
 
 		if ( null === $secret_display ) {
-			echo '<p class="description">' . esc_html__( 'Optional. When set, callers must send an X-daiaw-Signature header (sha256=… HMAC of the raw body). Leave blank for an unsigned webhook.', 'dragwyb-ai-agent-workflows' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Optional. When set, callers must send an X-dragaiw-Signature header (sha256=… HMAC of the raw body). Leave blank for an unsigned webhook.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		} else {
 			echo '<p class="description">' . esc_html__( 'Leave blank to keep the current secret. Enter a new value to rotate it.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 
@@ -264,9 +264,9 @@ class WebhookFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderIpAllowListRow( array $ip_allow_list ): void {
-		echo '<tr><th scope="row"><label for="daiaw-webhook-ip-allow-list">' . esc_html__( 'IP allow-list', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragaiw-webhook-ip-allow-list">' . esc_html__( 'IP allow-list', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
-			'<textarea name="ip_allow_list" id="daiaw-webhook-ip-allow-list" class="large-text code" rows="4" cols="50">%s</textarea>',
+			'<textarea name="ip_allow_list" id="dragaiw-webhook-ip-allow-list" class="large-text code" rows="4" cols="50">%s</textarea>',
 			esc_textarea( implode( "\n", $ip_allow_list ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Optional. One IPv4/IPv6 address or IPv4 CIDR (e.g. 203.0.113.0/24) per line. Leave empty to accept requests from any IP.', 'dragwyb-ai-agent-workflows' ) . '</p>';

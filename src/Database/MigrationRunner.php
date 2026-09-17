@@ -2,14 +2,14 @@
 /**
  * Migration runner.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Database;
+namespace DRAGAIW\Plugin\Database;
 
-use DragwybVisualAutomation\Plugin\Core\Options;
+use DRAGAIW\Plugin\Core\Options;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
