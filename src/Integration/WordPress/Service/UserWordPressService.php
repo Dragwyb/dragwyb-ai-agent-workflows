@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress User, Role, and Capability actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Service;
+namespace DRAGAIW\Plugin\Integration\WordPress\Service;
 
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -75,13 +75,8 @@ final class UserWordPressService {
 			return WordPressActionHelper::fail( __( 'A user with this email already exists.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		$autoPassword = WordPressActionHelper::bool( $config, 'auto_password' );
-		$password     = $autoPassword ? wp_generate_password() : WordPressActionHelper::str( $config, 'password' );
-
-		// Agent tools cannot pass passwords (excluded); generate when none is configured.
-		if ( '' === $password ) {
-			$password = wp_generate_password();
-		}
+		// Always generate a strong, random password automatically to avoid storing plain text passwords in workflow definitions.
+		$password = wp_generate_password( 24, true, true );
 
 		$userRole = WordPressActionHelper::str( $config, 'user_role' );
 
@@ -175,11 +170,6 @@ final class UserWordPressService {
 			$userData['role'] = $resolved['slug'];
 		}
 
-		$password = WordPressActionHelper::str( $config, 'password' );
-
-		if ( '' !== $password ) {
-			$userData['user_pass'] = $password;
-		}
 
 		$result = wp_update_user( $userData );
 
@@ -332,17 +322,6 @@ final class UserWordPressService {
 		}
 
 		return $candidate;
-	}
-
-	/**
-	 * @deprecated Use resolveAssignableRole().
-	 *
-	 * @param string $role Role slug.
-	 *
-	 * @return string|null Error message or null when valid.
-	 */
-	private function validateAssignableRole( string $role ): ?string {
-		return $this->resolveAssignableRole( $role )['error'];
 	}
 
 	/**

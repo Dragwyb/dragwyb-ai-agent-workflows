@@ -2,14 +2,14 @@
 /**
  * Authenticated HTTP client for Google Sheets and Drive APIs.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet;
+namespace DRAGAIW\Plugin\Integration\GoogleSheet;
 
-use DragwybVisualAutomation\Plugin\Integration\Actions\TelegramSendMessageAction;
+use DRAGAIW\Plugin\Integration\Actions\TelegramSendMessageAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

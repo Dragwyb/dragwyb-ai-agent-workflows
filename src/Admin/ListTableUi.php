@@ -2,12 +2,12 @@
 /**
  * Shared list-table UI helpers.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -51,7 +51,7 @@ final class ListTableUi {
 			return;
 		}
 
-		echo '<div class="alignleft actions daiaw-list-table-filters">';
+		echo '<div class="alignleft actions dragaiw-list-table-filters">';
 
 		foreach ( $filters as $filter ) {
 			if ( ! is_array( $filter ) || empty( $filter['name'] ) ) {
@@ -65,8 +65,8 @@ final class ListTableUi {
 
 			if ( 'search' === $type ) {
 				printf(
-					'<label class="screen-reader-text" for="daiaw-filter-%1$s">%2$s</label>'
-						. '<input type="search" id="daiaw-filter-%1$s" name="%1$s" value="%3$s" placeholder="%4$s" />',
+					'<label class="screen-reader-text" for="dragaiw-filter-%1$s">%2$s</label>'
+						. '<input type="search" id="dragaiw-filter-%1$s" name="%1$s" value="%3$s" placeholder="%4$s" />',
 					esc_attr( $name ),
 					esc_html( $label ),
 					esc_attr( (string) $value ),
@@ -78,8 +78,8 @@ final class ListTableUi {
 			$options = is_array( $filter['options'] ?? null ) ? $filter['options'] : array();
 
 			printf(
-				'<label class="screen-reader-text" for="daiaw-filter-%1$s">%2$s</label>'
-					. '<select id="daiaw-filter-%1$s" name="%1$s">',
+				'<label class="screen-reader-text" for="dragaiw-filter-%1$s">%2$s</label>'
+					. '<select id="dragaiw-filter-%1$s" name="%1$s">',
 				esc_attr( $name ),
 				esc_html( $label )
 			);
@@ -113,11 +113,11 @@ final class ListTableUi {
 	 */
 	public static function openBulkForm( string $page_slug, string $nonce_action, string $bulk_flag ): void {
 		printf(
-			'<form method="post" action="%s" class="daiaw-list-table-bulk-form">',
+			'<form method="post" action="%s" class="dragaiw-list-table-bulk-form">',
 			esc_url( admin_url( 'admin.php?page=' . $page_slug ) )
 		);
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( $page_slug ) );
-		wp_nonce_field( $nonce_action, 'daiaw_bulk_nonce' );
+		wp_nonce_field( $nonce_action, 'dragaiw_bulk_nonce' );
 		printf( '<input type="hidden" name="%s" value="1" />', esc_attr( $bulk_flag ) );
 	}
 
@@ -127,12 +127,12 @@ final class ListTableUi {
 	 * @return bool
 	 */
 	public static function verifyBulkNonce( string $nonce_action ): bool {
-		if ( ! isset( $_POST['daiaw_bulk_nonce'] ) ) {
+		if ( ! isset( $_POST['dragaiw_bulk_nonce'] ) ) {
 			return false;
 		}
 
 		return (bool) wp_verify_nonce(
-			sanitize_text_field( wp_unslash( $_POST['daiaw_bulk_nonce'] ) ),
+			sanitize_text_field( wp_unslash( $_POST['dragaiw_bulk_nonce'] ) ),
 			$nonce_action
 		);
 	}

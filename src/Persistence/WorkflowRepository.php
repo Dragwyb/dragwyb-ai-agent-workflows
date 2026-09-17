@@ -2,15 +2,15 @@
 /**
  * Workflow repository.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Persistence;
+namespace DRAGAIW\Plugin\Persistence;
 
-use DragwybVisualAutomation\Plugin\Database\Table;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Database\Table;
+use DRAGAIW\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `daiaw_workflows` access goes through this class. Every query is built
+ * All `dragaiw_workflows` access goes through this class. Every query is built
  * with `$wpdb->prepare()` or the `$wpdb` helper methods; the table name
  * itself is never user input, so its direct interpolation into SQL strings
  * is safe.
@@ -27,7 +27,7 @@ class WorkflowRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'daiaw_workflows';
+	private const CACHE_GROUP = 'dragaiw_workflows';
 
 	private const MAX_PER_PAGE = 100;
 

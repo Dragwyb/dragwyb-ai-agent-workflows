@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Taxonomy, Term, Category, Tag, and Media actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Service;
+namespace DRAGAIW\Plugin\Integration\WordPress\Service;
 
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,6 +22,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class TaxonomyWordPressService {
 
 	public function createTermByTax( array $config, string $taxonomy ): array {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return WordPressActionHelper::fail( __( 'Taxonomy does not exist.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		$taxObj    = get_taxonomy( $taxonomy );
+
+		if ( ! $taxObj ) {
+			return WordPressActionHelper::fail(
+				__( 'Invalid taxonomy.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$manageTermsCapability = $taxObj->cap->manage_terms ?? ( $taxObj->cap->edit_terms ?? 'manage_categories' );
+
+		if ( ! current_user_can( $manageTermsCapability ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to create terms in this taxonomy.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
 		$name = WordPressActionHelper::str( $config, 'name' );
 
 		if ( '' === $name ) {
@@ -54,6 +74,18 @@ final class TaxonomyWordPressService {
 	}
 
 	public function updateTermByTax( array $config, string $taxonomy ): array {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return WordPressActionHelper::fail( __( 'Taxonomy does not exist.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		$taxObj  = get_taxonomy( $taxonomy );
+		$editCap = $taxObj->cap->edit_terms ?? ( $taxObj->cap->manage_terms ?? 'manage_categories' );
+		if ( ! current_user_can( $editCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to edit terms in this taxonomy.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
 		$termId = WordPressActionHelper::int( $config, 'term_id' );
 
 		if ( $termId <= 0 ) {
@@ -91,6 +123,18 @@ final class TaxonomyWordPressService {
 	}
 
 	public function deleteTermByTax( array $config, string $taxonomy ): array {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return WordPressActionHelper::fail( __( 'Taxonomy does not exist.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		$taxObj    = get_taxonomy( $taxonomy );
+		$deleteCap = $taxObj->cap->delete_terms ?? ( $taxObj->cap->manage_terms ?? 'manage_categories' );
+		if ( ! current_user_can( $deleteCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to delete terms in this taxonomy.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
 		$termId = WordPressActionHelper::int( $config, 'term_id' );
 
 		if ( $termId <= 0 ) {
@@ -467,6 +511,10 @@ final class TaxonomyWordPressService {
 
 	// Media management.
 	public function addNewImage( array $config ): array {
+		if ( ! current_user_can( 'upload_files' ) ) {
+			return WordPressActionHelper::fail( __( 'Uploading media requires the upload_files capability.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
 		$url = WordPressActionHelper::str( $config, 'url' );
 
 		if ( '' === $url ) {
@@ -528,6 +576,10 @@ final class TaxonomyWordPressService {
 			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
+		if ( ! current_user_can( 'delete_post', $mediaId ) ) {
+			return WordPressActionHelper::fail( __( 'Deleting media items requires the delete_post capability for the target item.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );
 		$res   = wp_delete_attachment( $mediaId, $force );
 
@@ -552,6 +604,10 @@ final class TaxonomyWordPressService {
 
 		if ( ! get_post( $mediaId ) ) {
 			return WordPressActionHelper::fail( __( 'Media item not found.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $mediaId ) ) {
+			return WordPressActionHelper::fail( __( 'Renaming media items requires the edit_post capability for the target item.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		$res = wp_update_post(

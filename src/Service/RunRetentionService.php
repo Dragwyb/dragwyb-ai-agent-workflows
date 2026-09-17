@@ -2,15 +2,15 @@
 /**
  * Prunes old, finished workflow runs and their logs.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,7 +33,7 @@ class RunRetentionService {
 	/**
 	 * The WP-Cron hook this service's pruneAccordingToSettings() is bound to.
 	 */
-	public const CRON_HOOK = 'daiaw/cron/prune_runs';
+	public const CRON_HOOK = 'dragaiw/cron/prune_runs';
 
 	private WorkflowRunRepository $runs;
 

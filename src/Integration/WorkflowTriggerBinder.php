@@ -2,21 +2,21 @@
 /**
  * Binds active workflows' triggers to their real-world event sources.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration;
+namespace DRAGAIW\Plugin\Integration;
 
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
-use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\TriggerReentrancyGuard;
-use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowTestListenerService;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionHelper;
+use DRAGAIW\Plugin\Service\NodeTypeRegistry;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\TriggerReentrancyGuard;
+use DRAGAIW\Plugin\Service\WorkflowExecutionService;
+use DRAGAIW\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Service\WorkflowTestListenerService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * not recommended otherwise.
  *
  * Reads trigger configuration directly from the workflow's `graph_json`
- * rather than the `daiaw_workflow_nodes` table: binding must happen as early
+ * rather than the `dragaiw_workflow_nodes` table: binding must happen as early
  * as possible in the request (see Core\Plugin::registerExecutionEngine()),
  * before WorkflowExecutionService ever gets a chance to lazily sync that
  * table, so `graph_json` — the builder's own always-current source of
@@ -176,7 +176,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Mid-write: any daiaw create/update/delete is still on the stack.
+					// Mid-write: any dragaiw create/update/delete is still on the stack.
 					if ( $this->trigger_guard->isWriting() ) {
 						return;
 					}
@@ -186,7 +186,7 @@ class WorkflowTriggerBinder {
 						return;
 					}
 
-					// Entity was created by a previous daiaw action (translated post,
+					// Entity was created by a previous dragaiw action (translated post,
 					// auto-user, auto-comment, etc.) — do not start another loop.
 					if ( WordPressActionHelper::isAutomatedPayload( $payload ) ) {
 						return;

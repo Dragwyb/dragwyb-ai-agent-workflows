@@ -2,19 +2,19 @@
 /**
  * Connection create/edit admin page.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin\Pages;
+namespace DRAGAIW\Plugin\Admin\Pages;
 
-use DragwybVisualAutomation\Plugin\Admin\AdminPage;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Domain\Connection;
-use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Admin\AdminPage;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Domain\Connection;
+use DRAGAIW\Plugin\Service\ConnectionAuthTypes;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ConnectionFormPage implements AdminPage {
 
-	public const SLUG = 'daiaw-connection-form';
+	public const SLUG = 'dragaiw-connection-form';
 
 	private ConnectionService $connections;
 
@@ -94,10 +94,10 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'daiaw-admin',
-			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragaiw-admin',
+			DRAGAIW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DAIAW_VERSION
+			DRAGAIW_VERSION
 		);
 	}
 
@@ -112,7 +112,7 @@ class ConnectionFormPage implements AdminPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which connection to load/create; the admin-post controller this feeds still re-checks capability and nonce on every write.
 		$id = isset( $_GET['connection'] ) ? absint( wp_unslash( $_GET['connection'] ) ) : 0;
 
-		echo '<div class="wrap daiaw-admin-page">';
+		echo '<div class="wrap dragaiw-admin-page">';
 		$this->renderNotice();
 
 		if ( $id > 0 ) {
@@ -177,22 +177,22 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderChooseTypeForm(): void {
-		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '" class="daiaw-settings-form">';
+		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '" class="dragaiw-settings-form">';
 		printf( '<input type="hidden" name="page" value="%s" />', esc_attr( self::SLUG ) );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="daiaw-connection-integration">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
-		echo '<input type="text" id="daiaw-connection-integration" name="integration_slug" class="regular-text" required="required" />';
+		echo '<tr><th scope="row"><label for="dragaiw-connection-integration">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<input type="text" id="dragaiw-connection-integration" name="integration_slug" class="regular-text" required="required" />';
 		echo '<p class="description">' . esc_html__( 'A short identifier for what this connection is for, e.g. "my_email_provider".', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="daiaw-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
-		echo '<input type="text" id="daiaw-connection-label" name="label" class="regular-text" required="required" />';
+		echo '<tr><th scope="row"><label for="dragaiw-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<input type="text" id="dragaiw-connection-label" name="label" class="regular-text" required="required" />';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="daiaw-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
-		echo '<select id="daiaw-connection-auth-type" name="auth_type">';
+		echo '<tr><th scope="row"><label for="dragaiw-connection-auth-type">' . esc_html__( 'Authentication type', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<select id="dragaiw-connection-auth-type" name="auth_type">';
 		foreach ( ConnectionAuthTypes::VALID as $auth_type ) {
 			printf(
 				'<option value="%1$s">%2$s</option>',
@@ -218,24 +218,24 @@ class ConnectionFormPage implements AdminPage {
 	 * @return void
 	 */
 	private function renderCreateForm( string $auth_type, string $integration_slug, string $label ): void {
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form">';
-		echo '<input type="hidden" name="action" value="daiaw_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragaiw-settings-form">';
+		echo '<input type="hidden" name="action" value="dragaiw_connection_action" />';
 		echo '<input type="hidden" name="op" value="create" />';
 		echo '<input type="hidden" name="auth_type" value="' . esc_attr( $auth_type ) . '" />';
-		wp_nonce_field( 'daiaw_connection_action_create' );
+		wp_nonce_field( 'dragaiw_connection_action_create' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="daiaw-connection-integration">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragaiw-connection-integration">' . esc_html__( 'Integration', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="daiaw-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragaiw-connection-integration" name="integration_slug" class="regular-text" value="%s" required="required" />',
 			esc_attr( $integration_slug )
 		);
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="daiaw-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragaiw-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="daiaw-connection-label" name="label" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragaiw-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $label )
 		);
 		echo '</td></tr>';
@@ -265,11 +265,11 @@ class ConnectionFormPage implements AdminPage {
 	private function renderEditForm( Connection $connection ): void {
 		$connection_id = (int) $connection->id();
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form">';
-		echo '<input type="hidden" name="action" value="daiaw_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragaiw-settings-form">';
+		echo '<input type="hidden" name="action" value="dragaiw_connection_action" />';
 		echo '<input type="hidden" name="op" value="update" />';
 		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
-		wp_nonce_field( 'daiaw_connection_action_update_' . $connection->id() );
+		wp_nonce_field( 'dragaiw_connection_action_update_' . $connection->id() );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -281,9 +281,9 @@ class ConnectionFormPage implements AdminPage {
 		echo '<p>' . esc_html( ConnectionAuthTypes::label( $connection->authType() ) ) . '</p>';
 		echo '</td></tr>';
 
-		echo '<tr><th scope="row"><label for="daiaw-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="dragaiw-connection-label">' . esc_html__( 'Label', 'dragwyb-ai-agent-workflows' ) . '</label></th><td>';
 		printf(
-			'<input type="text" id="daiaw-connection-label" name="label" class="regular-text" value="%s" required="required" />',
+			'<input type="text" id="dragaiw-connection-label" name="label" class="regular-text" value="%s" required="required" />',
 			esc_attr( $connection->label() )
 		);
 		echo '</td></tr>';
@@ -307,11 +307,11 @@ class ConnectionFormPage implements AdminPage {
 		echo '</form>';
 
 		echo '<h2>' . esc_html__( 'Delete Connection', 'dragwyb-ai-agent-workflows' ) . '</h2>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="daiaw-settings-form daiaw-settings-danger-zone">';
-		echo '<input type="hidden" name="action" value="daiaw_connection_action" />';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="dragaiw-settings-form dragaiw-settings-danger-zone">';
+		echo '<input type="hidden" name="action" value="dragaiw_connection_action" />';
 		echo '<input type="hidden" name="op" value="delete" />';
 		printf( '<input type="hidden" name="connection_id" value="%d" />', esc_attr( $connection_id ) );
-		wp_nonce_field( 'daiaw_connection_action_delete_' . $connection->id() );
+		wp_nonce_field( 'dragaiw_connection_action_delete_' . $connection->id() );
 		echo '<p>' . esc_html__( 'Permanently deletes this connection. Anything using it will stop working.', 'dragwyb-ai-agent-workflows' ) . '</p>';
 		submit_button( __( 'Delete Connection', 'dragwyb-ai-agent-workflows' ), 'delete' );
 		echo '</form>';
@@ -331,12 +331,12 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderFieldRow( string $field, string $label, bool $secret, string $current, bool $configured ): void {
 		$input_type = $secret ? 'password' : 'text';
-		$input_id   = 'daiaw-connection-field-' . $field;
+		$input_id   = 'dragaiw-connection-field-' . $field;
 
 		echo '<tr><th scope="row"><label for="' . esc_attr( $input_id ) . '">' . esc_html( $label ) . '</label></th><td>';
 
 		if ( $configured ) {
-			echo '<p class="description daiaw-connection-current-value">' . sprintf(
+			echo '<p class="description dragaiw-connection-current-value">' . sprintf(
 				/* translators: %s: masked or otherwise safe-to-display current value. */
 				esc_html__( 'Currently set: %s', 'dragwyb-ai-agent-workflows' ),
 				'<code>' . esc_html( $current ) . '</code>'
@@ -410,9 +410,9 @@ class ConnectionFormPage implements AdminPage {
 		echo '<tr><th scope="row">' . esc_html__( 'Google account', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
 
 		if ( $connected ) {
-			echo '<p><span class="daiaw-connection-status daiaw-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-ai-agent-workflows' ) . '</span></p>';
+			echo '<p><span class="dragaiw-connection-status dragaiw-connection-status--verified">' . esc_html__( 'Connected', 'dragwyb-ai-agent-workflows' ) . '</span></p>';
 		} else {
-			echo '<p><span class="daiaw-connection-status daiaw-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-ai-agent-workflows' ) . '</span></p>';
+			echo '<p><span class="dragaiw-connection-status dragaiw-connection-status--pending">' . esc_html__( 'Not connected — click Connect with Google below.', 'dragwyb-ai-agent-workflows' ) . '</span></p>';
 		}
 
 		echo '</td></tr>';
@@ -427,12 +427,12 @@ class ConnectionFormPage implements AdminPage {
 		$url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'        => 'daiaw_google_oauth_authorize',
+					'action'        => 'dragaiw_google_oauth_authorize',
 					'connection_id' => $connection->id(),
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'daiaw_google_oauth_authorize_' . $connection->id()
+			'dragaiw_google_oauth_authorize_' . $connection->id()
 		);
 
 		echo '<tr><th scope="row">' . esc_html__( 'Authorize', 'dragwyb-ai-agent-workflows' ) . '</th><td>';
@@ -450,7 +450,7 @@ class ConnectionFormPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector.
-		$key = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
+		$key = isset( $_GET['dragaiw_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragaiw_notice'] ) ) : '';
 
 		$notices = array(
 			'created_oauth'   => array(
@@ -472,7 +472,7 @@ class ConnectionFormPage implements AdminPage {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display detail.
-		$detail = isset( $_GET['daiaw_error'] ) ? sanitize_text_field( wp_unslash( $_GET['daiaw_error'] ) ) : '';
+		$detail = isset( $_GET['dragaiw_error'] ) ? sanitize_text_field( wp_unslash( $_GET['dragaiw_error'] ) ) : '';
 
 		printf(
 			'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p>%3$s</div>',

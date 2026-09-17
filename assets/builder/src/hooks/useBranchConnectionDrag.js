@@ -12,8 +12,8 @@ export function getCanvasZoom(canvasElement) {
 	}
 
 	const raw =
-		canvasElement.style.getPropertyValue('--daiaw-canvas-zoom') ||
-		getComputedStyle(canvasElement).getPropertyValue('--daiaw-canvas-zoom');
+		canvasElement.style.getPropertyValue('--dragaiw-canvas-zoom') ||
+		getComputedStyle(canvasElement).getPropertyValue('--dragaiw-canvas-zoom');
 	const zoom = parseFloat(raw);
 
 	return zoom > 0 ? zoom : 1;

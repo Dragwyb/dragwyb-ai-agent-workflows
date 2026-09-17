@@ -2,26 +2,26 @@
 /**
  * Run detail admin page.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin\Pages;
+namespace DRAGAIW\Plugin\Admin\Pages;
 
-use DragwybVisualAutomation\Plugin\Admin\AdminPage;
-use DragwybVisualAutomation\Plugin\Admin\RunDuration;
-use DragwybVisualAutomation\Plugin\Admin\RunStatusBadge;
-use DragwybVisualAutomation\Plugin\Admin\RunTimestamp;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRunLog;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
+use DRAGAIW\Plugin\Admin\AdminPage;
+use DRAGAIW\Plugin\Admin\RunDuration;
+use DRAGAIW\Plugin\Admin\RunStatusBadge;
+use DRAGAIW\Plugin\Admin\RunTimestamp;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Domain\WorkflowRun;
+use DRAGAIW\Plugin\Domain\WorkflowRunLog;
+use DRAGAIW\Plugin\Persistence\WorkflowRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\WorkflowExecutionService;
 
-// BuilderPage and RunsPage live in this same namespace (DragwybVisualAutomation\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
+// BuilderPage and RunsPage live in this same namespace (DRAGAIW\Plugin\Admin\Pages), so no `use` import is needed to reference BuilderPage::SLUG/RunsPage::SLUG below.
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RunDetailPage implements AdminPage {
 
-	public const SLUG = 'daiaw-run-detail';
+	public const SLUG = 'dragaiw-run-detail';
 
 	/**
 	 * Statuses that make sense to re-run — see RunsListTable's own
@@ -103,10 +103,10 @@ class RunDetailPage implements AdminPage {
 	 */
 	public function enqueueAssets(): void {
 		wp_enqueue_style(
-			'daiaw-admin',
-			DAIAW_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'dragaiw-admin',
+			DRAGAIW_PLUGIN_URL . 'assets/admin/css/admin.css',
 			array(),
-			DAIAW_VERSION
+			DRAGAIW_VERSION
 		);
 	}
 
@@ -122,7 +122,7 @@ class RunDetailPage implements AdminPage {
 		$run_id = isset( $_GET['run_id'] ) ? absint( wp_unslash( $_GET['run_id'] ) ) : 0;
 		$run    = $run_id > 0 ? $this->runs->find( $run_id ) : null;
 
-		echo '<div class="wrap daiaw-admin-page">';
+		echo '<div class="wrap dragaiw-admin-page">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( $this->pageTitle() ) . '</h1>';
 		echo '<hr class="wp-header-end" />';
 
@@ -191,7 +191,7 @@ class RunDetailPage implements AdminPage {
 	private function renderMeta( WorkflowRun $run ): void {
 		$workflow = $this->workflows->find( $run->workflowId(), true );
 
-		echo '<table class="widefat fixed striped daiaw-run-meta"><tbody>';
+		echo '<table class="widefat fixed striped dragaiw-run-meta"><tbody>';
 
 		$this->renderMetaRow(
 			__( 'Workflow', 'dragwyb-ai-agent-workflows' ),
@@ -263,7 +263,7 @@ class RunDetailPage implements AdminPage {
 		}
 
 		printf(
-			'<details class="daiaw-run-details-block"><summary>%1$s</summary><pre>%2$s</pre></details>',
+			'<details class="dragaiw-run-details-block"><summary>%1$s</summary><pre>%2$s</pre></details>',
 			esc_html__( 'Trigger payload', 'dragwyb-ai-agent-workflows' ),
 			esc_html( (string) wp_json_encode( $payload, JSON_PRETTY_PRINT ) )
 		);
@@ -285,7 +285,7 @@ class RunDetailPage implements AdminPage {
 			return;
 		}
 
-		echo '<table class="widefat fixed striped daiaw-run-logs"><thead><tr>';
+		echo '<table class="widefat fixed striped dragaiw-run-logs"><thead><tr>';
 		echo '<th>' . esc_html__( 'Node', 'dragwyb-ai-agent-workflows' ) . '</th>';
 		echo '<th>' . esc_html__( 'Status', 'dragwyb-ai-agent-workflows' ) . '</th>';
 		echo '<th>' . esc_html__( 'Duration', 'dragwyb-ai-agent-workflows' ) . '</th>';
@@ -354,7 +354,7 @@ class RunDetailPage implements AdminPage {
 		$slug  = array_key_exists( $status, $labels ) ? $status : 'unknown';
 
 		return sprintf(
-			'<span class="daiaw-status-badge daiaw-status-badge--%1$s">%2$s</span>',
+			'<span class="dragaiw-status-badge dragaiw-status-badge--%1$s">%2$s</span>',
 			esc_attr( $slug ),
 			esc_html( $label )
 		);
@@ -376,7 +376,7 @@ class RunDetailPage implements AdminPage {
 			return;
 		}
 
-		echo '<details class="daiaw-run-details-block"><summary>' . esc_html__( 'View', 'dragwyb-ai-agent-workflows' ) . '</summary>';
+		echo '<details class="dragaiw-run-details-block"><summary>' . esc_html__( 'View', 'dragwyb-ai-agent-workflows' ) . '</summary>';
 
 		if ( null !== $log->input() ) {
 			echo '<p><strong>' . esc_html__( 'Input', 'dragwyb-ai-agent-workflows' ) . '</strong></p>';
@@ -435,7 +435,7 @@ class RunDetailPage implements AdminPage {
 	 * @return string
 	 */
 	private function runActionForm( string $op, int $run_id, string $label, string $button_class, bool $confirm = false ): string {
-		$nonce_field  = wp_nonce_field( 'daiaw_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
+		$nonce_field  = wp_nonce_field( 'dragaiw_run_action_' . $op . '_' . $run_id, '_wpnonce', true, false );
 		$confirm_attr = '';
 
 		if ( $confirm ) {
@@ -447,7 +447,7 @@ class RunDetailPage implements AdminPage {
 
 		return sprintf(
 			'<form method="post" action="%1$s" style="display:inline-block;margin-right:8px;">'
-				. '<input type="hidden" name="action" value="daiaw_run_action" />'
+				. '<input type="hidden" name="action" value="dragaiw_run_action" />'
 				. '<input type="hidden" name="op" value="%2$s" />'
 				. '<input type="hidden" name="run_id" value="%3$d" />'
 				. '%4$s'
@@ -465,7 +465,7 @@ class RunDetailPage implements AdminPage {
 
 	/**
 	 * Allow-listed, already-translated messages for the read-only
-	 * `?daiaw_notice=` query arg, same pattern as WorkflowsPage::notices().
+	 * `?dragaiw_notice=` query arg, same pattern as WorkflowsPage::notices().
 	 *
 	 * @return array<string, array{message: string, type: string}>
 	 */
@@ -487,7 +487,7 @@ class RunDetailPage implements AdminPage {
 	 */
 	private function renderNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display selector; the value is never echoed, only used as an array-key lookup against a fixed allow-list.
-		$key     = isset( $_GET['daiaw_notice'] ) ? sanitize_key( wp_unslash( $_GET['daiaw_notice'] ) ) : '';
+		$key     = isset( $_GET['dragaiw_notice'] ) ? sanitize_key( wp_unslash( $_GET['dragaiw_notice'] ) ) : '';
 		$notices = $this->notices();
 
 		if ( ! isset( $notices[ $key ] ) ) {

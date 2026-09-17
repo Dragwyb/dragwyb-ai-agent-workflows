@@ -2,19 +2,19 @@
 /**
  * Registers REST endpoints & feature integrations against the container.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Provider;
+namespace DRAGAIW\Plugin\Provider;
 
-use DragwybVisualAutomation\Plugin\Core\Container;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybVisualAutomation\Plugin\Service\AiModelsService;
-use DragwybVisualAutomation\Plugin\Service\ChatMessageService;
-use DragwybVisualAutomation\Plugin\Service\ElementorFormsService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Core\Container;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Service\AiModelsService;
+use DRAGAIW\Plugin\Service\ChatMessageService;
+use DRAGAIW\Plugin\Service\ElementorFormsService;
+use DRAGAIW\Plugin\Service\WorkflowService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -3,7 +3,7 @@
  * Plugin Name:       Dragwyb AI Agent Workflows
  * Plugin URI:        https://dragwyb.com/product/ai-workflows/
  * Description:       Build and run visual multi-step automation workflows, webhooks, and AI agent actions in WordPress.
- * Version:           0.1.1
+ * Version:           0.1.2
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Dragwyb
@@ -13,7 +13,7 @@
  * Text Domain:       dragwyb-ai-agent-workflows
  * Domain Path:       /languages
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 // Prevent direct file access.
@@ -29,16 +29,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  * versions older than the plugin's stated minimum. Nothing below this gate is
  * loaded unless both the PHP and WordPress version requirements are met.
  */
-if ( ! defined( 'DAIAW_MIN_PHP_VERSION' ) ) {
-	define( 'DAIAW_MIN_PHP_VERSION', '7.4' );
+if ( ! defined( 'DRAGAIW_MIN_PHP_VERSION' ) ) {
+	define( 'DRAGAIW_MIN_PHP_VERSION', '7.4' );
 }
 
-if ( ! defined( 'DAIAW_MIN_WP_VERSION' ) ) {
-	define( 'DAIAW_MIN_WP_VERSION', '5.8' );
+if ( ! defined( 'DRAGAIW_MIN_WP_VERSION' ) ) {
+	define( 'DRAGAIW_MIN_WP_VERSION', '5.8' );
 }
 
-if ( version_compare( PHP_VERSION, DAIAW_MIN_PHP_VERSION, '<' ) ) {
-	add_action( 'admin_notices', 'daiaw_php_version_notice' );
+if ( version_compare( PHP_VERSION, DRAGAIW_MIN_PHP_VERSION, '<' ) ) {
+	add_action( 'admin_notices', 'dragaiw_php_version_notice' );
 
 	return;
 }
@@ -49,27 +49,27 @@ if ( version_compare( PHP_VERSION, DAIAW_MIN_PHP_VERSION, '<' ) ) {
  * Defined as a plain function (not a class method) so it can never be the
  * cause of the fatal error it is meant to report.
  */
-function daiaw_php_version_notice() {
+function dragaiw_php_version_notice() {
 	printf(
 		'<div class="notice notice-error"><p>%s</p></div>',
 		esc_html(
 			sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version. */
 				__( 'Dragwyb AI Agent Workflows requires PHP %1$s or higher. Your site is running PHP %2$s. Please ask your host to upgrade PHP, then reactivate the plugin.', 'dragwyb-ai-agent-workflows' ),
-				DAIAW_MIN_PHP_VERSION,
+				DRAGAIW_MIN_PHP_VERSION,
 				PHP_VERSION
 			)
 		)
 	);
 }
 
-define( 'DAIAW_VERSION', '0.1.1' );
-define( 'DAIAW_PLUGIN_FILE', __FILE__ );
-define( 'DAIAW_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'DAIAW_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'DAIAW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'DRAGAIW_VERSION', '0.1.2' );
+define( 'DRAGAIW_PLUGIN_FILE', __FILE__ );
+define( 'DRAGAIW_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'DRAGAIW_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'DRAGAIW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-require_once DAIAW_PLUGIN_DIR . 'src/Core/WordPressCompat.php';
+require_once DRAGAIW_PLUGIN_DIR . 'src/Core/WordPressCompat.php';
 
 /*
  * Autoloading.
@@ -88,9 +88,9 @@ require_once DAIAW_PLUGIN_DIR . 'src/Core/WordPressCompat.php';
  * this point our vendored SDK has NOT been loaded yet, so this check reliably
  * reflects core capabilities and cannot be tripped by our own polyfills.
  */
-$daiaw_has_core_ai_client = daiaw_has_core_ai_client();
+$dragaiw_has_core_ai_client = dragaiw_has_core_ai_client();
 
-if ( $daiaw_has_core_ai_client ) {
+if ( $dragaiw_has_core_ai_client ) {
 	/*
 	 * WordPress 7+: rely entirely on the core `WordPress\AiClient\*` library.
 	 *
@@ -104,20 +104,20 @@ if ( $daiaw_has_core_ai_client ) {
 	 * Instead we register only the plugin's own classes and the vendored AI
 	 * provider packages, all of which extend core's `WordPress\AiClient\*`.
 	 */
-	require_once DAIAW_PLUGIN_DIR . 'src/autoload.php';
-} elseif ( file_exists( DAIAW_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	require_once DRAGAIW_PLUGIN_DIR . 'src/autoload.php';
+} elseif ( file_exists( DRAGAIW_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	// Pre-WP 7: load the full vendored SDK (php-ai-client + HTTP/PSR deps).
-	require_once DAIAW_PLUGIN_DIR . 'vendor/autoload.php';
+	require_once DRAGAIW_PLUGIN_DIR . 'vendor/autoload.php';
 } else {
-	require_once DAIAW_PLUGIN_DIR . 'src/autoload.php';
+	require_once DRAGAIW_PLUGIN_DIR . 'src/autoload.php';
 }
 
 // AI provider packages (official + custom) extend core's SDK; load them either way.
-if ( file_exists( DAIAW_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php' ) ) {
-	require_once DAIAW_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
+if ( file_exists( DRAGAIW_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php' ) ) {
+	require_once DRAGAIW_PLUGIN_DIR . 'includes/ai-providers/vendor/autoload.php';
 }
 
-register_activation_hook( DAIAW_PLUGIN_FILE, array( 'DragwybVisualAutomation\\Plugin\\Core\\Activator', 'activate' ) );
-register_deactivation_hook( DAIAW_PLUGIN_FILE, array( 'DragwybVisualAutomation\\Plugin\\Core\\Deactivator', 'deactivate' ) );
+register_activation_hook( DRAGAIW_PLUGIN_FILE, array( 'DRAGAIW\\Plugin\\Core\\Activator', 'activate' ) );
+register_deactivation_hook( DRAGAIW_PLUGIN_FILE, array( 'DRAGAIW\\Plugin\\Core\\Deactivator', 'deactivate' ) );
 
-DragwybVisualAutomation\Plugin\Core\Plugin::instance()->boot();
+DRAGAIW\Plugin\Core\Plugin::instance()->boot();

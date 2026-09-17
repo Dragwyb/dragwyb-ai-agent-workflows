@@ -2,14 +2,14 @@
 /**
  * Renders a WorkflowRun status as a small colored badge.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
+use DRAGAIW\Plugin\Domain\WorkflowRun;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ class RunStatusBadge {
 	 */
 	public static function render( string $status ): string {
 		return sprintf(
-			'<span class="daiaw-status-badge daiaw-status-badge--%1$s">%2$s</span>',
+			'<span class="dragaiw-status-badge dragaiw-status-badge--%1$s">%2$s</span>',
 			esc_attr( self::slug( $status ) ),
 			esc_html( self::label( $status ) )
 		);

@@ -2,22 +2,22 @@
 /**
  * Handles state-changing Run admin actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Admin\Pages\RunDetailPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\RunsPage;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
-use DragwybVisualAutomation\Plugin\Service\WorkflowExecutionService;
+use DRAGAIW\Plugin\Admin\Pages\RunDetailPage;
+use DRAGAIW\Plugin\Admin\Pages\RunsPage;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Domain\WorkflowRun;
+use DRAGAIW\Plugin\Service\WorkflowExecutionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Receives the `admin-post.php?action=daiaw_run_action` POST submitted by
+ * Receives the `admin-post.php?action=dragaiw_run_action` POST submitted by
  * RunsListTable's and RunDetailPage's row/page action forms.
  *
  * Same reasoning as WorkflowActionsController for being its own class: the
@@ -56,7 +56,7 @@ class RunActionsController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_daiaw_run_action', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragaiw_run_action', array( $this, 'handle' ) );
 		add_action( 'admin_init', array( $this, 'maybeHandleRunsBulkFromList' ), 5 );
 	}
 
@@ -94,7 +94,7 @@ class RunActionsController {
 	 */
 	public function handleRunsBulkFromList(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below.
-		if ( empty( $_POST['daiaw_run_bulk'] ) ) {
+		if ( empty( $_POST['dragaiw_run_bulk'] ) ) {
 			return;
 		}
 
@@ -102,7 +102,7 @@ class RunActionsController {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dragwyb-ai-agent-workflows' ), 403 );
 		}
 
-		if ( ! ListTableUi::verifyBulkNonce( 'daiaw_run_bulk_action' ) ) {
+		if ( ! ListTableUi::verifyBulkNonce( 'dragaiw_run_bulk_action' ) ) {
 			$this->redirectToList( 'action_failed', $this->bulkRedirectArgs() );
 		}
 
@@ -147,7 +147,7 @@ class RunActionsController {
 			$this->redirectToList( 'action_failed' );
 		}
 
-		check_admin_referer( 'daiaw_run_action_' . $op . '_' . $run_id );
+		check_admin_referer( 'dragaiw_run_action_' . $op . '_' . $run_id );
 
 		switch ( $op ) {
 			case 'rerun':
@@ -218,7 +218,7 @@ class RunActionsController {
 				array(
 					'page'       => RunDetailPage::SLUG,
 					'run_id'     => $run_id,
-					'daiaw_notice' => $notice,
+					'dragaiw_notice' => $notice,
 				),
 				admin_url( 'admin.php' )
 			)
@@ -264,7 +264,7 @@ class RunActionsController {
 				array_merge(
 					array(
 						'page'       => RunsPage::SLUG,
-						'daiaw_notice' => $notice,
+						'dragaiw_notice' => $notice,
 					),
 					$extra
 				),

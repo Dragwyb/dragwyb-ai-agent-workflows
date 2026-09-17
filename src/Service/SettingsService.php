@@ -2,14 +2,14 @@
 /**
  * Global plugin settings.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Core\Options;
+use DRAGAIW\Plugin\Core\Options;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

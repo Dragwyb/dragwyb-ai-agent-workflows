@@ -16,5 +16,5 @@ return array(
     'Http\\Promise\\' => array($vendorDir . '/php-http/promise/src'),
     'Http\\Discovery\\' => array($vendorDir . '/php-http/discovery/src'),
     'Http\\Client\\' => array($vendorDir . '/php-http/httplug/src'),
-    'DragwybVisualAutomation\\Plugin\\' => array($baseDir . '/src'),
+    'DRAGAIW\\Plugin\\' => array($baseDir . '/src'),
 );

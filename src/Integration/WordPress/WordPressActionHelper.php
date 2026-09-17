@@ -2,12 +2,12 @@
 /**
  * Shared helpers for WordPress workflow actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
+namespace DRAGAIW\Plugin\Integration\WordPress;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +25,7 @@ final class WordPressActionHelper {
 	 * triggers do not re-fire on the automation's own output (e.g. a
 	 * translated post created by an agent).
 	 */
-	public const AUTOMATED_META_KEY = '_daiaw_automated';
+	public const AUTOMATED_META_KEY = '_dragaiw_automated';
 
 	/**
 	 * Builds a successful action result.
@@ -201,7 +201,7 @@ final class WordPressActionHelper {
 		 *
 		 * @param int $limit Requested limit.
 		 */
-		$limit = (int) apply_filters( 'daiaw_wp_list_limit', $limit );
+		$limit = (int) apply_filters( 'dragaiw_wp_list_limit', $limit );
 
 		if ( $limit < 1 ) {
 			$limit = self::DEFAULT_LIST_LIMIT;
@@ -296,6 +296,16 @@ final class WordPressActionHelper {
 			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return self::fail( __( 'Taxonomy does not exist.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		$taxObj    = get_taxonomy( $taxonomy );
+		$manageCap = $taxObj->cap->manage_terms ?? ( $taxObj->cap->edit_terms ?? 'manage_categories' );
+		if ( ! current_user_can( $manageCap ) ) {
+			return self::fail( __( 'You do not have permission to create terms in this taxonomy.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
 		$term = wp_insert_term( $name, $taxonomy, array_filter( $args, function( $value ) { return null !== $value && '' !== $value; } ) );
 
 		if ( is_wp_error( $term ) ) {
@@ -320,6 +330,16 @@ final class WordPressActionHelper {
 
 		if ( '' === $taxonomy ) {
 			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return self::fail( __( 'Taxonomy does not exist.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		$taxObj  = get_taxonomy( $taxonomy );
+		$editCap = $taxObj->cap->edit_terms ?? ( $taxObj->cap->manage_terms ?? 'manage_categories' );
+		if ( ! current_user_can( $editCap ) ) {
+			return self::fail( __( 'You do not have permission to edit terms in this taxonomy.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
@@ -353,6 +373,16 @@ final class WordPressActionHelper {
 
 		if ( '' === $taxonomy ) {
 			return self::fail( __( 'Taxonomy is required.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return self::fail( __( 'Taxonomy does not exist.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		$taxObj    = get_taxonomy( $taxonomy );
+		$deleteCap = $taxObj->cap->delete_terms ?? ( $taxObj->cap->manage_terms ?? 'manage_categories' );
+		if ( ! current_user_can( $deleteCap ) ) {
+			return self::fail( __( 'You do not have permission to delete terms in this taxonomy.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
 		if ( ! get_term( $termId, $taxonomy ) ) {
@@ -723,7 +753,7 @@ final class WordPressActionHelper {
 	}
 
 	/**
-	 * True when this post was just written by a daiaw action (short grace window).
+	 * True when this post was just written by a dragaiw action (short grace window).
 	 *
 	 * @param int $post_id Post id.
 	 *
@@ -741,14 +771,14 @@ final class WordPressActionHelper {
 		}
 
 		/**
-		 * Seconds after a daiaw create/update during which save_post is ignored
+		 * Seconds after a dragaiw create/update during which save_post is ignored
 		 * for that post (prevents immediate echo triggers). After this window,
 		 * human edits of the post may start workflows again.
 		 *
 		 * @param int $seconds Grace period in seconds.
 		 * @param int $post_id Post id.
 		 */
-		$grace = (int) apply_filters( 'daiaw_automated_post_grace_seconds', 45, $post_id );
+		$grace = (int) apply_filters( 'dragaiw_automated_post_grace_seconds', 45, $post_id );
 
 		if ( $grace < 1 ) {
 			$grace = 45;

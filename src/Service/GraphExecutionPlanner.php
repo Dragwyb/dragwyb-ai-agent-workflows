@@ -2,12 +2,12 @@
 /**
  * Branch-aware execution order for workflow graphs.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,15 +2,15 @@
 /**
  * Builds LLM tool schemas from attached workflow action nodes.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service\Agent;
+namespace DRAGAIW\Plugin\Service\Agent;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
-use DragwybVisualAutomation\Plugin\Service\NodeTypeRegistry;
+use DRAGAIW\Plugin\Domain\Contracts\ActionInterface;
+use DRAGAIW\Plugin\Service\NodeTypeRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

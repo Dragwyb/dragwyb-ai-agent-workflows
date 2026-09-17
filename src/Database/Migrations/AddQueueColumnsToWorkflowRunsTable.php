@@ -2,15 +2,15 @@
 /**
  * Adds background-queue columns to the workflow runs table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Database\Migrations;
+namespace DRAGAIW\Plugin\Database\Migrations;
 
-use DragwybVisualAutomation\Plugin\Database\Migration;
-use DragwybVisualAutomation\Plugin\Database\Table;
+use DRAGAIW\Plugin\Database\Migration;
+use DRAGAIW\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Extends `daiaw_workflow_runs` (created in roadmap item 7) for background/
+ * Extends `dragaiw_workflow_runs` (created in roadmap item 7) for background/
  * queued execution (roadmap item 8), rather than editing
  * `CreateWorkflowRunsTable` in place — that migration already shipped and
  * may have run against a live site, so schema evolution happens through a

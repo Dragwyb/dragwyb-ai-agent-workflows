@@ -2,12 +2,12 @@
 /**
  * Resolves AI Agent attachments from the workflow builder graph.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service\Agent;
+namespace DRAGAIW\Plugin\Service\Agent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

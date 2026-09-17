@@ -2,14 +2,14 @@
 /**
  * Google Sheets append row action (legacy slug).
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\Actions;
+namespace DRAGAIW\Plugin\Integration\Actions;
 
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

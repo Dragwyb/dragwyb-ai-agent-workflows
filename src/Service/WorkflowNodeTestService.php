@@ -2,17 +2,17 @@
 /**
  * Executes a single builder node for "Test node" previews.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentGraphHelper;
-use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Domain\WorkflowNode;
+use DRAGAIW\Plugin\Service\Agent\AgentGraphHelper;
+use DRAGAIW\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

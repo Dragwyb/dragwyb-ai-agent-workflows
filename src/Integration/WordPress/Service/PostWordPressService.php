@@ -2,14 +2,14 @@
 /**
  * Business logic for WordPress Post and Post Type actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Service;
+namespace DRAGAIW\Plugin\Integration\WordPress\Service;
 
-use DragwybVisualAutomation\Plugin\Integration\WordPress\WordPressActionHelper;
+use DRAGAIW\Plugin\Integration\WordPress\WordPressActionHelper;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -124,6 +124,12 @@ final class PostWordPressService {
 		}
 
 		$limit = WordPressActionHelper::int( $config, 'limit' );
+		// Verify the current user has permission to query posts of the given type.
+		$postTypeObj = get_post_type_object( $postType );
+		$capability  = $postTypeObj && isset( $postTypeObj->cap->edit_posts ) ? $postTypeObj->cap->edit_posts : 'edit_posts';
+		if ( ! current_user_can( $capability ) ) {
+			return WordPressActionHelper::fail( __( 'Insufficient permissions to query posts of this type.', 'dragwyb-ai-agent-workflows' ) );
+		}
 		$posts = get_posts(
 			array(
 				'post_type'   => $postType,
@@ -149,6 +155,16 @@ final class PostWordPressService {
 			return WordPressActionHelper::fail( __( 'Post id is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
+		if ( ! get_post( $postId ) ) {
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $postId ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Viewing post metadata requires the edit_post capability for this post.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
 		$meta = get_post_meta( $postId );
 
 		if ( empty( $meta ) ) {
@@ -168,6 +184,16 @@ final class PostWordPressService {
 
 		if ( '' === $metaKey ) {
 			return WordPressActionHelper::fail( __( 'Meta key is required.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! get_post( $postId ) ) {
+			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $postId ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Viewing post metadata requires the edit_post capability for this post.', 'dragwyb-ai-agent-workflows' )
+			);
 		}
 
 		$val = get_post_meta( $postId, $metaKey, true );
@@ -256,6 +282,46 @@ final class PostWordPressService {
 			$postType = 'post';
 		}
 
+		$postTypeObj = get_post_type_object( $postType );
+		$createCap   = $postTypeObj->cap->create_posts ?? ( 'page' === $postType ? 'edit_pages' : 'edit_posts' );
+		if ( ! current_user_can( $createCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to create posts of this type.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$postStatus    = WordPressActionHelper::str( $config, 'post_status', 'draft' );
+		$allowedStatuses = array(
+			'draft',
+			'pending',
+			'private',
+			'publish',
+			'future',
+		);
+		if ( ! in_array( $postStatus, $allowedStatuses, true ) ) {
+			return WordPressActionHelper::fail(
+				sprintf(
+					/* translators: %s: post status */
+					__( 'Invalid post status "%s".', 'dragwyb-ai-agent-workflows' ),
+					$postStatus
+				)
+			);
+		}
+
+		$publishCap = $postTypeObj->cap->publish_posts ?? ( 'page' === $postType ? 'publish_pages' : 'publish_posts' );
+		if ( in_array( $postStatus, array( 'publish', 'future' ), true ) && ! current_user_can( $publishCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to publish posts of this type.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$privateCap = $postTypeObj->cap->edit_private_posts ?? ( 'page' === $postType ? 'edit_private_pages' : 'edit_private_posts' );
+		if ( 'private' === $postStatus && ! current_user_can( $privateCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to set posts of this type to private.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
 		$content = WordPressActionHelper::resolvePostContent( $config );
 
 		$postData = array(
@@ -263,7 +329,7 @@ final class PostWordPressService {
 			'post_content' => $content,
 			'post_excerpt' => WordPressActionHelper::str( $config, 'excerpt' ),
 			'post_type'    => $postType,
-			'post_status'  => WordPressActionHelper::str( $config, 'post_status', 'draft' ),
+			'post_status'  => $postStatus,
 		);
 
 		$slug = WordPressActionHelper::str( $config, 'slug' );
@@ -293,6 +359,15 @@ final class PostWordPressService {
 
 		$author = WordPressActionHelper::int( $config, 'post_author' );
 		if ( $author > 0 ) {
+			if ( ! get_userdata( $author ) ) {
+				return WordPressActionHelper::fail( __( 'Invalid post author ID.', 'dragwyb-ai-agent-workflows' ) );
+			}
+			$editOthersCap = $postTypeObj->cap->edit_others_posts ?? ( 'page' === $postType ? 'edit_others_pages' : 'edit_others_posts' );
+			if ( $author !== get_current_user_id() && ! current_user_can( $editOthersCap ) ) {
+				return WordPressActionHelper::fail(
+					__( 'You do not have permission to assign post authorship to other users.', 'dragwyb-ai-agent-workflows' )
+				);
+			}
 			$postData['post_author'] = $author;
 		}
 
@@ -335,7 +410,14 @@ final class PostWordPressService {
 			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		$postData = array( 'ID' => $postId );
+		if ( ! current_user_can( 'edit_post', $postId ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Updating posts requires the edit_post capability for the target post.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$postTypeObj = get_post_type_object( $post->post_type );
+		$postData    = array( 'ID' => $postId );
 
 		$title = WordPressActionHelper::str( $config, 'title' );
 		if ( '' !== $title ) {
@@ -360,6 +442,37 @@ final class PostWordPressService {
 
 		$status = WordPressActionHelper::str( $config, 'post_status' );
 		if ( '' !== $status ) {
+			$allowedStatuses = array(
+				'draft',
+				'pending',	
+				'private',
+				'publish',
+				'future',
+			);
+			if ( ! in_array( $status, $allowedStatuses, true ) ) {
+				return WordPressActionHelper::fail(
+					sprintf(
+						/* translators: %s: post status */
+						__( 'Invalid post status "%s".', 'dragwyb-ai-agent-workflows' ),
+						$status
+					)
+				);
+			}
+
+			$publishCap = $postTypeObj->cap->publish_posts ?? ( 'page' === $post->post_type ? 'publish_pages' : 'publish_posts' );
+			if ( in_array( $status, array( 'publish', 'future' ), true ) && ! current_user_can( $publishCap ) ) {
+				return WordPressActionHelper::fail(
+					__( 'You do not have permission to publish posts of this type.', 'dragwyb-ai-agent-workflows' )
+				);
+			}
+
+			$privateCap = $postTypeObj->cap->edit_private_posts ?? ( 'page' === $post->post_type ? 'edit_private_pages' : 'edit_private_posts' );
+			if ( 'private' === $status && ! current_user_can( $privateCap ) ) {
+				return WordPressActionHelper::fail(
+					__( 'You do not have permission to set posts of this type to private.', 'dragwyb-ai-agent-workflows' )
+				);
+			}
+
 			$postData['post_status'] = $status;
 		}
 
@@ -390,6 +503,15 @@ final class PostWordPressService {
 
 		$author = WordPressActionHelper::int( $config, 'post_author' );
 		if ( $author > 0 ) {
+			if ( ! get_userdata( $author ) ) {
+				return WordPressActionHelper::fail( __( 'Invalid post author ID.', 'dragwyb-ai-agent-workflows' ) );
+			}
+			$editOthersCap = $postTypeObj->cap->edit_others_posts ?? ( 'page' === $post->post_type ? 'edit_others_pages' : 'edit_others_posts' );
+			if ( (int) $post->post_author !== $author && ! current_user_can( $editOthersCap ) ) {
+				return WordPressActionHelper::fail(
+					__( 'You do not have permission to change the author of this post.', 'dragwyb-ai-agent-workflows' )
+				);
+			}
 			$postData['post_author'] = $author;
 		}
 
@@ -431,8 +553,48 @@ final class PostWordPressService {
 			return WordPressActionHelper::fail( __( 'Post status is required.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		if ( ! get_post( $postId ) ) {
+		$post = get_post( $postId );
+		if ( ! $post ) {
 			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $postId ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Updating post status requires the edit_post capability for the target post.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$allowedStatuses = array(
+			'draft',
+			'pending',	
+			'private',
+			'publish',
+			'future',
+		);
+
+		if ( ! in_array( $status, $allowedStatuses, true ) ) {
+			return WordPressActionHelper::fail(
+				sprintf(
+					/* translators: %s: post status */
+					__( 'Invalid post status "%s".', 'dragwyb-ai-agent-workflows' ),
+					$status
+				)
+			);
+		}
+
+		$postTypeObj = get_post_type_object( $post->post_type );
+		$publishCap  = $postTypeObj->cap->publish_posts ?? ( 'page' === $post->post_type ? 'publish_pages' : 'publish_posts' );
+		if ( in_array( $status, array( 'publish', 'future' ), true ) && ! current_user_can( $publishCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to publish posts of this type.', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		$privateCap = $postTypeObj->cap->edit_private_posts ?? ( 'page' === $post->post_type ? 'edit_private_pages' : 'edit_private_posts' );
+		if ( 'private' === $status && ! current_user_can( $privateCap ) ) {
+			return WordPressActionHelper::fail(
+				__( 'You do not have permission to set posts of this type to private.', 'dragwyb-ai-agent-workflows' )
+			);
 		}
 
 		$res = wp_update_post(
@@ -464,6 +626,12 @@ final class PostWordPressService {
 
 		if ( ! get_post( $postId ) ) {
 			return WordPressActionHelper::fail( __( 'Post not found.', 'dragwyb-ai-agent-workflows' ) );
+		}
+
+		if ( ! current_user_can( 'delete_post', $postId ) ) {
+			return WordPressActionHelper::fail(
+				__( 'Deleting posts requires the delete_post capability for the target post.', 'dragwyb-ai-agent-workflows' )
+			);
 		}
 
 		$force = WordPressActionHelper::bool( $config, 'force_delete' );

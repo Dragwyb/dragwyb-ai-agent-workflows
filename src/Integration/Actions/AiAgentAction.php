@@ -2,16 +2,16 @@
 /**
  * AI Agent — reasoning node with attached chat model, memory, and tools.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\Actions;
+namespace DRAGAIW\Plugin\Integration\Actions;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
-use DragwybVisualAutomation\Plugin\Service\Agent\AgentService;
-use DragwybVisualAutomation\Plugin\Service\ConfigInterpolator;
+use DRAGAIW\Plugin\Domain\Contracts\ActionInterface;
+use DRAGAIW\Plugin\Service\Agent\AgentService;
+use DRAGAIW\Plugin\Service\ConfigInterpolator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

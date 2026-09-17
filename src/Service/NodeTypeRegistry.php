@@ -2,15 +2,15 @@
 /**
  * Node type registry.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Domain\Contracts\ActionInterface;
-use DragwybVisualAutomation\Plugin\Domain\Contracts\TriggerInterface;
+use DRAGAIW\Plugin\Domain\Contracts\ActionInterface;
+use DRAGAIW\Plugin\Domain\Contracts\TriggerInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Deliberately a plain PHP collection with no WordPress hook knowledge of
  * its own: something else (Plugin::registerNodeTypes()) is responsible for
- * firing the `daiaw/nodes/register` action that populates it, so this class
+ * firing the `dragaiw/nodes/register` action that populates it, so this class
  * stays trivially unit-testable.
  */
 class NodeTypeRegistry {
@@ -111,7 +111,7 @@ class NodeTypeRegistry {
 				esc_html( $kind ),
 				esc_html( $slug )
 			),
-			esc_html( DAIAW_VERSION )
+			esc_html( DRAGAIW_VERSION )
 		);
 	}
 }

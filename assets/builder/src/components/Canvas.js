@@ -390,28 +390,28 @@ export default function Canvas({
 	});
 
 	return (
-		<div className="daiaw-builder-canvas-host">
+		<div className="dragaiw-builder-canvas-host">
 			<div
 				ref={setCanvasRef}
 				className={
 					connectionDrag
-						? 'daiaw-builder-canvas daiaw-builder-canvas--connecting'
-						: 'daiaw-builder-canvas'
+						? 'dragaiw-builder-canvas dragaiw-builder-canvas--connecting'
+						: 'dragaiw-builder-canvas'
 				}
-				style={{ '--daiaw-canvas-zoom': String(zoom) }}
+				style={{ '--dragaiw-canvas-zoom': String(zoom) }}
 				role="region"
 				aria-label={__('Workflow canvas', 'dragwyb-ai-agent-workflows')}
 				onClick={onCanvasClick}
 			>
 				<div
-					className="daiaw-builder-canvas__scaler"
+					className="dragaiw-builder-canvas__scaler"
 					style={{
 						width: bounds.w * zoom,
 						height: bounds.h * zoom,
 					}}
 				>
 					<div
-						className="daiaw-builder-canvas__world"
+						className="dragaiw-builder-canvas__world"
 						style={{
 							width: bounds.w,
 							height: bounds.h,
@@ -423,7 +423,7 @@ export default function Canvas({
 							branchEdges.length > 0 ||
 							connectionDrag) && (
 								<svg
-									className="daiaw-builder-canvas__edges"
+									className="dragaiw-builder-canvas__edges"
 
 									aria-hidden="true"
 
@@ -441,8 +441,8 @@ export default function Canvas({
 												key={edge.id}
 												className={
 													isSelected
-														? 'daiaw-builder-canvas__edge daiaw-builder-canvas__edge--selected'
-														: 'daiaw-builder-canvas__edge'
+														? 'dragaiw-builder-canvas__edge dragaiw-builder-canvas__edge--selected'
+														: 'dragaiw-builder-canvas__edge'
 												}
 												d={edge.path}
 												fill="none"
@@ -460,8 +460,8 @@ export default function Canvas({
 												key={edge.id}
 												className={
 													isSelected
-														? 'daiaw-builder-canvas__edge daiaw-builder-canvas__edge--branch daiaw-builder-canvas__edge--selected'
-														: 'daiaw-builder-canvas__edge daiaw-builder-canvas__edge--branch'
+														? 'dragaiw-builder-canvas__edge dragaiw-builder-canvas__edge--branch dragaiw-builder-canvas__edge--selected'
+														: 'dragaiw-builder-canvas__edge dragaiw-builder-canvas__edge--branch'
 												}
 												d={edge.path}
 												fill="none"
@@ -473,8 +473,8 @@ export default function Canvas({
 										<path
 											className={
 												connectionDrag.kind === 'branch'
-													? 'daiaw-builder-canvas__edge daiaw-builder-canvas__edge--branch daiaw-builder-canvas__edge--preview'
-													: 'daiaw-builder-canvas__edge daiaw-builder-canvas__edge--preview'
+													? 'dragaiw-builder-canvas__edge dragaiw-builder-canvas__edge--branch dragaiw-builder-canvas__edge--preview'
+													: 'dragaiw-builder-canvas__edge dragaiw-builder-canvas__edge--preview'
 											}
 											d={
 												connectionDrag.kind === 'branch'
@@ -495,7 +495,7 @@ export default function Canvas({
 										<path
 											key={edge.id}
 
-											className="daiaw-builder-canvas__edge daiaw-builder-canvas__edge--attachment"
+											className="dragaiw-builder-canvas__edge dragaiw-builder-canvas__edge--attachment"
 
 											d={dashedPath(edge.from, edge.to)}
 
@@ -607,7 +607,7 @@ export default function Canvas({
 							.map((chatModel) => (
 								<div
 									key={chatModel.id}
-									className="daiaw-chat-model-node-wrap"
+									className="dragaiw-chat-model-node-wrap"
 									style={{
 										transform: `translate(${chatModel.x}px, ${chatModel.y}px)`,
 									}}
@@ -630,7 +630,7 @@ export default function Canvas({
 							.map((memory) => (
 								<div
 									key={memory.id}
-									className="daiaw-memory-node-wrap"
+									className="dragaiw-memory-node-wrap"
 									style={{
 										transform: `translate(${memory.x}px, ${memory.y}px)`,
 									}}
@@ -654,7 +654,7 @@ export default function Canvas({
 							.map((parser) => (
 								<div
 									key={parser.id}
-									className="daiaw-output-parser-node-wrap"
+									className="dragaiw-output-parser-node-wrap"
 									style={{
 										transform: `translate(${parser.x}px, ${parser.y}px)`,
 									}}
@@ -681,7 +681,7 @@ export default function Canvas({
 							.map((tool) => (
 								<div
 									key={tool.id}
-									className="daiaw-tool-node-wrap"
+									className="dragaiw-tool-node-wrap"
 									style={{
 										transform: `translate(${tool.x}px, ${tool.y}px)`,
 									}}
@@ -697,10 +697,10 @@ export default function Canvas({
 					</div>
 				</div>
 			</div>
-			<div className="daiaw-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'dragwyb-ai-agent-workflows')}>
+			<div className="dragaiw-builder-canvas__zoom" role="group" aria-label={__('Canvas zoom', 'dragwyb-ai-agent-workflows')}>
 				<button
 					type="button"
-					className="daiaw-builder-canvas__zoom-btn"
+					className="dragaiw-builder-canvas__zoom-btn"
 					aria-label={__('Zoom out', 'dragwyb-ai-agent-workflows')}
 					disabled={zoom <= ZOOM_MIN}
 					onClick={(event) => {
@@ -710,12 +710,12 @@ export default function Canvas({
 				>
 					−
 				</button>
-				<span className="daiaw-builder-canvas__zoom-label">
+				<span className="dragaiw-builder-canvas__zoom-label">
 					{Math.round(zoom * 100)}%
 				</span>
 				<button
 					type="button"
-					className="daiaw-builder-canvas__zoom-btn"
+					className="dragaiw-builder-canvas__zoom-btn"
 					aria-label={__('Zoom in', 'dragwyb-ai-agent-workflows')}
 					disabled={zoom >= ZOOM_MAX}
 					onClick={(event) => {
@@ -732,12 +732,12 @@ export default function Canvas({
 
 function EmptyCanvasGuide() {
 	return (
-		<div className="daiaw-builder-canvas__guide" role="status">
-			<h2 className="daiaw-builder-canvas__guide-title">
+		<div className="dragaiw-builder-canvas__guide" role="status">
+			<h2 className="dragaiw-builder-canvas__guide-title">
 				{__('Build your workflow', 'dragwyb-ai-agent-workflows')}
 			</h2>
 
-			<ol className="daiaw-builder-canvas__guide-steps">
+			<ol className="dragaiw-builder-canvas__guide-steps">
 				<li>
 					{__(
 						'Add a trigger, then add an AI Agent from the Agents section.',

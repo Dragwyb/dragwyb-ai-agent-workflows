@@ -2,12 +2,12 @@
 /**
  * Optional action grouping for the builder palette.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Domain\Contracts;
+namespace DRAGAIW\Plugin\Domain\Contracts;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

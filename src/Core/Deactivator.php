@@ -2,15 +2,15 @@
 /**
  * Plugin deactivation handler.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Core;
+namespace DRAGAIW\Plugin\Core;
 
-use DragwybVisualAutomation\Plugin\Service\BackgroundRunner;
-use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
+use DRAGAIW\Plugin\Service\BackgroundRunner;
+use DRAGAIW\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

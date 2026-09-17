@@ -2,15 +2,15 @@
 /**
  * Creates the workflows table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Database\Migrations;
+namespace DRAGAIW\Plugin\Database\Migrations;
 
-use DragwybVisualAutomation\Plugin\Database\Migration;
-use DragwybVisualAutomation\Plugin\Database\Table;
+use DRAGAIW\Plugin\Database\Migration;
+use DRAGAIW\Plugin\Database\Table;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `daiaw_workflows` holds one row per workflow: its builder graph, status,
+ * `dragaiw_workflows` holds one row per workflow: its builder graph, status,
  * and lightweight run-count/soft-delete bookkeeping. See
  * docs/internal/architecture.md §2.3 for the full column rationale.
  */

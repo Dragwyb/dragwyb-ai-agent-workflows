@@ -2,14 +2,14 @@
 /**
  * Worksheet/tab-level Google Sheets operations.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet;
+namespace DRAGAIW\Plugin\Integration\GoogleSheet;
 
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
+use DRAGAIW\Plugin\Integration\GoogleSheet\Helpers\GoogleSheetCommons;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

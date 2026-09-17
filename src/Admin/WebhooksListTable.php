@@ -2,18 +2,18 @@
 /**
  * Webhooks admin list table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
-use DragwybVisualAutomation\Plugin\Admin\Pages\WebhookFormPage;
-use DragwybVisualAutomation\Plugin\Domain\Webhook;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\WebhookService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Admin\Pages\WebhookFormPage;
+use DRAGAIW\Plugin\Domain\Webhook;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\WebhookService;
+use DRAGAIW\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -206,7 +206,7 @@ class WebhooksListTable extends WP_List_Table {
 		$edit_url = $this->editUrl( $item->id() );
 
 		$title = sprintf(
-			'<strong><a href="%1$s"><code class="daiaw-webhook-url">%2$s</code></a></strong>',
+			'<strong><a href="%1$s"><code class="dragaiw-webhook-url">%2$s</code></a></strong>',
 			esc_url( $edit_url ),
 			esc_html( $url )
 		);
@@ -266,7 +266,7 @@ class WebhooksListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'table-view-list', 'daiaw-webhooks-table' );
+		return array( 'widefat', 'fixed', 'striped', 'table-view-list', 'dragaiw-webhooks-table' );
 	}
 
 	/**
@@ -284,12 +284,12 @@ class WebhooksListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function deleteForm( int $id ): string {
-		$form_id     = 'daiaw-webhook-delete-' . $id;
-		$nonce_field = wp_nonce_field( 'daiaw_webhook_action_delete_' . $id, '_wpnonce', true, false );
+		$form_id     = 'dragaiw-webhook-delete-' . $id;
+		$nonce_field = wp_nonce_field( 'dragaiw_webhook_action_delete_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="daiaw-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="daiaw_webhook_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="dragaiw-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="dragaiw_webhook_action" />'
 				. '<input type="hidden" name="op" value="delete" />'
 				. '<input type="hidden" name="webhook_id" value="%3$d" />'
 				. '%4$s'

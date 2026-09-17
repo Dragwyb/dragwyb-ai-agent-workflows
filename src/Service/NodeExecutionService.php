@@ -2,15 +2,15 @@
 /**
  * Node execution service.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use Throwable;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowNode;
+use DRAGAIW\Plugin\Domain\WorkflowNode;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,7 +54,7 @@ class NodeExecutionService {
 		 * @param WorkflowNode         $node    The node about to execute.
 		 * @param array<string, mixed> $context Runtime data available to this node.
 		 */
-		do_action( 'daiaw/node/before_execute', $node, $context );
+		do_action( 'dragaiw/node/before_execute', $node, $context );
 
 		$result = $this->executeAction( $node, $context );
 
@@ -68,7 +68,7 @@ class NodeExecutionService {
 		 * @param array                $result  Its outcome (see return value of execute()).
 		 * @param array<string, mixed> $context Runtime data that was available to this node.
 		 */
-		do_action( 'daiaw/node/after_execute', $node, $result, $context );
+		do_action( 'dragaiw/node/after_execute', $node, $result, $context );
 
 		return $result;
 	}

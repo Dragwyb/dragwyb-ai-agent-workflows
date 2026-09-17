@@ -3,10 +3,10 @@
  * Dependency-free PSR-4 autoloader fallback.
  *
  * Used only when no Composer-generated `vendor/autoload.php` is present.
- * Maps the `DragwybVisualAutomation\Plugin\` namespace prefix to this directory,
+ * Maps the `DRAGAIW\Plugin\` namespace prefix to this directory,
  * following the standard PSR-4 file resolution algorithm.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 // Prevent direct file access.
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 spl_autoload_register(
 	function ( $class ) {
-		$prefix = 'DragwybVisualAutomation\\Plugin\\';
+		$prefix = 'DRAGAIW\\Plugin\\';
 
 		if ( strncmp( $prefix, $class, strlen( $prefix ) ) !== 0 ) {
 			return;

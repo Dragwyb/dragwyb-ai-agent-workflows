@@ -2,12 +2,12 @@
 /**
  * Post, Comment, and Post Type catalog definitions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog;
+namespace DRAGAIW\Plugin\Integration\WordPress\Catalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -114,7 +114,7 @@ final class PostActionCatalog {
 		$definitions[] = array(
 			'slug'          => 'wp_get_post_metadata_all_action',
 			'label'         => __( 'Get Post Metadata (All)', 'dragwyb-ai-agent-workflows' ),
-			'description'   => __( 'Retrieves every metadata entry for a post.', 'dragwyb-ai-agent-workflows' ),
+			'description'   => __( 'Retrieves metadata entries for a post. Requires edit_post capability on the target post.', 'dragwyb-ai-agent-workflows' ),
 			'group'         => 'post',
 			'group_label'   => $groups['post'],
 			'method'        => 'getPostMetadata',
@@ -127,7 +127,7 @@ final class PostActionCatalog {
 		$definitions[] = array(
 			'slug'          => 'wp_get_post_metadata_single_action',
 			'label'         => __( 'Get Post Metadata (Single)', 'dragwyb-ai-agent-workflows' ),
-			'description'   => __( 'Retrieves a single metadata value for a post by meta key.', 'dragwyb-ai-agent-workflows' ),
+			'description'   => __( 'Retrieves a single metadata value for a post by meta key. Requires edit_post capability on the target post.', 'dragwyb-ai-agent-workflows' ),
 			'group'         => 'post',
 			'group_label'   => $groups['post'],
 			'method'        => 'getPostMetadataByMetaKey',
@@ -241,7 +241,7 @@ final class PostActionCatalog {
 				'date_gmt'          => $field( 'string', __( 'Date GMT (Y-m-d H:i:s, optional)', 'dragwyb-ai-agent-workflows' ) ),
 				'parent_id'         => $field( 'string', __( 'Parent Post ID', 'dragwyb-ai-agent-workflows' ) ),
 				'post_password'     => $field( 'string', __( 'Post Password', 'dragwyb-ai-agent-workflows' ) ),
-				'post_author'       => $field( 'string', __( 'Author (User ID)', 'dragwyb-ai-agent-workflows' ) ),
+				'post_author'       => $field( 'string', __( 'Author (User ID)', 'dragwyb-ai-agent-workflows' ), array( 'description' => __( 'Optional author user ID. Assigning other authors requires the edit_others_posts capability.', 'dragwyb-ai-agent-workflows' ) ) ),
 				'categories'        => $field( 'string', __( 'Categories (comma-separated category IDs)', 'dragwyb-ai-agent-workflows' ) ),
 				'tags'              => $field( 'string', __( 'Tags (comma-separated)', 'dragwyb-ai-agent-workflows' ) ),
 				'taxonomy'          => $field( 'string', __( 'Custom Taxonomy (optional)', 'dragwyb-ai-agent-workflows' ) ),
@@ -294,7 +294,7 @@ final class PostActionCatalog {
 				'date_gmt'          => $field( 'string', __( 'Date GMT (Y-m-d H:i:s, optional)', 'dragwyb-ai-agent-workflows' ) ),
 				'parent_id'         => $field( 'string', __( 'Parent Post ID', 'dragwyb-ai-agent-workflows' ) ),
 				'post_password'     => $field( 'string', __( 'Post Password', 'dragwyb-ai-agent-workflows' ) ),
-				'post_author'       => $field( 'string', __( 'Author (User ID)', 'dragwyb-ai-agent-workflows' ) ),
+				'post_author'       => $field( 'string', __( 'Author (User ID)', 'dragwyb-ai-agent-workflows' ), array( 'description' => __( 'Optional author user ID. Changing post author requires the edit_others_posts capability.', 'dragwyb-ai-agent-workflows' ) ) ),
 				'categories'        => $field( 'string', __( 'Categories (comma-separated category IDs)', 'dragwyb-ai-agent-workflows' ) ),
 				'tags'              => $field( 'string', __( 'Tags (comma-separated)', 'dragwyb-ai-agent-workflows' ) ),
 				'taxonomy'          => $field( 'string', __( 'Custom Taxonomy (optional)', 'dragwyb-ai-agent-workflows' ) ),
@@ -308,7 +308,7 @@ final class PostActionCatalog {
 		$definitions[] = array(
 			'slug'          => 'wp_update_post_status_action',
 			'label'         => __( 'Update Post Status', 'dragwyb-ai-agent-workflows' ),
-			'description'   => __( 'Changes only the status of an existing post.', 'dragwyb-ai-agent-workflows' ),
+			'description'   => __( 'Changes only the status of an existing post. Requires edit_post (and publish_posts if publishing) capability.', 'dragwyb-ai-agent-workflows' ),
 			'group'         => 'post',
 			'group_label'   => $groups['post'],
 			'method'        => 'updatePostStatus',

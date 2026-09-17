@@ -2,12 +2,12 @@
 /**
  * Request-scoped workflow trigger reentrancy guard.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -135,7 +135,7 @@ class TriggerReentrancyGuard {
 	}
 
 	/**
-	 * True while any daiaw WordPress action is writing (create/update/delete).
+	 * True while any dragaiw WordPress action is writing (create/update/delete).
 	 *
 	 * @return bool
 	 */
@@ -165,7 +165,7 @@ class TriggerReentrancyGuard {
 			return false;
 		}
 
-		$transient_key = 'daiaw_trig_' . md5( $memory_key );
+		$transient_key = 'dragaiw_trig_' . md5( $memory_key );
 
 		if ( false !== get_transient( $transient_key ) ) {
 			$this->claimed_triggers[ $memory_key ] = true;

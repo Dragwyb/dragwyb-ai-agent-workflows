@@ -2,19 +2,19 @@
 /**
  * Starts the Google OAuth authorization redirect from wp-admin.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Admin\Pages\ConnectionFormPage;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Admin\Pages\ConnectionFormPage;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Service\ConnectionAuthTypes;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles `admin-post.php?action=daiaw_google_oauth_authorize`.
+ * Handles `admin-post.php?action=dragaiw_google_oauth_authorize`.
  */
 class GoogleOAuthStartController {
 
@@ -39,7 +39,7 @@ class GoogleOAuthStartController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'admin_post_daiaw_google_oauth_authorize', array( $this, 'handle' ) );
+		add_action( 'admin_post_dragaiw_google_oauth_authorize', array( $this, 'handle' ) );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class GoogleOAuthStartController {
 			$this->redirectWithError( 0, __( 'Invalid connection.', 'dragwyb-ai-agent-workflows' ) );
 		}
 
-		check_admin_referer( 'daiaw_google_oauth_authorize_' . $connection_id );
+		check_admin_referer( 'dragaiw_google_oauth_authorize_' . $connection_id );
 
 		$connection = $this->connections->find( $connection_id );
 
@@ -88,8 +88,8 @@ class GoogleOAuthStartController {
 	private function redirectWithError( int $connection_id, string $message ): void {
 		$args = array(
 			'page'       => ConnectionFormPage::SLUG,
-			'daiaw_notice' => 'error',
-			'daiaw_error'  => $message,
+			'dragaiw_notice' => 'error',
+			'dragaiw_error'  => $message,
 		);
 
 		if ( $connection_id > 0 ) {

@@ -2,21 +2,21 @@
 /**
  * Connections REST controller (list + create for the builder).
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Rest;
+namespace DRAGAIW\Plugin\Rest;
 
 use InvalidArgumentException;
 use RuntimeException;
-use DragwybVisualAutomation\Plugin\Core\Capabilities;
-use DragwybVisualAutomation\Plugin\Domain\Connection;
-use DragwybVisualAutomation\Plugin\Service\AiModelsService;
-use DragwybVisualAutomation\Plugin\Service\ConnectionAuthTypes;
-use DragwybVisualAutomation\Plugin\Service\ConnectionService;
-use DragwybVisualAutomation\Plugin\Service\GoogleOAuthService;
+use DRAGAIW\Plugin\Core\Capabilities;
+use DRAGAIW\Plugin\Domain\Connection;
+use DRAGAIW\Plugin\Service\AiModelsService;
+use DRAGAIW\Plugin\Service\ConnectionAuthTypes;
+use DRAGAIW\Plugin\Service\ConnectionService;
+use DRAGAIW\Plugin\Service\GoogleOAuthService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ConnectionsController {
 
-	private const API_NAMESPACE = 'daiaw/v1';
+	private const API_NAMESPACE = 'dragaiw/v1';
 
 	private const ROUTE = '/connections';
 
@@ -154,7 +154,7 @@ class ConnectionsController {
 	public function permissionsCheck( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
-				'daiaw_rest_forbidden',
+				'dragaiw_rest_forbidden',
 				__( 'Sorry, you are not allowed to view connections.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -174,7 +174,7 @@ class ConnectionsController {
 	public function createPermissionsCheck( $request ) {
 		if ( ! current_user_can( Capabilities::MANAGE_WORKFLOWS ) && ! current_user_can( Capabilities::MANAGE_CONNECTIONS ) ) {
 			return new WP_Error(
-				'daiaw_rest_forbidden',
+				'dragaiw_rest_forbidden',
 				__( 'Sorry, you are not allowed to create connections.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -209,7 +209,7 @@ class ConnectionsController {
 
 		if ( ! is_array( $credentials ) ) {
 			return new WP_Error(
-				'daiaw_rest_invalid',
+				'dragaiw_rest_invalid',
 				__( 'Credentials must be an object of field values.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -240,9 +240,9 @@ class ConnectionsController {
 				$filtered
 			);
 		} catch ( InvalidArgumentException $exception ) {
-			return new WP_Error( 'daiaw_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
+			return new WP_Error( 'dragaiw_rest_invalid', $exception->getMessage(), array( 'status' => 400 ) );
 		} catch ( RuntimeException $exception ) {
-			return new WP_Error( 'daiaw_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
+			return new WP_Error( 'dragaiw_rest_server_error', $exception->getMessage(), array( 'status' => 500 ) );
 		}
 
 		$response = rest_ensure_response( $this->serialize( $connection ) );
@@ -274,7 +274,7 @@ class ConnectionsController {
 
 		if ( null === $connection ) {
 			return new WP_Error(
-				'daiaw_rest_not_found',
+				'dragaiw_rest_not_found',
 				__( 'Connection not found.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 404 )
 			);
@@ -282,7 +282,7 @@ class ConnectionsController {
 
 		if ( ConnectionAuthTypes::OAUTH2 !== $connection->authType() ) {
 			return new WP_Error(
-				'daiaw_rest_invalid',
+				'dragaiw_rest_invalid',
 				__( 'This connection is not a Google OAuth connection.', 'dragwyb-ai-agent-workflows' ),
 				array( 'status' => 400 )
 			);
@@ -296,7 +296,7 @@ class ConnectionsController {
 			);
 		} catch ( \RuntimeException $exception ) {
 			return new WP_Error(
-				'daiaw_rest_invalid',
+				'dragaiw_rest_invalid',
 				$exception->getMessage(),
 				array( 'status' => 400 )
 			);

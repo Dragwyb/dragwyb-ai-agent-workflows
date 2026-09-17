@@ -2,15 +2,15 @@
 /**
  * Workflow JSON import/export (n8n-style portable definition).
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
 use InvalidArgumentException;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Domain\Workflow;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,6 +49,7 @@ class WorkflowImportExport {
 	public static function exportWorkflow( Workflow $workflow ): array {
 		$graph       = $workflow->graph();
 		$nodes       = isset( $graph['nodes'] ) && is_array( $graph['nodes'] ) ? array_values( $graph['nodes'] ) : array();
+		$nodes       = self::sanitizeNodesForExport( $nodes );
 		$connections = isset( $graph['connections'] ) && is_array( $graph['connections'] ) ? array_values( $graph['connections'] ) : array();
 		$settings    = self::portableSettings( $workflow->settings() );
 
@@ -65,6 +66,49 @@ class WorkflowImportExport {
 			),
 			'id'          => $workflow->id(),
 		);
+	}
+
+	/**
+	 * Sanitizes nodes prior to export by removing sensitive credential keys
+	 * such as plain text passwords or secrets.
+	 *
+	 * @param array<int, mixed> $nodes Node definitions.
+	 *
+	 * @return array<int, mixed>
+	 */
+	public static function sanitizeNodesForExport( array $nodes ): array {
+		$sensitiveKeys = array(
+			'password'      => true,
+			'auto_password' => true,
+			'user_pass'     => true,
+			'client_secret' => true,
+		);
+
+		return self::stripSensitiveKeys( $nodes, $sensitiveKeys );
+	}
+
+	/**
+	 * Recursively strips sensitive keys from an array.
+	 *
+	 * @param mixed               $data          Data to sanitize.
+	 * @param array<string, true> $sensitiveKeys Keys to strip.
+	 *
+	 * @return mixed
+	 */
+	private static function stripSensitiveKeys( $data, array $sensitiveKeys ) {
+		if ( ! is_array( $data ) ) {
+			return $data;
+		}
+
+		foreach ( $data as $key => $val ) {
+			if ( is_string( $key ) && isset( $sensitiveKeys[ strtolower( $key ) ] ) ) {
+				unset( $data[ $key ] );
+			} elseif ( is_array( $val ) ) {
+				$data[ $key ] = self::stripSensitiveKeys( $val, $sensitiveKeys );
+			}
+		}
+
+		return $data;
 	}
 
 	/**

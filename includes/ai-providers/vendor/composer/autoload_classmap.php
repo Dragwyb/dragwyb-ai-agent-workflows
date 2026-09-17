@@ -7,12 +7,12 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'DragwybVisualAutomation\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => $baseDir . '/src/Compatible/AbstractCompatibleApiProvider.php',
-    'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => $baseDir . '/src/Compatible/CompatibleModelMetadataDirectory.php',
-    'DragwybVisualAutomation\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => $baseDir . '/src/Compatible/CompatibleTextGenerationModel.php',
-    'DragwybVisualAutomation\\AiProviders\\DeepSeek\\DeepSeekProvider' => $baseDir . '/src/DeepSeek/DeepSeekProvider.php',
-    'DragwybVisualAutomation\\AiProviders\\Groq\\GroqProvider' => $baseDir . '/src/Groq/GroqProvider.php',
-    'DragwybVisualAutomation\\AiProviders\\OpenRouter\\OpenRouterProvider' => $baseDir . '/src/OpenRouter/OpenRouterProvider.php',
+    'DRAGAIW\\AiProviders\\Compatible\\AbstractCompatibleApiProvider' => $baseDir . '/src/Compatible/AbstractCompatibleApiProvider.php',
+    'DRAGAIW\\AiProviders\\Compatible\\CompatibleModelMetadataDirectory' => $baseDir . '/src/Compatible/CompatibleModelMetadataDirectory.php',
+    'DRAGAIW\\AiProviders\\Compatible\\CompatibleTextGenerationModel' => $baseDir . '/src/Compatible/CompatibleTextGenerationModel.php',
+    'DRAGAIW\\AiProviders\\DeepSeek\\DeepSeekProvider' => $baseDir . '/src/DeepSeek/DeepSeekProvider.php',
+    'DRAGAIW\\AiProviders\\Groq\\GroqProvider' => $baseDir . '/src/Groq/GroqProvider.php',
+    'DRAGAIW\\AiProviders\\OpenRouter\\OpenRouterProvider' => $baseDir . '/src/OpenRouter/OpenRouterProvider.php',
     'WordPress\\AnthropicAiProvider\\Authentication\\AnthropicApiKeyRequestAuthentication' => $vendorDir . '/wordpress/ai-provider-for-anthropic/src/Authentication/AnthropicApiKeyRequestAuthentication.php',
     'WordPress\\AnthropicAiProvider\\Metadata\\AnthropicModelMetadataDirectory' => $vendorDir . '/wordpress/ai-provider-for-anthropic/src/Metadata/AnthropicModelMetadataDirectory.php',
     'WordPress\\AnthropicAiProvider\\Models\\AnthropicTextGenerationModel' => $vendorDir . '/wordpress/ai-provider-for-anthropic/src/Models/AnthropicTextGenerationModel.php',

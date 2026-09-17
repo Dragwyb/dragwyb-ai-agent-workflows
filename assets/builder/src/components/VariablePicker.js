@@ -83,10 +83,10 @@ export default function VariablePicker({
 
 	return (
 		<div
-			className={`daiaw-variable-picker${embedded ? ' daiaw-variable-picker--embedded' : ''}${popover ? ' daiaw-variable-picker--popover' : ''}`}
+			className={`dragaiw-variable-picker${embedded ? ' dragaiw-variable-picker--embedded' : ''}${popover ? ' dragaiw-variable-picker--popover' : ''}`}
 		>
 			{!popover && (
-				<div className="daiaw-variable-picker__header">
+				<div className="dragaiw-variable-picker__header">
 					<h3>{__('Variables', 'dragwyb-ai-agent-workflows')}</h3>
 					{!embedded && (
 						<Button
@@ -99,10 +99,10 @@ export default function VariablePicker({
 			)}
 
 			{showSearch && (
-				<div className="daiaw-variable-picker__search">
+				<div className="dragaiw-variable-picker__search">
 					<input
 						type="search"
-						className="daiaw-variable-picker__search-input"
+						className="dragaiw-variable-picker__search-input"
 						placeholder={__('Search variables…', 'dragwyb-ai-agent-workflows')}
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
@@ -111,7 +111,7 @@ export default function VariablePicker({
 			)}
 
 			{!hasData ? (
-				<p className="daiaw-variable-picker__empty">
+				<p className="dragaiw-variable-picker__empty">
 					{__(
 						'No variables yet. Listen for trigger data or add steps above this node.',
 						'dragwyb-ai-agent-workflows'
@@ -119,16 +119,16 @@ export default function VariablePicker({
 				</p>
 			) : (
 				filteredSources.map((source) => (
-					<div key={source.id} className="daiaw-variable-picker__source-block">
-						<div className="daiaw-variable-picker__source">
-							<span className="daiaw-variable-picker__source-badge">
+					<div key={source.id} className="dragaiw-variable-picker__source-block">
+						<div className="dragaiw-variable-picker__source">
+							<span className="dragaiw-variable-picker__source-badge">
 								{source.badge}
 							</span>
-							<span className="daiaw-variable-picker__source-label">
+							<span className="dragaiw-variable-picker__source-label">
 								{source.label}
 							</span>
 						</div>
-						<ul className="daiaw-variable-picker__tree">
+						<ul className="dragaiw-variable-picker__tree">
 							{(source.tree.children || []).map((child) => (
 								<TreeBranch
 									key={`${source.id}-${child.id}`}
@@ -161,10 +161,10 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 
 	if (node.isLeaf) {
 		return (
-			<li className="daiaw-variable-picker__leaf">
+			<li className="dragaiw-variable-picker__leaf">
 				<button
 					type="button"
-					className="daiaw-variable-picker__leaf-btn"
+					className="dragaiw-variable-picker__leaf-btn"
 					style={{ paddingLeft: `${8 + depth * 14}px` }}
 					onClick={() => onSelect(node.token, node.path)}
 					title={
@@ -173,13 +173,13 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 							: node.token
 					}
 				>
-					<span className="daiaw-variable-picker__pill">
+					<span className="dragaiw-variable-picker__pill">
 						{node.id.endsWith('.__all__')
 							? node.label
 							: pathToDisplayLabel(node.path, nodeLabels)}
 					</span>
 					{node.preview && (
-						<span className="daiaw-variable-picker__preview">
+						<span className="dragaiw-variable-picker__preview">
 							{node.preview}
 						</span>
 					)}
@@ -193,19 +193,19 @@ function TreeBranch({ node, depth, defaultOpen, nodeLabels, onSelect }) {
 	}
 
 	return (
-		<li className="daiaw-variable-picker__branch">
+		<li className="dragaiw-variable-picker__branch">
 			<button
 				type="button"
-				className="daiaw-variable-picker__branch-btn"
+				className="dragaiw-variable-picker__branch-btn"
 				style={{ paddingLeft: `${8 + depth * 14}px` }}
 				onClick={() => setOpen(!open)}
 				aria-expanded={open}
 			>
-				<span className="daiaw-variable-picker__chevron">{open ? '▾' : '▸'}</span>
-				<span className="daiaw-variable-picker__branch-label">{node.label}</span>
+				<span className="dragaiw-variable-picker__chevron">{open ? '▾' : '▸'}</span>
+				<span className="dragaiw-variable-picker__branch-label">{node.label}</span>
 			</button>
 			{open && (
-				<ul className="daiaw-variable-picker__tree daiaw-variable-picker__tree--nested">
+				<ul className="dragaiw-variable-picker__tree dragaiw-variable-picker__tree--nested">
 					{children.map((child) => (
 						<TreeBranch
 							key={child.id}

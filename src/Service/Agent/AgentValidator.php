@@ -2,14 +2,14 @@
 /**
  * Validates AI Agent configuration before execution.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service\Agent;
+namespace DRAGAIW\Plugin\Service\Agent;
 
-use DragwybVisualAutomation\Plugin\Service\Ai\AiClientBootstrap;
+use DRAGAIW\Plugin\Service\Ai\AiClientBootstrap;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

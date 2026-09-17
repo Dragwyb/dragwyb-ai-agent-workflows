@@ -2,17 +2,17 @@
 /**
  * Plugin activation handler.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Core;
+namespace DRAGAIW\Plugin\Core;
 
-use DragwybVisualAutomation\Plugin\Database\MigrationRunner;
-use DragwybVisualAutomation\Plugin\Database\SchemaMigrations;
-use DragwybVisualAutomation\Plugin\Service\BackgroundRunner;
-use DragwybVisualAutomation\Plugin\Service\RunRetentionService;
+use DRAGAIW\Plugin\Database\MigrationRunner;
+use DRAGAIW\Plugin\Database\SchemaMigrations;
+use DRAGAIW\Plugin\Service\BackgroundRunner;
+use DRAGAIW\Plugin\Service\RunRetentionService;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,7 +38,7 @@ class Activator {
 		$requirements = Requirements::check();
 
 		if ( is_wp_error( $requirements ) ) {
-			deactivate_plugins( DAIAW_PLUGIN_BASENAME );
+			deactivate_plugins( DRAGAIW_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html( implode( ' ', $requirements->get_error_messages() ) ),
@@ -55,7 +55,7 @@ class Activator {
 			Options::add( 'installed_at', time(), true );
 		}
 
-		Options::update( 'db_version', DAIAW_VERSION );
+		Options::update( 'db_version', DRAGAIW_VERSION );
 
 		self::scheduleBackgroundQueue();
 		self::scheduleRetentionPruning();

@@ -2,14 +2,14 @@
 /**
  * Spreadsheet-level Google Sheets workflow actions.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\GoogleSheet\Actions;
+namespace DRAGAIW\Plugin\Integration\GoogleSheet\Actions;
 
-use DragwybVisualAutomation\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
+use DRAGAIW\Plugin\Integration\GoogleSheet\AbstractGoogleSheetsAction;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

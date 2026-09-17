@@ -2,17 +2,17 @@
 /**
  * Static catalog of every built-in WordPress workflow action.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Integration\WordPress;
+namespace DRAGAIW\Plugin\Integration\WordPress;
 
-use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
-use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
-use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
-use DragwybVisualAutomation\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
+use DRAGAIW\Plugin\Integration\WordPress\Catalog\PluginActionCatalog;
+use DRAGAIW\Plugin\Integration\WordPress\Catalog\PostActionCatalog;
+use DRAGAIW\Plugin\Integration\WordPress\Catalog\TaxonomyActionCatalog;
+use DRAGAIW\Plugin\Integration\WordPress\Catalog\UserActionCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "DragwybVisualAutomation\\AiProviders\\": "src/"
+            "DRAGAIW\\AiProviders\\": "src/"
         }
     },
     "config": {

@@ -2,14 +2,14 @@
 /**
  * Service provider contract.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Provider;
+namespace DRAGAIW\Plugin\Provider;
 
-use DragwybVisualAutomation\Plugin\Core\Container;
+use DRAGAIW\Plugin\Core\Container;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

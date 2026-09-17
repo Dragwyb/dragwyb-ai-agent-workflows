@@ -2,12 +2,12 @@
 /**
  * Shared object-cache helpers for repositories.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Persistence;
+namespace DRAGAIW\Plugin\Persistence;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

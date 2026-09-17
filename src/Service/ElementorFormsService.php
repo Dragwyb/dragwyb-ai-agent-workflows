@@ -2,14 +2,14 @@
 /**
  * Lists Elementor Pro forms for builder config fields.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Integration\IntegrationTriggerCatalog;
+use DRAGAIW\Plugin\Integration\IntegrationTriggerCatalog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

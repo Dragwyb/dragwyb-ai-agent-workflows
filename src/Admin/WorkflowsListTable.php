@@ -2,18 +2,18 @@
 /**
  * Workflows admin list table.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Admin;
+namespace DRAGAIW\Plugin\Admin;
 
-use DragwybVisualAutomation\Plugin\Admin\Pages\BuilderPage;
-use DragwybVisualAutomation\Plugin\Admin\Pages\RunsPage;
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Service\SettingsService;
-use DragwybVisualAutomation\Plugin\Service\WorkflowService;
+use DRAGAIW\Plugin\Admin\Pages\BuilderPage;
+use DRAGAIW\Plugin\Admin\Pages\RunsPage;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Service\SettingsService;
+use DRAGAIW\Plugin\Service\WorkflowService;
 use WP_List_Table;
 
 // Prevent direct file access.
@@ -295,12 +295,12 @@ class WorkflowsListTable extends WP_List_Table {
 		return wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'      => 'daiaw_workflow_export',
+					'action'      => 'dragaiw_workflow_export',
 					'workflow_id' => $id,
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'daiaw_workflow_export_' . $id
+			'dragaiw_workflow_export_' . $id
 		);
 	}
 
@@ -330,7 +330,7 @@ class WorkflowsListTable extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function get_table_classes() {
-		return array( 'widefat', 'fixed', 'striped', 'daiaw-workflows-table' );
+		return array( 'widefat', 'fixed', 'striped', 'dragaiw-workflows-table' );
 	}
 
 	/**
@@ -343,12 +343,12 @@ class WorkflowsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function actionForm( string $op, int $id, string $label ): string {
-		$form_id     = 'daiaw-workflow-action-' . $op . '-' . $id;
-		$nonce_field = wp_nonce_field( 'daiaw_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
+		$form_id     = 'dragaiw-workflow-action-' . $op . '-' . $id;
+		$nonce_field = wp_nonce_field( 'dragaiw_workflow_action_' . $op . '_' . $id, '_wpnonce', true, false );
 
 		$form_markup = sprintf(
-			'<form id="%1$s" method="post" action="%2$s" class="daiaw-detached-row-action-form">'
-				. '<input type="hidden" name="action" value="daiaw_workflow_action" />'
+			'<form id="%1$s" method="post" action="%2$s" class="dragaiw-detached-row-action-form">'
+				. '<input type="hidden" name="action" value="dragaiw_workflow_action" />'
 				. '<input type="hidden" name="op" value="%3$s" />'
 				. '<input type="hidden" name="workflow_id" value="%4$d" />'
 				. '%5$s'

@@ -48,22 +48,22 @@ export default function BranchConnectSidebar({
 
 	return (
 		<aside
-			className="daiaw-builder-picker daiaw-builder-picker--branch-connect"
+			className="dragaiw-builder-picker dragaiw-builder-picker--branch-connect"
 			aria-label={__('Connect branch to node', 'dragwyb-ai-agent-workflows')}
 		>
-			<div className="daiaw-builder-picker__header">
-				<h2 className="daiaw-builder-picker__title">
+			<div className="dragaiw-builder-picker__header">
+				<h2 className="dragaiw-builder-picker__title">
 					{__('Connect branch', 'dragwyb-ai-agent-workflows')}
 				</h2>
 				<Button
-					className="daiaw-builder-picker__close"
+					className="dragaiw-builder-picker__close"
 					icon="no-alt"
 					label={__('Close', 'dragwyb-ai-agent-workflows')}
 					onClick={onClose}
 				/>
 			</div>
 
-			<p className="daiaw-builder-picker__hint">
+			<p className="dragaiw-builder-picker__hint">
 				{__(
 					'Choose any step on the canvas for',
 					'dragwyb-ai-agent-workflows'
@@ -71,7 +71,7 @@ export default function BranchConnectSidebar({
 				<strong>{branchLabel}</strong>
 			</p>
 
-			<div className="daiaw-builder-picker__search">
+			<div className="dragaiw-builder-picker__search">
 				<TextControl
 					label={__('Search nodes', 'dragwyb-ai-agent-workflows')}
 					hideLabelFromVision
@@ -82,14 +82,14 @@ export default function BranchConnectSidebar({
 			</div>
 
 			{filtered.length === 0 ? (
-				<p className="daiaw-builder-picker__empty">
+				<p className="dragaiw-builder-picker__empty">
 					{__(
 						'No steps on the canvas yet. Add an AI Agent or action first.',
 						'dragwyb-ai-agent-workflows'
 					)}
 				</p>
 			) : (
-				<ul className="daiaw-builder-picker__list">
+				<ul className="dragaiw-builder-picker__list">
 					{filtered.map((node) => {
 						const meta = getNodeMeta(node.type, node.category);
 						const isCurrent = node.id === currentTargetId;
@@ -100,13 +100,13 @@ export default function BranchConnectSidebar({
 									type="button"
 									className={
 										isCurrent
-											? 'daiaw-builder-picker__item daiaw-builder-picker__item--selected'
-											: 'daiaw-builder-picker__item'
+											? 'dragaiw-builder-picker__item dragaiw-builder-picker__item--selected'
+											: 'dragaiw-builder-picker__item'
 									}
 									onClick={() => onSelect(node.id)}
 								>
 									<span
-										className="daiaw-builder-picker__item-icon"
+										className="dragaiw-builder-picker__item-icon"
 										style={{
 											backgroundColor: meta.bg,
 											color: meta.accent,
@@ -115,11 +115,11 @@ export default function BranchConnectSidebar({
 									>
 										{meta.icon}
 									</span>
-									<span className="daiaw-builder-picker__item-content">
-										<span className="daiaw-builder-picker__item-label">
+									<span className="dragaiw-builder-picker__item-content">
+										<span className="dragaiw-builder-picker__item-label">
 											{node.label || node.type}
 										</span>
-										<span className="daiaw-builder-picker__item-hint">
+										<span className="dragaiw-builder-picker__item-hint">
 											{node.type === 'ai_agent_action'
 												? __('AI Agent', 'dragwyb-ai-agent-workflows')
 												: node.type === 'condition_action'
@@ -130,7 +130,7 @@ export default function BranchConnectSidebar({
 										</span>
 									</span>
 									{isCurrent && (
-										<span className="daiaw-builder-picker__item-badge">
+										<span className="dragaiw-builder-picker__item-badge">
 											{__('Connected', 'dragwyb-ai-agent-workflows')}
 										</span>
 									)}

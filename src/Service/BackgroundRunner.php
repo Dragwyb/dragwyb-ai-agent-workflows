@@ -2,14 +2,14 @@
 /**
  * WP-Cron-driven background execution worker.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunRepository;
+use DRAGAIW\Plugin\Persistence\WorkflowRunRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,14 +29,14 @@ class BackgroundRunner {
 	/**
 	 * The WP-Cron hook this worker's processBatch() is bound to.
 	 */
-	public const CRON_HOOK = 'daiaw/cron/process_queue';
+	public const CRON_HOOK = 'dragaiw/cron/process_queue';
 
 	/**
 	 * The custom cron_schedules key registered for that hook. WordPress
 	 * ships nothing finer-grained than hourly, so a custom schedule is
 	 * required for timely queue draining — see registerCronSchedule().
 	 */
-	public const CRON_SCHEDULE = 'daiaw_every_minute';
+	public const CRON_SCHEDULE = 'dragaiw_every_minute';
 
 	/**
 	 * Maximum runs claimed per cron tick. Kept modest because a single

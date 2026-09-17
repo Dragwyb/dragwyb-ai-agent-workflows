@@ -2,18 +2,18 @@
 /**
  * Resolves chat-trigger workflows and extracts chat replies from runs.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Service;
+namespace DRAGAIW\Plugin\Service;
 
-use DragwybVisualAutomation\Plugin\Domain\Workflow;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRun;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRunLog;
-use DragwybVisualAutomation\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
-use DragwybVisualAutomation\Plugin\Persistence\WorkflowRunLogRepository;
+use DRAGAIW\Plugin\Domain\Workflow;
+use DRAGAIW\Plugin\Domain\WorkflowRun;
+use DRAGAIW\Plugin\Domain\WorkflowRunLog;
+use DRAGAIW\Plugin\Integration\Triggers\ChatMessageReceivedTrigger;
+use DRAGAIW\Plugin\Persistence\WorkflowRunLogRepository;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {

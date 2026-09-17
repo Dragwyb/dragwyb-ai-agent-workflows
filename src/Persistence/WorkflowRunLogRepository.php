@@ -2,15 +2,15 @@
 /**
  * Workflow run log repository.
  *
- * @package DragwybVisualAutomation\Plugin
+ * @package DRAGAIW\Plugin
  */
 
 declare(strict_types=1);
 
-namespace DragwybVisualAutomation\Plugin\Persistence;
+namespace DRAGAIW\Plugin\Persistence;
 
-use DragwybVisualAutomation\Plugin\Database\Table;
-use DragwybVisualAutomation\Plugin\Domain\WorkflowRunLog;
+use DRAGAIW\Plugin\Database\Table;
+use DRAGAIW\Plugin\Domain\WorkflowRunLog;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * All `daiaw_workflow_run_logs` access goes through this class.
+ * All `dragaiw_workflow_run_logs` access goes through this class.
  */
 class WorkflowRunLogRepository {
 
 	use CachesRepositoryRows;
 
-	private const CACHE_GROUP = 'daiaw_workflow_run_logs';
+	private const CACHE_GROUP = 'dragaiw_workflow_run_logs';
 
 	/**
 	 * Defensive upper bound on logs fetched for a single run. A legitimate
