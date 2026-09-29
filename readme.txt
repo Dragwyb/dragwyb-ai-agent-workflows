@@ -133,14 +133,12 @@ Site administrators are responsible for ensuring that all API keys, data process
 
 == Screenshots ==
 
-1. Visual graph workflow builder with drag-and-drop node canvas.
-2. Multi-model AI agent node configuration panel.
-3. Form triggers setup for Contact Form 7, WPForms, and Elementor.
-4. WooCommerce order trigger and payload mapping interface.
-5. Google Sheets OAuth connection and action configuration.
-6. Real-time workflow execution runs and node snapshot inspection screen.
-7. WhatsApp Cloud API and Telegram action configuration.
-8. Incoming webhook generator with endpoint testing interface.
+1. Visual drag-and-drop workflow canvas.
+2. Multi-model AI agent node setup.
+3. WooCommerce and form trigger configuration.
+4. Google Sheets, WhatsApp and Slack connections.
+5. Real-time run logs and execution history.
+6. Custom incoming webhooks manager.
 
 == Changelog ==
 
