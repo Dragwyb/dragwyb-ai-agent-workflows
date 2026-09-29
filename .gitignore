@@ -18,7 +18,6 @@ Thumbs.db
 *.log
 .phpunit.result.cache
 .phpcs-cache
-.eslintcache
 
 # Composer / npm lock optional local overrides
 composer.phar
