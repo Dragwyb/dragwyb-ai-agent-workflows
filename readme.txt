@@ -1,10 +1,10 @@
 === AI Agent Workflows – Visual Automation & Webhooks by Dragwyb ===
 Contributors: dragwyb
-Tags: ai agent, automation, workflows, webhooks, openai
+Tags: ai agent, automation, workflows, webhooks, woocommerce
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,10 @@ Site administrators are responsible for ensuring that all API keys, data process
 6. Custom incoming webhooks manager.
 
 == Changelog ==
+
+= 0.1.3 =
+* Added Feedback notice.
+* Public Release.
 
 = 0.1.2 =
 * Security improvement.
