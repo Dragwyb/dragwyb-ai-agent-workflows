@@ -131,15 +131,6 @@ When configuring AI and external integration nodes (e.g., OpenAI, Anthropic, Goo
 
 Site administrators are responsible for ensuring that all API keys, data processing flows, and user privacy disclosures comply with regional laws and regulations (such as GDPR).
 
-== Screenshots ==
-
-1. Visual drag-and-drop workflow canvas.
-2. Multi-model AI agent node setup.
-3. WooCommerce and form trigger configuration.
-4. Google Sheets, WhatsApp and Slack connections.
-5. Real-time run logs and execution history.
-6. Custom incoming webhooks manager.
-
 == Changelog ==
 
 = 0.1.3 =
