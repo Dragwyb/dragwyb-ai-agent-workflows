@@ -1,6 +1,6 @@
-=== Dragwyb AI Agent Workflows ===
+=== AI Agent Workflows – Visual Automation & Webhooks by Dragwyb ===
 Contributors: dragwyb
-Tags: automation, workflow, ai, webhooks, woocommerce
+Tags: ai agent, automation, workflows, webhooks, openai
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -8,92 +8,139 @@ Stable tag: 0.1.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Build visual automation workflows in WordPress with webhooks, form triggers, WooCommerce events, and AI agent actions.
+Build autonomous AI workflows and visual automations connecting OpenAI, Claude, Gemini, Webhooks, WooCommerce, and forms without code.
 
 == Description ==
 
-Dragwyb AI Agent Workflows lets you design and run multi-step automations from your WordPress admin.
+**AI Agent Workflows by Dragwyb** is a visual workflow automation and autonomous AI agent platform built directly inside WordPress. It enables you to orchestrate multi-step automated pipelines connecting leading AI models, webhooks, form builders, and external business tools—all from an intuitive node-based canvas.
 
-Use the visual builder to connect triggers (forms, WooCommerce events, inbound webhooks, chat messages) to actions (email, HTTP requests, Google Sheets, messaging services, and AI agents). Workflows can be activated, tested, and reviewed with run history from the admin screens.
+Connect autonomous agents to real-world tasks. Trigger workflows from form submissions, e-commerce orders, or incoming webhooks, execute intelligent multi-model prompts with built-in tool calling, route data through conditional branches, and sync results across services like Google Sheets, WhatsApp, Slack, and Telegram.
 
-### Features
+---
 
-* Visual workflow builder with a drag-and-drop canvas
-* AI agent nodes that can call configured LLM providers (OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, DeepSeek)
-* Inbound webhooks with optional signing secrets and IP allow lists
-* WooCommerce event triggers
-* Form triggers for Contact Form 7, WPForms, and Elementor forms
-* Action nodes for email, HTTP requests, Slack, Telegram, WhatsApp Cloud, and Google Sheets
-* Connections manager for API keys and OAuth credentials
-* Run history and per-node execution logs
+### Why Choose AI Agent Workflows?
 
-### Getting started
+* **Visual Flow Canvas:** Design complex, multi-branch automation routines using an intuitive drag-and-drop node graph builder.
+* **Autonomous AI Agents & Tool Calling:** Deploy agents capable of structured JSON parsing, memory management, and executing multi-step WordPress functions dynamically.
+* **Multi-LLM Provider Freedom:** Seamlessly switch between or combine OpenAI, Anthropic Claude, Google Gemini, DeepSeek, Groq, and OpenRouter in a single workflow.
+* **Self-Hosted Privacy & Speed:** Run automations on your own WordPress server without third-party middleman per-task subscription fees or payload interception.
+* **Enterprise-Grade Execution Tracking:** Inspect live execution logs, node snapshots, execution runtimes, and step-by-step payloads with re-entrancy protection.
 
-1. Activate the plugin.
-2. Open **Agent Workflows → Workflows** and create a workflow.
-3. Add a trigger, then add one or more actions on the canvas.
-4. Configure credentials under **Automation → Connections** when an action needs them.
-5. Save the workflow and set it to Active.
+---
 
-== External services ==
+### Core Automations & Trigger Integrations
 
-This plugin sends data to third-party services only when a site administrator configures a connection and places the matching node in an active workflow.
+=== Form Builder Triggers ===
+* **Contact Form 7:** Trigger automations instantly upon successful CF7 submissions.
+* **WPForms:** Ingest lead submissions and pass form fields directly into AI agents.
+* **Elementor Forms & Atomic Forms:** Native integration for Elementor form submission triggers.
 
-API keys and OAuth tokens are stored in the WordPress database and are transmitted only as authorization material to the services you configure.
+=== WooCommerce E-Commerce Automation ===
+* Trigger multi-step flows on new orders, status changes, customer signups, and catalog stock updates.
+* Analyze order notes and generate AI-driven customer summaries or notifications automatically.
 
-### AI Providers
-When an AI node runs, the plugin sends prompts, conversation context, tool schemas, and model parameters to the selected provider.
-* OpenAI: [Terms](https://openai.com/policies/terms-of-use) | [Privacy](https://openai.com/policies/privacy-policy)
-* Google Gemini: [Terms](https://ai.google.dev/gemini-api/terms) | [Privacy](https://policies.google.com/privacy)
-* Anthropic Claude: [Terms](https://www.anthropic.com/legal/commercial-terms) | [Privacy](https://www.anthropic.com/legal/privacy)
-* OpenRouter: [Terms](https://openrouter.ai/terms) | [Privacy](https://openrouter.ai/privacy)
-* Groq: [Terms](https://console.groq.com/docs/legal/services-agreement) | [Privacy](https://groq.com/privacy-policy)
-* DeepSeek: [Terms](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html) | [Privacy](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html)
+=== Webhooks & Custom Ingress ===
+* **Incoming Webhooks:** Accept payload triggers from external CRMs, payment gateways, and custom applications via dedicated webhook endpoints.
+* **Chat Message Ingress:** Listen for incoming conversational triggers and pass them directly to autonomous agents.
 
-### Google Workspace & Sheets
-Google Sheets actions use Google OAuth2, Sheets, and Drive APIs.
-* Google APIs: [Terms](https://developers.google.com/terms) | [Privacy](https://policies.google.com/privacy)
+---
 
-### Messaging
-Notification nodes send message text and required identifiers to the selected provider.
-* Slack: [Terms](https://slack.com/terms-of-service) | [Privacy](https://slack.com/privacy-policy)
-* Telegram: [Terms](https://telegram.org/tos) | [Privacy](https://telegram.org/privacy)
-* WhatsApp Cloud API (Meta): [Terms](https://www.whatsapp.com/legal/business-terms) | [Privacy](https://www.facebook.com/privacy/policy)
+### Multi-Model AI Capabilities
 
-### Admin UI fonts
-The builder may load the Inter font from Google Fonts.
-* Google Fonts: [FAQ](https://developers.google.com/fonts/faq) | [Privacy](https://policies.google.com/privacy)
+* **OpenAI:** Integrate GPT models for chat completions, content generation, and tool calling.
+* **Anthropic Claude:** Leverage Claude models for complex analysis, summarization, and reasoning tasks.
+* **Google Gemini:** Run fast multimodal prompts and text generation.
+* **DeepSeek & Groq:** Execute high-speed open-source and reasoning models at ultra-low latency.
+* **OpenRouter:** Access hundreds of open-source and commercial foundation models through a single connection.
+* **Structured Output Parser:** Force AI models to return validated, reliable JSON schemas for automated processing.
 
-### Generic HTTP requests
-The HTTP Request action sends the method, headers, and body you configure to a URL you choose. Review that destination’s terms and privacy policy before use.
+---
 
-### Gitbub Repository
-*   GitHub Repository: [https://github.com/Dragwyb/dragwyb-ai-agent-workflows](https://github.com/Dragwyb/dragwyb-ai-agent-workflows)
+### Actions & Third-Party Channels
 
-* **Build Files & UI Source**
-    The React-based visual workflow builder is bundled within the plugin. 
-    *   The compiled build files are located in: `assets/builder/`
-    *   The uncompiled source files for the visual builder can be found in: `assets/builder/src/`
+* **Google Sheets:** Connect via secure OAuth to append rows, read ranges, and update spreadsheets dynamically.
+* **WhatsApp Cloud API:** Send automated template messages and direct customer updates.
+* **Telegram:** Dispatch bot notifications, alerts, and rich responses to private chats or channels.
+* **Slack:** Post messages and structured webhook blocks directly into team channels.
+* **Custom HTTP Requests:** Perform custom GET, POST, PUT, and DELETE API calls with custom headers and auth tokens.
+* **WordPress Native Actions:** Automatically create, update, or publish Posts, Pages, Users, Comments, and Taxonomies.
+
+---
+
+### Logic & Flow Control Nodes
+
+* **Conditional Logic Nodes:** Branch your workflows dynamically based on custom rules and payload variables.
+* **Multi-Branch Routers:** Route data through distinct paths depending on conditions and user types.
+* **Delay & Scheduling Nodes:** Control execution timing and prevent API rate-limit overages.
 
 == Installation ==
 
-1. Upload the plugin folder to `/wp-content/plugins/dragwyb-ai-agent-workflows`, or install the ZIP from Plugins → Add New.
-2. Activate **Dragwyb AI Agent Workflows**.
-3. Open **Automation → Workflows** to create your first workflow.
+### Automatic Installation
+
+1. Navigate to **Plugins → Add New** in your WordPress Admin Dashboard.
+2. In the search field, enter **AI Agent Workflows** or **Dragwyb Workflows**.
+3. Locate the plugin and click **Install Now**.
+4. Click **Activate**.
+5. Navigate to the **AI Workflows** menu in your WordPress sidebar to start building your first pipeline!
+
+### Manual Installation via ZIP
+
+1. Download the plugin ZIP archive.
+2. Go to **Plugins → Add New → Upload Plugin**.
+3. Select the file and click **Install Now**.
+4. Activate the plugin through the WordPress admin interface.
+
+== Other Plugins by Dragwyb ==
+
+* 🧩 **[Form Builder](https://wordpress.org/plugins/smart-form-builder-by-dragwyb/)** – The easiest & most powerful drag and drop form builder plugin for WordPress.
+* 💬 **[Click To Chat](https://wordpress.org/plugins/dragwyb-click-to-chat/)** – Connect with your website visitors instantly through WhatsApp, Telegram, and social channels.
+* 🎨 **[Contact form 7 Addon](https://wordpress.org/plugins/enhanced-addon-for-contact-form-7/)** – Enhances the functionality of Contact Form 7.
+* 🎛️ **[Flipbox Addon for Elementor](https://wordpress.org/plugins/ultimate-flipbox-addon-for-elementor/)** – Create interactive, conversion-focused 3D flip boxes in Elementor.
 
 == Frequently Asked Questions ==
 
-= Does uninstall remove my data? =
+= Does this plugin require external automation platforms like Zapier or Make? =
 
-No by default. Data removal on uninstall is opt-in in plugin settings.
+No. AI Agent Workflows runs directly on your WordPress installation, meaning all execution logic, webhooks, and routing happen on your server without third-party platform subscription fees.
 
-= What versions are required? =
+= Which AI providers are supported? =
 
-PHP 7.4+ and WordPress 5.8+.
+The plugin natively integrates with OpenAI, Anthropic (Claude), Google Gemini, DeepSeek, Groq, and OpenRouter.
 
-= Can workflows create WordPress users? =
+= Do I need my own API keys? =
 
-User create/update/delete actions only run when the current request has the matching WordPress capability (`create_users`, `edit_users`, or `delete_users`). Unauthenticated public triggers cannot create privileged users.
+Yes. You provide your own API keys for the respective AI services or connection providers (e.g., OpenAI, Google OAuth, WhatsApp Cloud API). Credentials are stored securely and encrypted in your database.
+
+= Can I trigger workflows from form plugins? =
+
+Yes. Built-in triggers support Contact Form 7, WPForms, Elementor Forms, and Elementor Atomic Forms.
+
+= Does it support conditional routing and multi-branch execution? =
+
+Yes. You can add Condition and Router nodes to direct payloads through different pathways based on specific criteria or AI evaluation outcomes.
+
+= How do I inspect workflow errors or logs? =
+
+Navigate to **AI Workflows → Runs** to view a full history of all executions, step-by-step node durations, raw input/output payloads, and failure traces.
+
+== Privacy ==
+
+AI Agent Workflows processes and stores trigger event data, workflow states, and execution logs in your local WordPress MySQL database. 
+
+When configuring AI and external integration nodes (e.g., OpenAI, Anthropic, Google Sheets, WhatsApp), the payloads passed through those specific nodes are transmitted to the respective third-party service APIs configured by the site administrator. 
+
+Site administrators are responsible for ensuring that all API keys, data processing flows, and user privacy disclosures comply with regional laws and regulations (such as GDPR).
+
+== Screenshots ==
+
+1. Visual graph workflow builder with drag-and-drop node canvas.
+2. Multi-model AI agent node configuration panel.
+3. Form triggers setup for Contact Form 7, WPForms, and Elementor.
+4. WooCommerce order trigger and payload mapping interface.
+5. Google Sheets OAuth connection and action configuration.
+6. Real-time workflow execution runs and node snapshot inspection screen.
+7. WhatsApp Cloud API and Telegram action configuration.
+8. Incoming webhook generator with endpoint testing interface.
 
 == Changelog ==
 
@@ -109,11 +156,10 @@ User create/update/delete actions only run when the current request has the matc
 * Updated plugin metadata and WordPress compatibility information.
 * Improved source/build documentation for generated assets.
 
-
 = 0.1.0 =
 * Update plugin name, plugin slug & prefix.
 * Improve create, update and insert user validation and capability check.
 * Use wp_iniline_script instead of direct script.
 
-= 0.0.0 =
-* Initial Release
+= 1.0.0 =
+* Initial release.
