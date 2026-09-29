@@ -66,6 +66,7 @@ use DRAGAIW\Plugin\Provider\PersistenceServiceProvider;
 use DRAGAIW\Plugin\Provider\AdminServiceProvider;
 use DRAGAIW\Plugin\Provider\RestServiceProvider;
 use DRAGAIW\Plugin\Provider\ExecutionServiceProvider;
+use DRAGAIW\Admin\Feedback\DRAGAIW_Feedback_Form;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -173,6 +174,13 @@ class Plugin {
 		// Idempotent; cheap when caps are already present.
 		if ( is_admin() && current_user_can( 'manage_options' ) ) {
 			Capabilities::grantToAdministrator();
+
+			// feedback file
+			require_once DRAGAIW_PLUGIN_DIR . '/admin/feedback/class-dragaiw-feedback-form.php';
+
+			if ( class_exists( DRAGAIW_Feedback_Form::class ) ) {
+				DRAGAIW_Feedback_Form::get_instance();
+			}
 		}
 
 		$this->registerServices();
