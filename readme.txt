@@ -4,7 +4,7 @@ Tags: ai agent, automation, workflows, webhooks, woocommerce
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -140,6 +140,9 @@ When configuring AI and external integration nodes (e.g., OpenAI, Anthropic, Goo
 Site administrators are responsible for ensuring that all API keys, data processing flows, and user privacy disclosures comply with regional laws and regulations (such as GDPR).
 
 == Changelog ==
+
+= 0.1.4 =
+* Added Docs link.
 
 = 0.1.3 =
 * Added Feedback notice.
