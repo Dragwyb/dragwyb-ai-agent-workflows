@@ -134,7 +134,7 @@ class BuilderPage implements AdminPage {
 	}
 
 	/**
-	 * @return array{workflowId: int, listUrl: string, connectionsUrl: string, aiCredentialsUrl: string, googleCredentialsUrl: string, googleOAuthCallbackUrl: string}
+	 * @return array{workflowId: int, listUrl: string, connectionsUrl: string, aiCredentialsUrl: string, googleCredentialsUrl: string, googleOAuthCallbackUrl: string, docsUrl: string}
 	 */
 	private function bootstrapSettings(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only route parameter selecting which workflow to load; the REST API this feeds still re-checks capability on every request.
@@ -148,8 +148,10 @@ class BuilderPage implements AdminPage {
 			'aiCredentialsUrl'       => \DRAGAIW\Plugin\Service\Ai\AiClientBootstrap::credentialsUrl(),
 			'googleCredentialsUrl'   => GoogleOAuthService::GOOGLE_CREDENTIALS_URL,
 			'googleOAuthCallbackUrl' => rest_url( 'dragaiw/v1/oauth/google/callback' ),
+			'docsUrl'                => dragaiw_docs_url( 'workflow_editor' ),
 		);
 	}
+
 
 	/**
 	 * @return void

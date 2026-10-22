@@ -1892,6 +1892,7 @@ export default function App() {
 				onExport={handleExportWorkflow}
 				onImportFile={handleImportWorkflowFile}
 				listUrl={bootstrap.listUrl}
+				docsUrl={bootstrap.docsUrl}
 				saveDisabled={saveStatus === 'saving' || toggleActiveBusy}
 				testFlow={testFlow}
 				showChat={hasChatTrigger}

@@ -761,6 +761,19 @@ function EmptyCanvasGuide() {
 					)}
 				</li>
 			</ol>
+
+			<a
+				className="dragaiw-builder-canvas__guide-btn"
+				href="https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=dragwyb-ai-agent-workflows&utm_medium=canvas_empty_guide&utm_campaign=documentation"
+				target="_blank"
+				rel="noopener noreferrer"
+				title={__(
+					'Documentation & Getting Started Guide',
+					'dragwyb-ai-agent-workflows'
+				)}
+			>
+				{__('Documentation & Guide →', 'dragwyb-ai-agent-workflows')}
+			</a>
 		</div>
 	);
 }

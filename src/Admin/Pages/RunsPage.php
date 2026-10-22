@@ -132,6 +132,13 @@ class RunsPage implements AdminPage {
 						'label'   => __( 'Go to Workflows', 'dragwyb-ai-agent-workflows' ),
 						'primary' => true,
 					),
+					array(
+						'url'     => dragaiw_docs_url( 'runs_empty_state' ),
+						'label'   => __( 'Documentation & Guide', 'dragwyb-ai-agent-workflows' ),
+						'primary' => false,
+						'title'   => __( 'Documentation & Getting Started Guide', 'dragwyb-ai-agent-workflows' ),
+						'target'  => '_blank',
+					),
 				)
 			);
 			echo '</div>';

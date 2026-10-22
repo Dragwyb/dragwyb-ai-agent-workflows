@@ -2,6 +2,11 @@
 
 A from-scratch WordPress workflow automation plugin. See `CURSOR_INSTRUCTIONS.md` for the governing process, `docs/internal/bitpi-analysis.md` for the competitive analysis that informed this design, and `docs/internal/architecture.md` for the architecture this codebase follows.
 
+## Documentation & Getting Started Guide
+
+Comprehensive tutorials, configuration guides, and step-by-step setup documentation:
+- 📖 **[Documentation & Getting Started Guide](https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=readme_md&utm_medium=readme&utm_campaign=documentation)**
+
 ## Requirements
 
 - PHP 7.4+

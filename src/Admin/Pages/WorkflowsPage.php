@@ -156,6 +156,13 @@ class WorkflowsPage implements AdminPage {
 						'label'   => __( 'Create workflow', 'dragwyb-ai-agent-workflows' ),
 						'primary' => true,
 					),
+					array(
+						'url'     => dragaiw_docs_url( 'workflows_empty_state' ),
+						'label'   => __( 'Documentation & Guide', 'dragwyb-ai-agent-workflows' ),
+						'primary' => false,
+						'title'   => __( 'Documentation & Getting Started Guide', 'dragwyb-ai-agent-workflows' ),
+						'target'  => '_blank',
+					),
 				)
 			);
 

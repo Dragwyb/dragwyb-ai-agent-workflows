@@ -99,3 +99,27 @@ if ( ! function_exists( 'array_is_list' ) ) {
 		return array_keys( $array ) === range( 0, count( $array ) - 1 );
 	}
 }
+
+if ( ! function_exists( 'dragaiw_docs_url' ) ) {
+	/**
+	 * Builds a documentation URL with UTM campaign parameters.
+	 *
+	 * @param string $medium   UTM medium (e.g. 'workflow_editor', 'runs_empty_state').
+	 * @param string $campaign Optional UTM campaign. Default 'documentation'.
+	 * @return string Full docs URL with UTM parameters.
+	 */
+	function dragaiw_docs_url( string $medium = '', string $campaign = 'documentation' ): string {
+		$base = defined( 'DRAGAIW_DOCS_URL' ) ? DRAGAIW_DOCS_URL : 'https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/';
+		$args = array(
+			'utm_source'   => 'dragwyb-ai-agent-workflows',
+			'utm_campaign' => $campaign,
+		);
+
+		if ( '' !== $medium ) {
+			$args['utm_medium'] = $medium;
+		}
+
+		return add_query_arg( $args, $base );
+	}
+}
+

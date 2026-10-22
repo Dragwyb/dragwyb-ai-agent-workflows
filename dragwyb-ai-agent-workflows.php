@@ -68,8 +68,42 @@ define( 'DRAGAIW_PLUGIN_FILE', __FILE__ );
 define( 'DRAGAIW_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DRAGAIW_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'DRAGAIW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'DRAGAIW_DOCS_URL', 'https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/' );
 
 require_once DRAGAIW_PLUGIN_DIR . 'src/Core/WordPressCompat.php';
+
+add_filter(
+	'plugin_action_links_' . DRAGAIW_PLUGIN_BASENAME,
+	static function ( array $links ): array {
+		$docs_link = sprintf(
+			'<a href="%1$s" target="_blank" rel="noopener noreferrer" title="%2$s">%3$s</a>',
+			esc_url( dragaiw_docs_url( 'plugin_action_links' ) ),
+			esc_attr__( 'Documentation & Getting Started Guide', 'dragwyb-ai-agent-workflows' ),
+			esc_html__( 'Docs', 'dragwyb-ai-agent-workflows' )
+		);
+		$links['docs'] = $docs_link;
+
+		return $links;
+	}
+);
+
+add_filter(
+	'plugin_row_meta',
+	static function ( array $links, string $file ): array {
+		if ( DRAGAIW_PLUGIN_BASENAME === $file ) {
+			$links[] = sprintf(
+				'<a href="%1$s" target="_blank" rel="noopener noreferrer" title="%2$s">%3$s</a>',
+				esc_url( dragaiw_docs_url( 'plugin_row_meta' ) ),
+				esc_attr__( 'Documentation & Getting Started Guide', 'dragwyb-ai-agent-workflows' ),
+				esc_html__( 'Documentation', 'dragwyb-ai-agent-workflows' )
+			);
+		}
+
+		return $links;
+	},
+	10,
+	2
+);
 
 /*
  * Autoloading.

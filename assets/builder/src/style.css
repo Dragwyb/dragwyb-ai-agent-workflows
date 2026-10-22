@@ -112,6 +112,12 @@
 	flex: 0 0 auto;
 }
 
+.dragaiw-builder-header__guide-btn {
+	text-decoration: none !important;
+	display: inline-flex;
+	align-items: center;
+}
+
 .dragaiw-builder-header__status {
 	font-size: 12px;
 	color: #64748b;
@@ -839,6 +845,28 @@
 	font-size: 12px;
 	color: #64748b;
 	line-height: 1.45;
+}
+
+.dragaiw-builder-canvas__guide-btn {
+	display: inline-flex;
+	align-items: center;
+	margin-top: 6px;
+	padding: 8px 16px;
+	background: var(--dragaiw-accent-blue);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 500;
+	border-radius: 6px;
+	text-decoration: none;
+	transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.dragaiw-builder-canvas__guide-btn:hover,
+.dragaiw-builder-canvas__guide-btn:focus {
+	background: #1b4b9b;
+	color: #fff;
+	text-decoration: none;
+	transform: translateY(-1px);
 }
 
 /* —— Nodes —— */

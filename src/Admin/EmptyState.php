@@ -23,10 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class EmptyState {
 
 	/**
-	 * @param string                                                        $title       Heading.
-	 * @param string                                                        $description Supporting paragraph.
-	 * @param array<int, string>                                            $steps       Optional numbered guidance steps.
-	 * @param array<int, array{url: string, label: string, primary?: bool}> $actions CTA buttons.
+	 * @param string                                                                                                         $title       Heading.
+	 * @param string                                                                                                         $description Supporting paragraph.
+	 * @param array<int, string>                                                                                             $steps       Optional numbered guidance steps.
+	 * @param array<int, array{url: string, label: string, primary?: bool, title?: string, target?: string, rel?: string}> $actions     CTA buttons.
 	 *
 	 * @return void
 	 */
@@ -46,16 +46,23 @@ class EmptyState {
 		if ( array() !== $actions ) {
 			echo '<p class="dragaiw-empty-state__actions">';
 			foreach ( $actions as $action ) {
-				$class = ! empty( $action['primary'] ) ? 'button button-primary' : 'button';
-				printf(
-					'<a class="%1$s" href="%2$s">%3$s</a> ',
-					esc_attr( $class ),
-					esc_url( (string) $action['url'] ),
-					esc_html( (string) $action['label'] )
-				);
+				$class  = ! empty( $action['primary'] ) ? 'button button-primary' : 'button';
+				$title  = ! empty( $action['title'] ) ? (string) $action['title'] : '';
+				$target = ! empty( $action['target'] ) ? (string) $action['target'] : '';
+				$rel    = ! empty( $action['rel'] ) ? (string) $action['rel'] : ( $target ? 'noopener noreferrer' : '' );
+
+				echo '<a class="' . esc_attr( $class ) . '" href="' . esc_url( (string) $action['url'] ) . '"';
+				if ( '' !== $title ) {
+					echo ' title="' . esc_attr( $title ) . '"';
+				}
+				if ( '' !== $target ) {
+					echo ' target="' . esc_attr( $target ) . '" rel="' . esc_attr( $rel ) . '"';
+				}
+				echo '>' . esc_html( (string) $action['label'] ) . '</a> ';
 			}
 			echo '</p>';
 		}
+
 
 		echo '</div>';
 	}

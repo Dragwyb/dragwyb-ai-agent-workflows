@@ -131,6 +131,13 @@ class ConnectionsPage implements AdminPage {
 						'label'   => __( 'Add connection', 'dragwyb-ai-agent-workflows' ),
 						'primary' => true,
 					),
+					array(
+						'url'     => dragaiw_docs_url( 'connections_empty_state' ),
+						'label'   => __( 'Documentation & Guide', 'dragwyb-ai-agent-workflows' ),
+						'primary' => false,
+						'title'   => __( 'Documentation & Getting Started Guide', 'dragwyb-ai-agent-workflows' ),
+						'target'  => '_blank',
+					),
 				)
 			);
 			echo '</div>';

@@ -132,6 +132,7 @@ export function getBootstrap() {
 			aiCredentialsUrl: '',
 			googleCredentialsUrl: 'https://console.cloud.google.com/apis/credentials',
 			googleOAuthCallbackUrl: '',
+			docsUrl: 'https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=dragwyb-ai-agent-workflows&utm_medium=workflow_editor&utm_campaign=documentation',
 		}
 	);
 }

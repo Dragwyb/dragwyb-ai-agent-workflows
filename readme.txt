@@ -16,6 +16,10 @@ Build autonomous AI workflows and visual automations connecting OpenAI, Claude, 
 
 Connect autonomous agents to real-world tasks. Trigger workflows from form submissions, e-commerce orders, or incoming webhooks, execute intelligent multi-model prompts with built-in tool calling, route data through conditional branches, and sync results across services like Google Sheets, WhatsApp, Slack, and Telegram.
 
+=== Documentation & Getting Started Guide ===
+
+* 📖 **[Documentation & User Guide](https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=readme_txt&utm_medium=readme&utm_campaign=documentation)** – Step-by-step getting started tutorial, node configuration walkthroughs, tool-calling examples, and trigger references.
+
 ---
 
 ### Why Choose AI Agent Workflows?
@@ -81,7 +85,7 @@ Connect autonomous agents to real-world tasks. Trigger workflows from form submi
 2. In the search field, enter **AI Agent Workflows** or **Dragwyb Workflows**.
 3. Locate the plugin and click **Install Now**.
 4. Click **Activate**.
-5. Navigate to the **AI Workflows** menu in your WordPress sidebar to start building your first pipeline!
+5. Navigate to the **AI Workflows** menu in your WordPress sidebar to start building your first pipeline! See the [Getting Started Guide](https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=readme_txt&utm_medium=readme&utm_campaign=documentation) for a detailed walkthrough.
 
 ### Manual Installation via ZIP
 
@@ -98,6 +102,10 @@ Connect autonomous agents to real-world tasks. Trigger workflows from form submi
 * 🎛️ **[Flipbox Addon for Elementor](https://wordpress.org/plugins/ultimate-flipbox-addon-for-elementor/)** – Create interactive, conversion-focused 3D flip boxes in Elementor.
 
 == Frequently Asked Questions ==
+
+= Where can I find documentation and user guides? =
+
+Comprehensive step-by-step documentation, tutorials, and getting started guides are available on the [Dragwyb Documentation Portal](https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=readme_txt&utm_medium=readme&utm_campaign=documentation).
 
 = Does this plugin require external automation platforms like Zapier or Make? =
 

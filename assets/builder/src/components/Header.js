@@ -34,6 +34,7 @@ export default function Header({
 	onExport,
 	onImportFile,
 	listUrl,
+	docsUrl,
 	saveDisabled,
 	testFlow,
 	showChat,
@@ -154,6 +155,26 @@ export default function Header({
 						{__('Export', 'dragwyb-ai-agent-workflows')}
 					</Button>
 				)}
+				<Button
+					isSecondary
+					href={
+						docsUrl ||
+						'https://dragwyb.com/docs/ai-agent-workflows-by-dragwyb-getting-started/?utm_source=dragwyb-ai-agent-workflows&utm_medium=workflow_editor&utm_campaign=documentation'
+					}
+					target="_blank"
+					rel="noopener noreferrer"
+					title={__(
+						'Documentation & Getting Started Guide',
+						'dragwyb-ai-agent-workflows'
+					)}
+					aria-label={__(
+						'Documentation & Getting Started Guide',
+						'dragwyb-ai-agent-workflows'
+					)}
+					className="dragaiw-builder-header__guide-btn"
+				>
+					{__('Guide', 'dragwyb-ai-agent-workflows')}
+				</Button>
 				{testFlow && (
 					<div
 						className="dragaiw-builder-header__test-wrap"
